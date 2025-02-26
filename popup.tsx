@@ -1,3 +1,4 @@
+import MarkdownIt from "markdown-it"
 import { useEffect, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
@@ -8,9 +9,11 @@ type ScrapedData = {
   title: string
   url: string
   articleContent: string
+  cleanedContent: string
   author: string
   publishDate: string
   metadata: Record<string, string>
+  images?: Array<{ src: string; alt: string; title: string; index: number }>
 }
 
 // 定义响应类型
@@ -25,11 +28,57 @@ function IndexPopup() {
   const [error, setError] = useState<string | null>(null)
   const [scrapedData, setScrapedData] = useState<ScrapedData | null>(null)
   const [debugInfo, setDebugInfo] = useState<string>("")
+  const [isPreviewMode, setIsPreviewMode] = useState(false)
+  const [isMarkdown, setIsMarkdown] = useState(false)
+  const [showCleanedContent, setShowCleanedContent] = useState(false)
+
+  // 初始化 markdown-it 实例
+  const md = new MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer: true
+  })
 
   // 添加调试信息
   const addDebugInfo = (info: string) => {
     console.log(info)
     setDebugInfo((prev) => prev + "\n" + info)
+  }
+
+  // 检测内容是否为 Markdown
+  const detectMarkdown = (content: string): boolean => {
+    if (!content) return false
+
+    // 常见的 Markdown 标记
+    const markdownPatterns = [
+      /^#+ .+$/m, // 标题
+      /\[.+\]\(.+\)/, // 链接
+      /!\[.+\]\(.+\)/, // 图片
+      /^- .+$/m, // 无序列表
+      /^[0-9]+\. .+$/m, // 有序列表
+      /^>.+$/m, // 引用
+      /`{1,3}[^`]+`{1,3}/, // 代码块或行内代码
+      /^\s*```[\s\S]+?```\s*$/m, // 代码块
+      /^\|(.+\|)+$/m, // 表格
+      /^-{3,}$/m, // 水平线
+      /\*\*.+\*\*/, // 粗体
+      /\*.+\*/, // 斜体
+      /~~.+~~/ // 删除线
+    ]
+
+    // 如果匹配到任意一个 Markdown 标记，则认为是 Markdown 内容
+    return markdownPatterns.some((pattern) => pattern.test(content))
+  }
+
+  // 处理文本格式，保留必要的换行
+  const formatContent = (content: string): string => {
+    if (!content) return ""
+
+    // 保留段落间的空行（通常是连续两个换行）
+    // 但移除过多的连续空行（3个以上的换行替换为2个）
+    return content
+      .replace(/\n{3,}/g, "\n\n") // 将3个以上连续换行替换为2个
+      .replace(/\r\n/g, "\n") // 统一换行符
   }
 
   // 在组件挂载时抓取当前页面内容
@@ -50,7 +99,19 @@ function IndexPopup() {
 
         if (response && response.success && response.data) {
           addDebugInfo("抓取成功, 标题: " + response.data.title)
+
+          // 处理文章内容，保留必要的格式
+          if (response.data.articleContent) {
+            response.data.articleContent = formatContent(
+              response.data.articleContent
+            )
+          }
+
           setScrapedData(response.data)
+          // 检测是否为 Markdown 内容
+          if (response.data.articleContent) {
+            setIsMarkdown(detectMarkdown(response.data.articleContent))
+          }
         } else {
           const errorMsg = response?.error || "获取内容失败"
           addDebugInfo("抓取失败: " + errorMsg)
@@ -84,8 +145,20 @@ function IndexPopup() {
 
         if (response && response.success && response.data) {
           addDebugInfo("刷新成功, 标题: " + response.data.title)
+
+          // 处理文章内容，保留必要的格式
+          if (response.data.articleContent) {
+            response.data.articleContent = formatContent(
+              response.data.articleContent
+            )
+          }
+
           setScrapedData(response.data)
           setError(null)
+          // 检测是否为 Markdown 内容
+          if (response.data.articleContent) {
+            setIsMarkdown(detectMarkdown(response.data.articleContent))
+          }
         } else {
           const errorMsg = response?.error || "刷新内容失败"
           addDebugInfo("刷新失败: " + errorMsg)
@@ -105,12 +178,40 @@ function IndexPopup() {
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text
   }
 
+  // 渲染 Markdown 内容
+  const renderMarkdown = (content: string) => {
+    // 在渲染前确保内容格式正确
+    const formattedContent = formatContent(content)
+    return { __html: md.render(formattedContent || "") }
+  }
+
+  // 切换预览模式
+  const togglePreview = () => {
+    setIsPreviewMode(!isPreviewMode)
+  }
+
+  // 切换内容版本
+  const toggleContentVersion = () => {
+    setShowCleanedContent(!showCleanedContent)
+  }
+
+  // 获取当前要显示的内容
+  const getCurrentContent = () => {
+    if (!scrapedData) return ""
+    return showCleanedContent
+      ? scrapedData.cleanedContent
+      : scrapedData.articleContent
+  }
+
   return (
     <div className="bg-white p-4 min-w-[400px] max-h-[600px] overflow-y-auto">
       <header className="mb-4">
         <h1 className="text-xl font-bold text-gray-800">页面内容抓取器</h1>
         <p className="text-sm text-gray-600">
           抓取当前页面内容，转换为AI可读的格式
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          支持原始格式(保留Markdown格式与换行)和紧凑版(无换行，文本更精简)两种模式
         </p>
       </header>
 
@@ -178,17 +279,37 @@ function IndexPopup() {
             <div className="mb-4">
               <h2 className="text-lg font-semibold mb-2">文章内容</h2>
               <div className="p-2 bg-white rounded border border-gray-300 max-h-[200px] overflow-y-auto">
-                <p className="whitespace-pre-line text-sm">
-                  {scrapedData.articleContent}
-                  {/* {truncateText(scrapedData.articleContent, 1000)} */}
-                </p>
+                {isPreviewMode ? (
+                  <div
+                    className="markdown-preview"
+                    dangerouslySetInnerHTML={renderMarkdown(
+                      getCurrentContent()
+                    )}
+                  />
+                ) : (
+                  <pre className="whitespace-pre-wrap text-sm font-normal">
+                    {getCurrentContent()}
+                  </pre>
+                )}
               </div>
-              <div className="mt-2 flex justify-end">
+              <div className="mt-2 flex justify-end gap-2">
+                <button
+                  onClick={toggleContentVersion}
+                  className="text-xs px-2 py-1 bg-purple-500 text-white rounded hover:bg-purple-600">
+                  {showCleanedContent ? "显示原始格式" : "显示紧凑版(无换行)"}
+                </button>
+                {isMarkdown && (
+                  <button
+                    onClick={togglePreview}
+                    className="text-xs px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600">
+                    {isPreviewMode ? "查看原文" : "预览 Markdown"}
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     // 将内容复制到剪贴板
                     navigator.clipboard
-                      .writeText(scrapedData.articleContent)
+                      .writeText(getCurrentContent())
                       .then(() => alert("内容已复制到剪贴板"))
                       .catch((err) => console.error("复制失败:", err))
                   }}
@@ -199,9 +320,191 @@ function IndexPopup() {
             </div>
           )}
 
+          {/* 添加页面图片展示区域 */}
+          {scrapedData.images && scrapedData.images.length > 0 && (
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold mb-2">页面图片</h2>
+              <div className="p-2 bg-white rounded border border-gray-300">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {scrapedData.images.map((img, index) => (
+                    <div
+                      key={index}
+                      className="border border-gray-200 rounded overflow-hidden">
+                      <div className="relative w-full h-[120px] flex items-center justify-center bg-white">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="animate-pulse bg-gray-200 w-full h-full"></div>
+                        </div>
+                        <img
+                          src={img.src}
+                          alt={img.alt || "页面图片"}
+                          title={img.title || img.alt || ""}
+                          className="relative z-10 max-w-full max-h-[120px] object-contain"
+                          onLoad={(e) => {
+                            const parent = (e.target as HTMLElement)
+                              .parentElement
+                            if (parent) {
+                              const loader =
+                                parent.querySelector(".animate-pulse")
+                              if (loader) loader.classList.add("hidden")
+                            }
+                          }}
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement
+                            img.style.display = "none"
+                            const parent = img.parentElement
+                            if (parent) {
+                              const loader =
+                                parent.querySelector(".animate-pulse")
+                              if (loader) loader.classList.add("hidden")
+                              parent.innerHTML +=
+                                '<div class="text-red-500 text-xs p-2">图片加载失败</div>'
+                            }
+                            addDebugInfo(`图片加载失败: ${img.src}`)
+                          }}
+                        />
+                      </div>
+                      <div className="p-1 text-xs bg-gray-50 truncate text-center border-t border-gray-200">
+                        {img.alt || img.title || `图片 #${img.index}`}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {Object.keys(scrapedData.metadata).length > 0 && (
             <div>
               <h2 className="text-lg font-semibold mb-2">元数据</h2>
+
+              {/* 添加图片展示区 */}
+              {(scrapedData.metadata["og:image"] ||
+                scrapedData.metadata["twitter:image"] ||
+                scrapedData.metadata["image"]) && (
+                <div className="mb-4">
+                  <h3 className="text-md font-medium mb-2">元数据图片</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {scrapedData.metadata["og:image"] && (
+                      <div className="border border-gray-300 rounded overflow-hidden bg-white">
+                        <div className="relative w-full h-[150px] flex items-center justify-center">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="animate-pulse bg-gray-200 w-full h-full"></div>
+                          </div>
+                          <img
+                            src={scrapedData.metadata["og:image"]}
+                            alt="Open Graph 图片"
+                            className="relative z-10 max-w-full max-h-[150px] object-contain"
+                            onLoad={(e) => {
+                              const parent = (e.target as HTMLElement)
+                                .parentElement
+                              if (parent) {
+                                const loader =
+                                  parent.querySelector(".animate-pulse")
+                                if (loader) loader.classList.add("hidden")
+                              }
+                            }}
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement
+                              img.style.display = "none"
+                              const parent = img.parentElement
+                              if (parent) {
+                                const loader =
+                                  parent.querySelector(".animate-pulse")
+                                if (loader) loader.classList.add("hidden")
+                                parent.innerHTML +=
+                                  '<div class="text-red-500 text-xs p-2">图片加载失败</div>'
+                              }
+                              addDebugInfo("og:image 加载失败")
+                            }}
+                          />
+                        </div>
+                        <div className="text-xs p-1 bg-gray-100 text-center border-t border-gray-200">
+                          og:image
+                        </div>
+                      </div>
+                    )}
+                    {scrapedData.metadata["twitter:image"] && (
+                      <div className="border border-gray-300 rounded overflow-hidden bg-white">
+                        <div className="relative w-full h-[150px] flex items-center justify-center">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="animate-pulse bg-gray-200 w-full h-full"></div>
+                          </div>
+                          <img
+                            src={scrapedData.metadata["twitter:image"]}
+                            alt="Twitter 图片"
+                            className="relative z-10 max-w-full max-h-[150px] object-contain"
+                            onLoad={(e) => {
+                              const parent = (e.target as HTMLElement)
+                                .parentElement
+                              if (parent) {
+                                const loader =
+                                  parent.querySelector(".animate-pulse")
+                                if (loader) loader.classList.add("hidden")
+                              }
+                            }}
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement
+                              img.style.display = "none"
+                              const parent = img.parentElement
+                              if (parent) {
+                                const loader =
+                                  parent.querySelector(".animate-pulse")
+                                if (loader) loader.classList.add("hidden")
+                                parent.innerHTML +=
+                                  '<div class="text-red-500 text-xs p-2">图片加载失败</div>'
+                              }
+                              addDebugInfo("twitter:image 加载失败")
+                            }}
+                          />
+                        </div>
+                        <div className="text-xs p-1 bg-gray-100 text-center border-t border-gray-200">
+                          twitter:image
+                        </div>
+                      </div>
+                    )}
+                    {scrapedData.metadata["image"] && (
+                      <div className="border border-gray-300 rounded overflow-hidden bg-white">
+                        <div className="relative w-full h-[150px] flex items-center justify-center">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="animate-pulse bg-gray-200 w-full h-full"></div>
+                          </div>
+                          <img
+                            src={scrapedData.metadata["image"]}
+                            alt="元数据图片"
+                            className="relative z-10 max-w-full max-h-[150px] object-contain"
+                            onLoad={(e) => {
+                              const parent = (e.target as HTMLElement)
+                                .parentElement
+                              if (parent) {
+                                const loader =
+                                  parent.querySelector(".animate-pulse")
+                                if (loader) loader.classList.add("hidden")
+                              }
+                            }}
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement
+                              img.style.display = "none"
+                              const parent = img.parentElement
+                              if (parent) {
+                                const loader =
+                                  parent.querySelector(".animate-pulse")
+                                if (loader) loader.classList.add("hidden")
+                                parent.innerHTML +=
+                                  '<div class="text-red-500 text-xs p-2">图片加载失败</div>'
+                              }
+                              addDebugInfo("image 加载失败")
+                            }}
+                          />
+                        </div>
+                        <div className="text-xs p-1 bg-gray-100 text-center border-t border-gray-200">
+                          image
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white rounded border border-gray-300 overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -224,7 +527,9 @@ function IndexPopup() {
                           "og:description",
                           "og:image",
                           "twitter:title",
-                          "twitter:description"
+                          "twitter:description",
+                          "twitter:image",
+                          "image"
                         ].includes(key)
                       )
                       .map(([key, value]) => (
@@ -234,6 +539,51 @@ function IndexPopup() {
                           </td>
                           <td className="px-3 py-2 text-xs text-gray-500 whitespace-pre-wrap break-all">
                             {truncateText(value, 200)}
+                            {/* 为图片类型显示缩略图 */}
+                            {(key === "og:image" ||
+                              key === "twitter:image" ||
+                              key === "image") &&
+                              value && (
+                                <div className="mt-1">
+                                  <div className="relative w-[120px] h-[80px] border border-gray-200 rounded overflow-hidden bg-white">
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <div className="animate-pulse bg-gray-200 w-full h-full"></div>
+                                    </div>
+                                    <img
+                                      src={value}
+                                      alt={`${key} 预览`}
+                                      className="relative z-10 max-w-full max-h-[80px] w-full h-full object-contain"
+                                      onLoad={(e) => {
+                                        const parent = (e.target as HTMLElement)
+                                          .parentElement
+                                        if (parent) {
+                                          const loader =
+                                            parent.querySelector(
+                                              ".animate-pulse"
+                                            )
+                                          if (loader)
+                                            loader.classList.add("hidden")
+                                        }
+                                      }}
+                                      onError={(e) => {
+                                        const img = e.target as HTMLImageElement
+                                        img.style.display = "none"
+                                        const parent = img.parentElement
+                                        if (parent) {
+                                          const loader =
+                                            parent.querySelector(
+                                              ".animate-pulse"
+                                            )
+                                          if (loader)
+                                            loader.classList.add("hidden")
+                                          parent.innerHTML +=
+                                            '<div class="text-red-500 text-xs p-2">图片加载失败</div>'
+                                        }
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
                           </td>
                         </tr>
                       ))}

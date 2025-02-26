@@ -77,8 +77,8 @@ function extractFormattedText(element, imagesArray = []) {
 
           imagesArray.push(imageInfo)
 
-          // 在文本中插入图片引用标记
-          result += `\n\n[图片#${imageIndex}]\n\n`
+          // 在文本中插入图片引用标记，使用Markdown格式
+          result += `\n\n![${alt || "图片#" + imageIndex}](${src})\n\n`
           imageIndex++
         }
         return
@@ -93,19 +93,22 @@ function extractFormattedText(element, imagesArray = []) {
         tagName === "h5" ||
         tagName === "h6"
       ) {
-        result += "\n\n" + node.textContent.trim() + "\n\n"
+        // 将标题转换为Markdown格式的标题
+        const level = parseInt(tagName.substring(1))
+        const headingMd = "#".repeat(level)
+        result += `\n\n${headingMd} ${node.textContent.trim()}\n\n`
       } else if (tagName === "p") {
         // 段落处理
         const text = node.textContent.trim()
         if (text) {
-          result += "\n\n" + text
+          result += "\n\n" + text + "\n"
         }
       } else if (tagName === "blockquote") {
         // 引用处理
         result += "\n\n> " + node.textContent.trim() + "\n\n"
       } else if (tagName === "li") {
         // 列表项处理
-        result += "\n• " + node.textContent.trim()
+        result += "\n- " + node.textContent.trim()
       } else if (tagName === "br") {
         // 换行处理
         result += "\n"
@@ -123,20 +126,55 @@ function extractFormattedText(element, imagesArray = []) {
         // 代码块处理
         result += "\n\n```\n" + node.textContent.trim() + "\n```\n\n"
       } else if (tagName === "table") {
-        // 表格处理 - 简单提取表格内容
-        result += "\n\n表格内容:\n"
+        // 表格处理 - 以Markdown格式输出表格
         const rows = node.querySelectorAll("tr")
-        rows.forEach((row) => {
-          const cells = row.querySelectorAll("th, td")
-          let rowText = ""
-          cells.forEach((cell) => {
-            rowText += cell.textContent.trim() + " | "
+        if (rows.length > 0) {
+          result += "\n\n"
+
+          // 添加表头
+          const headerRow = rows[0]
+          const headerCells = headerRow.querySelectorAll("th, td")
+          let headerText = "|"
+          let separatorRow = "|"
+
+          headerCells.forEach(() => {
+            headerText += " --- |"
           })
-          if (rowText) {
-            result += rowText.slice(0, -3) + "\n" // 移除最后一个 " | "
-          }
-        })
-        result += "\n"
+
+          rows.forEach((row, rowIndex) => {
+            const cells = row.querySelectorAll("th, td")
+            let rowText = "|"
+            cells.forEach((cell) => {
+              rowText += ` ${cell.textContent.trim()} |`
+            })
+
+            // 添加行
+            result += rowText + "\n"
+
+            // 在第一行后添加分隔符
+            if (rowIndex === 0) {
+              headerCells.forEach(() => {
+                separatorRow += " --- |"
+              })
+              result += separatorRow + "\n"
+            }
+          })
+          result += "\n"
+        } else {
+          // 退化为简单文本表示
+          result += "\n\n表格内容:\n"
+          rows.forEach((row) => {
+            const cells = row.querySelectorAll("th, td")
+            let rowText = ""
+            cells.forEach((cell) => {
+              rowText += cell.textContent.trim() + " | "
+            })
+            if (rowText) {
+              result += rowText.slice(0, -3) + "\n" // 移除最后一个 " | "
+            }
+          })
+          result += "\n\n"
+        }
       } else if (tagName === "a") {
         // 链接处理
         const href = node.getAttribute("href")
@@ -178,11 +216,60 @@ function extractFormattedText(element, imagesArray = []) {
   // 清理结果：规范化空白和换行
   return result
     .trim()
-    .replace(/\s+/g, " ") // 将连续空白字符替换为单个空格
+    .replace(/[ \t]+/g, " ") // 仅替换连续的空格和制表符为单个空格，保留换行
     .replace(/\n\s+/g, "\n") // 删除换行后的前导空格
-    .replace(/\n{3,}/g, "\n\n") // 将三个或以上连续换行替换为两个换行
+    .replace(/\n{4,}/g, "\n\n\n") // 将四个或以上连续换行替换为三个换行
     .replace(/\s+\./g, ".") // 修复句号前的空格
     .replace(/\s+,/g, ",") // 修复逗号前的空格
+}
+
+// 清理内容，移除无用空格和空行的函数
+function cleanContent(content) {
+  if (!content) return ""
+
+  // 临时存储代码块
+  const codeBlocks = []
+  let tempContent = content
+
+  // 提取并保存代码块
+  const codeBlockRegex = /```[\s\S]*?```/g
+  let match
+  let index = 0
+
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    const placeholder = `__CODE_BLOCK_${index}__`
+    tempContent = tempContent.replace(match[0], placeholder)
+    codeBlocks.push(match[0])
+    index++
+  }
+
+  // 清理非代码块部分
+  tempContent = tempContent
+    .replace(/\n+/g, " ") // 将所有换行替换为空格
+    .replace(/[ \t]+/g, " ") // 替换连续空格为单个空格
+    .replace(/^\s+|\s+$/g, "") // 移除开头和结尾的空白
+    .replace(/\s+([.,;:!?])/g, "$1") // 修复标点符号(句号、逗号、分号、冒号、感叹号、问号)前的空格
+    .replace(/\s*-\s*/g, "-") // 修复破折号周围的空格
+    .replace(/\(\s+|\s+\)/g, (m) => m.replace(/\s+/g, "")) // 修复圆括号前后的空格
+    .replace(/\s+"|"\s+/g, '"') // 修复引号前后的空格
+    .replace(/\s*\[\s*|\s*\]\s*/g, (m) => m.replace(/\s+/g, "")) // 修复方括号内外的空格
+    .replace(/\s*\{\s*|\s*\}\s*/g, (m) => m.replace(/\s+/g, "")) // 修复花括号内外的空格
+    .replace(/([.!?:;]) +/g, "$1 ") // 确保标点符号后只有一个空格
+
+  // 保留Markdown标题格式
+  tempContent = tempContent.replace(/# +/g, "# ")
+  tempContent = tempContent.replace(/## +/g, "## ")
+  tempContent = tempContent.replace(/### +/g, "### ")
+  tempContent = tempContent.replace(/#### +/g, "#### ")
+  tempContent = tempContent.replace(/##### +/g, "##### ")
+  tempContent = tempContent.replace(/###### +/g, "###### ")
+
+  // 恢复代码块
+  for (let i = 0; i < codeBlocks.length; i++) {
+    tempContent = tempContent.replace(`__CODE_BLOCK_${i}__`, codeBlocks[i])
+  }
+
+  return tempContent
 }
 
 // 增强抓取文章内容的函数
@@ -262,6 +349,7 @@ function scrapeWebpageContent() {
     title: document.title || "无标题",
     url: window.location.href,
     articleContent: "",
+    cleanedContent: "", // 添加清洁版内容字段
     author: "",
     publishDate: "",
     metadata: {},
@@ -364,7 +452,10 @@ function scrapeWebpageContent() {
   // 使用增强的函数抓取文章内容
   debugLog("开始抓取文章内容")
   scrapedContent.articleContent = extractArticleContent(scrapedContent.images)
+  // 生成清洁版内容
+  scrapedContent.cleanedContent = cleanContent(scrapedContent.articleContent)
   debugLog("文章内容抓取完成，长度:", scrapedContent.articleContent.length)
+  debugLog("清洁版内容生成完成，长度:", scrapedContent.cleanedContent.length)
   debugLog("图片抓取完成，数量:", scrapedContent.images.length)
 
   // 抓取元数据
@@ -387,6 +478,7 @@ function scrapeWebpageContent() {
     author: scrapedContent.author,
     publishDate: scrapedContent.publishDate,
     contentLength: scrapedContent.articleContent.length,
+    cleanedContentLength: scrapedContent.cleanedContent.length,
     metadataCount: Object.keys(scrapedContent.metadata).length,
     imageCount: scrapedContent.images.length
   })
