@@ -1,5 +1,5 @@
 import { debugLog } from "../utils/logger"
-import { SKIP_TAGS } from "./config"
+import { IMAGE_SRC_ATTRIBUTES, SKIP_TAGS } from "./config"
 import type { ImageInfo } from "./types"
 
 // 从HTML元素中提取格式化的文本
@@ -18,6 +18,8 @@ export function extractFormattedText(
     imgElements: 0,
     imgExtracted: 0,
     imgSkipped: 0,
+    anchorImages: 0,
+    fancyboxImages: 0,
     totalProcessed: 0,
     totalExtracted: 0,
     totalSkipped: 0
@@ -104,14 +106,26 @@ export function extractFormattedText(
         processingSummary.totalProcessed++
 
         const imgElement = node as HTMLImageElement
-        const src =
-          imgElement.getAttribute("src") ||
-          imgElement.getAttribute("data-original") ||
-          ""
+        // 从配置的属性列表中提取src
+        let src = ""
+
+        // 遍历所有可能的图片属性
+        for (const attr of IMAGE_SRC_ATTRIBUTES) {
+          const value = imgElement.getAttribute(attr)
+          if (value && value.trim() && !value.startsWith("data:image/")) {
+            src = value
+            break
+          }
+        }
+
         const alt = imgElement.getAttribute("alt") || ""
         const title = imgElement.getAttribute("title") || ""
 
-        if (src && src.trim() && !src.startsWith("data:image/")) {
+        debugLog(
+          `处理图片元素: ${src.substring(0, 100)}${src.length > 100 ? "..." : ""}`
+        )
+
+        if (src) {
           // 将图片信息存储到数组中
           const imageInfo: ImageInfo = {
             src: src,
@@ -149,7 +163,22 @@ export function extractFormattedText(
         result += `\n\n${headingMd} ${(node as Element).textContent?.trim()}\n\n`
       } else if (tagName === "p") {
         // 段落处理
-        const text = (node as Element).textContent?.trim() || ""
+        const paragraphElement = node as Element
+
+        // 检查段落中是否包含图片
+        const imgElements = paragraphElement.querySelectorAll("img")
+        if (imgElements.length > 0) {
+          debugLog(`在段落中找到 ${imgElements.length} 个图片`)
+
+          // 如果段落中有图片，我们需要手动遍历处理段落的子节点
+          for (const child of Array.from(paragraphElement.childNodes)) {
+            traverse(child)
+          }
+          return // 已经处理完子节点，直接返回
+        }
+
+        // 如果段落中没有图片，按常规处理
+        const text = paragraphElement.textContent?.trim() || ""
         if (text) {
           result += "\n\n" + text + "\n"
         }
@@ -252,6 +281,69 @@ export function extractFormattedText(
 
   // 链接处理函数
   function handleLink(anchorElement: HTMLAnchorElement): void {
+    // 检查是否是fancybox类型的链接
+    const isFancybox =
+      anchorElement.classList.contains("fancybox") ||
+      anchorElement.hasAttribute("data-fancybox")
+
+    // 首先检查链接内是否包含图片
+    const imgElement = anchorElement.querySelector("img")
+
+    if (imgElement || isFancybox) {
+      // 图片处理
+      processingSummary.imgElements++
+      processingSummary.totalProcessed++
+
+      // 对于fancybox类型的链接，链接的href通常是大图，而内部img的src可能是缩略图
+      // 优先使用链接href作为图片源（如果存在）
+      let src = ""
+      if (isFancybox && anchorElement.getAttribute("href")) {
+        src = anchorElement.getAttribute("href") || ""
+        debugLog(`处理fancybox链接，使用href作为图片源: ${src}`)
+        processingSummary.fancyboxImages++
+      } else if (imgElement) {
+        // 从配置的属性列表中提取src
+        for (const attr of IMAGE_SRC_ATTRIBUTES) {
+          const value = imgElement.getAttribute(attr)
+          if (value && value.trim() && !value.startsWith("data:image/")) {
+            src = value
+            break
+          }
+        }
+        processingSummary.anchorImages++
+      }
+
+      // 获取alt和title
+      const alt = imgElement ? imgElement.getAttribute("alt") || "" : ""
+      const title = imgElement ? imgElement.getAttribute("title") || "" : ""
+
+      if (src) {
+        // 将图片信息存储到数组中
+        const imageInfo: ImageInfo = {
+          src: src,
+          alt: alt,
+          title: title,
+          index: imageIndex
+        }
+
+        imagesArray.push(imageInfo)
+        processingSummary.imgExtracted++
+        processingSummary.totalExtracted++
+
+        const linkType = isFancybox ? "fancybox链接" : "普通链接"
+        debugLog(`从${linkType}中提取图片: ${src}`)
+
+        // 在文本中插入图片引用标记，使用Markdown格式
+        result += `\n\n![${alt || "图片#" + imageIndex}](${src})\n\n`
+        imageIndex++
+      } else {
+        processingSummary.imgSkipped++
+        processingSummary.totalSkipped++
+      }
+      return // 已处理完图片，不再处理链接文本
+    }
+
+    // 如果链接不包含图片，按原逻辑处理链接文本
     const href = anchorElement.getAttribute("href") || ""
     const text = anchorElement.textContent?.trim() || ""
     if (text) {
@@ -264,6 +356,16 @@ export function extractFormattedText(
   }
 
   traverse(element)
+
+  // 输出图片处理统计信息
+  debugLog("图片处理统计:", {
+    figureImages: `${processingSummary.figureImagesExtracted}/${processingSummary.figureElements}`,
+    imgElements: `${processingSummary.imgExtracted}/${processingSummary.imgElements}`,
+    anchorImages: processingSummary.anchorImages,
+    fancyboxImages: processingSummary.fancyboxImages,
+    totalExtracted: processingSummary.totalExtracted,
+    totalSkipped: processingSummary.totalSkipped
+  })
 
   // 清理结果：规范化空白和换行
   return result

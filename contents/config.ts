@@ -79,3 +79,18 @@ export const SKIP_TAGS = [
   "button",
   "input"
 ]
+
+// 图片属性选择器列表 - 用于提取图片的src属性
+export const IMAGE_SRC_ATTRIBUTES = [
+  "src",
+  "data-original",
+  "data-src",
+  "data-lazy-src",
+  "data-lazy",
+  "data-original-src",
+  "data-source",
+  "data-url",
+  "data-hi-res",
+  "data-fullsize",
+  "data-image"
+]

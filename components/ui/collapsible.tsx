@@ -1,5 +1,7 @@
 import { Icon } from "@iconify/react"
-import { forwardRef, useState } from "react"
+import type { Transition } from "motion/react"
+import { AnimatePresence, motion, useAnimation } from "motion/react"
+import { forwardRef, useEffect, useState } from "react"
 
 import { cn } from "~/utils"
 
@@ -11,6 +13,13 @@ export interface CollapsibleProps
   iconExpanded?: React.ReactNode
   iconCollapsed?: React.ReactNode
   onToggle?: (expanded: boolean) => void
+}
+
+const defaultTransition: Transition = {
+  type: "spring",
+  stiffness: 300,
+  damping: 30,
+  mass: 0.8
 }
 
 const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
@@ -29,14 +38,15 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
     ref
   ) => {
     const [expanded, setExpanded] = useState(defaultExpanded)
-    const [animating, setAnimating] = useState(false)
+    const controls = useAnimation()
+
+    useEffect(() => {
+      controls.start(expanded ? "expanded" : "collapsed")
+    }, [expanded, controls])
 
     const toggleExpand = () => {
-      setAnimating(true)
       setExpanded(!expanded)
       if (onToggle) onToggle(!expanded)
-      // 动画结束后重置状态
-      setTimeout(() => setAnimating(false), 500)
     }
 
     return (
@@ -82,17 +92,18 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
                   ? "border-sky-200 bg-opacity-50 group-hover:bg-opacity-80"
                   : "border-pink-200 bg-opacity-70 group-hover:bg-opacity-100"
               }`}>
-              {expanded ? (
+              <motion.div
+                animate={expanded ? "expanded" : "collapsed"}
+                variants={{
+                  expanded: { rotate: 0 },
+                  collapsed: { rotate: 180 }
+                }}
+                transition={defaultTransition}>
                 <Icon
                   icon="line-md:chevron-up"
-                  className="h-4 w-4 text-sky-500 transition-transform duration-300 group-hover:scale-110"
+                  className="h-4 w-4 text-sky-500 group-hover:scale-110"
                 />
-              ) : (
-                <Icon
-                  icon="line-md:chevron-down"
-                  className="h-4 w-4 animate-pulse text-pink-500 transition-transform duration-300 group-hover:scale-110"
-                />
-              )}
+              </motion.div>
 
               {/* 小气泡装饰 */}
               <span
@@ -101,16 +112,22 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
           </div>
         </div>
 
-        {/* 内容区域 - 带有展开收起动画 */}
-        <div
-          className={`overflow-hidden transition-all duration-500 ease-in-out ${
-            expanded ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0"
-          }`}>
-          <div
-            className={`p-3 ${animating && expanded ? "animate-fadeIn" : ""}`}>
-            {children}
-          </div>
-        </div>
+        {/* 内容区域 - 使用motion实现展开收起动画 */}
+        <AnimatePresence initial={false}>
+          {expanded && (
+            <motion.div
+              initial="collapsed"
+              animate="expanded"
+              exit="collapsed"
+              variants={{
+                expanded: { height: "auto", opacity: 1 },
+                collapsed: { height: 0, opacity: 0 }
+              }}
+              transition={defaultTransition}>
+              <div className="p-3">{children}</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     )
   }

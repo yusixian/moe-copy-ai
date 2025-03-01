@@ -7,32 +7,12 @@ import { CopyIcon } from "./svg/CopyIcon"
 import { AnimatedContainer } from "./ui/animated-container"
 import { Button } from "./ui/button"
 
-interface StarDecorationProps {
-  className?: string
-}
-
 // 防止事件冒泡的工具函数
 const preventBubbling =
   (callback: Function) => (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation()
     callback(e)
   }
-
-interface CopyIconProps {
-  size?: number
-  className?: string
-}
-
-// 更改为更简洁的成功指示器
-const SuccessIndicator = ({ className }: StarDecorationProps) => (
-  <div
-    className={cn(
-      "absolute -right-1 -top-1 rounded-full bg-green-100 p-1.5 shadow-sm",
-      className
-    )}>
-    <Icon icon="line-md:check-all" className="h-3 w-3 text-green-500" />
-  </div>
-)
 
 interface CopyableTextFieldProps {
   /**
