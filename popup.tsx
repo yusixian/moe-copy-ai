@@ -5,6 +5,8 @@ import { sendToBackground } from "@plasmohq/messaging"
 
 import "./styles/global.css"
 
+import { logger } from "~contents/utils"
+
 type ScrapedData = {
   title: string
   url: string
@@ -41,7 +43,7 @@ function IndexPopup() {
 
   // 添加调试信息
   const addDebugInfo = (info: string) => {
-    console.log(info)
+    logger.debug(info)
     setDebugInfo((prev) => prev + "\n" + info)
   }
 

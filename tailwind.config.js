@@ -1,6 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 const config = {
-  content: ["./**/*.tsx"],
+  content: [
+    "./popup.tsx",
+    "./options.tsx",
+    "./background.ts",
+    "./contents/**/*.{ts,tsx}",
+    "./styles/**/*.css"
+  ],
   theme: {
     extend: {
       container: {

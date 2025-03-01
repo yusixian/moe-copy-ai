@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@plasmohq/messaging": "^0.7.1",
+    "@plasmohq/storage": "^1.15.0",
     "markdown-it": "^14.1.0",
+    "pino": "^9.6.0",
     "plasmo": "0.90.3",
     "react": "18.2.0",
     "react-dom": "18.2.0"

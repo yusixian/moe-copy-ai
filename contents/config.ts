@@ -29,6 +29,7 @@ export const AUTHOR_SELECTORS = [
   'meta[property="article:author"]',
   'meta[property="og:author"]',
   'a[rel="author"]',
+  ".author-name",
   ".author",
   ".byline",
   ".writer",

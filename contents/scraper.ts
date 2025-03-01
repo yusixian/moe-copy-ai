@@ -1,17 +1,32 @@
 // 网页内容抓取器
+import { Storage } from "@plasmohq/storage"
+
 import { config } from "./config"
 import { scrapeWebpageContent } from "./extractor"
 import type { Message } from "./types"
 import { debugLog } from "./utils"
 
+// 创建存储实例
+const storage = new Storage({ area: "sync" })
+
 // 导出配置
 export { config }
 
-// 在页面加载完成后执行一次抓取，并在控制台输出结果
-window.addEventListener("load", () => {
-  debugLog("页面加载完成，执行初始抓取")
-  const initialData = scrapeWebpageContent()
-  debugLog("初始抓取结果:", initialData)
+// 在页面加载完成后，检查用户配置决定是否自动抓取
+window.addEventListener("load", async () => {
+  // 获取用户配置的抓取时机
+  const scrapeTiming = (await storage.get<string>("scrape_timing")) || "auto"
+
+  debugLog(`页面加载完成，抓取时机配置: ${scrapeTiming}`)
+
+  // 如果配置为自动抓取，则执行抓取
+  if (scrapeTiming === "auto") {
+    debugLog("根据配置执行自动抓取")
+    const initialData = scrapeWebpageContent()
+    debugLog("初始抓取结果:", initialData)
+  } else {
+    debugLog("根据配置跳过自动抓取，等待用户手动触发")
+  }
 })
 
 // 监听来自后台脚本的消息
