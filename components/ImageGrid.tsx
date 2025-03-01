@@ -132,7 +132,6 @@ interface ImageGridProps {
   images: ImageInfo[]
   onLoadError?: (src: string) => void
   title?: React.ReactNode
-  defaultExpanded?: boolean
 }
 
 /**
@@ -141,8 +140,7 @@ interface ImageGridProps {
 export const ImageGrid: React.FC<ImageGridProps> = ({
   images,
   onLoadError,
-  title,
-  defaultExpanded = true
+  title
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [failedImages, setFailedImages] = useState<{ [key: string]: boolean }>(
@@ -173,10 +171,8 @@ export const ImageGrid: React.FC<ImageGridProps> = ({
   )
 
   return (
-    <Collapsible
-      title={title || defaultTitle}
-      defaultExpanded={defaultExpanded}>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+    <Collapsible title={title || defaultTitle}>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
         {images.map((img, index) => (
           <ImageCard
             key={index}

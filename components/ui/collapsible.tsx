@@ -28,7 +28,7 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
       className,
       title,
       children,
-      defaultExpanded = true,
+      defaultExpanded = false,
       icon,
       iconExpanded = "✨",
       iconCollapsed = "📁",

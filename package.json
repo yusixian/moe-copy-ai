@@ -10,6 +10,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.5",
     "@iconify/react": "^5.2.0",
     "@plasmohq/messaging": "^0.7.1",
     "@plasmohq/storage": "^1.15.0",
@@ -21,6 +22,7 @@
     "plasmo": "0.90.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-responsive": "^10.0.0",
     "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
