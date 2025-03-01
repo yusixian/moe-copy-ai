@@ -7,9 +7,9 @@ import ContentSection from "~/components/ContentSection"
 import ImageGrid from "~/components/ImageGrid"
 import MetadataImageSection from "~/components/MetadataImageSection"
 import MetadataTable from "~/components/MetadataTable"
-import { truncateText } from "~/components/utils"
 import CatSVG from "~components/svg/CatSVG"
 import useScrapedData from "~hooks/useScrapedData"
+import { truncateText } from "~utils/format"
 
 function IndexPopup() {
   const {
@@ -61,50 +61,48 @@ function IndexPopup() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 min-w-[400px] max-h-[600px] overflow-y-auto relative">
-      <header className="mb-4 flex justify-between items-center bg-white p-3 rounded-xl shadow-md border-2 border-sky-200 relative z-20">
+    <div className="relative max-h-[600px] min-w-[400px] overflow-y-auto bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+      <header className="relative z-20 mb-4 flex items-center justify-between rounded-xl border-2 border-sky-200 bg-white p-3 shadow-md">
         <div>
-          <h1 className="text-xl font-bold text-sky-600 flex items-center">
-            <span className="mr-2">✨</span>
-            Moe Copy AI
-            <span className="ml-2">✨</span>
+          <h1 className="flex items-center text-xl font-bold text-sky-600">
+            Moe Copy AI <span className="ml-2">✨</span> 萌抓
           </h1>
           <p className="text-sm text-indigo-600">
             抓取当前页面内容，转换为 AI 易读的格式 (。・ω・。)
           </p>
-          <p className="text-xs text-blue-500 mt-1">
+          <p className="mt-1 text-xs text-blue-500">
             支持原始格式(保留Markdown格式与换行)和紧凑版(无换行，文本更精简)两种模式
           </p>
         </div>
-        <div className="absolute top-[6.5rem] right-10 w-14 h-14 z-10 mr-2">
+        <div className="absolute right-10 top-[6.5rem] z-10 mr-2 h-14 w-14">
           <CatSVG className="size-14" />
           {/* 对话气泡  */}
           <div
-            className={`absolute -top-10 -right-3 bg-gradient-to-br from-blue-50 to-sky-100 p-2 rounded-2xl border border-blue-200 text-xs w-48 transition-opacity duration-300 ${showBubble ? "opacity-90" : "opacity-0"} shadow-sm`}>
-            <div className="absolute -bottom-2 right-8 w-4 h-4 bg-sky-100 border-r border-b border-blue-200 transform rotate-45"></div>
-            <span className="text-blue-500 text-center font-medium">
+            className={`absolute -right-3 -top-10 w-48 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-sky-100 p-2 text-xs transition-opacity duration-300 ${showBubble ? "opacity-90" : "opacity-0"} shadow-sm`}>
+            <div className="absolute -bottom-2 right-8 h-4 w-4 rotate-45 transform border-b border-r border-blue-200 bg-sky-100"></div>
+            <span className="text-center font-medium text-blue-500">
               喵～抓取中～♪(=^･ω･^=)
             </span>
           </div>
         </div>
         <button
           onClick={handleOpenOptions}
-          className="p-2 rounded-full hover:bg-blue-50 text-sky-500 transform hover:rotate-12 transition relative z-30"
+          className="relative z-30 transform rounded-full p-2 text-sky-500 transition hover:rotate-12 hover:bg-blue-50"
           title="打开设置">
           <Icon icon="line-md:cog-filled-loop" width="24" height="24" />
         </button>
       </header>
 
-      <div className="mb-4 relative z-20">
+      <div className="relative z-20 mb-4">
         <button
           onClick={handleRefresh}
           disabled={isLoading}
-          className="px-4 py-2 bg-gradient-to-r from-sky-500 to-indigo-500 text-white rounded-xl hover:from-sky-600 hover:to-indigo-600 disabled:opacity-50 shadow-md transform hover:scale-105 transition-all flex items-center justify-center font-medium border border-indigo-300">
+          className="flex transform items-center justify-center rounded-xl border border-indigo-300 bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 font-medium text-white shadow-md transition-all hover:scale-105 hover:from-sky-600 hover:to-indigo-600 disabled:opacity-50">
           {isLoading ? (
             <>
-              <span className="animate-bounce mr-2">♪</span>
+              <span className="mr-2 animate-bounce">♪</span>
               加载中...
-              <span className="animate-bounce ml-2 delay-100">♪</span>
+              <span className="ml-2 animate-bounce delay-100">♪</span>
             </>
           ) : (
             <>
@@ -116,26 +114,26 @@ function IndexPopup() {
       </div>
 
       {error && (
-        <div className="p-2.5 mb-4 bg-pink-50 text-red-700 rounded-xl border-2 border-pink-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="mb-4 rounded-xl border-2 border-pink-200 bg-pink-50 p-2.5 text-red-700 shadow-sm transition-shadow hover:shadow-md">
           <div className="flex items-start">
-            <div className="flex items-center mr-2">
-              <span className="text-xl inline-block transform hover:rotate-12 transition-transform">
+            <div className="mr-2 flex items-center">
+              <span className="inline-block transform text-xl transition-transform hover:rotate-12">
                 ʕ•́ᴥ•̀ʔ
               </span>
               <Icon
                 icon="mdi:heart-broken"
-                className="text-pink-500 mx-1 animate-pulse"
+                className="mx-1 animate-pulse text-pink-500"
                 width="20"
                 height="20"
               />
             </div>
             <div className="flex-1">
               <div className="flex items-center">
-                <p className="font-medium text-pink-600 mr-2">哎呀～出错啦</p>
-                <p className="text-xs text-red-600 flex-1">{error}</p>
+                <p className="mr-2 font-medium text-pink-600">哎呀～出错啦</p>
+                <p className="flex-1 text-xs text-red-600">{error}</p>
                 <button
                   onClick={handleRefresh}
-                  className="ml-1 px-2 py-1 bg-gradient-to-r from-pink-100 to-pink-200 hover:from-pink-200 hover:to-pink-300 text-pink-600 rounded-full text-xs flex items-center border border-pink-300 transition-all transform hover:scale-105 shadow-sm">
+                  className="ml-1 flex transform items-center rounded-full border border-pink-300 bg-gradient-to-r from-pink-100 to-pink-200 px-2 py-1 text-xs text-pink-600 shadow-sm transition-all hover:scale-105 hover:from-pink-200 hover:to-pink-300">
                   <Icon
                     icon="mdi:refresh"
                     className="mr-1 animate-spin-slow"
@@ -145,7 +143,7 @@ function IndexPopup() {
                   再试一次喵～
                 </button>
               </div>
-              <div className="mt-1.5 text-xs bg-pink-100 p-1.5 rounded-lg border border-pink-200">
+              <div className="mt-1.5 rounded-lg border border-pink-200 bg-pink-100 p-1.5 text-xs">
                 <div className="flex items-start">
                   <span className="mr-1 mt-0.5">🙀</span>
                   <div>
@@ -166,9 +164,9 @@ function IndexPopup() {
 
       {/* 仅在开发模式显示调试信息 */}
       {process.env.NODE_ENV !== "production" && debugInfo && (
-        <div className="p-3 mb-4 bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 rounded-xl border-2 border-indigo-200 text-xs shadow-md hover:shadow-lg transition-all">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-medium text-sm flex items-center">
+        <div className="mb-4 rounded-xl border-2 border-indigo-200 bg-gradient-to-r from-indigo-50 to-purple-50 p-3 text-xs text-indigo-700 shadow-md transition-all hover:shadow-lg">
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="flex items-center text-sm font-medium">
               <Icon
                 icon="line-md:coffee-half-empty-twotone-loop"
                 className="mr-1.5 text-purple-500"
@@ -176,13 +174,13 @@ function IndexPopup() {
                 height="18"
               />
               <span className="text-purple-600">调试小助手</span>
-              <span className="ml-1.5 bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full text-[10px] border border-purple-200">
+              <span className="ml-1.5 rounded-full border border-purple-200 bg-purple-100 px-1.5 py-0.5 text-[10px] text-purple-600">
                 开发模式
               </span>
             </h3>
             <div className="flex items-center space-x-1">
               <button
-                className="p-1 rounded-full hover:bg-purple-100 text-purple-500 transition-colors"
+                className="rounded-full p-1 text-purple-500 transition-colors hover:bg-purple-100"
                 title="复制调试信息"
                 onClick={() => {
                   navigator.clipboard.writeText(debugInfo)
@@ -190,20 +188,20 @@ function IndexPopup() {
                 }}>
                 <Icon icon="line-md:clipboard-check" width="14" height="14" />
               </button>
-              <span className="text-[10px] text-purple-400 animate-pulse">
+              <span className="animate-pulse text-[10px] text-purple-400">
                 ฅ^•ﻌ•^ฅ
               </span>
             </div>
           </div>
 
-          <div className="overflow-auto max-h-[120px] bg-white/70 p-2 rounded-lg border border-indigo-100 relative">
-            <div className="absolute right-1 top-1 opacity-30 pointer-events-none">
+          <div className="relative max-h-[120px] overflow-auto rounded-lg border border-indigo-100 bg-white/70 p-2">
+            <div className="pointer-events-none absolute right-1 top-1 opacity-30">
               <span className="text-xs text-purple-300">♪(･ω･)ﾉ</span>
             </div>
             <pre className="text-indigo-800">{debugInfo}</pre>
           </div>
 
-          <div className="mt-2 flex justify-between items-center text-[10px] text-purple-500">
+          <div className="mt-2 flex items-center justify-between text-[10px] text-purple-500">
             <div className="flex items-center">
               <Icon
                 icon={
@@ -211,19 +209,19 @@ function IndexPopup() {
                     ? "line-md:loading-twotone-loop"
                     : "line-md:confirm-circle"
                 }
-                className={`mr-1 ${isLoading ? "text-indigo-400 animate-spin" : "text-green-500"}`}
+                className={`mr-1 ${isLoading ? "animate-spin text-indigo-400" : "text-green-500"}`}
                 width="12"
                 height="12"
               />
               <span>{isLoading ? "正在渲染..." : "渲染完成"}</span>
               {!isLoading && (
-                <span className="ml-1.5 bg-green-100 text-green-600 px-1.5 py-0.5 rounded-full text-[8px] border border-green-200">
+                <span className="ml-1.5 rounded-full border border-green-200 bg-green-100 px-1.5 py-0.5 text-[8px] text-green-600">
                   成功 (｡•ᴗ•｡)
                 </span>
               )}
             </div>
             <div className="flex items-center">
-              <div className="flex items-center bg-purple-100/70 px-1.5 py-0.5 rounded-full border border-purple-200 mr-1.5">
+              <div className="mr-1.5 flex items-center rounded-full border border-purple-200 bg-purple-100/70 px-1.5 py-0.5">
                 <Icon
                   icon="line-md:computer-twotone"
                   className="mr-1 text-indigo-500"
@@ -233,7 +231,7 @@ function IndexPopup() {
                 <span>{new Date().toLocaleTimeString()}</span>
               </div>
               <button
-                className="p-1 rounded-full hover:bg-purple-100 text-purple-500 transition-colors"
+                className="rounded-full p-1 text-purple-500 transition-colors hover:bg-purple-100"
                 title="查看更多调试信息"
                 onClick={() => {
                   const details = {
@@ -256,18 +254,18 @@ function IndexPopup() {
       )}
 
       {isLoading ? (
-        <div className="flex flex-col justify-center items-center p-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-t-4 border-blue-500"></div>
-          <p className="text-sky-500 mt-3 animate-pulse">加载中... (●'◡'●)</p>
+        <div className="flex flex-col items-center justify-center p-8">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-4 border-t-4 border-blue-500"></div>
+          <p className="mt-3 animate-pulse text-sky-500">加载中... (●'◡'●)</p>
         </div>
       ) : scrapedData ? (
-        <div className="bg-white p-4 rounded-xl border-2 border-indigo-200 shadow-lg">
+        <div className="rounded-xl border-2 border-indigo-200 bg-white p-4 shadow-lg">
           {/* 页面标题 */}
           <div className="mb-4">
-            <h2 className="text-lg font-semibold mb-2 text-sky-600 flex items-center">
+            <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
               <span className="mr-2">📑</span>页面标题
             </h2>
-            <p className="p-2 bg-blue-50 rounded-xl border border-sky-200">
+            <p className="rounded-xl border border-sky-200 bg-blue-50 p-2">
               {scrapedData.title}
             </p>
           </div>
@@ -275,10 +273,10 @@ function IndexPopup() {
           {/* 作者信息 */}
           {scrapedData.author && (
             <div className="mb-4">
-              <h2 className="text-lg font-semibold mb-2 text-sky-600 flex items-center">
+              <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
                 <span className="mr-2">👤</span>作者
               </h2>
-              <p className="p-2 bg-blue-50 rounded-xl border border-sky-200">
+              <p className="rounded-xl border border-sky-200 bg-blue-50 p-2">
                 {scrapedData.author}
               </p>
             </div>
@@ -287,10 +285,10 @@ function IndexPopup() {
           {/* 发布日期 */}
           {scrapedData.publishDate && (
             <div className="mb-4">
-              <h2 className="text-lg font-semibold mb-2 text-sky-600 flex items-center">
+              <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
                 <span className="mr-2">🗓️</span>发布日期
               </h2>
-              <p className="p-2 bg-blue-50 rounded-xl border border-sky-200">
+              <p className="rounded-xl border border-sky-200 bg-blue-50 p-2">
                 {scrapedData.publishDate}
               </p>
             </div>
@@ -298,10 +296,10 @@ function IndexPopup() {
 
           {/* URL */}
           <div className="mb-4">
-            <h2 className="text-lg font-semibold mb-2 text-sky-600 flex items-center">
+            <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
               <span className="mr-2">🔗</span>URL
             </h2>
-            <p className="p-2 bg-blue-50 rounded-xl border border-sky-200 break-all text-xs">
+            <p className="break-all rounded-xl border border-sky-200 bg-blue-50 p-2 text-xs">
               {scrapedData.url}
             </p>
           </div>
@@ -318,9 +316,9 @@ function IndexPopup() {
           {/* 页面图片 */}
           {scrapedData.images && scrapedData.images.length > 0 && (
             <div className="mb-4">
-              <h2 className="text-lg font-semibold mb-2 text-sky-600 flex items-center">
+              <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
                 <span className="mr-2">🖼️</span>页面图片
-                <span className="text-sm font-normal ml-1.5 text-sky-500">
+                <span className="ml-1.5 text-sm font-normal text-sky-500">
                   ({scrapedData.images.length}张)
                 </span>
               </h2>
@@ -334,7 +332,7 @@ function IndexPopup() {
           {/* 元数据 */}
           {Object.keys(scrapedData.metadata).length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold mb-2 text-sky-600 flex items-center">
+              <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
                 <span className="mr-2">📊</span>元数据
               </h2>
 
@@ -347,20 +345,19 @@ function IndexPopup() {
               {/* 元数据表格 */}
               <MetadataTable
                 metadata={scrapedData.metadata}
-                truncateText={truncateText}
                 onLoadError={handleMetadataImageError}
               />
             </div>
           )}
         </div>
       ) : (
-        <div className="text-center p-8 text-gray-500 bg-white rounded-xl border-2 border-sky-200 shadow-md">
+        <div className="rounded-xl border-2 border-sky-200 bg-white p-8 text-center text-gray-500 shadow-md">
           <p className="mb-2">(づ￣ ³￣)づ</p>
           没有找到内容。点击"刷新内容"按钮重试。
         </div>
       )}
 
-      <footer className="mt-4 pt-4 border-t border-sky-200 text-center text-xs text-sky-500 flex justify-center items-center">
+      <footer className="mt-4 flex items-center justify-center border-t border-sky-200 pt-4 text-center text-xs text-sky-500">
         <span className="mr-1">♡</span>
         Moe Copy AI - 萌抓 v1.0
         <span className="ml-1">♡</span>

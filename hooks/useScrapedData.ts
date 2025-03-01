@@ -2,11 +2,10 @@ import { useEffect, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
-import type { ScrapedContent } from "~contents/types"
-import { logger } from "~contents/utils"
-
-import type { ScrapeResponse } from "../components/types"
-import { detectMarkdown, formatContent } from "../components/utils"
+import type { ScrapedContent, ScrapeResponse } from "~contents/types"
+import { detectMarkdown } from "~utils"
+import { formatContent } from "~utils/format"
+import { logger } from "~utils/logger"
 
 /**
  * 抓取数据钩子

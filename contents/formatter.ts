@@ -1,6 +1,6 @@
+import { debugLog } from "../utils/logger"
 import { SKIP_TAGS } from "./config"
 import type { ImageInfo } from "./types"
-import { debugLog } from "./utils"
 
 // 从HTML元素中提取格式化的文本
 export function extractFormattedText(

@@ -1,10 +1,14 @@
 import { useState } from "react"
 
 import ContentDisplay from "./ContentDisplay"
-import type { ContentSectionProps } from "./types"
 import { Button } from "./ui/button"
 import { Card } from "./ui/card"
 
+interface ContentSectionProps {
+  articleContent: string
+  cleanedContent: string
+  isMarkdown: boolean
+}
 /**
  * 文章内容区域组件
  */

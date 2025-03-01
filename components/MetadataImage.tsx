@@ -1,5 +1,12 @@
-import type { MetadataImageProps } from "./types"
 import { Image } from "./ui/image"
+
+// 元数据图片组件属性
+interface MetadataImageProps {
+  src: string
+  alt: string
+  label: string
+  onLoadError?: (label: string) => void
+}
 
 /**
  * 元数据图片显示组件

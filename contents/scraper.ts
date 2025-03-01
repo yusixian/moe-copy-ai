@@ -1,10 +1,10 @@
 // 网页内容抓取器
 import { Storage } from "@plasmohq/storage"
 
+import { debugLog } from "../utils/logger"
 import { config } from "./config"
 import { scrapeWebpageContent } from "./extractor"
 import type { Message } from "./types"
-import { debugLog } from "./utils"
 
 // 创建存储实例
 const storage = new Storage({ area: "sync" })

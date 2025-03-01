@@ -1,6 +1,8 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 
-import { logger } from "./contents/utils" // 导入logger
+import type { ScrapedContent } from "~contents/types"
+
+import { logger } from "./utils/logger" // 导入logger
 
 // 创建一个消息处理程序，用于转发内容脚本抓取的数据到弹出窗口
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {

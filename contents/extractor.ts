@@ -1,3 +1,6 @@
+import { getFirstMatchContent } from "~utils/extract"
+
+import { debugLog } from "../utils/logger"
 import {
   AUTHOR_SELECTORS,
   CONTENT_SELECTORS,
@@ -6,7 +9,6 @@ import {
 } from "./config"
 import { cleanContent, extractFormattedText } from "./formatter"
 import type { ImageInfo, ScrapedContent } from "./types"
-import { debugLog, getFirstMatchContent } from "./utils"
 
 // 增强抓取文章内容的函数
 export function extractArticleContent(imagesArray: ImageInfo[] = []): string {

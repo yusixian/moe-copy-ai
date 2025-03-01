@@ -23,3 +23,9 @@ export interface Message {
   action: string
   [key: string]: any
 }
+
+export interface ScrapeResponse {
+  success: boolean
+  data?: ScrapedContent
+  error?: string
+}

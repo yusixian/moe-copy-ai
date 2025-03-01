@@ -2,15 +2,9 @@ import { Icon } from "@iconify/react"
 import { useState } from "react"
 
 import type { ImageInfo } from "~contents/types"
-import { cn } from "~utils"
 
-import {
-  copyToClipboard,
-  createTemporaryState,
-  openInNewTab,
-  preventBubbling
-} from "../utils/clipboard"
-import { CopyIcon } from "./svg/CopyIcon"
+import { openInNewTab, preventBubbling } from "../utils/clipboard"
+import CopyableTextField from "./CopyableTextField"
 import { AnimatedContainer } from "./ui/animated-container"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
@@ -35,63 +29,13 @@ const ImageLoadError = () => (
   </div>
 )
 
-// 图片URL复制组件
-interface ImageUrlCopyFieldProps {
-  src: string
-  index: number
-  isCopied: boolean
-  onCopy: (text: string, index: number) => void
-}
-
-const ImageUrlCopyField = ({
-  src,
-  index,
-  isCopied,
-  onCopy
-}: ImageUrlCopyFieldProps) => (
-  <div className="flex items-center gap-1">
-    <div className="relative flex w-full items-center">
-      <div className="w-full overflow-hidden truncate rounded-l-md border border-r-0 border-sky-200/70 bg-white bg-opacity-70 px-2.5 py-1.5 text-xs text-slate-600">
-        {src}
-      </div>
-      <Button
-        onClick={preventBubbling(() => onCopy(src, index))}
-        variant="copy"
-        size="sm"
-        className={cn(
-          "rounded-l-none rounded-r-md border border-sky-200/70 bg-white hover:bg-sky-50",
-          {
-            "p-0": !isCopied,
-            "bg-sky-50": isCopied
-          }
-        )}>
-        {isCopied ? (
-          <Icon icon="line-md:confirm" className="h-4 w-4 text-sky-600" />
-        ) : (
-          <CopyIcon className="size-7" size={16} />
-        )}
-
-        {isCopied && (
-          <AnimatedContainer
-            animation="ping"
-            className="absolute -right-1 -top-1">
-            <StarDecoration />
-          </AnimatedContainer>
-        )}
-      </Button>
-    </div>
-  </div>
-)
-
 // 单张图片卡片组件
 interface ImageCardProps {
   img: ImageInfo
   index: number
   isHovered: boolean
-  isCopied: boolean
   isFailed: boolean
   onHover: (index: number | null) => void
-  onCopy: (text: string, index: number) => void
   onOpen: (src: string) => void
   onError: (src: string) => void
 }
@@ -100,10 +44,8 @@ const ImageCard = ({
   img,
   index,
   isHovered,
-  isCopied,
   isFailed,
   onHover,
-  onCopy,
   onOpen,
   onError
 }: ImageCardProps) => (
@@ -142,13 +84,7 @@ const ImageCard = ({
     </div>
 
     <div className="border-t border-sky-100/50 bg-gradient-to-r from-blue-50/60 to-sky-50/60 px-3 py-2 transition-all duration-300">
-      <ImageUrlCopyField
-        src={img.src}
-        index={index}
-        isCopied={isCopied}
-        onCopy={onCopy}
-      />
-
+      <CopyableTextField text={img.src} isUrl={true} />
       <div className="mt-2 flex justify-end">
         <Button
           onClick={preventBubbling(() => onOpen(img.src))}
@@ -209,26 +145,14 @@ export const ImageGrid: React.FC<ImageGridProps> = ({
   defaultExpanded = true
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
   const [failedImages, setFailedImages] = useState<{ [key: string]: boolean }>(
     {}
   )
-
-  // 创建临时状态设置函数
-  const setTemporaryCopiedIndex = createTemporaryState(setCopiedIndex, null)
 
   // 处理图片加载失败
   const handleImageError = (src: string) => {
     setFailedImages((prev) => ({ ...prev, [src]: true }))
     if (onLoadError) onLoadError(src)
-  }
-
-  // 复制URL到剪贴板
-  const handleCopy = async (text: string, index: number) => {
-    const success = await copyToClipboard(text)
-    if (success) {
-      setTemporaryCopiedIndex(index)
-    }
   }
 
   // 在新标签页中打开图片
@@ -259,10 +183,8 @@ export const ImageGrid: React.FC<ImageGridProps> = ({
             img={img}
             index={index}
             isHovered={hoveredIndex === index}
-            isCopied={copiedIndex === index}
             isFailed={!!failedImages[img.src]}
             onHover={setHoveredIndex}
-            onCopy={handleCopy}
             onOpen={handleOpenInNewTab}
             onError={handleImageError}
           />

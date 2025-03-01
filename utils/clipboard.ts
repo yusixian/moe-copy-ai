@@ -2,7 +2,7 @@
  * 剪贴板和链接操作工具函数
  */
 
-import { logger } from "~contents/utils"
+import { logger } from "~utils/logger"
 
 /**
  * 复制文本到剪贴板

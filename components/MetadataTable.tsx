@@ -1,12 +1,17 @@
-import type { MetadataTableProps } from "./types"
+import CopyableTextField from "./CopyableTextField"
 import { Image } from "./ui/image"
+
+// 元数据表格组件属性
+export interface MetadataTableProps {
+  metadata: Record<string, string>
+  onLoadError?: (key: string) => void
+}
 
 /**
  * 元数据表格组件
  */
 export const MetadataTable: React.FC<MetadataTableProps> = ({
   metadata,
-  truncateText,
   onLoadError
 }) => {
   // 重要的元数据字段
@@ -36,10 +41,10 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
       <table className="min-w-full divide-y divide-sky-200">
         <thead className="bg-gradient-to-r from-blue-100 to-indigo-100">
           <tr>
-            <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-sky-600">
+            <th className="w-1/5 px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-sky-600">
               属性 🏷️
             </th>
-            <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-sky-600">
+            <th className="w-4/5 px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-sky-600">
               值 ✨
             </th>
           </tr>
@@ -49,11 +54,16 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
             <tr
               key={key}
               className={index % 2 === 0 ? "bg-blue-50" : "bg-white"}>
-              <td className="px-3 py-2 text-xs font-medium text-indigo-600">
+              <td className="w-1/5 px-3 py-2 text-xs font-medium text-indigo-600">
                 {key}
               </td>
-              <td className="whitespace-pre-wrap break-all px-3 py-2 text-xs text-gray-700">
-                {truncateText(value, 200)}
+              <td className="w-4/5 whitespace-pre-wrap break-all px-3 py-2 text-xs text-gray-700">
+                <CopyableTextField
+                  text={value}
+                  readOnly={true}
+                  rows={3}
+                  className="w-full"
+                />
                 {/* 为图片类型显示缩略图 */}
                 {(key === "og:image" ||
                   key === "twitter:image" ||

@@ -1,7 +1,11 @@
 import MarkdownIt from "markdown-it"
 import { useMemo } from "react"
 
-import type { ContentDisplayProps } from "./types"
+interface ContentDisplayProps {
+  content: string
+  isMarkdown: boolean
+  isPreviewMode: boolean
+}
 
 /**
  * 内容显示组件，支持纯文本和Markdown渲染
