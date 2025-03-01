@@ -36,15 +36,24 @@ const config = {
         wiggle: {
           "0%, 100%": { transform: "rotate(-3deg)" },
           "50%": { transform: "rotate(3deg)" }
+        },
+        fadeIn: {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" }
+        },
+        bounce: {
+          "0%, 100%": { transform: "translateY(-5%)" },
+          "50%": { transform: "translateY(0)" }
         }
       },
       animation: {
         float: "float 3s ease-in-out infinite",
         wiggle: "wiggle 1s ease-in-out infinite",
-        "spin-slow": "spin 3s linear infinite"
+        "spin-slow": "spin 3s linear infinite",
+        fadeIn: "fadeIn 0.5s ease-out forwards",
+        bounce: "bounce 0.6s ease-in-out infinite"
       }
     }
-  },
-  plugins: []
+  }
 }
 export default config

@@ -2,6 +2,8 @@ import { useState } from "react"
 
 import ContentDisplay from "./ContentDisplay"
 import type { ContentSectionProps } from "./types"
+import { Button } from "./ui/button"
+import { Card } from "./ui/card"
 
 /**
  * 文章内容区域组件
@@ -48,60 +50,49 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
 
   return (
     <div className="mb-4">
-      <h2 className="text-lg font-semibold mb-2 text-sky-600 flex items-center">
+      <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
         <span className="mr-2">📝</span>文章内容
       </h2>
-      <div className="p-2 bg-blue-50 rounded-xl border border-sky-200 max-h-[200px] overflow-y-auto shadow-sm">
+      <Card
+        variant="content"
+        padding="sm"
+        className="max-h-[200px] overflow-y-auto">
         <ContentDisplay
           content={getCurrentContent()}
           isMarkdown={isMarkdown}
           isPreviewMode={isPreviewMode}
         />
-      </div>
-      <div className="mt-3 flex flex-wrap justify-end gap-3 relative">
-        <button
-          onClick={toggleContentVersion}
-          className="text-xs font-medium px-4 py-2 bg-gradient-to-br from-indigo-400 to-sky-400 text-white rounded-full hover:from-indigo-500 hover:to-sky-500 transition-all duration-200 shadow-md hover:shadow-lg border border-indigo-200 flex items-center group">
-          <span className="mr-1.5 transition-transform duration-200 group-hover:scale-110">
-            {showCleanedContent ? "✨" : "✂️"}
-          </span>
-          <span className="relative">
-            {showCleanedContent ? "显示原始格式" : "显示紧凑版"}
-            <span className="absolute inset-x-0 bottom-0 h-0.5 bg-white/40 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-left rounded-full"></span>
-          </span>
-        </button>
+      </Card>
+      <div className="relative mt-3 flex flex-wrap justify-end gap-3">
+        <Button
+          variant="default"
+          size="md"
+          icon={showCleanedContent ? "✨" : "✂️"}
+          onClick={toggleContentVersion}>
+          {showCleanedContent ? "显示原始格式" : "显示紧凑版"}
+        </Button>
+
         {isMarkdown && (
-          <button
-            onClick={togglePreview}
-            className="text-xs font-medium px-4 py-2 bg-gradient-to-br from-blue-400 to-teal-400 text-white rounded-full hover:from-blue-500 hover:to-teal-500 transition-all duration-200 shadow-md hover:shadow-lg border border-teal-200 flex items-center group">
-            <span className="mr-1.5 transition-transform duration-200 group-hover:scale-110">
-              {isPreviewMode ? "📄" : "✨"}
-            </span>
-            <span className="relative">
-              {isPreviewMode ? "查看原文" : "预览 Markdown"}
-              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-white/40 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-left rounded-full"></span>
-            </span>
-          </button>
+          <Button
+            variant="secondary"
+            size="md"
+            icon={isPreviewMode ? "📄" : "✨"}
+            onClick={togglePreview}>
+            {isPreviewMode ? "查看原文" : "预览 Markdown"}
+          </Button>
         )}
-        <button
-          onClick={handleCopy}
-          className={`text-xs font-medium px-4 py-2 ${
-            copySuccess
-              ? "bg-gradient-to-br from-green-400 to-emerald-400 text-white border-emerald-200"
-              : "bg-gradient-to-br from-sky-300 to-blue-200 text-blue-800 hover:from-sky-400 hover:to-blue-300 border-sky-200"
-          } rounded-full transition-all duration-200 shadow-md hover:shadow-lg border flex items-center group hover:scale-102`}>
-          <span className="mr-1.5 transition-transform duration-200 group-hover:scale-110">
-            {copySuccess ? "✓" : "📋"}
-          </span>
-          <span className="relative">
-            {copySuccess ? "复制成功!" : "复制全文"}
-            <span className="absolute inset-x-0 bottom-0 h-0.5 bg-white/40 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-left rounded-full"></span>
-          </span>
-        </button>
+
+        <Button
+          variant={copySuccess ? "success" : "copy"}
+          size="md"
+          icon={copySuccess ? "✓" : "📋"}
+          onClick={handleCopy}>
+          {copySuccess ? "复制成功!" : "复制全文"}
+        </Button>
 
         {/* 复制成功动画 */}
         {copySuccess && (
-          <div className="absolute -top-12 right-0 bg-gradient-to-br from-green-50 to-emerald-100 text-green-600 px-4 py-2 rounded-full text-xs border border-green-200 shadow-md transform -translate-y-1">
+          <div className="absolute -top-12 right-0 -translate-y-1 transform rounded-full border border-green-200 bg-gradient-to-br from-green-50 to-emerald-100 px-4 py-2 text-xs text-green-600 shadow-md">
             <div className="flex items-center">
               <span className="mr-1">(っ◔◡◔)っ</span>
               内容已复制到剪贴板!

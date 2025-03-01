@@ -1,5 +1,6 @@
 import { SKIP_TAGS } from "./config"
 import type { ImageInfo } from "./types"
+import { debugLog } from "./utils"
 
 // 从HTML元素中提取格式化的文本
 export function extractFormattedText(
@@ -8,6 +9,21 @@ export function extractFormattedText(
 ): string {
   let result = ""
   let imageIndex = 0
+
+  // 创建日志跟踪对象 - 用于收集图片处理数据
+  const processingSummary = {
+    figureElements: 0,
+    figureImagesExtracted: 0,
+    figureImagesSkipped: 0,
+    imgElements: 0,
+    imgExtracted: 0,
+    imgSkipped: 0,
+    totalProcessed: 0,
+    totalExtracted: 0,
+    totalSkipped: 0
+  }
+
+  debugLog("开始提取格式化文本和图片内容")
 
   // 递归遍历节点
   function traverse(node: Node): void {
@@ -29,10 +45,69 @@ export function extractFormattedText(
         return
       }
 
-      // 处理图片元素
+      // 处理figure元素（可能包含图片和说明）
+      if (tagName === "figure") {
+        processingSummary.figureElements++
+
+        const figureElement = node as Element
+        const imgElement = figureElement.querySelector("img")
+        const figCaption = figureElement.querySelector("figcaption")
+
+        if (imgElement) {
+          processingSummary.totalProcessed++
+
+          // 提取图片信息
+          const src =
+            imgElement.getAttribute("src") ||
+            imgElement.getAttribute("data-original") ||
+            ""
+          const alt = imgElement.getAttribute("alt") || ""
+          const title = imgElement.getAttribute("title") || ""
+          const caption = figCaption ? figCaption.textContent?.trim() || "" : ""
+
+          // 使用caption作为alt文本（如果alt为空且caption存在）
+          const effectiveAlt = alt || caption || "图片#" + imageIndex
+
+          if (src && src.trim() && !src.startsWith("data:image/")) {
+            // 将图片信息存储到数组中
+            const imageInfo: ImageInfo = {
+              src: src,
+              alt: effectiveAlt,
+              title: title,
+              index: imageIndex
+            }
+
+            imagesArray.push(imageInfo)
+            processingSummary.figureImagesExtracted++
+            processingSummary.totalExtracted++
+
+            // 在文本中插入图片引用标记，使用Markdown格式并加入caption作为说明
+            result += `\n\n![${effectiveAlt}](${src})`
+            if (caption && caption !== alt) {
+              result += `\n*${caption}*`
+            }
+            result += "\n\n"
+            imageIndex++
+          } else {
+            processingSummary.figureImagesSkipped++
+            processingSummary.totalSkipped++
+          }
+
+          // 已经处理了figure内的内容，避免重复处理
+          return
+        }
+      }
+
+      // 处理独立的图片元素
       if (tagName === "img") {
+        processingSummary.imgElements++
+        processingSummary.totalProcessed++
+
         const imgElement = node as HTMLImageElement
-        const src = imgElement.getAttribute("src") || ""
+        const src =
+          imgElement.getAttribute("src") ||
+          imgElement.getAttribute("data-original") ||
+          ""
         const alt = imgElement.getAttribute("alt") || ""
         const title = imgElement.getAttribute("title") || ""
 
@@ -46,10 +121,15 @@ export function extractFormattedText(
           }
 
           imagesArray.push(imageInfo)
+          processingSummary.imgExtracted++
+          processingSummary.totalExtracted++
 
           // 在文本中插入图片引用标记，使用Markdown格式
           result += `\n\n![${alt || "图片#" + imageIndex}](${src})\n\n`
           imageIndex++
+        } else {
+          processingSummary.imgSkipped++
+          processingSummary.totalSkipped++
         }
         return
       }

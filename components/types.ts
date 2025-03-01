@@ -7,15 +7,6 @@ export interface ScrapeResponse {
   error?: string
 }
 
-// 图片组件属性
-export interface ImageDisplayProps {
-  src: string
-  alt: string
-  title?: string
-  className?: string
-  onLoadError?: (src: string) => void
-}
-
 // 内容显示组件属性
 export interface ContentDisplayProps {
   content: string

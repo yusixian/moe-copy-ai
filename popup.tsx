@@ -66,11 +66,11 @@ function IndexPopup() {
         <div>
           <h1 className="text-xl font-bold text-sky-600 flex items-center">
             <span className="mr-2">✨</span>
-            萌萌页面抓取器
+            Moe Copy AI
             <span className="ml-2">✨</span>
           </h1>
           <p className="text-sm text-indigo-600">
-            抓取当前页面内容，转换为AI可读的格式 (。・ω・。)
+            抓取当前页面内容，转换为 AI 易读的格式 (。・ω・。)
           </p>
           <p className="text-xs text-blue-500 mt-1">
             支持原始格式(保留Markdown格式与换行)和紧凑版(无换行，文本更精简)两种模式
@@ -320,13 +320,14 @@ function IndexPopup() {
             <div className="mb-4">
               <h2 className="text-lg font-semibold mb-2 text-sky-600 flex items-center">
                 <span className="mr-2">🖼️</span>页面图片
+                <span className="text-sm font-normal ml-1.5 text-sky-500">
+                  ({scrapedData.images.length}张)
+                </span>
               </h2>
-              <div className="p-2 bg-blue-50 rounded-xl border border-sky-200">
-                <ImageGrid
-                  images={scrapedData.images}
-                  onLoadError={handleImageLoadError}
-                />
-              </div>
+              <ImageGrid
+                images={scrapedData.images}
+                onLoadError={handleImageLoadError}
+              />
             </div>
           )}
 

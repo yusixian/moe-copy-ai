@@ -1,5 +1,5 @@
-import ImageDisplay from "./ImageDisplay"
 import type { MetadataImageProps } from "./types"
+import { Image } from "./ui/image"
 
 /**
  * 元数据图片显示组件
@@ -11,15 +11,17 @@ export const MetadataImage: React.FC<MetadataImageProps> = ({
   onLoadError
 }) => {
   return (
-    <div className="border-2 border-sky-200 rounded-lg overflow-hidden bg-white shadow-sm transform hover:scale-105 transition-all hover:shadow-md">
-      <div className="relative w-full h-[150px] flex items-center justify-center">
-        <ImageDisplay
+    <div className="transform overflow-hidden rounded-lg border-2 border-sky-200 bg-white shadow-sm transition-all hover:scale-105 hover:shadow-md">
+      <div className="relative flex h-[150px] w-full items-center justify-center">
+        <Image
           src={src}
           alt={alt}
+          variant="rounded"
+          size="full"
           onLoadError={() => onLoadError && onLoadError(label)}
         />
       </div>
-      <div className="text-xs p-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 text-center border-t border-sky-200 text-sky-600">
+      <div className="border-t border-sky-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-1.5 text-center text-xs text-sky-600">
         {label} ✨
       </div>
     </div>
