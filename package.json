@@ -10,6 +10,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@iconify/react": "^5.2.0",
     "@plasmohq/messaging": "^0.7.1",
     "@plasmohq/storage": "^1.15.0",
     "markdown-it": "^14.1.0",
