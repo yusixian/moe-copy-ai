@@ -60,6 +60,11 @@ function IndexPopup() {
     chrome.runtime.openOptionsPage()
   }
 
+  // 打开GitHub仓库
+  const handleOpenGithub = () => {
+    window.open("https://github.com/yusixian/moe-copy-ai", "_blank")
+  }
+
   return (
     <div className="relative max-h-[600px] min-w-[400px] overflow-y-auto bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
       <header className="relative z-20 mb-4 flex items-center justify-between rounded-xl border-2 border-sky-200 bg-white p-3 shadow-md">
@@ -85,12 +90,20 @@ function IndexPopup() {
             </span>
           </div>
         </div>
-        <button
-          onClick={handleOpenOptions}
-          className="relative z-30 transform rounded-full p-2 text-sky-500 transition hover:rotate-12 hover:bg-blue-50"
-          title="打开设置">
-          <Icon icon="line-md:cog-filled-loop" width="24" height="24" />
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleOpenGithub}
+            className="relative z-30 transform rounded-full p-2 text-sky-500 transition hover:rotate-12 hover:bg-blue-50"
+            title="访问GitHub">
+            <Icon icon="mdi:github" width="24" height="24" />
+          </button>
+          <button
+            onClick={handleOpenOptions}
+            className="relative z-30 transform rounded-full p-2 text-sky-500 transition hover:rotate-12 hover:bg-blue-50"
+            title="打开设置">
+            <Icon icon="line-md:cog-filled-loop" width="24" height="24" />
+          </button>
+        </div>
       </header>
 
       <div className="relative z-20 mb-4">
