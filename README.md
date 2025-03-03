@@ -1,6 +1,6 @@
-# MoeCopy AI
+# MoeCopy AI (WIP)
 
-![](https://github.com/yusixian/moe-copy-ai/blob/main/assets/logo.webp?raw=true)
+![](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/logo.webp?raw=true)
 
 <p align="center">
   <b>✨ 萌萌哒的 AI 网页数据提取助手 ✨</b>
@@ -10,26 +10,29 @@
 
 MoeCopy AI 是一款基于 Plasmo 框架开发的浏览器扩展，能够智能识别并提取网页中的结构化数据，为 AI 模型提供高质量输入。
 
+> 需求很简单，是我想在手机端 kiwi 浏览器访问的时候能够直接复制全文、标题、作者和网页元信息等，排除干扰，就类似 [llms.txt](https://llmstxt.org/) 那样。
+
 ## ✨ 功能
 
 - 🔍 **一键解析**：点击插件图标即可解析当前页面
-- 🧩 **多模式提取**：支持HTML、纯文本、关键信息等多种提取模式
 - 👁️ **实时预览**：直观展示提取的结构化数据
-- 💾 **多格式导出**：支持JSON、CSV、Markdown等格式
-- 🤖 **AI集成**：对接OpenAI、Ollama等LLM服务
-- 🔒 **隐私保护**：提供本地处理选项，保护敏感数据
+- 移动端适配
 
-## 📋 开发计划 (v0.1)
+![](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example.webp?raw=true)
+
+## 📋 开发计划
 
 - [x] 实现基础UI框架与插件架构
 - [x] 开发核心网页内容提取功能
 - [x] 添加基本文本格式化与预览功能
+- [x] 网页元数据抓取
+- [x] 移动端适配
 - [x] 完成基础错误处理和日志记录
 - [x] 添加简单的用户配置选项
-- [ ] 优化多尺寸图标和应用商店素材
-- [ ] 图片可选的 AI OCR
-- [ ] 支持JSON导出功能
-- [ ] 集成基本的OpenAI API连接
+- [ ] 自定义抓取的选择器
+- [ ] 增加图片的 AI OCR 功能
+- [ ] 支持 JSON 结构化导出导出功能
+- [ ] 集成 AI 摘要功能
 
 ## 开发指南
 

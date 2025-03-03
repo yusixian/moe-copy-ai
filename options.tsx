@@ -33,11 +33,11 @@ const DEBUG_PANEL_OPTIONS = [
 
 function OptionsPage() {
   // 使用storage hook获取/设置日志级别
-  const [logLevel, setLogLevel] = useStorage<string>("log_level", "debug")
+  const [logLevel, setLogLevel] = useStorage<string>("log_level", "silent")
   // 添加新的hook用于获取/设置抓取时机
   const [scrapeTiming, setScrapeTiming] = useStorage<string>(
     "scrape_timing",
-    "auto"
+    "manual"
   )
   // 添加新的hook用于获取/设置调试面板显示状态，默认为显示
   const [showDebugPanel, setShowDebugPanel] = useStorage<string>(
