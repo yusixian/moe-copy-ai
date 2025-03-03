@@ -1,7 +1,13 @@
 // https://icons8.com/icons/set/cat--style-cool
 import React from "react"
+import type { MouseEventHandler } from "react"
 
-export default function CatSVG({ className }: { className?: string }) {
+interface CatSVGProps {
+  className?: string
+  onClick?: MouseEventHandler<SVGSVGElement>
+}
+
+export default function CatSVG({ className, onClick }: CatSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -10,7 +16,8 @@ export default function CatSVG({ className }: { className?: string }) {
       width="1em"
       height="1em"
       viewBox="0 0 64 64"
-      className={className}>
+      className={className}
+      onClick={onClick}>
       <radialGradient
         id="FmGFr4qy5fVnlZU2lCKFDa_RouHxOFPEP1c_gr1"
         cx="-116.365"

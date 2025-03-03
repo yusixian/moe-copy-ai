@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react"
-import { useEffect, useState } from "react"
+import { memo, useCallback, useState } from "react"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
@@ -31,47 +31,31 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
   // 添加气泡出现的动画状态
   const [showBubble, setShowBubble] = useState(false)
-  // 添加眨眼动画状态
-  const [blinking, setBlinking] = useState(false)
 
-  // 控制眨眼动画
-  useEffect(() => {
-    const blinkInterval = setInterval(() => {
-      setBlinking(true)
-      setTimeout(() => setBlinking(false), 200)
-    }, 3000)
-
-    return () => clearInterval(blinkInterval)
-  }, [])
-
-  // 控制气泡显示
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setShowBubble(true)
-    }, 500)
-
-    return () => clearTimeout(timeout)
+  // 处理猫猫图标点击事件
+  const handleCatClick = useCallback(() => {
+    setShowBubble((prev) => !prev)
   }, [])
 
   // 图片加载错误处理
-  const handleImageLoadError = (src: string) => {
+  const handleImageLoadError = useCallback((src: string) => {
     console.error("图片加载失败:", src)
-  }
+  }, [])
 
   // 元数据图片加载错误处理
-  const handleMetadataImageError = (label: string) => {
+  const handleMetadataImageError = useCallback((label: string) => {
     console.error(`${label} 加载失败`)
-  }
+  }, [])
 
   // 打开选项页面
-  const handleOpenOptions = () => {
+  const handleOpenOptions = useCallback(() => {
     chrome.runtime.openOptionsPage()
-  }
+  }, [])
 
   // 打开GitHub仓库
-  const handleOpenGithub = () => {
+  const handleOpenGithub = useCallback(() => {
     window.open("https://github.com/yusixian/moe-copy-ai", "_blank")
-  }
+  }, [])
 
   return (
     <div
@@ -79,7 +63,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         "relative max-h-[600px] min-w-[400px] overflow-y-auto bg-gradient-to-br from-blue-50 to-indigo-50 p-4",
         className
       )}>
-      <header className="relative z-20 mb-4 flex items-center justify-between rounded-xl border-2 border-sky-200 bg-white p-3 shadow-md">
+      <header className="relative mb-4 flex items-center justify-between rounded-xl border-2 border-sky-200 bg-white p-3 shadow-md">
         <div>
           <h1 className="flex items-center text-xl font-bold text-sky-600">
             Moe Copy AI <span className="ml-2">✨</span> 萌抓
@@ -90,43 +74,51 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           <p className="mt-1 text-xs text-blue-500">
             支持原始格式(保留Markdown格式与换行)和紧凑版(无换行，文本更精简)两种模式
           </p>
-        </div>
-        <div className="absolute right-10 top-[6.5rem] z-10 mr-2 h-14 w-14 xs:hidden">
-          <CatSVG className="size-14" />
-          {/* 对话气泡  */}
-          <div
-            className={`absolute -right-3 -top-10 w-48 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-sky-100 p-2 text-xs transition-opacity duration-300 ${showBubble ? "opacity-90" : "opacity-0"} shadow-sm`}>
-            <div className="absolute -bottom-2 right-8 h-4 w-4 rotate-45 transform border-b border-r border-blue-200 bg-sky-100"></div>
-            <span className="text-center font-medium text-blue-500">
-              喵～抓取中～♪(=^･ω･^=)
-            </span>
+
+          <div className="absolute -bottom-16 right-10 z-10 mr-2 h-14 w-14 xs:hidden">
+            <CatSVG
+              className="size-14 cursor-pointer transition-transform hover:scale-110"
+              onClick={handleCatClick}
+            />
+            {/* 对话气泡  */}
+            <div
+              className={`absolute -right-3 bottom-16 w-48 transform rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-sky-100 p-2 text-xs transition-all duration-500 ${
+                showBubble
+                  ? "scale-100 opacity-100"
+                  : "pointer-events-none scale-75 opacity-0"
+              } shadow-sm`}>
+              <div className="absolute -bottom-2 right-8 h-4 w-4 rotate-45 transform border-b border-r border-blue-200 bg-sky-100"></div>
+              <span className="text-center font-medium text-blue-500">
+                喵～抓取中～♪(=^･ω･^=)
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex items-center space-x-2 xs:flex-col">
           {onClose && (
             <button
               onClick={onClose}
-              className="relative z-30 transform rounded-full p-2 text-pink-500 transition hover:rotate-12 hover:bg-pink-50"
+              className="transform rounded-full p-2 text-pink-500 transition hover:rotate-12 hover:bg-pink-50"
               title="关闭">
               <Icon icon="line-md:close" width="24" height="24" />
             </button>
           )}
           <button
             onClick={handleOpenGithub}
-            className="relative z-30 transform rounded-full p-2 text-sky-500 transition hover:rotate-12 hover:bg-blue-50"
+            className="transform rounded-full p-2 text-sky-500 transition hover:rotate-12 hover:bg-blue-50"
             title="访问GitHub">
             <Icon icon="mdi:github" width="24" height="24" />
           </button>
           <button
             onClick={handleOpenOptions}
-            className="relative z-30 transform rounded-full p-2 text-sky-500 transition hover:rotate-12 hover:bg-blue-50"
+            className="transform rounded-full p-2 text-sky-500 transition hover:rotate-12 hover:bg-blue-50"
             title="打开设置">
             <Icon icon="line-md:cog-filled-loop" width="24" height="24" />
           </button>
         </div>
       </header>
 
-      <div className="relative z-20 mb-4">
+      <div className="mb-4">
         <button
           onClick={handleRefresh}
           disabled={isLoading}
@@ -139,8 +131,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             </>
           ) : (
             <>
-              <span className="mr-2">✨</span> 刷新内容{" "}
-              <span className="ml-2">✨</span>
+              刷新内容 <span className="ml-2">✨</span>
             </>
           )}
         </button>
@@ -398,5 +389,5 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
     </div>
   )
 }
-
-export default PopupContent
+PopupContent.displayName = "PopupContent"
+export default memo(PopupContent)

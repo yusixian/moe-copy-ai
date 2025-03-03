@@ -1,3 +1,4 @@
+import DownloadButton from "./DownloadButton"
 import { Image } from "./ui/image"
 
 // 元数据图片组件属性
@@ -26,6 +27,12 @@ export const MetadataImage: React.FC<MetadataImageProps> = ({
           variant="rounded"
           size="full"
           onLoadError={() => onLoadError && onLoadError(label)}
+        />
+        <DownloadButton
+          fileUrl={src}
+          fileName={`${label}.jpg`}
+          title="点击下载可爱图片～"
+          className="absolute right-2 top-2 z-10"
         />
       </div>
       <div className="border-t border-sky-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-1.5 text-center text-xs text-sky-600">
