@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 
-import type { ScrapedContent } from "~contents/types"
+import type { ScrapedContent } from "~constants/types"
 
 import { logger } from "./utils/logger" // 导入logger
 

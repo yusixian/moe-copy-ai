@@ -1,10 +1,3 @@
-import type { PlasmoCSConfig } from "plasmo"
-
-// 指定内容脚本应该运行的页面
-export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"]
-}
-
 // 文章内容选择器列表 - 按优先级排序
 export const CONTENT_SELECTORS = [
   "main",

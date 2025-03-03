@@ -2,7 +2,6 @@ import {
   autoUpdate,
   flip,
   FloatingFocusManager,
-  FloatingOverlay,
   offset,
   shift,
   useClick,

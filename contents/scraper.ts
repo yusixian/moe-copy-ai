@@ -1,16 +1,12 @@
 // 网页内容抓取器
 import { Storage } from "@plasmohq/storage"
 
+import type { Message } from "../constants/types"
+import { scrapeWebpageContent } from "../utils/extractor"
 import { debugLog } from "../utils/logger"
-import { config } from "./config"
-import { scrapeWebpageContent } from "./extractor"
-import type { Message } from "./types"
 
 // 创建存储实例
 const storage = new Storage({ area: "sync" })
-
-// 导出配置
-export { config }
 
 // 在页面加载完成后，检查用户配置决定是否自动抓取
 window.addEventListener("load", async () => {

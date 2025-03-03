@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react"
 import { useState } from "react"
 
-import type { ImageInfo } from "~contents/types"
+import type { ImageInfo } from "~constants/types"
 
 import { openInNewTab, preventBubbling } from "../utils/clipboard"
 import CopyableTextField from "./CopyableTextField"

@@ -2,9 +2,9 @@ import { useEffect, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
-import type { ScrapedContent, ScrapeResponse } from "~contents/types"
+import type { ScrapedContent, ScrapeResponse } from "~constants/types"
 import { detectMarkdown } from "~utils"
-import { formatContent } from "~utils/format"
+import { formatContent } from "~utils/formatter"
 import { logger } from "~utils/logger"
 
 /**

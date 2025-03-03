@@ -1,14 +1,30 @@
-import { getFirstMatchContent } from "~utils/extract"
-
-import { debugLog } from "../utils/logger"
 import {
   AUTHOR_SELECTORS,
   CONTENT_SELECTORS,
   DATE_SELECTORS,
   TITLE_SELECTORS
-} from "./config"
+} from "../constants/config"
+import type { ImageInfo, ScrapedContent } from "../constants/types"
 import { cleanContent, extractFormattedText } from "./formatter"
-import type { ImageInfo, ScrapedContent } from "./types"
+import { debugLog } from "./logger"
+
+// 从选择器列表中获取第一个匹配的内容
+export function getFirstMatchContent(
+  selectors: string[],
+  getContentFn: (el: Element) => string
+): string {
+  for (const selector of selectors) {
+    const element = document.querySelector(selector)
+    if (element) {
+      const content = getContentFn(element)
+      if (content) {
+        debugLog(`从${selector}获取内容:`, content)
+        return content
+      }
+    }
+  }
+  return ""
+}
 
 // 增强抓取文章内容的函数
 export function extractArticleContent(imagesArray: ImageInfo[] = []): string {
