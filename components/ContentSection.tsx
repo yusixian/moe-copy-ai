@@ -168,11 +168,10 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
           onContentChange={handleContentUpdate}
         />
       </Card>
-      <div className="relative mt-3 flex flex-wrap justify-end gap-3">
+      <div className="relative mt-3 flex flex-wrap justify-end gap-2">
         <Button
           variant="default"
           size="md"
-          icon={showCleanedContent ? "✨" : "✂️"}
           onClick={toggleContentVersion}
           disabled={isEditing}>
           {showCleanedContent ? "显示原始格式" : "显示紧凑版"}
@@ -182,7 +181,6 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
           <Button
             variant="secondary"
             size="md"
-            icon={isPreviewMode ? "📄" : "✨"}
             onClick={togglePreview}
             disabled={isEditing}>
             {isPreviewMode ? "查看原文" : "预览 Markdown"}
@@ -192,7 +190,6 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
         <Button
           variant={isEditing ? "outline" : "secondary"}
           size="md"
-          icon={isEditing ? "✓" : "✏️"}
           onClick={toggleEditMode}>
           {isEditing ? "完成编辑" : "编辑内容"}
         </Button>
@@ -200,7 +197,6 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
         <Button
           variant={copySuccess ? "success" : "copy"}
           size="md"
-          icon={copySuccess ? "✓" : "📋"}
           onClick={handleCopy}>
           {copySuccess ? "复制成功!" : "复制全文"}
         </Button>

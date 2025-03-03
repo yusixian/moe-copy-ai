@@ -1,6 +1,8 @@
 import { Icon } from "@iconify/react"
 import { useEffect, useState } from "react"
 
+import { useStorage } from "@plasmohq/storage/hook"
+
 import ContentSection from "~/components/ContentSection"
 import ImageGrid from "~/components/ImageGrid"
 import MetadataImageSection from "~/components/MetadataImageSection"
@@ -23,6 +25,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
     isMarkdown,
     handleRefresh
   } = useScrapedData()
+
+  // 从存储中获取是否显示调试面板的设置
+  const [showDebugPanel] = useStorage<string>("show_debug_panel", "true")
 
   // 添加气泡出现的动画状态
   const [showBubble, setShowBubble] = useState(false)
@@ -190,8 +195,8 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         </div>
       )}
 
-      {/* 仅在开发模式显示调试信息 */}
-      {process.env.NODE_ENV !== "production" && debugInfo && (
+      {/* 根据设置控制是否显示调试信息 */}
+      {showDebugPanel === "true" && debugInfo && (
         <div className="mb-4 rounded-xl border-2 border-indigo-200 bg-gradient-to-r from-indigo-50 to-purple-50 p-3 text-xs text-indigo-700 shadow-md transition-all hover:shadow-lg">
           <div className="mb-2 flex items-center justify-between">
             <h3 className="flex items-center text-sm font-medium">

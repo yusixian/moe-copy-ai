@@ -115,12 +115,9 @@ const FloatingPopup = () => {
           <FloatingFocusManager context={context}>
             <div
               ref={refs.setFloating}
-              className="fixed top-2 z-[999] max-h-[80vh] rounded-xl border-2 border-sky-200 bg-white text-black md:fixed md:left-[2.5vw] md:top-[5vh] md:h-[90vh] md:max-h-[90vh] md:w-full md:max-w-[95vw]"
+              className="fixed top-2 z-[999] max-h-[90vh] rounded-xl border-2 border-sky-200 bg-white text-black md:fixed md:left-[2.5vw] md:top-[5vh] md:h-[90vh] md:max-h-[90vh] md:w-full md:max-w-[95vw]"
               {...getFloatingProps()}>
-              <PopupContent
-                onClose={handleClose}
-                className="h-full max-h-[80vh] md:max-h-[90vh]"
-              />
+              <PopupContent onClose={handleClose} className="h-full" />
             </div>
           </FloatingFocusManager>
         </>
