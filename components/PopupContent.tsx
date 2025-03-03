@@ -60,7 +60,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
   return (
     <div
       className={cn(
-        "relative max-h-[600px] min-w-[400px] overflow-y-auto bg-gradient-to-br from-blue-50 to-indigo-50 p-4",
+        "relative max-h-[600px] overflow-y-auto rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 p-4",
         className
       )}>
       <header className="relative mb-4 flex items-center justify-between rounded-xl border-2 border-sky-200 bg-white p-3 shadow-md">
@@ -94,7 +94,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             </div>
           </div>
         </div>
-        <div className="flex items-center space-x-2 xs:flex-col">
+        <div className="flex items-center gap-2 xs:flex-col">
           {onClose && (
             <button
               onClick={onClose}

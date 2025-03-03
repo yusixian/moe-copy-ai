@@ -23,7 +23,7 @@ const FloatingButton = ({ onClick, isOpen }: FloatingButtonProps) => {
           icon="line-md:close"
           width="20"
           height="20"
-          className="text-opacity-80"
+          className="rotate-45 text-opacity-80"
         />
       ) : (
         <div className="flex flex-col items-center text-sm opacity-80">萌</div>

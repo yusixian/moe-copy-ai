@@ -171,7 +171,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
       <div className="relative mt-3 flex flex-wrap justify-end gap-2">
         <Button
           variant="default"
-          size="md"
+          size="sm"
           onClick={toggleContentVersion}
           disabled={isEditing}>
           {showCleanedContent ? "显示原始格式" : "显示紧凑版"}
@@ -180,7 +180,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
         {isMarkdown && (
           <Button
             variant="secondary"
-            size="md"
+            size="sm"
             onClick={togglePreview}
             disabled={isEditing}>
             {isPreviewMode ? "查看原文" : "预览 Markdown"}
@@ -189,16 +189,16 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
 
         <Button
           variant={isEditing ? "outline" : "secondary"}
-          size="md"
+          size="sm"
           onClick={toggleEditMode}>
           {isEditing ? "完成编辑" : "编辑内容"}
         </Button>
 
         <Button
           variant={copySuccess ? "success" : "copy"}
-          size="md"
+          size="sm"
           onClick={handleCopy}>
-          {copySuccess ? "复制成功!" : "复制全文"}
+          {copySuccess ? "成功" : "复制"}
         </Button>
 
         {/* 复制成功动画 */}
