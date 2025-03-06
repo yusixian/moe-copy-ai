@@ -1,6 +1,6 @@
 # MoeCopy AI
 
-![](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/logo.webp?raw=true)
+[![](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/logo.webp?raw=true)](https://chromewebstore.google.com/detail/moe-copy-ai/dfmlcfckmfgabpgbaobgapdfmjiihnck)
 
 <p align="center">
   <b>✨ 萌萌哒的 AI 网页数据提取助手 ✨</b>
@@ -13,6 +13,12 @@ MoeCopy AI 是一款基于 Plasmo 框架开发的浏览器扩展，能够智能�
 > 需求很简单，是我想在手机端 kiwi 浏览器访问的时候能够直接复制全文、标题、作者和网页元信息等，排除干扰，就类似 [llms.txt](https://llmstxt.org/) 那样。
 
 本插件还处于早期开发阶段～欢迎 Star 关注一下
+
+## 安装
+
+已上架 [Chrome 应用商店](https://chromewebstore.google.com/detail/moe-copy-ai/dfmlcfckmfgabpgbaobgapdfmjiihnck)
+
+- 也可以：从 Github 最新 Release 页面获取插件 zip 包 ( chrome-mv3-prod.zip ) ，然后打开浏览器的插件管理页面，启用**开发者模式**，点击“加载已解压的拓展程序”，选择刚刚下载并解压的插件文件夹，就可以完成安装。
 
 ## ✨ 功能
 
