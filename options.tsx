@@ -235,7 +235,6 @@ function OptionsPage() {
                 icon="line-md:heart-twotone"
                 className="-mt-1 inline text-pink-500"
               />
-              <span className="ml-1 animate-pulse">♡</span>
             </p>
           </div>
         </div>

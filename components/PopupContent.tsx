@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react"
 import { memo, useCallback, useState } from "react"
 
+import { sendToBackground } from "@plasmohq/messaging"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import ContentSection from "~/components/ContentSection"
@@ -49,7 +50,12 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
   // 打开选项页面
   const handleOpenOptions = useCallback(() => {
-    chrome.runtime.openOptionsPage()
+    // 使用sendToBackground发送消息到background脚本打开选项页面
+    sendToBackground({
+      name: "openOptionsPage"
+    }).catch((error) => {
+      console.error("打开选项页面失败:", error)
+    })
   }, [])
 
   // 打开GitHub仓库
