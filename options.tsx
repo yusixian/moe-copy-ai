@@ -31,6 +31,12 @@ const DEBUG_PANEL_OPTIONS = [
   { value: "false", label: "隐藏" }
 ]
 
+// 定义悬浮窗显示选项
+const FLOAT_BUTTON_OPTIONS = [
+  { value: "true", label: "显示" },
+  { value: "false", label: "隐藏" }
+]
+
 function OptionsPage() {
   // 使用storage hook获取/设置日志级别
   const [logLevel, setLogLevel] = useStorage<string>("log_level", "silent")
@@ -42,6 +48,11 @@ function OptionsPage() {
   // 添加新的hook用于获取/设置调试面板显示状态，默认为显示
   const [showDebugPanel, setShowDebugPanel] = useStorage<string>(
     "show_debug_panel",
+    "true"
+  )
+  // 添加新的hook用于获取/设置网页内悬浮窗显示状态，默认为显示
+  const [showFloatButton, setShowFloatButton] = useStorage<string>(
+    "show_float_button",
     "true"
   )
 
@@ -70,6 +81,15 @@ function OptionsPage() {
       toast.success("设置已保存！")
     },
     [setShowDebugPanel]
+  )
+
+  // 处理悬浮窗显示状态变更
+  const handleFloatButtonChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setShowFloatButton(e.target.value)
+      toast.success("设置已保存！")
+    },
+    [setShowFloatButton]
   )
 
   // 打开GitHub仓库
@@ -191,6 +211,36 @@ function OptionsPage() {
                 <span className="ml-2">不记录任何日志</span>
               </li>
             </ul>
+          </div>
+        </div>
+
+        <div className="mb-6 rounded-xl border-2 border-sky-200 bg-white p-6 shadow-md">
+          <h2 className="mb-4 flex items-center text-xl font-semibold text-sky-600">
+            <Icon icon="line-md:cog-filled-loop" className="mr-2" />
+            界面设置
+          </h2>
+
+          <div className="mb-4">
+            <label
+              className="mb-2 block font-medium text-sky-600"
+              htmlFor="floatButton">
+              网页内悬浮窗
+            </label>
+            <select
+              id="floatButton"
+              value={showFloatButton}
+              onChange={handleFloatButtonChange}
+              className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 focus:border-sky-400 focus:ring-2 focus:ring-sky-200">
+              {FLOAT_BUTTON_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <p className="mt-2 text-sm text-sky-500">
+              控制是否在网页中显示悬浮球。关闭后将不会在浏览的网页中显示悬浮窗，您仍可以通过浏览器扩展图标使用功能
+              (=^･ω･^=)
+            </p>
           </div>
         </div>
 

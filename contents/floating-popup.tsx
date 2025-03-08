@@ -14,6 +14,8 @@ import cssText from "data-text:~styles/global.css"
 import type { PlasmoCSConfig } from "plasmo"
 import { useEffect, useState } from "react"
 
+import { useStorage } from "@plasmohq/storage/hook"
+
 import FloatingButton from "~components/FloatingButton"
 import PopupContent from "~components/PopupContent"
 
@@ -33,6 +35,8 @@ export const config: PlasmoCSConfig = {
 // 主组件
 const FloatingPopup = () => {
   const [isOpen, setIsOpen] = useState(false)
+  // 从存储中获取悬浮窗显示设置，默认为显示
+  const [showFloatButton] = useStorage<string>("show_float_button", "true")
 
   // 使用floating-ui来定位弹窗
   const { refs, floatingStyles, context } = useFloating({
@@ -96,6 +100,11 @@ const FloatingPopup = () => {
   // 处理关闭弹窗
   const handleClose = () => {
     setIsOpen(false)
+  }
+
+  // 如果设置为不显示悬浮窗，则直接返回null
+  if (showFloatButton === "false") {
+    return null
   }
 
   return (
