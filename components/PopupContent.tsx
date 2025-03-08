@@ -12,6 +12,8 @@ import CatSVG from "~components/svg/CatSVG"
 import useScrapedData from "~hooks/useScrapedData"
 import { cn } from "~utils"
 
+import CopyableTextField from "./CopyableTextField"
+
 interface PopupContentProps {
   className?: string
   onClose?: () => void
@@ -292,46 +294,51 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         <div className="rounded-xl border-2 border-indigo-200 bg-white p-4 shadow-lg">
           {/* 页面标题 */}
           <div className="mb-4">
-            <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
-              <span className="mr-2">📑</span>页面标题
+            <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+              <Icon icon="line-md:hash" width="24" height="24" />
+              标题
             </h2>
-            <p className="rounded-xl border border-sky-200 bg-blue-50 p-2">
-              {scrapedData.title}
-            </p>
+            <CopyableTextField
+              text={scrapedData.title}
+              className="rounded-xl border border-sky-200 bg-blue-50 p-2"
+            />
           </div>
 
           {/* 作者信息 */}
           {scrapedData.author && (
             <div className="mb-4">
-              <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
-                <span className="mr-2">👤</span>作者
+              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+                <Icon icon="line-md:account" width="24" height="24" /> 作者
               </h2>
-              <p className="rounded-xl border border-sky-200 bg-blue-50 p-2">
-                {scrapedData.author}
-              </p>
+              <CopyableTextField
+                text={scrapedData.author}
+                className="rounded-xl border border-sky-200 bg-blue-50 p-2"
+              />
             </div>
           )}
 
           {/* 发布日期 */}
           {scrapedData.publishDate && (
             <div className="mb-4">
-              <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
-                <span className="mr-2">🗓️</span>发布日期
+              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+                <Icon icon="line-md:calendar" width="24" height="24" /> 发布日期
               </h2>
-              <p className="rounded-xl border border-sky-200 bg-blue-50 p-2">
-                {scrapedData.publishDate}
-              </p>
+              <CopyableTextField
+                text={scrapedData.publishDate}
+                className="rounded-xl border border-sky-200 bg-blue-50 p-2"
+              />
             </div>
           )}
 
           {/* URL */}
           <div className="mb-4">
-            <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
-              <span className="mr-2">🔗</span>URL
+            <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+              <Icon icon="line-md:link" width="24" height="24" /> URL
             </h2>
-            <p className="break-all rounded-xl border border-sky-200 bg-blue-50 p-2 text-xs">
-              {scrapedData.url}
-            </p>
+            <CopyableTextField
+              text={scrapedData.url}
+              className="rounded-xl border border-sky-200 bg-blue-50 p-2 text-xs"
+            />
           </div>
 
           {/* 文章内容 */}
@@ -346,9 +353,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 页面图片 */}
           {scrapedData.images && scrapedData.images.length > 0 && (
             <div className="mb-4">
-              <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
-                <span className="mr-2">🖼️</span>页面图片
-                <span className="ml-1.5 text-sm font-normal text-sky-500">
+              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+                <Icon icon="line-md:image" width="24" height="24" /> 页面图片
+                <span className="text-sm font-normal text-sky-500">
                   ({scrapedData.images.length}张)
                 </span>
               </h2>
@@ -362,8 +369,13 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 元数据 */}
           {Object.keys(scrapedData.metadata).length > 0 && (
             <div>
-              <h2 className="mb-2 flex items-center text-lg font-semibold text-sky-600">
-                <span className="mr-2">📊</span>元数据
+              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+                <Icon
+                  icon="line-md:emoji-grin-twotone"
+                  width="24"
+                  height="24"
+                />
+                元数据
               </h2>
 
               {/* 元数据图片 */}

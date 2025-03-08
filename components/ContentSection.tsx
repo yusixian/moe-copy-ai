@@ -137,7 +137,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
   return (
     <div className="mb-4">
       <h2 className="relative mb-2 flex items-center justify-between text-lg font-semibold text-sky-600">
-        <span className="inline-block">
+        <span className="inline-flex items-center gap-1">
           <Icon
             icon="line-md:file-document-twotone"
             className="inline"
