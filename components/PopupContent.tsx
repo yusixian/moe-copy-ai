@@ -8,6 +8,7 @@ import ContentSection from "~/components/ContentSection"
 import ImageGrid from "~/components/ImageGrid"
 import MetadataImageSection from "~/components/MetadataImageSection"
 import MetadataTable from "~/components/MetadataTable"
+import SelectorDropdown from "~/components/SelectorDropdown"
 import CatSVG from "~components/svg/CatSVG"
 import useScrapedData from "~hooks/useScrapedData"
 import { cn } from "~utils"
@@ -26,7 +27,14 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
     scrapedData,
     debugInfo,
     isMarkdown,
-    handleRefresh
+    handleRefresh,
+    contentSelectors,
+    authorSelectors,
+    dateSelectors,
+    titleSelectors,
+    selectedSelectorIndices,
+    selectorResults,
+    handleSelectorChange
   } = useScrapedData()
 
   // 从存储中获取是否显示调试面板的设置
@@ -298,6 +306,15 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               <Icon icon="line-md:hash" width="24" height="24" />
               标题
             </h2>
+            {titleSelectors.length > 0 && (
+              <SelectorDropdown
+                type="title"
+                selectors={titleSelectors}
+                selectedIndex={selectedSelectorIndices.title}
+                results={scrapedData?.selectorResults?.title || []}
+                onChange={(index) => handleSelectorChange("title", index)}
+              />
+            )}
             <CopyableTextField
               text={scrapedData.title}
               className="rounded-xl border border-sky-200 bg-blue-50 p-2"
@@ -310,6 +327,15 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
                 <Icon icon="line-md:account" width="24" height="24" /> 作者
               </h2>
+              {authorSelectors.length > 0 && (
+                <SelectorDropdown
+                  type="author"
+                  selectors={authorSelectors}
+                  selectedIndex={selectedSelectorIndices.author}
+                  results={scrapedData?.selectorResults?.author || []}
+                  onChange={(index) => handleSelectorChange("author", index)}
+                />
+              )}
               <CopyableTextField
                 text={scrapedData.author}
                 className="rounded-xl border border-sky-200 bg-blue-50 p-2"
@@ -323,6 +349,15 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
                 <Icon icon="line-md:calendar" width="24" height="24" /> 发布日期
               </h2>
+              {dateSelectors.length > 0 && (
+                <SelectorDropdown
+                  type="date"
+                  selectors={dateSelectors}
+                  selectedIndex={selectedSelectorIndices.date}
+                  results={scrapedData?.selectorResults?.date || []}
+                  onChange={(index) => handleSelectorChange("date", index)}
+                />
+              )}
               <CopyableTextField
                 text={scrapedData.publishDate}
                 className="rounded-xl border border-sky-200 bg-blue-50 p-2"
@@ -343,11 +378,25 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
           {/* 文章内容 */}
           {scrapedData.articleContent && (
-            <ContentSection
-              articleContent={scrapedData.articleContent}
-              cleanedContent={scrapedData.cleanedContent}
-              isMarkdown={isMarkdown}
-            />
+            <div className="mb-4">
+              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+                <Icon icon="line-md:text-box" width="24" height="24" /> 文章内容
+              </h2>
+              {contentSelectors.length > 0 && (
+                <SelectorDropdown
+                  type="content"
+                  selectors={contentSelectors}
+                  selectedIndex={selectedSelectorIndices.content}
+                  results={scrapedData?.selectorResults?.content || []}
+                  onChange={(index) => handleSelectorChange("content", index)}
+                />
+              )}
+              <ContentSection
+                articleContent={scrapedData.articleContent}
+                cleanedContent={scrapedData.cleanedContent}
+                isMarkdown={isMarkdown}
+              />
+            </div>
           )}
 
           {/* 页面图片 */}

@@ -1,14 +1,105 @@
+import { Storage } from "@plasmohq/storage"
+
 import {
   AUTHOR_SELECTORS,
   CONTENT_SELECTORS,
   DATE_SELECTORS,
   TITLE_SELECTORS
 } from "../constants/config"
-import type { ImageInfo, ScrapedContent } from "../constants/types"
+import type {
+  ImageInfo,
+  ScrapedContent,
+  SelectorResultItem,
+  SelectorType
+} from "../constants/types"
 import { cleanContent, extractFormattedText } from "./formatter"
 import { debugLog } from "./logger"
 
-// 从选择器列表中获取第一个匹配的内容
+// 存储键
+const STORAGE_KEYS = {
+  CONTENT: "custom_content_selectors",
+  AUTHOR: "custom_author_selectors",
+  DATE: "custom_date_selectors",
+  TITLE: "custom_title_selectors"
+}
+
+// 存储实例
+const storage = new Storage({ area: "sync" })
+
+// 获取选择器列表，优先使用自定义选择器，如果不存在则使用默认选择器
+async function getSelectors(
+  type: keyof typeof STORAGE_KEYS,
+  customSelector?: string
+): Promise<{ selectors: string[]; selectedSelector?: string }> {
+  // 如果提供了自定义选择器，直接使用
+  if (customSelector) {
+    debugLog(`使用指定的${type}选择器: ${customSelector}`)
+    return { selectors: [customSelector], selectedSelector: customSelector }
+  }
+
+  try {
+    const customSelectors = await storage.get<string[]>(STORAGE_KEYS[type])
+
+    if (customSelectors && customSelectors.length > 0) {
+      debugLog(`使用自定义${type}选择器:`, customSelectors)
+      return { selectors: customSelectors }
+    }
+  } catch (error) {
+    debugLog(`获取自定义${type}选择器时出错:`, error)
+  }
+
+  // 返回默认选择器
+  const defaultSelectors = {
+    CONTENT: CONTENT_SELECTORS,
+    AUTHOR: AUTHOR_SELECTORS,
+    DATE: DATE_SELECTORS,
+    TITLE: TITLE_SELECTORS
+  }
+
+  debugLog(`使用默认${type}选择器`)
+  return { selectors: defaultSelectors[type] }
+}
+
+// 使用选择器列表抓取内容，并收集所有选择器的结果
+async function getContentWithResults(
+  type: SelectorType,
+  selectors: string[],
+  getContentFn: (el: Element) => string
+): Promise<{ content: string; results: SelectorResultItem[] }> {
+  const results: SelectorResultItem[] = []
+  let selectedContent = ""
+
+  // 首先尝试所有选择器，收集结果
+  for (const selector of selectors) {
+    try {
+      const elements = document.querySelectorAll(selector)
+      if (elements.length > 0) {
+        const element = elements[0]
+        const content = getContentFn(element)
+
+        // 如果有内容，添加到结果列表
+        if (content) {
+          results.push({
+            selector,
+            content
+          })
+
+          // 如果还没有选择内容，使用第一个匹配的内容
+          if (!selectedContent) {
+            selectedContent = content
+            debugLog(`从${selector}获取${type}内容:`, content)
+          }
+        }
+      }
+    } catch (error) {
+      debugLog(`使用选择器 ${selector} 抓取内容时出错:`, error)
+    }
+  }
+
+  return { content: selectedContent, results }
+}
+
+// 从选择器列表中获取第一个匹配的内容（为了兼容性保留）
 export function getFirstMatchContent(
   selectors: string[],
   getContentFn: (el: Element) => string
@@ -27,10 +118,15 @@ export function getFirstMatchContent(
 }
 
 // 增强抓取文章内容的函数
-export function extractArticleContent(imagesArray: ImageInfo[] = []): string {
+export async function extractArticleContent(
+  imagesArray: ImageInfo[] = [],
+  customSelector?: string
+): Promise<{ content: string; results: SelectorResultItem[] }> {
+  const results: SelectorResultItem[] = []
+
   // 首先检查是否有article标签
   const articleElements = document.querySelectorAll("article")
-  if (articleElements.length > 0) {
+  if (articleElements.length > 0 && !customSelector) {
     debugLog(`找到了 ${articleElements.length} 个article标签`)
 
     // 如果有多个article元素，选择最长的那个
@@ -47,15 +143,49 @@ export function extractArticleContent(imagesArray: ImageInfo[] = []): string {
     })
 
     debugLog("使用最长的article元素, 长度:", maxLength)
-    return extractFormattedText(longestArticle, imagesArray)
+    const content = extractFormattedText(longestArticle, imagesArray)
+
+    results.push({
+      selector: "article (longest)",
+      content
+    })
+
+    return { content, results }
   }
 
-  // 如果没有article标签，尝试其他常见内容容器
-  for (const selector of CONTENT_SELECTORS) {
-    const contentEl = document.querySelector(selector)
-    if (contentEl) {
-      debugLog(`找到内容容器: ${selector}`)
-      return extractFormattedText(contentEl, imagesArray)
+  // 如果没有article标签或者有自定义选择器，尝试使用选择器
+  const { selectors } = await getSelectors("CONTENT", customSelector)
+
+  const contentResults: SelectorResultItem[] = []
+
+  // 尝试所有选择器，收集结果
+  for (const selector of selectors) {
+    try {
+      const contentEl = document.querySelector(selector)
+      if (contentEl) {
+        debugLog(`找到内容容器: ${selector}`)
+        const content = extractFormattedText(contentEl, imagesArray)
+
+        contentResults.push({
+          selector,
+          content
+        })
+
+        // 如果是指定的选择器或者第一个匹配的选择器，立即返回
+        if (customSelector || contentResults.length === 1) {
+          return { content, results: contentResults }
+        }
+      }
+    } catch (error) {
+      debugLog(`使用选择器 ${selector} 抓取内容时出错:`, error)
+    }
+  }
+
+  // 如果已经找到内容，返回第一个匹配的结果
+  if (contentResults.length > 0) {
+    return {
+      content: contentResults[0].content,
+      results: contentResults
     }
   }
 
@@ -69,59 +199,135 @@ export function extractArticleContent(imagesArray: ImageInfo[] = []): string {
       .map((p) => p.textContent?.trim() || "")
 
     if (contentArray.length > 0) {
-      return contentArray.join("\n\n")
+      const content = contentArray.join("\n\n")
+
+      results.push({
+        selector: "p (paragraphs collection)",
+        content
+      })
+
+      return { content, results }
     }
   }
 
   // 最后的fallback：尝试获取body中的主要文本内容
   debugLog("未找到明确的内容区域，尝试提取body内容")
-  return extractFormattedText(document.body, imagesArray)
+  const content = extractFormattedText(document.body, imagesArray)
+
+  results.push({
+    selector: "body",
+    content
+  })
+
+  return { content, results }
 }
 
 // 提取页面标题
-export function extractTitle(): string {
-  // 首先检查是否有h1标签
-  const headingEl = document.querySelector("h1")
-  if (headingEl) {
-    const title = headingEl.textContent?.trim() || ""
-    if (title) {
-      debugLog("从h1标签获取标题:", title)
-      return title
-    }
-  }
+export async function extractTitle(
+  customSelector?: string
+): Promise<{ title: string; results: SelectorResultItem[] }> {
+  const results: SelectorResultItem[] = []
 
-  // 检查元数据标签
-  for (const selector of TITLE_SELECTORS) {
-    const metaTitle = document.querySelector(selector)
-    if (metaTitle) {
-      const content = metaTitle.getAttribute("content")
-      if (content && content.trim()) {
-        debugLog(`从${selector}获取标题:`, content.trim())
-        return content.trim()
+  // 首先检查是否有h1标签
+  if (!customSelector) {
+    const headingEl = document.querySelector("h1")
+    if (headingEl) {
+      const title = headingEl.textContent?.trim() || ""
+      if (title) {
+        debugLog("从h1标签获取标题:", title)
+
+        results.push({
+          selector: "h1",
+          content: title
+        })
+
+        return { title, results }
       }
     }
   }
 
+  // 检查元数据标签
+  const { selectors } = await getSelectors("TITLE", customSelector)
+
+  const titleResults: SelectorResultItem[] = []
+
+  // 尝试所有选择器，收集结果
+  for (const selector of selectors) {
+    try {
+      const metaTitle = document.querySelector(selector)
+      if (metaTitle) {
+        const content = metaTitle.getAttribute("content")
+        if (content && content.trim()) {
+          debugLog(`从${selector}获取标题:`, content.trim())
+
+          titleResults.push({
+            selector,
+            content: content.trim()
+          })
+
+          // 如果是指定的选择器或者第一个匹配的选择器，立即返回
+          if (customSelector || titleResults.length === 1) {
+            return { title: content.trim(), results: titleResults }
+          }
+        }
+      }
+    } catch (error) {
+      debugLog(`使用选择器 ${selector} 抓取标题时出错:`, error)
+    }
+  }
+
+  // 如果已经找到标题，返回第一个匹配的结果
+  if (titleResults.length > 0) {
+    return {
+      title: titleResults[0].content,
+      results: titleResults
+    }
+  }
+
   // 如果都没有找到，返回文档标题
-  return document.title || "无标题"
+  const docTitle = document.title || "无标题"
+
+  results.push({
+    selector: "document.title",
+    content: docTitle
+  })
+
+  return { title: docTitle, results }
 }
 
 // 提取作者信息
-export function extractAuthor(): string {
-  // 从常见的作者元素位置尝试获取作者信息
-  return getFirstMatchContent(AUTHOR_SELECTORS, (element) => {
+export async function extractAuthor(
+  customSelector?: string
+): Promise<{ author: string; results: SelectorResultItem[] }> {
+  // 获取选择器列表
+  const { selectors } = await getSelectors("AUTHOR", customSelector)
+
+  // 抓取并收集结果
+  const getAuthorContent = (element: Element) => {
     if (element.tagName.toLowerCase() === "meta") {
       return element.getAttribute("content") || ""
     } else {
       return element.textContent?.trim() || ""
     }
-  })
+  }
+
+  const { content, results } = await getContentWithResults(
+    "author",
+    selectors,
+    getAuthorContent
+  )
+  return { author: content, results }
 }
 
 // 提取发布日期
-export function extractPublishDate(): string {
-  // 从常见的日期元素位置尝试获取日期信息
-  return getFirstMatchContent(DATE_SELECTORS, (element) => {
+export async function extractPublishDate(
+  customSelector?: string
+): Promise<{ publishDate: string; results: SelectorResultItem[] }> {
+  // 获取选择器列表
+  const { selectors } = await getSelectors("DATE", customSelector)
+
+  // 抓取并收集结果
+  const getDateContent = (element: Element) => {
     if (element.tagName.toLowerCase() === "meta") {
       return element.getAttribute("content") || ""
     } else if (element.tagName.toLowerCase() === "time") {
@@ -131,7 +337,14 @@ export function extractPublishDate(): string {
     } else {
       return element.textContent?.trim() || ""
     }
-  })
+  }
+
+  const { content, results } = await getContentWithResults(
+    "date",
+    selectors,
+    getDateContent
+  )
+  return { publishDate: content, results }
 }
 
 // 提取页面元数据
@@ -152,8 +365,13 @@ export function extractMetadata(): Record<string, string> {
 }
 
 // 抓取网页内容的主函数
-export function scrapeWebpageContent(): ScrapedContent {
+export async function scrapeWebpageContent(
+  customSelectors?: Partial<Record<SelectorType, string>>
+): Promise<ScrapedContent> {
   debugLog("开始抓取网页内容")
+  if (customSelectors) {
+    debugLog("使用自定义选择器:", customSelectors)
+  }
 
   // 创建一个对象存储抓取的内容
   const scrapedContent: ScrapedContent = {
@@ -164,21 +382,44 @@ export function scrapeWebpageContent(): ScrapedContent {
     author: "",
     publishDate: "",
     metadata: {},
-    images: []
+    images: [],
+    selectorResults: {
+      content: [],
+      author: [],
+      date: [],
+      title: []
+    }
   }
 
   // 提取标题
-  scrapedContent.title = extractTitle()
+  const { title, results: titleResults } = await extractTitle(
+    customSelectors?.title
+  )
+  scrapedContent.title = title
+  scrapedContent.selectorResults.title = titleResults
 
   // 提取作者信息
-  scrapedContent.author = extractAuthor()
+  const { author, results: authorResults } = await extractAuthor(
+    customSelectors?.author
+  )
+  scrapedContent.author = author
+  scrapedContent.selectorResults.author = authorResults
 
   // 提取发布日期
-  scrapedContent.publishDate = extractPublishDate()
+  const { publishDate, results: dateResults } = await extractPublishDate(
+    customSelectors?.date
+  )
+  scrapedContent.publishDate = publishDate
+  scrapedContent.selectorResults.date = dateResults
 
   // 提取文章内容
   debugLog("开始抓取文章内容")
-  scrapedContent.articleContent = extractArticleContent(scrapedContent.images)
+  const { content, results: contentResults } = await extractArticleContent(
+    scrapedContent.images,
+    customSelectors?.content
+  )
+  scrapedContent.articleContent = content
+  scrapedContent.selectorResults.content = contentResults
 
   // 生成清洁版内容
   scrapedContent.cleanedContent = cleanContent(scrapedContent.articleContent)
@@ -200,7 +441,13 @@ export function scrapeWebpageContent(): ScrapedContent {
     contentLength: scrapedContent.articleContent.length,
     cleanedContentLength: scrapedContent.cleanedContent.length,
     metadataCount: Object.keys(scrapedContent.metadata).length,
-    imageCount: scrapedContent.images.length
+    imageCount: scrapedContent.images.length,
+    selectorResultsCount: {
+      title: scrapedContent.selectorResults.title.length,
+      author: scrapedContent.selectorResults.author.length,
+      date: scrapedContent.selectorResults.date.length,
+      content: scrapedContent.selectorResults.content.length
+    }
   })
 
   return scrapedContent

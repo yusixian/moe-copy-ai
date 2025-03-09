@@ -55,7 +55,21 @@ export const DATE_SELECTORS = [
 export const TITLE_SELECTORS = [
   'meta[property="og:title"]',
   'meta[name="twitter:title"]',
-  'meta[name="title"]'
+  'meta[name="title"]',
+  "h1",
+  "h1.title",
+  "h1.post-title",
+  "h1.entry-title",
+  "h1.article-title",
+  ".title",
+  ".post-title",
+  ".entry-title",
+  ".article-title",
+  ".headline",
+  "header h1",
+  "article h1",
+  '[itemprop="headline"]',
+  "title"
 ]
 
 // 不需要处理的元素标签列表

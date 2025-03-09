@@ -8,6 +8,7 @@ import Footer from "./components/option/Footer"
 import InterfaceSettingsSection from "./components/option/InterfaceSettingsSection"
 import LogSettingsSection from "./components/option/LogSettingsSection"
 import OptionHeader from "./components/option/OptionHeader"
+import SelectorSettingsSection from "./components/option/SelectorSettingsSection"
 
 function OptionsPage() {
   return (
@@ -16,6 +17,7 @@ function OptionsPage() {
         <OptionHeader />
         <LogSettingsSection />
         <InterfaceSettingsSection />
+        <SelectorSettingsSection />
         <DevSettingsSection />
         <Footer />
       </div>
