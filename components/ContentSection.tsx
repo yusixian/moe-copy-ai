@@ -2,6 +2,7 @@ import { countTokens } from "gpt-tokenizer"
 import { useMemo, useState } from "react"
 
 import ContentDisplay from "./ContentDisplay"
+import TokenizationDisplay from "./TokenizationDisplay"
 import { Button } from "./ui/button"
 import { Card } from "./ui/card"
 
@@ -29,6 +30,8 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
   // 本地维护内容状态，使编辑即时生效
   const [localArticleContent, setLocalArticleContent] = useState(articleContent)
   const [localCleanedContent, setLocalCleanedContent] = useState(cleanedContent)
+  // 添加分词显示状态
+  const [showTokenization, setShowTokenization] = useState(false)
 
   if (!articleContent) {
     return null
@@ -169,6 +172,13 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
         </Button>
 
         <Button
+          variant={showTokenization ? "outline" : "default"}
+          size="sm"
+          onClick={() => setShowTokenization(!showTokenization)}>
+          {showTokenization ? "隐藏分词" : "显示分词"}
+        </Button>
+
+        <Button
           variant={copySuccess ? "success" : "copy"}
           size="sm"
           onClick={handleCopy}>
@@ -186,6 +196,11 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
           </div>
         )}
       </div>
+      <TokenizationDisplay
+        className="mt-4"
+        content={currentContent}
+        isVisible={showTokenization}
+      />
     </div>
   )
 }
