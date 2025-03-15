@@ -22,7 +22,7 @@ export const MetadataImageSection: React.FC<MetadataImageSectionProps> = ({
 
   return (
     <div className="mb-4">
-      <h3 className="text-md font-medium mb-2 text-sky-600">元数据图片</h3>
+      <h3 className="text-md mb-2 font-medium text-sky-600">元数据图片</h3>
       <div className="flex flex-wrap gap-3">
         {metadata["og:image"] && (
           <MetadataImage

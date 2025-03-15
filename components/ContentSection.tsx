@@ -1,8 +1,8 @@
+import { countTokens } from "gpt-tokenizer"
 import { useMemo, useState } from "react"
 
-import { Icon } from "~node_modules/@iconify/react/dist/iconify"
-
 import ContentDisplay from "./ContentDisplay"
+import TokenizationDisplay from "./TokenizationDisplay"
 import { Button } from "./ui/button"
 import { Card } from "./ui/card"
 
@@ -30,6 +30,8 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
   // 本地维护内容状态，使编辑即时生效
   const [localArticleContent, setLocalArticleContent] = useState(articleContent)
   const [localCleanedContent, setLocalCleanedContent] = useState(cleanedContent)
+  // 添加分词显示状态
+  const [showTokenization, setShowTokenization] = useState(false)
 
   if (!articleContent) {
     return null
@@ -49,32 +51,16 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
     articleContent
   ])
 
-  // 获取大约的字数（中文+英文单词）
-  const wordCount = useMemo(() => {
-    if (!currentContent) return 0
-    // 匹配中文字符和英文单词
-    const chineseChars = (currentContent.match(/[\u4e00-\u9fa5]/g) || []).length
-    const englishWords = (currentContent.match(/[a-zA-Z]+/g) || []).length
-    return chineseChars + englishWords
-  }, [currentContent])
+  // 使用 gpt-tokenizer ，最快的 JavaScript BPE 分词编码解码器，适用于 OpenAI 的 GPT-2 / GPT-3 / GPT-4 / GPT-4o / GPT-o1。OpenAI 的 tiktoken 的移植版，并增加了额外功能。
 
-  // TODO: 估算AI模型的token数量，更精确的估算
   const tokenCount = useMemo(() => {
     if (!currentContent) return 0
-
-    // 简单估算token数量
-    // 1. 中文字符通常每字约1个token
-    const chineseChars = (currentContent.match(/[\u4e00-\u9fa5]/g) || []).length
-
-    // 2. 英文约每4个字符1个token
-    const englishChars = (currentContent.match(/[a-zA-Z0-9]/g) || []).length
-    const englishTokens = Math.ceil(englishChars / 4)
-
-    // 3. 空格和标点符号
-    const spacesAndPuncts = (currentContent.match(/[\s\p{P}]/gu) || []).length
-
-    // 合计并四舍五入
-    return Math.round(chineseChars + englishTokens + spacesAndPuncts)
+    try {
+      return countTokens(currentContent)
+    } catch (error) {
+      console.error("计算token数量失败:", error)
+      return 0
+    }
   }, [currentContent])
 
   // 切换预览模式
@@ -135,17 +121,8 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
   }
 
   return (
-    <div className="mb-4">
-      <h2 className="relative mb-2 flex items-center justify-between text-lg font-semibold text-sky-600">
-        <span className="inline-block">
-          <Icon
-            icon="line-md:file-document-twotone"
-            className="inline"
-            width="24"
-            height="24"
-          />
-          文章内容
-        </span>
+    <div className="relative mb-4">
+      <h2 className="absolute right-1 top-1 z-20 flex w-auto items-center justify-between text-lg font-semibold text-sky-600">
         {currentContent?.length ? (
           <div className="flex w-auto items-center gap-1.5 rounded-full bg-gradient-to-r from-sky-50 to-indigo-50 px-3 py-1 text-xs font-medium text-sky-600 shadow-sm ring-1 ring-sky-100 transition-opacity hover:opacity-80">
             <span className="flex items-center">
@@ -195,6 +172,13 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
         </Button>
 
         <Button
+          variant={showTokenization ? "outline" : "default"}
+          size="sm"
+          onClick={() => setShowTokenization(!showTokenization)}>
+          {showTokenization ? "隐藏分词" : "显示分词"}
+        </Button>
+
+        <Button
           variant={copySuccess ? "success" : "copy"}
           size="sm"
           onClick={handleCopy}>
@@ -212,6 +196,11 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
           </div>
         )}
       </div>
+      <TokenizationDisplay
+        className="mt-4"
+        content={currentContent}
+        isVisible={showTokenization}
+      />
     </div>
   )
 }

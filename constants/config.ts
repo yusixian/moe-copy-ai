@@ -22,18 +22,7 @@ export const AUTHOR_SELECTORS = [
   'meta[property="article:author"]',
   'meta[property="og:author"]',
   'a[rel="author"]',
-  ".author-name",
-  ".author",
-  ".byline",
-  ".writer",
-  ".by-line",
-  '[itemprop="author"]',
-  '[class*="author"]',
-  '[class*="byline"]',
-  'span[class*="author"]',
-  ".post-meta a",
-  'address[class*="author"]',
-  ".entry-meta .author"
+  '[class*="author"]'
 ]
 
 // 日期选择器列表 - 按优先级排序
@@ -41,21 +30,26 @@ export const DATE_SELECTORS = [
   'meta[property="article:published_time"]',
   'meta[property="og:published_time"]',
   'meta[name="date"]',
-  "time[datetime]",
-  "time[pubdate]",
-  '[itemprop="datePublished"]',
-  ".published-date",
-  ".post-date",
-  ".entry-date",
   '[class*="publish"]',
-  '[class*="date"]'
+  '[class*="date"]',
+  '[class*="time"]',
+  '[class*="pub"]'
 ]
 
 // 标题选择器列表 - 按优先级排序
 export const TITLE_SELECTORS = [
+  'meta[name="title"]',
   'meta[property="og:title"]',
   'meta[name="twitter:title"]',
-  'meta[name="title"]'
+  "h1[class*='title']",
+  "article h1",
+  "main h1",
+  "header h1",
+  "section h1",
+  "h1",
+  "[id*='title']",
+  "[class*='title']",
+  '[class*="head"]'
 ]
 
 // 不需要处理的元素标签列表
