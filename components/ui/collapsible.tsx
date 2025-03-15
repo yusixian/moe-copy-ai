@@ -68,7 +68,7 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
             <div className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-gradient-to-r from-yellow-200 to-pink-200 opacity-20 blur-xl filter"></div>
           </div>
 
-          <div className="relative z-10 flex items-center gap-2">
+          <div className="relative flex items-center gap-2">
             <span className="inline-block text-base text-sky-600 group-hover:animate-wiggle">
               {icon || (expanded ? iconExpanded : iconCollapsed)}
             </span>
@@ -84,7 +84,7 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
             <div className="ml-1 text-xs text-sky-500">{title}</div>
           </div>
 
-          <div className="relative z-10 flex items-center">
+          <div className="relative flex items-center">
             {/* 展开/收起按钮 */}
             <div
               className={`flex h-6 w-6 items-center justify-center rounded-full border bg-white transition-all duration-300 group-hover:shadow-md ${

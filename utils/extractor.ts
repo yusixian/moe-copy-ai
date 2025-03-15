@@ -62,41 +62,40 @@ async function getSelectors(
 
 // 使用选择器列表抓取内容，并收集所有选择器的结果
 async function getContentWithResults(
-  type: SelectorType,
   selectors: string[],
   getContentFn: (el: Element) => string
 ): Promise<{ content: string; results: SelectorResultItem[] }> {
   const results: SelectorResultItem[] = []
-  let selectedContent = ""
-
+  let firstContent = ""
   // 首先尝试所有选择器，收集结果
   for (const selector of selectors) {
+    const allContent: string[] = []
     try {
       const elements = document.querySelectorAll(selector)
-      if (elements.length > 0) {
-        const element = elements[0]
-        const content = getContentFn(element)
+      if (elements?.length) {
+        elements.forEach((element) => {
+          const content = getContentFn(element)
+          // 如果有内容，添加到结果列表
+          if (content) {
+            allContent.push(content)
 
-        // 如果有内容，添加到结果列表
-        if (content) {
-          results.push({
-            selector,
-            content
-          })
-
-          // 如果还没有选择内容，使用第一个匹配的内容
-          if (!selectedContent) {
-            selectedContent = content
-            debugLog(`从${selector}获取${type}内容:`, content)
+            if (!firstContent) firstContent = content
           }
-        }
+        })
       }
+      if (firstContent) {
+        results.push({
+          selector,
+          content: firstContent,
+          allContent
+        })
+      }
+      debugLog("firstContent:", firstContent)
     } catch (error) {
       debugLog(`使用选择器 ${selector} 抓取内容时出错:`, error)
     }
   }
-
-  return { content: selectedContent, results }
+  return { content: firstContent, results }
 }
 
 // 从选择器列表中获取第一个匹配的内容（为了兼容性保留）
@@ -288,7 +287,6 @@ export async function extractAuthor(
   }
 
   const { content, results } = await getContentWithResults(
-    "author",
     selectors,
     getAuthorContent
   )
@@ -316,7 +314,6 @@ export async function extractPublishDate(
   }
 
   const { content, results } = await getContentWithResults(
-    "date",
     selectors,
     getDateContent
   )

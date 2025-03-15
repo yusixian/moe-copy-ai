@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useLayoutEffect, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
@@ -6,6 +6,7 @@ import { Storage } from "@plasmohq/storage"
 import type {
   ScrapedContent,
   ScrapeResponse,
+  SelectorResultsMap,
   SelectorType
 } from "~constants/types"
 import { detectMarkdown } from "~utils"
@@ -38,10 +39,6 @@ const DEFAULT_SELECTORS_MAP: Record<SelectorType, string[]> = {
   title: TITLE_SELECTORS
 }
 
-// 选择器结果格式
-type SelectorResult = { selector: string; content: string }
-type SelectorResultsMap = Record<SelectorType, SelectorResult[]>
-
 /**
  * 抓取数据钩子
  */
@@ -55,12 +52,7 @@ export const useScrapedData = () => {
   // 选择器列表状态
   const [selectorsMap, setSelectorsMap] = useState<
     Record<SelectorType, string[]>
-  >({
-    content: [],
-    author: [],
-    date: [],
-    title: []
-  })
+  >(DEFAULT_SELECTORS_MAP)
 
   // 当前选择的选择器索引
   const [selectedSelectorIndices, setSelectedSelectorIndices] = useState<
@@ -83,69 +75,62 @@ export const useScrapedData = () => {
   // 添加调试信息
   const addDebugInfo = useCallback((info: string) => {
     logger.debug(info)
-    setDebugInfo((prev) => prev + "\n" + info)
+    setDebugInfo((prev) => prev + (prev ? "\n" : "") + info)
   }, [])
 
-  // 加载选择器
-  useEffect(() => {
-    const loadSelectors = async () => {
+  const initLoadSelectors = useCallback(async () => {
+    try {
+      const selectorCounts = Object.entries(DEFAULT_SELECTORS_MAP)
+        .map(([key, selectors]) => `${key}(${selectors.length})`)
+        .join(", ")
+
+      addDebugInfo(`已加载默认选择器: ${selectorCounts}`)
+
+      // 尝试加载自定义选择器
       try {
-        // 初始化默认选择器
-        const initialSelectorsMap = { ...DEFAULT_SELECTORS_MAP }
-        setSelectorsMap(initialSelectorsMap)
+        const customSelectorsPromises = Object.entries(STORAGE_KEYS).map(
+          async ([type, key]) => {
+            const selectorType = type.toLowerCase() as SelectorType
+            const customSelectors = await storage.get<string[]>(key)
 
-        const selectorCounts = Object.entries(initialSelectorsMap)
-          .map(([key, selectors]) => `${key}(${selectors.length})`)
-          .join(", ")
-
-        addDebugInfo(`已加载默认选择器: ${selectorCounts}`)
-
-        // 尝试加载自定义选择器
-        try {
-          const customSelectorsPromises = Object.entries(STORAGE_KEYS).map(
-            async ([type, key]) => {
-              const selectorType = type.toLowerCase() as SelectorType
-              const customSelectors = await storage.get<string[]>(key)
-
-              if (customSelectors?.length) {
-                addDebugInfo(
-                  `使用自定义${getSelectorTypeName(selectorType)}选择器 (${customSelectors.length})`
-                )
-                return [selectorType, customSelectors] as [
-                  SelectorType,
-                  string[]
-                ]
-              }
-              return null
+            if (customSelectors?.length) {
+              addDebugInfo(
+                `使用自定义 ${getSelectorTypeName(selectorType)} 选择器 (${customSelectors.length})`
+              )
+              return [selectorType, customSelectors] as [SelectorType, string[]]
             }
-          )
+            return null
+          }
+        )
 
-          const customSelectorsResults = await Promise.all(
-            customSelectorsPromises
-          )
+        const customSelectorsResults = await Promise.all(
+          customSelectorsPromises
+        )
 
-          // 更新选择器列表
-          const updatedSelectorsMap = { ...initialSelectorsMap }
-          customSelectorsResults.forEach((result) => {
-            if (result) {
-              const [type, selectors] = result
-              updatedSelectorsMap[type] = selectors
-            }
-          })
+        // 更新选择器列表
+        const updatedSelectorsMap = { ...DEFAULT_SELECTORS_MAP }
+        customSelectorsResults.forEach((result) => {
+          if (result) {
+            const [type, selectors] = result
+            updatedSelectorsMap[type] = selectors
+          }
+        })
 
-          setSelectorsMap(updatedSelectorsMap)
-        } catch (storageError) {
-          addDebugInfo(
-            "获取自定义选择器失败，使用默认选择器: " + storageError.message
-          )
-        }
-      } catch (error) {
-        addDebugInfo("选择器初始化失败: " + error.message)
+        setSelectorsMap(updatedSelectorsMap)
+      } catch (storageError) {
+        addDebugInfo(
+          "获取自定义选择器失败，使用默认选择器: " + storageError.message
+        )
       }
+    } catch (error) {
+      addDebugInfo("选择器初始化失败: " + error.message)
     }
-
-    loadSelectors()
   }, [addDebugInfo])
+
+  // 加载选择器
+  useLayoutEffect(() => {
+    initLoadSelectors()
+  }, [initLoadSelectors])
 
   // 获取抓取数据
   const fetchScrapedContent = useCallback(
@@ -346,7 +331,6 @@ export const useScrapedData = () => {
               updatedData.title = ""
               break
           }
-
           setScrapedData(updatedData)
 
           // 同时尝试重新抓取
@@ -368,8 +352,84 @@ export const useScrapedData = () => {
     ]
   )
 
+  // 处理选择特定内容项
+  const handleSelectContent = useCallback(
+    (type: SelectorType, selector: string, contentIndex: number) => {
+      addDebugInfo(
+        `选择 ${type} 选择器 ${selector} 的第 ${contentIndex + 1} 个结果`
+      )
+
+      // 确保有抓取数据
+      if (!scrapedData) {
+        addDebugInfo("没有抓取数据，无法选择内容")
+        return
+      }
+
+      // 查找该选择器的结果
+      const existingResults = selectorResults[type] || []
+      const existingResult = existingResults.find(
+        (r) => r.selector === selector
+      )
+
+      if (!existingResult) {
+        addDebugInfo(`未找到 ${selector} 选择器的结果`)
+        return
+      }
+
+      // 检查是否有多个内容
+      if (
+        !existingResult.allContent ||
+        existingResult.allContent.length <= contentIndex
+      ) {
+        addDebugInfo(`选择器 ${selector} 没有第 ${contentIndex + 1} 个结果`)
+        return
+      }
+
+      // 获取指定索引的内容
+      const selectedContent = existingResult.allContent[contentIndex]
+
+      // 创建更新后的数据副本
+      const updatedData = { ...scrapedData }
+
+      // 更新数据
+      switch (type) {
+        case "content":
+          updatedData.articleContent = selectedContent
+          updatedData.cleanedContent = formatContent(selectedContent)
+          break
+        case "author":
+          updatedData.author = selectedContent
+          break
+        case "date":
+          updatedData.publishDate = selectedContent
+          break
+        case "title":
+          updatedData.title = selectedContent
+          break
+      }
+
+      // 更新选择器结果中的 content 字段
+      const updatedResults = { ...selectorResults }
+      updatedResults[type] = existingResults.map((result) => {
+        if (result.selector === selector) {
+          return { ...result, content: selectedContent }
+        }
+        return result
+      })
+
+      // 更新状态
+      setSelectorResults(updatedResults)
+      setScrapedData(updatedData)
+
+      addDebugInfo(
+        `已将 ${type} 选择器 ${selector} 的第 ${contentIndex + 1} 个结果设置为当前内容`
+      )
+    },
+    [scrapedData, selectorResults, addDebugInfo]
+  )
+
   // 在组件挂载时抓取当前页面内容
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchScrapedContent()
   }, [fetchScrapedContent])
 
@@ -385,8 +445,8 @@ export const useScrapedData = () => {
     dateSelectors: selectorsMap.date,
     titleSelectors: selectorsMap.title,
     selectedSelectorIndices,
-    selectorResults,
     handleSelectorChange,
+    handleSelectContent,
     getSelectorsForType: (type: SelectorType) => selectorsMap[type] || []
   }
 }

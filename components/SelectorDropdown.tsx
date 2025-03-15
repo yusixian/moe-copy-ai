@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react"
-import React, { useState } from "react"
+import React, { memo, useCallback, useEffect, useRef, useState } from "react"
 
 import type { SelectorResultItem, SelectorType } from "~constants/types"
 
@@ -25,6 +25,7 @@ interface SelectorDropdownProps {
   selectedIndex: number
   results?: SelectorResultItem[]
   onChange: (index: number) => void
+  onSelectContent?: (selector: string, contentIndex: number) => void
 }
 
 // 选择器列表项组件
@@ -38,196 +39,376 @@ interface SelectorItemProps {
   showPreview: boolean
   previewContent?: string
   allPreviewContents?: string[]
+  onSelectContent?: (selector: string, contentIndex: number) => void
+  closeDropdown?: () => void
 }
 
-const SelectorItem: React.FC<SelectorItemProps> = ({
-  selector,
-  index,
-  isSelected,
-  hasContent,
-  onSelect,
-  onTogglePreview,
-  showPreview,
-  previewContent,
-  allPreviewContents
-}) => {
-  // 判断是否有多个内容
-  const hasMultipleContents =
-    allPreviewContents && allPreviewContents.length > 1
+// 使用 memo 优化 SelectorItem 组件减少不必要的重渲染
+const SelectorItem = memo<SelectorItemProps>(
+  ({
+    selector,
+    index,
+    isSelected,
+    hasContent,
+    onSelect,
+    onTogglePreview,
+    showPreview,
+    previewContent,
+    allPreviewContents,
+    onSelectContent,
+    closeDropdown
+  }) => {
+    // 判断是否有多个内容
+    const hasMultipleContents =
+      allPreviewContents && allPreviewContents.length > 1
 
-  return (
-    <li
-      className={`relative border-t border-sky-100 ${
-        isSelected ? "bg-sky-50 font-medium text-sky-700" : "hover:bg-blue-50"
-      }`}>
-      <button
-        className="flex w-full items-center justify-between p-2 text-left text-xs"
-        onClick={() => onSelect(index)}>
-        <div className="flex items-center">
-          {isSelected && (
-            <Icon icon="mdi:check" className="mr-1 text-sky-500" width={14} />
-          )}
-          <span className="font-mono">{selector}</span>
-        </div>
-        <div className="flex items-center">
-          {hasContent ? (
-            <span className="rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] text-green-600">
-              {hasMultipleContents
-                ? `${allPreviewContents?.length}个结果`
-                : "有结果"}
-            </span>
-          ) : (
-            <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">
-              无结果
-            </span>
-          )}
-          {hasContent && (
-            <button
-              className="ml-1 rounded-full p-1 text-sky-500 hover:bg-sky-100"
-              onClick={(e) => {
-                e.stopPropagation()
-                onTogglePreview(index)
-              }}>
+    // 添加内容预览区域的引用
+    const previewRef = useRef<HTMLDivElement>(null)
+
+    // 当预览显示状态变化时执行滚动
+    useEffect(() => {
+      // 如果预览显示并且预览元素存在
+      if (showPreview && previewRef.current) {
+        // 使用 requestAnimationFrame 代替 setTimeout 更高效
+        const scrollTimer = requestAnimationFrame(() => {
+          // 平滑滚动到预览区域
+          previewRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+          })
+        })
+
+        // 清理定时器
+        return () => cancelAnimationFrame(scrollTimer)
+      }
+    }, [showPreview])
+
+    // 优化事件处理函数，避免重复创建
+    const handleTogglePreview = useCallback(
+      (e: React.MouseEvent) => {
+        e.stopPropagation()
+        onTogglePreview(index)
+      },
+      [index, onTogglePreview]
+    )
+
+    const handleSelect = useCallback(() => {
+      onSelect(index)
+    }, [index, onSelect])
+
+    // 优化内容选择处理函数
+    const handleContentSelect = useCallback(
+      (contentIdx: number) => {
+        if (onSelectContent) {
+          onSelectContent(selector, contentIdx)
+          if (closeDropdown) closeDropdown()
+        }
+      },
+      [selector, onSelectContent, closeDropdown]
+    )
+
+    return (
+      <li
+        className={`relative transition-colors duration-150 ${
+          isSelected
+            ? "bg-gradient-to-r from-sky-50 to-blue-50 font-medium text-sky-700"
+            : "hover:bg-blue-50"
+        }`}>
+        <button
+          className="flex w-full items-center justify-between p-3 text-left text-xs"
+          onClick={handleSelect}>
+          <div className="flex items-center">
+            {isSelected ? (
               <Icon
-                icon={showPreview ? "mdi:eye-off-outline" : "mdi:eye-outline"}
-                width={14}
+                icon="mdi:check-circle"
+                className="mr-1.5 text-sky-500 md:mr-2"
+                width={16}
+                height={16}
               />
-            </button>
-          )}
-        </div>
-      </button>
-
-      {/* 内容预览 */}
-      {hasContent && showPreview && (
-        <div className="border-t border-sky-100 bg-blue-50 p-2">
-          <div className="mb-1 text-xs font-medium text-sky-600">
-            {hasMultipleContents ? "多个内容预览:" : "内容预览:"}
+            ) : (
+              <Icon
+                icon="mdi:selector"
+                className="mr-1.5 text-gray-300 md:mr-2"
+                width={16}
+                height={16}
+              />
+            )}
+            <span className="max-w-[18.75rem] truncate font-mono md:max-w-none">
+              {selector}
+            </span>
           </div>
-          {hasMultipleContents ? (
-            <div className="space-y-2">
-              {allPreviewContents?.map((content, idx) => (
-                <div
-                  key={idx}
-                  className="max-h-20 overflow-auto rounded bg-white p-1.5 text-xs text-gray-700">
-                  <div className="mb-1 text-[10px] text-sky-500">
-                    结果 {idx + 1}:
+          <div className="flex items-center space-x-2">
+            {hasContent ? (
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${hasMultipleContents ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"}`}>
+                {hasMultipleContents
+                  ? `${allPreviewContents?.length}个结果`
+                  : "有结果"}
+              </span>
+            ) : (
+              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+                无结果
+              </span>
+            )}
+            {hasContent && (
+              <button
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                  showPreview
+                    ? "bg-sky-100 text-sky-600 hover:bg-sky-200"
+                    : "text-sky-500 hover:bg-sky-50"
+                }`}
+                onClick={handleTogglePreview}
+                title={showPreview ? "隐藏预览" : "显示预览"}>
+                <Icon
+                  icon={showPreview ? "mdi:eye-off-outline" : "mdi:eye-outline"}
+                  width={18}
+                  height={18}
+                />
+              </button>
+            )}
+          </div>
+        </button>
+
+        {/* 内容预览 */}
+        {hasContent && showPreview && (
+          <div
+            ref={previewRef}
+            className="border-t border-sky-100 bg-blue-50 p-2">
+            <div className="mb-2 text-xs font-medium text-sky-600">
+              {hasMultipleContents ? "多个内容预览:" : "内容预览:"}
+            </div>
+            {hasMultipleContents ? (
+              <div className="space-y-3">
+                {allPreviewContents?.map((content, idx) => (
+                  <div
+                    key={idx}
+                    className="overflow-hidden rounded-lg border border-sky-100 bg-white shadow-sm transition-all hover:shadow-md">
+                    <div className="flex items-center justify-between border-b border-sky-50 bg-gradient-to-r from-sky-50 to-blue-50 px-2 py-2">
+                      <span className="flex items-center text-xs font-medium text-sky-600">
+                        <Icon icon="mdi:numeric" className="mr-1" width={14} />
+                        结果 {idx + 1}
+                      </span>
+                      {onSelectContent && (
+                        <button
+                          className="flex min-h-[32px] items-center rounded-full border border-sky-200 bg-white px-3 py-1 text-xs font-medium text-sky-600 shadow-sm transition-all hover:bg-sky-100 hover:shadow"
+                          onClick={() => handleContentSelect(idx)}
+                          title="将此结果设为当前选择器的内容">
+                          <Icon
+                            icon="mdi:check-circle-outline"
+                            className="mr-1.5"
+                            width={14}
+                            height={14}
+                          />
+                          设为当前结果
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-32 overflow-auto p-2 text-xs text-gray-700 md:max-h-40">
+                      {content}
+                    </div>
                   </div>
-                  {content}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="max-h-20 overflow-auto rounded bg-white p-1.5 text-xs text-gray-700">
-              {previewContent}
-            </div>
-          )}
-        </div>
-      )}
-    </li>
-  )
-}
+                ))}
+              </div>
+            ) : (
+              <div className="max-h-32 overflow-auto rounded-lg border border-sky-100 bg-white p-2 text-gray-700 shadow-sm md:max-h-40">
+                {previewContent}
+              </div>
+            )}
+          </div>
+        )}
+      </li>
+    )
+  }
+)
+
+SelectorItem.displayName = "SelectorItem"
 
 // 标题组件
-const SelectorHeader: React.FC<{
+const SelectorHeader = memo<{
   type: SelectorType
   count: number
-}> = ({ type, count }) => (
-  <div className="flex items-center text-xs text-sky-600">
-    <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-1" width={14} />
+}>(({ type, count }) => (
+  <div className="flex items-center gap-1 text-xs font-medium text-sky-600">
     <span>{SELECTOR_TYPE_NAMES[type]}</span>
-    <span className="ml-1 rounded-full bg-sky-100 px-1.5 py-0.5 text-[10px]">
+    <span className="rounded-full bg-sky-100 px-1 py-0.5 text-xs font-medium text-sky-600">
       {count}个
     </span>
   </div>
-)
+))
+
+SelectorHeader.displayName = "SelectorHeader"
 
 // 下拉触发按钮
-const DropdownToggle: React.FC<{
+const DropdownToggle = memo<{
   isOpen: boolean
   toggleOpen: () => void
   selectedText: string
-}> = ({ isOpen, toggleOpen, selectedText }) => (
+}>(({ isOpen, toggleOpen, selectedText }) => (
   <button
     onClick={toggleOpen}
-    className="flex items-center rounded-lg border border-sky-200 bg-sky-50 px-2 py-1 text-xs text-sky-600 hover:bg-sky-100">
-    <span className="mr-1 max-w-[150px] truncate font-mono">
+    className="flex min-h-[36px] items-center rounded-lg border border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50 px-3 py-1.5 text-xs font-medium text-sky-600 shadow-sm transition-all hover:shadow">
+    <span className="mr-2 max-w-[12.5rem] truncate font-mono md:max-w-[9.375rem]">
       {selectedText}
     </span>
-    <Icon icon={isOpen ? "mdi:chevron-up" : "mdi:chevron-down"} width={14} />
+    <Icon
+      icon={isOpen ? "mdi:chevron-up" : "mdi:chevron-down"}
+      className="text-sky-500 transition-transform duration-200"
+      width={16}
+      height={16}
+    />
   </button>
-)
+))
+
+DropdownToggle.displayName = "DropdownToggle"
+
+// 自定义钩子，管理选择器的状态和操作
+function useSelectorState(
+  selectors: string[],
+  results: SelectorResultItem[] = [],
+  onChange: (index: number) => void,
+  onSelectContent?: (selector: string, contentIndex: number) => void
+) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [showPreviewIndex, setShowPreviewIndex] = useState<number | null>(null)
+
+  // 获取选择器的结果内容
+  const getResultContent = useCallback(
+    (selector: string): string => {
+      const result = results.find((r) => r.selector === selector)
+      return result?.content || ""
+    },
+    [results]
+  )
+
+  // 获取选择器的所有结果内容
+  const getAllResultContents = useCallback(
+    (selector: string): string[] => {
+      // 首先检查是否有带有 allContent 的结果
+      const result = results.find(
+        (r) => r.selector === selector && r.allContent?.length
+      )
+      if (result?.allContent) {
+        return result.allContent
+      }
+
+      // 如果没有 allContent，收集所有匹配该选择器的结果的 content
+      const matchingResults = results
+        .filter((r) => r.selector === selector && r.content)
+        .map((r) => r.content)
+
+      return matchingResults.length ? matchingResults : []
+    },
+    [results]
+  )
+
+  // 检查选择器是否有内容
+  const hasContent = useCallback(
+    (selector: string): boolean => {
+      return results.some((r) => r.selector === selector && r.content)
+    },
+    [results]
+  )
+
+  // 处理选择器变化
+  const handleSelectorChange = useCallback(
+    (index: number) => {
+      if (hasContent(selectors[index])) {
+        onChange(index)
+        setIsOpen(false)
+      }
+    },
+    [selectors, hasContent, onChange]
+  )
+
+  // 切换预览状态
+  const togglePreview = useCallback((index: number) => {
+    setShowPreviewIndex((prevIndex) => (prevIndex === index ? null : index))
+  }, [])
+
+  // 关闭下拉菜单
+  const closeDropdown = useCallback(() => {
+    setIsOpen(false)
+  }, [])
+
+  // 切换下拉菜单开关状态
+  const toggleDropdown = useCallback(() => {
+    setIsOpen((prev) => !prev)
+  }, [])
+
+  // 自定义内容选择处理函数
+  const handleSelectContent = useCallback(
+    (selector: string, contentIndex: number) => {
+      if (onSelectContent) {
+        onSelectContent(selector, contentIndex)
+        closeDropdown() // 选择内容后关闭下拉菜单
+      }
+    },
+    [onSelectContent, closeDropdown]
+  )
+
+  return {
+    isOpen,
+    showPreviewIndex,
+    getResultContent,
+    getAllResultContents,
+    hasContent,
+    handleSelectorChange,
+    togglePreview,
+    closeDropdown,
+    toggleDropdown,
+    handleSelectContent
+  }
+}
 
 const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
   type,
   selectors,
   selectedIndex,
   results = [],
-  onChange
+  onChange,
+  onSelectContent
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [showPreviewIndex, setShowPreviewIndex] = useState<number | null>(null)
+  // 使用自定义钩子管理状态
+  const {
+    isOpen,
+    showPreviewIndex,
+    getResultContent,
+    getAllResultContents,
+    hasContent,
+    handleSelectorChange,
+    togglePreview,
+    closeDropdown,
+    toggleDropdown,
+    handleSelectContent
+  } = useSelectorState(selectors, results, onChange, onSelectContent)
 
   // 如果没有选择器，不显示下拉菜单
   if (!selectors?.length) return null
 
-  // 获取选择器的结果内容
-  const getResultContent = (selector: string): string => {
-    const result = results.find((r) => r.selector === selector)
-    return result?.content || ""
-  }
-
-  // 获取选择器的所有结果内容
-  const getAllResultContents = (selector: string): string[] => {
-    // 首先检查是否有带有 allContent 的结果
-    const result = results.find(
-      (r) => r.selector === selector && r.allContent?.length
-    )
-    if (result?.allContent) {
-      return result.allContent
-    }
-
-    // 如果没有 allContent，收集所有匹配该选择器的结果的 content
-    const matchingResults = results
-      .filter((r) => r.selector === selector && r.content)
-      .map((r) => r.content)
-
-    return matchingResults.length ? matchingResults : []
-  }
-
-  // 检查选择器是否有内容
-  const hasContent = (selector: string): boolean => {
-    return results.some((r) => r.selector === selector && r.content)
-  }
-
-  // 处理选择器变化
-  const handleSelectorChange = (index: number) => {
-    onChange(index)
-    setIsOpen(false)
-  }
-
-  // 切换预览状态
-  const togglePreview = (index: number) => {
-    setShowPreviewIndex(showPreviewIndex === index ? null : index)
-  }
-
   return (
-    <div className="relative mb-2">
-      <div className="flex items-center justify-between">
-        <SelectorHeader type={type} count={selectors.length} />
-        <DropdownToggle
-          isOpen={isOpen}
-          toggleOpen={() => setIsOpen(!isOpen)}
-          selectedText={selectors[selectedIndex] || "默认"}
-        />
-      </div>
+    <div className="ml-auto flex h-9 flex-wrap items-center justify-end gap-1">
+      <SelectorHeader type={type} count={selectors.length} />
+      <DropdownToggle
+        isOpen={isOpen}
+        toggleOpen={toggleDropdown}
+        selectedText={selectors[selectedIndex] || "默认"}
+      />
 
       {/* 下拉菜单 */}
       {isOpen && (
-        <div className="absolute right-0 z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-sky-200 bg-white shadow-lg">
-          <div className="p-2 text-xs text-sky-500">
-            选择不同的{SELECTOR_TYPE_NAMES[type]}查看抓取结果
+        <div className="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-full overflow-hidden rounded-lg border border-sky-200 bg-white shadow-lg">
+          <div className="border-b border-sky-100 bg-gradient-to-r from-sky-50 to-indigo-50 p-2.5 text-xs text-sky-600">
+            <div className="flex items-center">
+              <Icon
+                icon="mdi:information-outline"
+                className="mr-1.5 text-indigo-500 md:mr-2"
+                width={14}
+                height={14}
+              />
+              <span>选择不同的{SELECTOR_TYPE_NAMES[type]}查看抓取结果</span>
+            </div>
           </div>
-          <ul className="max-h-48 overflow-auto">
+          <ul className="max-h-[calc(60vh-3rem)] divide-y divide-sky-50 overflow-auto">
             {selectors.map((selector, index) => {
               const selectorHasContent = hasContent(selector)
               const allContents = getAllResultContents(selector)
@@ -244,6 +425,8 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
                   showPreview={showPreviewIndex === index}
                   previewContent={getResultContent(selector)}
                   allPreviewContents={allContents}
+                  onSelectContent={handleSelectContent}
+                  closeDropdown={closeDropdown}
                 />
               )
             })}

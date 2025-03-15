@@ -16,6 +16,8 @@ export interface SelectorResultItem {
   allContent?: string[] // 选择器抓取到的所有内容（如有多个）
 }
 
+export type SelectorResultsMap = Record<SelectorType, SelectorResultItem[]>
+
 // 抓取内容接口
 export interface ScrapedContent {
   title: string

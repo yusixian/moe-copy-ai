@@ -33,8 +33,8 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
     dateSelectors,
     titleSelectors,
     selectedSelectorIndices,
-    selectorResults,
-    handleSelectorChange
+    handleSelectorChange,
+    handleSelectContent
   } = useScrapedData()
 
   // 从存储中获取是否显示调试面板的设置
@@ -306,19 +306,23 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         <div className="rounded-xl border-2 border-indigo-200 bg-white p-4 shadow-lg">
           {/* 页面标题 */}
           <div className="mb-4">
-            <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+            <h2 className="relative mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
               <Icon icon="line-md:hash" width="24" height="24" />
               标题
+              {titleSelectors.length > 0 && (
+                <SelectorDropdown
+                  type="title"
+                  selectors={titleSelectors}
+                  selectedIndex={selectedSelectorIndices.title}
+                  results={scrapedData?.selectorResults?.title || []}
+                  onChange={(index) => handleSelectorChange("title", index)}
+                  onSelectContent={(selector, contentIndex) =>
+                    handleSelectContent("title", selector, contentIndex)
+                  }
+                />
+              )}
             </h2>
-            {titleSelectors.length > 0 && (
-              <SelectorDropdown
-                type="title"
-                selectors={titleSelectors}
-                selectedIndex={selectedSelectorIndices.title}
-                results={scrapedData?.selectorResults?.title || []}
-                onChange={(index) => handleSelectorChange("title", index)}
-              />
-            )}
+
             <CopyableTextField
               text={scrapedData.title}
               className="rounded-xl border border-sky-200 bg-blue-50 p-2"
@@ -328,18 +332,22 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 作者信息 */}
           {scrapedData.author && (
             <div className="mb-4">
-              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+              <h2 className="mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
                 <Icon icon="line-md:account" width="24" height="24" /> 作者
+                {authorSelectors.length > 0 && (
+                  <SelectorDropdown
+                    type="author"
+                    selectors={authorSelectors}
+                    selectedIndex={selectedSelectorIndices.author}
+                    results={scrapedData?.selectorResults?.author || []}
+                    onChange={(index) => handleSelectorChange("author", index)}
+                    onSelectContent={(selector, contentIndex) =>
+                      handleSelectContent("author", selector, contentIndex)
+                    }
+                  />
+                )}
               </h2>
-              {authorSelectors.length > 0 && (
-                <SelectorDropdown
-                  type="author"
-                  selectors={authorSelectors}
-                  selectedIndex={selectedSelectorIndices.author}
-                  results={scrapedData?.selectorResults?.author || []}
-                  onChange={(index) => handleSelectorChange("author", index)}
-                />
-              )}
+
               <CopyableTextField
                 text={scrapedData.author}
                 className="rounded-xl border border-sky-200 bg-blue-50 p-2"
@@ -350,18 +358,21 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 发布日期 */}
           {scrapedData.publishDate && (
             <div className="mb-4">
-              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+              <h2 className="mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
                 <Icon icon="line-md:calendar" width="24" height="24" /> 发布日期
+                {dateSelectors.length > 0 && (
+                  <SelectorDropdown
+                    type="date"
+                    selectors={dateSelectors}
+                    selectedIndex={selectedSelectorIndices.date}
+                    results={scrapedData?.selectorResults?.date || []}
+                    onChange={(index) => handleSelectorChange("date", index)}
+                    onSelectContent={(selector, contentIndex) =>
+                      handleSelectContent("date", selector, contentIndex)
+                    }
+                  />
+                )}
               </h2>
-              {dateSelectors.length > 0 && (
-                <SelectorDropdown
-                  type="date"
-                  selectors={dateSelectors}
-                  selectedIndex={selectedSelectorIndices.date}
-                  results={scrapedData?.selectorResults?.date || []}
-                  onChange={(index) => handleSelectorChange("date", index)}
-                />
-              )}
               <CopyableTextField
                 text={scrapedData.publishDate}
                 className="rounded-xl border border-sky-200 bg-blue-50 p-2"
@@ -393,6 +404,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   selectedIndex={selectedSelectorIndices.content}
                   results={scrapedData?.selectorResults?.content || []}
                   onChange={(index) => handleSelectorChange("content", index)}
+                  onSelectContent={(selector, contentIndex) =>
+                    handleSelectContent("content", selector, contentIndex)
+                  }
                 />
               )}
               <ContentSection
