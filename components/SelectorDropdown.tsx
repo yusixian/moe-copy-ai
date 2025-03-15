@@ -2,7 +2,6 @@ import { Icon } from "@iconify/react"
 import React, { memo, useCallback, useEffect, useRef, useState } from "react"
 
 import type { SelectorResultItem, SelectorType } from "~constants/types"
-import { useOutsideClick } from "~hooks/useOutsideClick"
 
 // 选择器类型映射到显示名称
 const SELECTOR_TYPE_NAMES: Record<SelectorType, string> = {
@@ -377,12 +376,6 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
     handleSelectContent
   } = useSelectorState(selectors, results, onChange, onSelectContent)
 
-  // 添加下拉菜单的引用
-  const dropdownRef = useRef<HTMLDivElement>(null)
-
-  // 使用自定义Hook检测点击外部区域
-  useOutsideClick(dropdownRef, closeDropdown)
-
   // 如果没有选择器，不显示下拉菜单
   if (!selectors?.length) return null
 
@@ -397,9 +390,7 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
 
       {/* 下拉菜单 */}
       {isOpen && (
-        <div
-          ref={dropdownRef}
-          className="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-hidden rounded-lg border border-sky-200 bg-white shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-hidden rounded-lg border border-sky-200 bg-white shadow-lg">
           <div className="border-b border-sky-100 bg-gradient-to-r from-sky-50 to-indigo-50 p-2.5 text-xs text-sky-600">
             <div className="flex items-center">
               <Icon
