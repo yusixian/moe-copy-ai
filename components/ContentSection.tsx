@@ -135,17 +135,8 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
   }
 
   return (
-    <div className="mb-4">
-      <h2 className="relative mb-2 flex items-center justify-between text-lg font-semibold text-sky-600">
-        <span className="inline-flex items-center gap-1">
-          <Icon
-            icon="line-md:file-document-twotone"
-            className="inline"
-            width="24"
-            height="24"
-          />
-          文章内容
-        </span>
+    <div className="relative mb-4">
+      <h2 className="absolute right-1 top-1 z-20 flex w-auto items-center justify-between text-lg font-semibold text-sky-600">
         {currentContent?.length ? (
           <div className="flex w-auto items-center gap-1.5 rounded-full bg-gradient-to-r from-sky-50 to-indigo-50 px-3 py-1 text-xs font-medium text-sky-600 shadow-sm ring-1 ring-sky-100 transition-opacity hover:opacity-80">
             <span className="flex items-center">

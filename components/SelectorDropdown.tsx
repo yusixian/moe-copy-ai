@@ -386,7 +386,7 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
   if (!selectors?.length) return null
 
   return (
-    <div className="ml-auto flex h-9 flex-wrap items-center justify-end gap-1">
+    <div className="relative ml-auto flex h-9 flex-wrap items-center justify-end gap-1">
       <SelectorHeader type={type} count={selectors.length} />
       <DropdownToggle
         isOpen={isOpen}
@@ -396,7 +396,7 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
 
       {/* 下拉菜单 */}
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-full overflow-hidden rounded-lg border border-sky-200 bg-white shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-hidden rounded-lg border border-sky-200 bg-white shadow-lg">
           <div className="border-b border-sky-100 bg-gradient-to-r from-sky-50 to-indigo-50 p-2.5 text-xs text-sky-600">
             <div className="flex items-center">
               <Icon

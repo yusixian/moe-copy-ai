@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react"
 import React, { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 
+import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import {
@@ -69,6 +70,7 @@ const SelectorEditor: React.FC<{
   // 本地编辑状态
   const [editingSelectors, setEditingSelectors] = useState<string[]>([])
   const [newSelector, setNewSelector] = useState("")
+  const [showRules, setShowRules] = useState(true)
 
   // 初始化编辑状态
   useEffect(() => {
@@ -148,20 +150,85 @@ const SelectorEditor: React.FC<{
 
         <p className="mb-4 text-sm text-gray-600">
           {SELECTOR_TYPE_DESCRIPTIONS[type]} (按优先级排序，从上到下)
-          {type === "title" && (
-            <>
-              <br />
-              <br />
-              <strong>标题抓取规则说明：</strong>
-              <ol className="mt-2 list-decimal pl-5">
-                <li>系统会严格按照选择器列表的顺序从上到下依次尝试匹配</li>
-                <li>
-                  建议将最常用、最可靠的选择器放在列表前面，以提高抓取效率和准确性
-                </li>
-              </ol>
-            </>
-          )}
         </p>
+
+        {(type === "title" || type === "content") && (
+          <div className="mb-4">
+            <button
+              onClick={() => setShowRules(!showRules)}
+              className="flex items-center rounded-md border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700">
+              <Icon
+                icon={showRules ? "mdi:chevron-up" : "mdi:chevron-down"}
+                className="mr-1.5"
+                width={16}
+              />
+              {showRules ? "收起规则说明" : "展开规则说明"}
+            </button>
+
+            {type === "title" && (
+              <div
+                className={`origin-top transform transition-all duration-300 ease-in-out ${
+                  showRules
+                    ? "mt-3 max-h-[500px] scale-100 opacity-100"
+                    : "scale-98 mt-0 max-h-0 overflow-hidden opacity-0"
+                }`}>
+                <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
+                  <strong className="mb-2 flex items-center text-sky-700">
+                    <Icon
+                      icon="mdi:information-outline"
+                      className="mr-1"
+                      width={16}
+                    />
+                    标题抓取规则说明：
+                  </strong>
+                  <ol className="ml-5 list-decimal space-y-1 text-gray-600">
+                    <li>系统会严格按照选择器列表的顺序从上到下依次尝试匹配</li>
+                    <li>
+                      建议将最常用、最可靠的选择器放在列表前面，以提高抓取效率和准确性
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            )}
+
+            {type === "content" && (
+              <div
+                className={`origin-top transform transition-all duration-300 ease-in-out ${
+                  showRules
+                    ? "mt-3 max-h-[500px] scale-100 opacity-100"
+                    : "scale-98 mt-0 max-h-0 overflow-hidden opacity-0"
+                }`}>
+                <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
+                  <strong className="mb-2 flex items-center text-sky-700">
+                    <Icon
+                      icon="mdi:information-outline"
+                      className="mr-1"
+                      width={16}
+                    />
+                    内容抓取规则说明：
+                  </strong>
+                  <ol className="ml-5 list-decimal space-y-1 text-gray-600">
+                    <li>
+                      如果页面中存在
+                      <code className="mx-1 rounded border border-sky-100 bg-white px-1 font-mono text-sky-700">
+                        article
+                      </code>
+                      标签且未指定自定义选择器，将优先使用内容最长的article元素
+                    </li>
+                    <li>如果指定了自定义选择器，将优先使用自定义选择器</li>
+                    <li>
+                      如果没有找到article标签或自定义选择器未匹配，将按顺序尝试选择器列表
+                    </li>
+                    <li>
+                      如果仍未找到内容，将尝试查找页面中的段落集合（至少3个段落且长度大于30个字符）
+                    </li>
+                    <li>最后的备选方案是提取整个body内容</li>
+                  </ol>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* 添加新选择器 */}
         <div className="mb-4 flex">
@@ -262,9 +329,52 @@ const SelectorTypeCard: React.FC<{
   )
 }
 
+// 抓取规则说明组件
+const ScrapeRulesExplanation = () => {
+  return (
+    <div className="rounded-lg border-2 border-sky-100 bg-white p-5 text-sm shadow-sm">
+      <h4 className="mb-3 flex items-center font-semibold text-sky-600">
+        <Icon icon="mdi:information-outline" className="mr-2" width={20} />
+        内容抓取规则说明
+      </h4>
+      <p className="mb-3 text-gray-600">
+        文章内容抓取采用以下策略（按优先级排序）：
+      </p>
+      <ol className="mb-4 ml-5 list-decimal space-y-2 text-gray-600">
+        <li>
+          如果页面中存在
+          <code className="mx-1 rounded border border-sky-100 bg-sky-50 px-1 font-mono text-sky-700">
+            article
+          </code>
+          标签且未指定自定义选择器，将使用内容最长的article元素
+        </li>
+        <li>如果指定了自定义选择器，将优先使用自定义选择器</li>
+        <li>
+          如果没有找到article标签或自定义选择器未匹配，将按顺序尝试默认选择器列表
+        </li>
+        <li>
+          如果仍未找到内容，将尝试查找页面中的段落集合（至少3个段落且长度大于30个字符）
+        </li>
+        <li>最后的备选方案是提取整个body内容</li>
+      </ol>
+      <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
+        <p className="mb-2 font-medium text-sky-700">
+          默认选择器列表（按优先级）：
+        </p>
+        <div className="max-h-32 overflow-y-auto rounded border border-sky-100 bg-white p-2">
+          <code className="font-mono text-xs text-gray-600">
+            {CONTENT_SELECTORS.join(", ")}
+          </code>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // 主组件
 export const SelectorSettingsSection: React.FC = () => {
   const [editingType, setEditingType] = useState<SelectorType | null>(null)
+  const [showExplanation, setShowExplanation] = useState(false)
 
   // 处理打开编辑器
   const handleOpenEditor = (type: SelectorType) => {
@@ -278,29 +388,58 @@ export const SelectorSettingsSection: React.FC = () => {
 
   return (
     <OptionSection title="选择器设置" icon="line-md:document-code">
-      <p className="mb-4 text-sm text-gray-600">
-        自定义网页内容抓取时使用的CSS选择器。这些选择器按优先级排序，抓取器会依次尝试每个选择器直到找到匹配元素。
-      </p>
+      <div className="mb-4 flex items-center justify-between">
+        <span className="text-sm text-gray-600">
+          自定义CSS选择器用于从网页中提取内容。点击卡片编辑对应类型的选择器。
+        </span>
+        <button
+          className="flex items-center rounded-md border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700"
+          onClick={() => setShowExplanation(!showExplanation)}>
+          <Icon
+            icon={showExplanation ? "mdi:eye-off-outline" : "mdi:eye-outline"}
+            className="mr-1.5"
+            width={18}
+          />
+          {showExplanation ? "隐藏抓取规则" : "查看抓取规则"}
+        </button>
+      </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div
+        className={`origin-top transform transition-all duration-500 ease-in-out ${
+          showExplanation
+            ? "mb-6 max-h-[1000px] scale-100 opacity-100"
+            : "scale-98 mb-0 max-h-0 overflow-hidden opacity-0"
+        }`}
+        style={{
+          transitionDelay: showExplanation ? "0ms" : "100ms"
+        }}>
+        <ScrapeRulesExplanation />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* 内容选择器卡片 */}
         <SelectorTypeCard
           type="content"
           onClick={() => handleOpenEditor("content")}
         />
+        {/* 作者选择器卡片 */}
         <SelectorTypeCard
           type="author"
           onClick={() => handleOpenEditor("author")}
         />
+        {/* 日期选择器卡片 */}
         <SelectorTypeCard
           type="date"
           onClick={() => handleOpenEditor("date")}
         />
+        {/* 标题选择器卡片 */}
         <SelectorTypeCard
           type="title"
           onClick={() => handleOpenEditor("title")}
         />
       </div>
 
+      {/* 选择器编辑器弹窗 */}
       {editingType && (
         <SelectorEditor type={editingType} onClose={handleCloseEditor} />
       )}

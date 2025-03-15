@@ -306,7 +306,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         <div className="rounded-xl border-2 border-indigo-200 bg-white p-4 shadow-lg">
           {/* 页面标题 */}
           <div className="mb-4">
-            <h2 className="relative mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
+            <h2 className="mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
               <Icon icon="line-md:hash" width="24" height="24" />
               标题
               {titleSelectors.length > 0 && (
@@ -395,20 +395,26 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {scrapedData.articleContent && (
             <div className="mb-4">
               <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
-                <Icon icon="line-md:text-box" width="24" height="24" /> 文章内容
-              </h2>
-              {contentSelectors.length > 0 && (
-                <SelectorDropdown
-                  type="content"
-                  selectors={contentSelectors}
-                  selectedIndex={selectedSelectorIndices.content}
-                  results={scrapedData?.selectorResults?.content || []}
-                  onChange={(index) => handleSelectorChange("content", index)}
-                  onSelectContent={(selector, contentIndex) =>
-                    handleSelectContent("content", selector, contentIndex)
-                  }
+                <Icon
+                  icon="line-md:file-document-twotone"
+                  className="inline"
+                  width="24"
+                  height="24"
                 />
-              )}
+                文章内容
+                {contentSelectors.length > 0 && (
+                  <SelectorDropdown
+                    type="content"
+                    selectors={contentSelectors}
+                    selectedIndex={selectedSelectorIndices.content}
+                    results={scrapedData?.selectorResults?.content || []}
+                    onChange={(index) => handleSelectorChange("content", index)}
+                    onSelectContent={(selector, contentIndex) =>
+                      handleSelectContent("content", selector, contentIndex)
+                    }
+                  />
+                )}
+              </h2>
               <ContentSection
                 articleContent={scrapedData.articleContent}
                 cleanedContent={scrapedData.cleanedContent}
