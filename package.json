@@ -16,6 +16,7 @@
     "@plasmohq/storage": "^1.15.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "gpt-tokenizer": "^2.9.0",
     "markdown-it": "^14.1.0",
     "motion": "^12.4.7",
     "pino": "^9.6.0",
