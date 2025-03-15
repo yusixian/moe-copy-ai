@@ -232,6 +232,43 @@ export const useScrapedData = () => {
       const selector = selectors[index]
       addDebugInfo(`使用 ${type} 选择器: ${selector}`)
 
+      // 检查是否有该选择器的已有结果
+      const existingResults = selectorResults[type] || []
+      const existingResult = existingResults.find(
+        (r) => r.selector === selector
+      )
+
+      if (existingResult && existingResult.content) {
+        // 如果已经有结果，则直接更新当前数据而不重新抓取
+        addDebugInfo(
+          `使用现有的 ${type} 选择器结果: ${existingResult.content.substring(0, 30)}...`
+        )
+
+        if (scrapedData) {
+          const updatedData = { ...scrapedData }
+
+          // 根据选择器类型更新相应的内容
+          switch (type) {
+            case "content":
+              updatedData.articleContent = existingResult.content
+              updatedData.cleanedContent = formatContent(existingResult.content)
+              break
+            case "author":
+              updatedData.author = existingResult.content
+              break
+            case "date":
+              updatedData.publishDate = existingResult.content
+              break
+            case "title":
+              updatedData.title = existingResult.content
+              break
+          }
+
+          setScrapedData(updatedData)
+          return
+        }
+      }
+
       // 创建一个只包含当前类型的选择器的对象
       const overrideSelectors: Partial<Record<SelectorType, string>> = {
         [type]: selector
