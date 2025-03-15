@@ -44,7 +44,7 @@ const SELECTOR_TYPE_DESCRIPTIONS = {
   content: "用于提取页面主要内容的CSS选择器",
   author: "用于提取作者信息的CSS选择器",
   date: "用于提取发布日期的CSS选择器",
-  title: "用于提取文章标题的CSS选择器"
+  title: "用于提取文章标题的CSS选择器，系统会严格按照选择器列表顺序尝试匹配"
 }
 
 // 选择器类型映射到默认选择器
@@ -148,6 +148,19 @@ const SelectorEditor: React.FC<{
 
         <p className="mb-4 text-sm text-gray-600">
           {SELECTOR_TYPE_DESCRIPTIONS[type]} (按优先级排序，从上到下)
+          {type === "title" && (
+            <>
+              <br />
+              <br />
+              <strong>标题抓取规则说明：</strong>
+              <ol className="mt-2 list-decimal pl-5">
+                <li>系统会严格按照选择器列表的顺序从上到下依次尝试匹配</li>
+                <li>
+                  建议将最常用、最可靠的选择器放在列表前面，以提高抓取效率和准确性
+                </li>
+              </ol>
+            </>
+          )}
         </p>
 
         {/* 添加新选择器 */}

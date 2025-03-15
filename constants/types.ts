@@ -12,7 +12,8 @@ export type SelectorType = "content" | "author" | "date" | "title"
 // 选择器结果项
 export interface SelectorResultItem {
   selector: string
-  content: string
+  content: string // 选择器抓取到的第一个内容
+  allContent?: string[] // 选择器抓取到的所有内容（如有多个）
 }
 
 // 抓取内容接口

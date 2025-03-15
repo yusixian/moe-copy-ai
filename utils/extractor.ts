@@ -228,71 +228,47 @@ export async function extractTitle(
 ): Promise<{ title: string; results: SelectorResultItem[] }> {
   const results: SelectorResultItem[] = []
 
-  // 首先检查是否有h1标签
-  if (!customSelector) {
-    const headingEl = document.querySelector("h1")
-    if (headingEl) {
-      const title = headingEl.textContent?.trim() || ""
-      if (title) {
-        debugLog("从h1标签获取标题:", title)
-
-        results.push({
-          selector: "h1",
-          content: title
-        })
-
-        return { title, results }
-      }
-    }
-  }
-
-  // 检查元数据标签
+  // 获取选择器列表
   const { selectors } = await getSelectors("TITLE", customSelector)
-
-  const titleResults: SelectorResultItem[] = []
 
   // 尝试所有选择器，收集结果
   for (const selector of selectors) {
     try {
-      const metaTitle = document.querySelector(selector)
-      if (metaTitle) {
-        const content = metaTitle.getAttribute("content")
-        if (content && content.trim()) {
-          debugLog(`从${selector}获取标题:`, content.trim())
+      const elements = document.querySelectorAll(selector)
+      let firstContent = ""
+      let allContent: string[] = []
+      if (elements.length > 0) {
+        for (const element of elements) {
+          let content = ""
+          // 根据元素类型获取内容
+          if (element.tagName.toLowerCase() === "meta") {
+            content = element.getAttribute("content")?.trim() || ""
+          } else {
+            content = element.textContent?.trim() || ""
+          }
 
-          titleResults.push({
-            selector,
-            content: content.trim()
-          })
-
-          // 如果是指定的选择器或者第一个匹配的选择器，立即返回
-          if (customSelector || titleResults.length === 1) {
-            return { title: content.trim(), results: titleResults }
+          if (!firstContent) firstContent = content
+          if (content) {
+            allContent.push(content)
+            // 找到第一个匹配的选择器就返回
           }
         }
+      }
+      if (firstContent) {
+        results.push({
+          selector,
+          content: firstContent,
+          allContent
+        })
+        debugLog(`从 ${selector} 获取到标题:`, firstContent)
       }
     } catch (error) {
       debugLog(`使用选择器 ${selector} 抓取标题时出错:`, error)
     }
   }
 
-  // 如果已经找到标题，返回第一个匹配的结果
-  if (titleResults.length > 0) {
-    return {
-      title: titleResults[0].content,
-      results: titleResults
-    }
-  }
-
-  // 如果都没有找到，返回文档标题
-  const docTitle = document.title || "无标题"
-
-  results.push({
-    selector: "document.title",
-    content: docTitle
-  })
-
-  return { title: docTitle, results }
+  debugLog(`extractTitle results:`, results)
+  return { title: results[0]?.content || "", results }
 }
 
 // 提取作者信息
@@ -361,6 +337,7 @@ export function extractMetadata(): Record<string, string> {
   })
 
   debugLog(`抓取了 ${Object.keys(metadata).length} 个元数据标签`)
+  // debugLog("元数据:" + JSON.stringify(metadata))
   return metadata
 }
 

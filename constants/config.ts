@@ -53,23 +53,17 @@ export const DATE_SELECTORS = [
 
 // 标题选择器列表 - 按优先级排序
 export const TITLE_SELECTORS = [
+  'meta[name="title"]',
   'meta[property="og:title"]',
   'meta[name="twitter:title"]',
-  'meta[name="title"]',
-  "h1",
-  "h1.title",
-  "h1.post-title",
-  "h1.entry-title",
-  "h1.article-title",
-  ".title",
-  ".post-title",
-  ".entry-title",
-  ".article-title",
-  ".headline",
-  "header h1",
+  "h1[class*='title']",
   "article h1",
-  '[itemprop="headline"]',
-  "title"
+  "main h1",
+  "header h1",
+  "section h1",
+  "h1",
+  "div[id*='title']",
+  "div[class*='title']"
 ]
 
 // 不需要处理的元素标签列表

@@ -43,6 +43,10 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
   // 添加气泡出现的动画状态
   const [showBubble, setShowBubble] = useState(false)
 
+  const handleRefreshClick = useCallback(() => {
+    handleRefresh()
+  }, [handleRefresh])
+
   // 处理猫猫图标点击事件
   const handleCatClick = useCallback(() => {
     setShowBubble((prev) => !prev)
@@ -136,7 +140,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
       <div className="mb-4">
         <button
-          onClick={handleRefresh}
+          onClick={handleRefreshClick}
           disabled={isLoading}
           className="flex transform items-center justify-center rounded-xl border border-indigo-300 bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 font-medium text-white shadow-md transition-all hover:scale-105 hover:from-sky-600 hover:to-indigo-600 disabled:opacity-50">
           {isLoading ? (
@@ -172,7 +176,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 <p className="mr-2 font-medium text-pink-600">哎呀～出错啦</p>
                 <p className="flex-1 text-xs text-red-600">{error}</p>
                 <button
-                  onClick={handleRefresh}
+                  onClick={handleRefreshClick}
                   className="ml-1 flex transform items-center rounded-full border border-pink-300 bg-gradient-to-r from-pink-100 to-pink-200 px-2 py-1 text-xs text-pink-600 shadow-sm transition-all hover:scale-105 hover:from-pink-200 hover:to-pink-300">
                   <Icon
                     icon="mdi:refresh"
@@ -437,6 +441,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               <MetadataTable
                 metadata={scrapedData.metadata}
                 onLoadError={handleMetadataImageError}
+              />
+              {/* 元数据 json */}
+              <CopyableTextField
+                text={JSON.stringify(scrapedData.metadata)}
+                className="rounded-xl border border-sky-200 bg-blue-50 p-2 text-xs"
               />
             </div>
           )}

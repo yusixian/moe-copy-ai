@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
@@ -6,7 +6,7 @@ import { Storage } from "@plasmohq/storage"
 import type {
   ScrapedContent,
   ScrapeResponse,
-  SelectorType as SelectorTypeAlias
+  SelectorType
 } from "~constants/types"
 import { detectMarkdown } from "~utils"
 import { formatContent } from "~utils/formatter"
@@ -30,8 +30,17 @@ const STORAGE_KEYS = {
   TITLE: "custom_title_selectors"
 }
 
-// 选择器类型
-export type SelectorType = "content" | "author" | "date" | "title"
+// 选择器配置映射
+const DEFAULT_SELECTORS_MAP: Record<SelectorType, string[]> = {
+  content: CONTENT_SELECTORS,
+  author: AUTHOR_SELECTORS,
+  date: DATE_SELECTORS,
+  title: TITLE_SELECTORS
+}
+
+// 选择器结果格式
+type SelectorResult = { selector: string; content: string }
+type SelectorResultsMap = Record<SelectorType, SelectorResult[]>
 
 /**
  * 抓取数据钩子
@@ -43,11 +52,15 @@ export const useScrapedData = () => {
   const [debugInfo, setDebugInfo] = useState<string>("")
   const [isMarkdown, setIsMarkdown] = useState(false)
 
-  // 不同类型的选择器列表
-  const [contentSelectors, setContentSelectors] = useState<string[]>([])
-  const [authorSelectors, setAuthorSelectors] = useState<string[]>([])
-  const [dateSelectors, setDateSelectors] = useState<string[]>([])
-  const [titleSelectors, setTitleSelectors] = useState<string[]>([])
+  // 选择器列表状态
+  const [selectorsMap, setSelectorsMap] = useState<
+    Record<SelectorType, string[]>
+  >({
+    content: [],
+    author: [],
+    date: [],
+    title: []
+  })
 
   // 当前选择的选择器索引
   const [selectedSelectorIndices, setSelectedSelectorIndices] = useState<
@@ -60,9 +73,7 @@ export const useScrapedData = () => {
   })
 
   // 每个选择器抓取到的内容
-  const [selectorResults, setSelectorResults] = useState<
-    Record<SelectorType, { selector: string; content: string }[]>
-  >({
+  const [selectorResults, setSelectorResults] = useState<SelectorResultsMap>({
     content: [],
     author: [],
     date: [],
@@ -70,66 +81,59 @@ export const useScrapedData = () => {
   })
 
   // 添加调试信息
-  const addDebugInfo = (info: string) => {
+  const addDebugInfo = useCallback((info: string) => {
     logger.debug(info)
     setDebugInfo((prev) => prev + "\n" + info)
-  }
+  }, [])
 
   // 加载选择器
   useEffect(() => {
     const loadSelectors = async () => {
       try {
-        // 首先初始化默认选择器
-        setContentSelectors(CONTENT_SELECTORS)
-        setAuthorSelectors(AUTHOR_SELECTORS)
-        setDateSelectors(DATE_SELECTORS)
-        setTitleSelectors(TITLE_SELECTORS)
+        // 初始化默认选择器
+        const initialSelectorsMap = { ...DEFAULT_SELECTORS_MAP }
+        setSelectorsMap(initialSelectorsMap)
 
-        addDebugInfo(
-          `已加载默认选择器: 内容(${CONTENT_SELECTORS.length}), 作者(${AUTHOR_SELECTORS.length}), 日期(${DATE_SELECTORS.length}), 标题(${TITLE_SELECTORS.length})`
-        )
+        const selectorCounts = Object.entries(initialSelectorsMap)
+          .map(([key, selectors]) => `${key}(${selectors.length})`)
+          .join(", ")
 
-        // 然后尝试加载自定义选择器
+        addDebugInfo(`已加载默认选择器: ${selectorCounts}`)
+
+        // 尝试加载自定义选择器
         try {
-          const customContentSelectors = await storage.get<string[]>(
-            STORAGE_KEYS.CONTENT
-          )
-          const customAuthorSelectors = await storage.get<string[]>(
-            STORAGE_KEYS.AUTHOR
-          )
-          const customDateSelectors = await storage.get<string[]>(
-            STORAGE_KEYS.DATE
-          )
-          const customTitleSelectors = await storage.get<string[]>(
-            STORAGE_KEYS.TITLE
+          const customSelectorsPromises = Object.entries(STORAGE_KEYS).map(
+            async ([type, key]) => {
+              const selectorType = type.toLowerCase() as SelectorType
+              const customSelectors = await storage.get<string[]>(key)
+
+              if (customSelectors?.length) {
+                addDebugInfo(
+                  `使用自定义${getSelectorTypeName(selectorType)}选择器 (${customSelectors.length})`
+                )
+                return [selectorType, customSelectors] as [
+                  SelectorType,
+                  string[]
+                ]
+              }
+              return null
+            }
           )
 
-          // 如果有自定义选择器，则覆盖默认选择器
-          if (customContentSelectors && customContentSelectors.length > 0) {
-            setContentSelectors(customContentSelectors)
-            addDebugInfo(
-              `使用自定义内容选择器 (${customContentSelectors.length})`
-            )
-          }
+          const customSelectorsResults = await Promise.all(
+            customSelectorsPromises
+          )
 
-          if (customAuthorSelectors && customAuthorSelectors.length > 0) {
-            setAuthorSelectors(customAuthorSelectors)
-            addDebugInfo(
-              `使用自定义作者选择器 (${customAuthorSelectors.length})`
-            )
-          }
+          // 更新选择器列表
+          const updatedSelectorsMap = { ...initialSelectorsMap }
+          customSelectorsResults.forEach((result) => {
+            if (result) {
+              const [type, selectors] = result
+              updatedSelectorsMap[type] = selectors
+            }
+          })
 
-          if (customDateSelectors && customDateSelectors.length > 0) {
-            setDateSelectors(customDateSelectors)
-            addDebugInfo(`使用自定义日期选择器 (${customDateSelectors.length})`)
-          }
-
-          if (customTitleSelectors && customTitleSelectors.length > 0) {
-            setTitleSelectors(customTitleSelectors)
-            addDebugInfo(
-              `使用自定义标题选择器 (${customTitleSelectors.length})`
-            )
-          }
+          setSelectorsMap(updatedSelectorsMap)
         } catch (storageError) {
           addDebugInfo(
             "获取自定义选择器失败，使用默认选择器: " + storageError.message
@@ -141,95 +145,148 @@ export const useScrapedData = () => {
     }
 
     loadSelectors()
-  }, [])
+  }, [addDebugInfo])
 
   // 获取抓取数据
-  const fetchScrapedContent = async (
-    overrideSelectors?: Partial<Record<SelectorType, string>>
-  ) => {
-    try {
-      setIsLoading(true)
-      setError(null)
-      addDebugInfo("开始请求抓取内容...")
+  const fetchScrapedContent = useCallback(
+    async (overrideSelectors?: Partial<Record<SelectorType, string>>) => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        addDebugInfo("开始请求抓取内容...")
 
-      if (overrideSelectors) {
-        addDebugInfo("使用自定义选择器: " + JSON.stringify(overrideSelectors))
+        if (overrideSelectors) {
+          addDebugInfo("使用自定义选择器: " + JSON.stringify(overrideSelectors))
+        }
+
+        const response = await sendToBackground<any, ScrapeResponse>({
+          name: "getScrapedContent",
+          body: {
+            selectors: overrideSelectors
+          }
+        })
+
+        addDebugInfo(
+          "收到响应: " + JSON.stringify(response).substring(0, 100) + "..."
+        )
+
+        if (response?.success && response?.data) {
+          addDebugInfo("抓取成功, 标题: " + response.data.title)
+
+          // 保存选择器结果
+          if (response.data.selectorResults) {
+            setSelectorResults(response.data.selectorResults)
+            addDebugInfo(
+              "收到选择器结果: " +
+                Object.keys(response.data.selectorResults).length +
+                " 种类型"
+            )
+          }
+
+          // 处理内容格式
+          const processedData = { ...response.data }
+          if (processedData.articleContent) {
+            processedData.articleContent = formatContent(
+              processedData.articleContent
+            )
+            setIsMarkdown(detectMarkdown(processedData.articleContent))
+          }
+
+          setScrapedData(processedData)
+        } else {
+          const errorMsg = response?.error || "获取内容失败"
+          addDebugInfo("抓取失败: " + errorMsg)
+          setError(errorMsg)
+        }
+      } catch (err) {
+        console.error("抓取内容时出错:", err)
+        addDebugInfo("抓取异常: " + JSON.stringify(err))
+        setError("抓取内容时出错: " + (err.message || "未知错误"))
+      } finally {
+        setIsLoading(false)
       }
+    },
+    [addDebugInfo]
+  )
 
-      const response = await sendToBackground<any, ScrapeResponse>({
-        name: "getScrapedContent",
-        body: {
-          selectors: overrideSelectors
-        }
-      })
-
-      addDebugInfo(
-        "收到响应: " + JSON.stringify(response).substring(0, 100) + "..."
-      )
-
-      if (response && response.success && response.data) {
-        addDebugInfo("抓取成功, 标题: " + response.data.title)
-
-        // 如果有选择器结果，保存它们
-        if (response.data.selectorResults) {
-          setSelectorResults(response.data.selectorResults)
-          addDebugInfo(
-            "收到选择器结果: " +
-              Object.keys(response.data.selectorResults).length +
-              " 种类型"
-          )
-        }
-
-        // 处理文章内容，保留必要的格式
-        if (response.data.articleContent) {
-          response.data.articleContent = formatContent(
-            response.data.articleContent
-          )
-        }
-
-        setScrapedData(response.data)
-        // 检测是否为 Markdown 内容
-        if (response.data.articleContent) {
-          setIsMarkdown(detectMarkdown(response.data.articleContent))
-        }
-      } else {
-        const errorMsg = response?.error || "获取内容失败"
-        addDebugInfo("抓取失败: " + errorMsg)
-        setError(errorMsg)
-      }
-    } catch (err) {
-      console.error("抓取内容时出错:", err)
-      addDebugInfo("抓取异常: " + JSON.stringify(err))
-      setError("抓取内容时出错: " + (err.message || "未知错误"))
-    } finally {
-      setIsLoading(false)
+  // 选择器类型名称映射
+  const getSelectorTypeName = (type: SelectorType): string => {
+    const nameMap: Record<SelectorType, string> = {
+      content: "内容",
+      author: "作者",
+      date: "日期",
+      title: "标题"
     }
+    return nameMap[type]
   }
 
-  // 在组件挂载时抓取当前页面内容
-  useEffect(() => {
-    fetchScrapedContent()
-  }, [])
+  // 检查选择器有效性
+  const isValidSelector = useCallback(
+    (selector: string): boolean => {
+      // 检查是否为空
+      if (!selector || selector.trim() === "") {
+        return false
+      }
+
+      // 简单检查是否是合法的CSS选择器
+      try {
+        // 尝试解析选择器
+        document.querySelector(selector)
+        return true
+      } catch (e) {
+        // 如果选择器语法错误，解析会抛出异常
+        addDebugInfo(`选择器不合法: ${selector}, 错误: ${e.message}`)
+        return false
+      }
+    },
+    [addDebugInfo]
+  )
 
   // 处理选择器变化
-  const handleSelectorChange = (type: SelectorType, index: number) => {
-    setSelectedSelectorIndices((prev) => ({
-      ...prev,
-      [type]: index
-    }))
+  const handleSelectorChange = useCallback(
+    (type: SelectorType, index: number) => {
+      setSelectedSelectorIndices((prev) => ({
+        ...prev,
+        [type]: index
+      }))
 
-    // 获取当前类型的选择器列表
-    const selectorsMap = {
-      content: contentSelectors,
-      author: authorSelectors,
-      date: dateSelectors,
-      title: titleSelectors
-    }
+      const selectors = selectorsMap[type]
+      if (!selectors?.[index]) {
+        addDebugInfo(`选择器索引无效: ${type} 类型，索引 ${index}`)
+        return
+      }
 
-    const selectors = selectorsMap[type]
-    if (selectors && selectors[index]) {
-      // 使用选定的选择器重新抓取内容
       const selector = selectors[index]
+
+      // 检查选择器合法性
+      if (!isValidSelector(selector)) {
+        addDebugInfo(`选择器 ${selector} 不是有效的CSS选择器`)
+
+        // 更新数据为无效选择器
+        if (scrapedData) {
+          const updatedData = { ...scrapedData }
+
+          switch (type) {
+            case "content":
+              updatedData.articleContent = "无效的选择器"
+              updatedData.cleanedContent = "无效的选择器"
+              break
+            case "author":
+              updatedData.author = "无效的选择器"
+              break
+            case "date":
+              updatedData.publishDate = "无效的选择器"
+              break
+            case "title":
+              updatedData.title = "无效的选择器"
+              break
+          }
+
+          setScrapedData(updatedData)
+        }
+        return
+      }
+
       addDebugInfo(`使用 ${type} 选择器: ${selector}`)
 
       // 检查是否有该选择器的已有结果
@@ -238,16 +295,21 @@ export const useScrapedData = () => {
         (r) => r.selector === selector
       )
 
-      if (existingResult && existingResult.content) {
-        // 如果已经有结果，则直接更新当前数据而不重新抓取
-        addDebugInfo(
-          `使用现有的 ${type} 选择器结果: ${existingResult.content.substring(0, 30)}...`
-        )
+      if (scrapedData) {
+        // 创建更新后的数据副本
+        const updatedData = { ...scrapedData }
 
-        if (scrapedData) {
-          const updatedData = { ...scrapedData }
+        // 检查选择器结果是否存在且有实际内容
+        if (
+          existingResult &&
+          existingResult.content &&
+          existingResult.content.trim() !== ""
+        ) {
+          // 如果已有结果，直接更新数据而不重新抓取
+          addDebugInfo(
+            `使用现有的 ${type} 选择器结果: ${existingResult.content.substring(0, 30)}...`
+          )
 
-          // 根据选择器类型更新相应的内容
           switch (type) {
             case "content":
               updatedData.articleContent = existingResult.content
@@ -265,40 +327,51 @@ export const useScrapedData = () => {
           }
 
           setScrapedData(updatedData)
-          return
+        } else {
+          // 没有已存在的结果或内容为空
+          addDebugInfo(`选择器 ${selector} 没有抓取到内容`)
+
+          switch (type) {
+            case "content":
+              updatedData.articleContent = ""
+              updatedData.cleanedContent = ""
+              break
+            case "author":
+              updatedData.author = ""
+              break
+            case "date":
+              updatedData.publishDate = ""
+              break
+            case "title":
+              updatedData.title = ""
+              break
+          }
+
+          setScrapedData(updatedData)
+
+          // 同时尝试重新抓取
+          fetchScrapedContent({ [type]: selector })
         }
+        return
       }
 
-      // 创建一个只包含当前类型的选择器的对象
-      const overrideSelectors: Partial<Record<SelectorType, string>> = {
-        [type]: selector
-      }
+      // 如果没有scrapedData，尝试重新抓取
+      fetchScrapedContent({ [type]: selector })
+    },
+    [
+      selectorsMap,
+      selectorResults,
+      scrapedData,
+      addDebugInfo,
+      fetchScrapedContent,
+      isValidSelector
+    ]
+  )
 
-      // 重新抓取内容
-      fetchScrapedContent(overrideSelectors)
-    }
-  }
-
-  // 处理手动刷新
-  const handleRefresh = () => {
+  // 在组件挂载时抓取当前页面内容
+  useEffect(() => {
     fetchScrapedContent()
-  }
-
-  // 获取选择器列表
-  const getSelectorsForType = (type: SelectorType): string[] => {
-    switch (type) {
-      case "content":
-        return contentSelectors
-      case "author":
-        return authorSelectors
-      case "date":
-        return dateSelectors
-      case "title":
-        return titleSelectors
-      default:
-        return []
-    }
-  }
+  }, [fetchScrapedContent])
 
   return {
     isLoading,
@@ -306,15 +379,15 @@ export const useScrapedData = () => {
     scrapedData,
     debugInfo,
     isMarkdown,
-    handleRefresh,
-    contentSelectors,
-    authorSelectors,
-    dateSelectors,
-    titleSelectors,
+    handleRefresh: fetchScrapedContent,
+    contentSelectors: selectorsMap.content,
+    authorSelectors: selectorsMap.author,
+    dateSelectors: selectorsMap.date,
+    titleSelectors: selectorsMap.title,
     selectedSelectorIndices,
     selectorResults,
     handleSelectorChange,
-    getSelectorsForType
+    getSelectorsForType: (type: SelectorType) => selectorsMap[type] || []
   }
 }
 

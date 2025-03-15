@@ -37,6 +37,7 @@ interface SelectorItemProps {
   onTogglePreview: (index: number) => void
   showPreview: boolean
   previewContent?: string
+  allPreviewContents?: string[]
 }
 
 const SelectorItem: React.FC<SelectorItemProps> = ({
@@ -47,58 +48,84 @@ const SelectorItem: React.FC<SelectorItemProps> = ({
   onSelect,
   onTogglePreview,
   showPreview,
-  previewContent
-}) => (
-  <li
-    className={`relative border-t border-sky-100 ${
-      isSelected ? "bg-sky-50 font-medium text-sky-700" : "hover:bg-blue-50"
-    }`}>
-    <button
-      className="flex w-full items-center justify-between p-2 text-left text-xs"
-      onClick={() => onSelect(index)}>
-      <div className="flex items-center">
-        {isSelected && (
-          <Icon icon="mdi:check" className="mr-1 text-sky-500" width={14} />
-        )}
-        <span className="font-mono">{selector}</span>
-      </div>
-      <div className="flex items-center">
-        {hasContent ? (
-          <span className="rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] text-green-600">
-            有结果
-          </span>
-        ) : (
-          <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">
-            无结果
-          </span>
-        )}
-        {hasContent && (
-          <button
-            className="ml-1 rounded-full p-1 text-sky-500 hover:bg-sky-100"
-            onClick={(e) => {
-              e.stopPropagation()
-              onTogglePreview(index)
-            }}>
-            <Icon
-              icon={showPreview ? "mdi:eye-off-outline" : "mdi:eye-outline"}
-              width={14}
-            />
-          </button>
-        )}
-      </div>
-    </button>
+  previewContent,
+  allPreviewContents
+}) => {
+  // 判断是否有多个内容
+  const hasMultipleContents =
+    allPreviewContents && allPreviewContents.length > 1
 
-    {/* 内容预览 */}
-    {hasContent && showPreview && (
-      <div className="border-t border-sky-100 bg-blue-50 p-2">
-        <div className="mb-1 text-xs font-medium text-sky-600">内容预览:</div>
-        <div className="max-h-20 overflow-auto rounded bg-white p-1.5 text-xs text-gray-700">
-          {previewContent}
+  return (
+    <li
+      className={`relative border-t border-sky-100 ${
+        isSelected ? "bg-sky-50 font-medium text-sky-700" : "hover:bg-blue-50"
+      }`}>
+      <button
+        className="flex w-full items-center justify-between p-2 text-left text-xs"
+        onClick={() => onSelect(index)}>
+        <div className="flex items-center">
+          {isSelected && (
+            <Icon icon="mdi:check" className="mr-1 text-sky-500" width={14} />
+          )}
+          <span className="font-mono">{selector}</span>
         </div>
-      </div>
-    )}
-  </li>
-)
+        <div className="flex items-center">
+          {hasContent ? (
+            <span className="rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] text-green-600">
+              {hasMultipleContents
+                ? `${allPreviewContents?.length}个结果`
+                : "有结果"}
+            </span>
+          ) : (
+            <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">
+              无结果
+            </span>
+          )}
+          {hasContent && (
+            <button
+              className="ml-1 rounded-full p-1 text-sky-500 hover:bg-sky-100"
+              onClick={(e) => {
+                e.stopPropagation()
+                onTogglePreview(index)
+              }}>
+              <Icon
+                icon={showPreview ? "mdi:eye-off-outline" : "mdi:eye-outline"}
+                width={14}
+              />
+            </button>
+          )}
+        </div>
+      </button>
+
+      {/* 内容预览 */}
+      {hasContent && showPreview && (
+        <div className="border-t border-sky-100 bg-blue-50 p-2">
+          <div className="mb-1 text-xs font-medium text-sky-600">
+            {hasMultipleContents ? "多个内容预览:" : "内容预览:"}
+          </div>
+          {hasMultipleContents ? (
+            <div className="space-y-2">
+              {allPreviewContents?.map((content, idx) => (
+                <div
+                  key={idx}
+                  className="max-h-20 overflow-auto rounded bg-white p-1.5 text-xs text-gray-700">
+                  <div className="mb-1 text-[10px] text-sky-500">
+                    结果 {idx + 1}:
+                  </div>
+                  {content}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="max-h-20 overflow-auto rounded bg-white p-1.5 text-xs text-gray-700">
+              {previewContent}
+            </div>
+          )}
+        </div>
+      )}
+    </li>
+  )
+}
 
 // 标题组件
 const SelectorHeader: React.FC<{
@@ -149,6 +176,29 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
     return result?.content || ""
   }
 
+  // 获取选择器的所有结果内容
+  const getAllResultContents = (selector: string): string[] => {
+    // 首先检查是否有带有 allContent 的结果
+    const result = results.find(
+      (r) => r.selector === selector && r.allContent?.length
+    )
+    if (result?.allContent) {
+      return result.allContent
+    }
+
+    // 如果没有 allContent，收集所有匹配该选择器的结果的 content
+    const matchingResults = results
+      .filter((r) => r.selector === selector && r.content)
+      .map((r) => r.content)
+
+    return matchingResults.length ? matchingResults : []
+  }
+
+  // 检查选择器是否有内容
+  const hasContent = (selector: string): boolean => {
+    return results.some((r) => r.selector === selector && r.content)
+  }
+
   // 处理选择器变化
   const handleSelectorChange = (index: number) => {
     onChange(index)
@@ -179,20 +229,21 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
           </div>
           <ul className="max-h-48 overflow-auto">
             {selectors.map((selector, index) => {
-              const hasContent = results.some(
-                (r) => r.selector === selector && r.content
-              )
+              const selectorHasContent = hasContent(selector)
+              const allContents = getAllResultContents(selector)
+
               return (
                 <SelectorItem
                   key={index}
                   selector={selector}
                   index={index}
                   isSelected={index === selectedIndex}
-                  hasContent={hasContent}
+                  hasContent={selectorHasContent}
                   onSelect={handleSelectorChange}
                   onTogglePreview={togglePreview}
                   showPreview={showPreviewIndex === index}
                   previewContent={getResultContent(selector)}
+                  allPreviewContents={allContents}
                 />
               )
             })}
