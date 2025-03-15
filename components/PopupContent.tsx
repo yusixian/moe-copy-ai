@@ -8,6 +8,7 @@ import ContentSection from "~/components/ContentSection"
 import ImageGrid from "~/components/ImageGrid"
 import MetadataImageSection from "~/components/MetadataImageSection"
 import MetadataTable from "~/components/MetadataTable"
+import SelectorDropdown from "~/components/SelectorDropdown"
 import CatSVG from "~components/svg/CatSVG"
 import useScrapedData from "~hooks/useScrapedData"
 import { cn } from "~utils"
@@ -26,7 +27,14 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
     scrapedData,
     debugInfo,
     isMarkdown,
-    handleRefresh
+    handleRefresh,
+    contentSelectors,
+    authorSelectors,
+    dateSelectors,
+    titleSelectors,
+    selectedSelectorIndices,
+    handleSelectorChange,
+    handleSelectContent
   } = useScrapedData()
 
   // 从存储中获取是否显示调试面板的设置
@@ -34,6 +42,10 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
   // 添加气泡出现的动画状态
   const [showBubble, setShowBubble] = useState(false)
+
+  const handleRefreshClick = useCallback(() => {
+    handleRefresh()
+  }, [handleRefresh])
 
   // 处理猫猫图标点击事件
   const handleCatClick = useCallback(() => {
@@ -128,7 +140,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
       <div className="mb-4">
         <button
-          onClick={handleRefresh}
+          onClick={handleRefreshClick}
           disabled={isLoading}
           className="flex transform items-center justify-center rounded-xl border border-indigo-300 bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 font-medium text-white shadow-md transition-all hover:scale-105 hover:from-sky-600 hover:to-indigo-600 disabled:opacity-50">
           {isLoading ? (
@@ -164,7 +176,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 <p className="mr-2 font-medium text-pink-600">哎呀～出错啦</p>
                 <p className="flex-1 text-xs text-red-600">{error}</p>
                 <button
-                  onClick={handleRefresh}
+                  onClick={handleRefreshClick}
                   className="ml-1 flex transform items-center rounded-full border border-pink-300 bg-gradient-to-r from-pink-100 to-pink-200 px-2 py-1 text-xs text-pink-600 shadow-sm transition-all hover:scale-105 hover:from-pink-200 hover:to-pink-300">
                   <Icon
                     icon="mdi:refresh"
@@ -294,10 +306,23 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         <div className="rounded-xl border-2 border-indigo-200 bg-white p-4 shadow-lg">
           {/* 页面标题 */}
           <div className="mb-4">
-            <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+            <h2 className="mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
               <Icon icon="line-md:hash" width="24" height="24" />
               标题
+              {titleSelectors.length > 0 && (
+                <SelectorDropdown
+                  type="title"
+                  selectors={titleSelectors}
+                  selectedIndex={selectedSelectorIndices.title}
+                  results={scrapedData?.selectorResults?.title || []}
+                  onChange={(index) => handleSelectorChange("title", index)}
+                  onSelectContent={(selector, contentIndex) =>
+                    handleSelectContent("title", selector, contentIndex)
+                  }
+                />
+              )}
             </h2>
+
             <CopyableTextField
               text={scrapedData.title}
               className="rounded-xl border border-sky-200 bg-blue-50 p-2"
@@ -307,9 +332,22 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 作者信息 */}
           {scrapedData.author && (
             <div className="mb-4">
-              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+              <h2 className="mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
                 <Icon icon="line-md:account" width="24" height="24" /> 作者
+                {authorSelectors.length > 0 && (
+                  <SelectorDropdown
+                    type="author"
+                    selectors={authorSelectors}
+                    selectedIndex={selectedSelectorIndices.author}
+                    results={scrapedData?.selectorResults?.author || []}
+                    onChange={(index) => handleSelectorChange("author", index)}
+                    onSelectContent={(selector, contentIndex) =>
+                      handleSelectContent("author", selector, contentIndex)
+                    }
+                  />
+                )}
               </h2>
+
               <CopyableTextField
                 text={scrapedData.author}
                 className="rounded-xl border border-sky-200 bg-blue-50 p-2"
@@ -320,8 +358,20 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 发布日期 */}
           {scrapedData.publishDate && (
             <div className="mb-4">
-              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+              <h2 className="mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
                 <Icon icon="line-md:calendar" width="24" height="24" /> 发布日期
+                {dateSelectors.length > 0 && (
+                  <SelectorDropdown
+                    type="date"
+                    selectors={dateSelectors}
+                    selectedIndex={selectedSelectorIndices.date}
+                    results={scrapedData?.selectorResults?.date || []}
+                    onChange={(index) => handleSelectorChange("date", index)}
+                    onSelectContent={(selector, contentIndex) =>
+                      handleSelectContent("date", selector, contentIndex)
+                    }
+                  />
+                )}
               </h2>
               <CopyableTextField
                 text={scrapedData.publishDate}
@@ -343,11 +393,34 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
           {/* 文章内容 */}
           {scrapedData.articleContent && (
-            <ContentSection
-              articleContent={scrapedData.articleContent}
-              cleanedContent={scrapedData.cleanedContent}
-              isMarkdown={isMarkdown}
-            />
+            <div className="mb-4">
+              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+                <Icon
+                  icon="line-md:file-document-twotone"
+                  className="inline"
+                  width="24"
+                  height="24"
+                />
+                文章内容
+                {contentSelectors.length > 0 && (
+                  <SelectorDropdown
+                    type="content"
+                    selectors={contentSelectors}
+                    selectedIndex={selectedSelectorIndices.content}
+                    results={scrapedData?.selectorResults?.content || []}
+                    onChange={(index) => handleSelectorChange("content", index)}
+                    onSelectContent={(selector, contentIndex) =>
+                      handleSelectContent("content", selector, contentIndex)
+                    }
+                  />
+                )}
+              </h2>
+              <ContentSection
+                articleContent={scrapedData.articleContent}
+                cleanedContent={scrapedData.cleanedContent}
+                isMarkdown={isMarkdown}
+              />
+            </div>
           )}
 
           {/* 页面图片 */}
@@ -388,6 +461,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               <MetadataTable
                 metadata={scrapedData.metadata}
                 onLoadError={handleMetadataImageError}
+              />
+              {/* 元数据 json */}
+              <CopyableTextField
+                text={JSON.stringify(scrapedData.metadata)}
+                className="rounded-xl border border-sky-200 bg-blue-50 p-2 text-xs"
               />
             </div>
           )}

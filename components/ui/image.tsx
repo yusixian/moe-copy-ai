@@ -72,10 +72,7 @@ const Image = forwardRef<HTMLImageElement, ImageProps>(
             src={src}
             alt={alt || "可爱图片"}
             title={title || alt || ""}
-            className={cn(
-              "relative z-10 max-h-full max-w-full object-contain",
-              className
-            )}
+            className={cn("max-h-full max-w-full object-contain", className)}
             onLoad={() => setIsLoading(false)}
             onError={() => {
               setIsLoading(false)
