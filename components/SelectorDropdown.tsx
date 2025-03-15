@@ -2,14 +2,7 @@ import { Icon } from "@iconify/react"
 import React, { memo, useCallback, useEffect, useRef, useState } from "react"
 
 import type { SelectorResultItem, SelectorType } from "~constants/types"
-
-// 选择器类型映射到图标
-const SELECTOR_TYPE_ICONS: Record<SelectorType, string> = {
-  content: "mdi:text-box-outline",
-  author: "mdi:account-outline",
-  date: "mdi:calendar-outline",
-  title: "mdi:format-title"
-}
+import { useOutsideClick } from "~hooks/useOutsideClick"
 
 // 选择器类型映射到显示名称
 const SELECTOR_TYPE_NAMES: Record<SelectorType, string> = {
@@ -115,7 +108,7 @@ const SelectorItem = memo<SelectorItemProps>(
             : "hover:bg-blue-50"
         }`}>
         <button
-          className="flex w-full items-center justify-between p-3 text-left text-xs"
+          className="flex w-full items-center justify-between gap-2 p-3 text-left text-xs"
           onClick={handleSelect}>
           <div className="flex items-center">
             {isSelected ? (
@@ -137,10 +130,10 @@ const SelectorItem = memo<SelectorItemProps>(
               {selector}
             </span>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center">
             {hasContent ? (
               <span
-                className={`rounded-full px-2 py-0.5 text-xs font-medium ${hasMultipleContents ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"}`}>
+                className={`inline-block max-w-[5rem] truncate whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${hasMultipleContents ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"}`}>
                 {hasMultipleContents
                   ? `${allPreviewContents?.length}个结果`
                   : "有结果"}
@@ -210,7 +203,9 @@ const SelectorItem = memo<SelectorItemProps>(
                 ))}
               </div>
             ) : (
-              <div className="max-h-32 overflow-auto rounded-lg border border-sky-100 bg-white p-2 text-gray-700 shadow-sm md:max-h-40">
+              <div
+                className="max-h-32 cursor-pointer overflow-auto rounded-lg border border-sky-100 bg-white p-2 text-gray-700 shadow-sm md:max-h-40"
+                onClick={() => handleContentSelect(0)}>
                 {previewContent}
               </div>
             )}
@@ -230,7 +225,7 @@ const SelectorHeader = memo<{
 }>(({ type, count }) => (
   <div className="flex items-center gap-1 text-xs font-medium text-sky-600">
     <span>{SELECTOR_TYPE_NAMES[type]}</span>
-    <span className="rounded-full bg-sky-100 px-1 py-0.5 text-xs font-medium text-sky-600">
+    <span className="whitespace-nowrap rounded-full bg-sky-100 px-1 py-0.5 text-xs font-medium text-sky-600">
       {count}个
     </span>
   </div>
@@ -382,6 +377,12 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
     handleSelectContent
   } = useSelectorState(selectors, results, onChange, onSelectContent)
 
+  // 添加下拉菜单的引用
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // 使用自定义Hook检测点击外部区域
+  useOutsideClick(dropdownRef, closeDropdown)
+
   // 如果没有选择器，不显示下拉菜单
   if (!selectors?.length) return null
 
@@ -396,7 +397,9 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
 
       {/* 下拉菜单 */}
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-hidden rounded-lg border border-sky-200 bg-white shadow-lg">
+        <div
+          ref={dropdownRef}
+          className="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-hidden rounded-lg border border-sky-200 bg-white shadow-lg">
           <div className="border-b border-sky-100 bg-gradient-to-r from-sky-50 to-indigo-50 p-2.5 text-xs text-sky-600">
             <div className="flex items-center">
               <Icon
