@@ -3,6 +3,7 @@ import { ToastContainer } from "react-toastify"
 
 import "./styles/global.css"
 
+import AiSettingsSection from "./components/option/AiSettingsSection"
 import DevSettingsSection from "./components/option/DevSettingsSection"
 import Footer from "./components/option/Footer"
 import InterfaceSettingsSection from "./components/option/InterfaceSettingsSection"
@@ -18,6 +19,7 @@ function OptionsPage() {
         <LogSettingsSection />
         <InterfaceSettingsSection />
         <SelectorSettingsSection />
+        <AiSettingsSection />
         <DevSettingsSection />
         <Footer />
       </div>

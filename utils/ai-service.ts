@@ -1,0 +1,117 @@
+import { generateText, type GenerateTextResult } from "@xsai/generate-text"
+
+// import { streamText, type StreamTextChunkResult } from "@xsai/stream-text"
+
+import { Storage } from "@plasmohq/storage"
+
+import { debugLog } from "./logger"
+
+// 创建存储实例
+const storage = new Storage({ area: "sync" })
+
+// 获取AI配置
+export async function getAiConfig() {
+  try {
+    const apiKey = await storage.get<string>("ai_api_key")
+    const baseURL =
+      (await storage.get<string>("ai_base_url")) || "https://api.openai.com/v1/"
+    const systemPrompt =
+      (await storage.get<string>("ai_system_prompt")) ||
+      "你是一个专业的文章摘要助手，请提炼文章的核心观点，总结要点。"
+    const model = (await storage.get<string>("ai_model")) || "gpt-3.5-turbo"
+
+    return {
+      apiKey,
+      baseURL,
+      systemPrompt,
+      model
+    }
+  } catch (error) {
+    debugLog("获取AI配置出错:", error)
+    throw new Error("获取AI配置失败，请检查设置")
+  }
+}
+
+// 生成文章摘要
+export async function generateSummary(content: string, customPrompt?: string) {
+  try {
+    debugLog("开始生成摘要...")
+    const { apiKey, baseURL, systemPrompt, model } = await getAiConfig()
+
+    if (!apiKey) {
+      throw new Error("未设置API密钥，请在设置中配置AI提供商信息")
+    }
+
+    const systemMessage = customPrompt || systemPrompt
+
+    debugLog("使用模型:", model)
+    debugLog("系统提示词:", systemMessage)
+    debugLog("内容:", content.slice(0, 100) + "...")
+    const res = await generateText({
+      apiKey,
+      baseURL,
+      model,
+      messages: [
+        {
+          role: "system",
+          content: systemMessage
+        },
+        {
+          role: "user",
+          content: content
+        }
+      ]
+    })
+
+    debugLog("摘要生成成功")
+    return res
+  } catch (error) {
+    debugLog("生成摘要出错:", error)
+    return null
+  }
+}
+
+// TODO: 生成文章摘要 (流式)
+// export async function generateSummaryStream(
+//   content: string,
+//   customPrompt?: string,
+//   onChunk?: (chunk: StreamTextChunkResult) => unknown,
+//   onComplete?: (fullText: string) => void
+// ) {
+//   try {
+//     debugLog("开始流式生成摘要...")
+//     const { apiKey, baseURL, systemPrompt, model } = await getAiConfig()
+
+//     if (!apiKey) {
+//       throw new Error("未设置API密钥，请在设置中配置AI提供商信息")
+//     }
+
+//     const systemMessage = customPrompt || systemPrompt
+
+//     debugLog("使用模型:", model)
+//     debugLog("系统提示词:", systemMessage)
+//     debugLog("内容:", content.slice(0, 100) + "...")
+
+//     // 使用流式生成API
+//     return await streamText({
+//       apiKey,
+//       baseURL,
+//       model,
+//       messages: [
+//         {
+//           role: "system",
+//           content: systemMessage
+//         },
+//         {
+//           role: "user",
+//           content: content
+//         }
+//       ],
+//       onChunk, // 每次收到新的文本块时调用
+//       onComplete // 生成完成时调用
+//     })
+//   } catch (error) {
+//     debugLog("流式生成摘要出错:", error)
+//     throw error
+//   }
+// }
