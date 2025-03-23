@@ -19,7 +19,7 @@ export async function getAiConfig() {
       (await storage.get<string>("ai_base_url")) || "https://api.openai.com/v1/"
     const systemPrompt =
       (await storage.get<string>("ai_system_prompt")) ||
-      "你是一个专业的文章摘要助手，请提炼文章的核心观点，总结要点。"
+      "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}"
     const model = (await storage.get<string>("ai_model")) || "gpt-3.5-turbo"
 
     return {
