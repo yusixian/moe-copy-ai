@@ -23,8 +23,8 @@ MoeCopy AI 是一款基于 Plasmo 框架开发的浏览器扩展，能够智能�
 ## ✨ 功能
 
 ![example](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example.webp?raw=true)
-![example-2](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example-2.webp?raw=true)
-![example-3](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example-3.webp?raw=true)
+![example-2](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example-2.png?raw=true)
+![example-3](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example-3.png?raw=true)
 
 - **一键解析**: 点击插件图标或浮动按钮，快速解析当前网页内容
 - **实时编辑**: 支持手动编辑提取的内容，满足自定义需求
