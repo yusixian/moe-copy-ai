@@ -1,11 +1,14 @@
-import type { GenerateTextResult } from "@xsai/generate-text"
-import { useCallback, useLayoutEffect, useMemo, useState } from "react"
+import { useCallback, useLayoutEffect, useState } from "react"
 import { toast } from "react-toastify"
 
 import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import type { ScrapedContent } from "~constants/types"
+import type {
+  StreamTextChunkResult,
+  StreamTextResult
+} from "~node_modules/@xsai/stream-text/dist"
 import { generateSummary, getAiConfig } from "~utils/ai-service"
 import { debugLog } from "~utils/logger"
 import { processTemplate } from "~utils/template"
@@ -17,9 +20,11 @@ const storage = new Storage({ area: "sync" })
  * AI摘要生成钩子返回值类型
  */
 export interface UseAiSummaryResult {
-  result: GenerateTextResult | null
+  result: StreamTextResult | null
   /** 生成的摘要内容 */
   summary: string
+  /** 流式显示的文本 */
+  streamingText: string
   /** 是否正在加载 */
   isLoading: boolean
   /** 错误信息 */
@@ -34,6 +39,12 @@ export interface UseAiSummaryResult {
   generateSummary: () => Promise<void>
   /** 保存为系统默认提示词 */
   saveAsDefaultPrompt: (prompt: string) => Promise<void>
+  /** Token使用情况 */
+  usage: {
+    total_tokens?: number
+    prompt_tokens?: number
+    completion_tokens?: number
+  } | null
 }
 
 /**
@@ -51,8 +62,10 @@ export const useAiSummary = (
 ): UseAiSummaryResult => {
   const [isLoading, setIsLoading] = useState(false)
   const [customPrompt, setCustomPrompt] = useState("")
-  const [result, setResult] = useState<GenerateTextResult | null>(null)
-  const summary = useMemo(() => result?.text || "", [result])
+  const [result, setResult] = useState<StreamTextResult | null>(null)
+  const [streamingText, setStreamingText] = useState("")
+  const [summary, setSummary] = useState("")
+  const [usage, setUsage] = useState<UseAiSummaryResult["usage"]>(null)
   const [apiKey] = useStorage<string>("ai_api_key", "")
   const [error, setError] = useState<string | null>(null)
   const [systemPrompt, setSystemPrompt] = useState("")
@@ -103,21 +116,106 @@ export const useAiSummary = (
     try {
       setIsLoading(true)
       setResult(null)
+      setStreamingText("")
       // 处理自定义提示词中的模板变量
       let processedPrompt = customPrompt
       if (scrapedData && customPrompt) {
         processedPrompt = processTemplate(customPrompt, scrapedData)
       }
       debugLog("processedPrompt", processedPrompt)
-      // 使用生成API
-      const result = await generateSummary(
-        content,
-        processedPrompt || undefined
-      )
+      const result = await generateSummary(processedPrompt)
       if (result) {
-        debugLog("generateSummaryText result", result)
+        debugLog("generateSummaryText result获取成功", result)
+        debugLog("streamText返回值结构:", {
+          textStream: typeof result.textStream,
+          stepStream: typeof result.stepStream,
+          chunkStream: typeof result.chunkStream,
+          hasTextStream: !!result.textStream,
+          hasStepStream: !!result.stepStream,
+          hasChunkStream: !!result.chunkStream
+        })
+
+        // 保存结果对象
         setResult(result)
-        onSummaryGenerated?.(result.text)
+        setUsage(null) // 初始化usage
+
+        // 使用流式接收文本和处理 usage
+        try {
+          // 处理 usage 流
+          const chunkStream =
+            result.chunkStream as unknown as AsyncIterable<StreamTextChunkResult>
+          // TODO: 流这块还得完善，现在只是能跑！
+          // 单独启动一个异步任务处理 chunkStream
+          const processChunkStream = async () => {
+            debugLog("开始处理 chunkStream 获取 usage...")
+
+            try {
+              for await (const chunk of chunkStream) {
+                // 如果 chunk 中有 usage 信息，则更新 usage 状态
+                if (chunk.usage) {
+                  debugLog("接收到 usage 信息:", chunk.usage)
+                  setUsage({
+                    total_tokens: chunk.usage.total_tokens,
+                    prompt_tokens: chunk.usage.prompt_tokens,
+                    completion_tokens: chunk.usage.completion_tokens
+                  })
+                }
+              }
+              debugLog("chunkStream 处理完成")
+            } catch (chunkError) {
+              console.error("chunkStream 处理出错:", chunkError)
+              debugLog("chunkStream 处理详细错误:", {
+                name: chunkError.name,
+                message: chunkError.message,
+                stack: chunkError.stack
+              })
+            }
+          }
+
+          // 启动异步处理，但不等待它完成
+          processChunkStream()
+
+          // 处理文本流
+          let fullText = ""
+          const textStream =
+            result.textStream as unknown as AsyncIterable<string>
+
+          // 处理文本流
+          debugLog("开始处理textStream...")
+          let chunkCount = 0
+
+          for await (const textPart of textStream) {
+            chunkCount++
+            // 每接收 20 个文本块打印一次日志，避免日志过多
+            if (chunkCount % 20 === 0 || chunkCount <= 2) {
+              debugLog(`接收到第${chunkCount}个文本块:`, {
+                length: textPart.length,
+                preview:
+                  textPart.slice(0, 20) + (textPart.length > 20 ? "..." : "")
+              })
+            }
+
+            fullText += textPart
+            setStreamingText((prev) => prev + textPart)
+          }
+
+          debugLog(
+            `textStream 处理完成，共接收${chunkCount}个文本块，最终文本长度:${fullText?.length}`
+          )
+
+          // 流处理完成后使用收集的完整文本
+          setSummary(fullText)
+          onSummaryGenerated?.(fullText)
+          debugLog("流式生成全部完成，最终文本:", fullText)
+        } catch (streamError) {
+          console.error("流处理出错:", streamError)
+          debugLog("流处理详细错误:", {
+            name: streamError.name,
+            message: streamError.message,
+            stack: streamError.stack
+          })
+        }
+
         setError(null)
       } else {
         throw new Error("生成摘要失败")
@@ -125,6 +223,7 @@ export const useAiSummary = (
     } catch (error) {
       setError(error.message || "未知错误")
       setResult(null)
+      setStreamingText("")
       console.error("摘要生成失败:", error)
     } finally {
       setIsLoading(false)
@@ -134,12 +233,14 @@ export const useAiSummary = (
   return {
     result,
     summary,
+    streamingText,
     isLoading,
     error,
     customPrompt,
     setCustomPrompt,
     systemPrompt,
     generateSummary: generateSummaryText,
-    saveAsDefaultPrompt
+    saveAsDefaultPrompt,
+    usage
   }
 }

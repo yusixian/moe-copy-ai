@@ -4,6 +4,8 @@ import { generateText, type GenerateTextResult } from "@xsai/generate-text"
 
 import { Storage } from "@plasmohq/storage"
 
+import { streamText } from "~node_modules/@xsai/stream-text/dist"
+
 import { debugLog } from "./logger"
 
 // 创建存储实例
@@ -33,7 +35,7 @@ export async function getAiConfig() {
 }
 
 // 生成文章摘要
-export async function generateSummary(content: string, customPrompt?: string) {
+export async function generateSummary(customPrompt?: string) {
   try {
     debugLog("开始生成摘要...")
     const { apiKey, baseURL, systemPrompt, model } = await getAiConfig()
@@ -44,23 +46,22 @@ export async function generateSummary(content: string, customPrompt?: string) {
 
     const systemMessage = customPrompt || systemPrompt
 
-    debugLog("使用模型:", model)
-    debugLog("系统提示词:", systemMessage)
-    debugLog("内容:", content.slice(0, 100) + "...")
-    const res = await generateText({
+    debugLog("模型:", model)
+    debugLog("baseURL:", baseURL)
+
+    const res = await streamText({
       apiKey,
       baseURL,
       model,
       messages: [
         {
-          role: "system",
-          content: systemMessage
-        },
-        {
           role: "user",
-          content: content
+          content: systemMessage
         }
-      ]
+      ],
+      streamOptions: {
+        usage: true // 启用 usage 统计
+      }
     })
 
     debugLog("摘要生成成功")

@@ -41,7 +41,7 @@ const GenerateButton = ({
   <button
     onClick={onClick}
     disabled={isLoading}
-    className="flex transform items-center justify-center rounded-xl border border-indigo-300 bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 font-medium text-white shadow-md transition-all hover:scale-105 hover:from-sky-600 hover:to-indigo-600 disabled:opacity-50">
+    className="flex transform items-center justify-center rounded-xl border border-indigo-300 bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 font-medium text-white shadow-md transition-all hover:scale-105 hover:from-sky-600 hover:to-indigo-600 disabled:opacity-50 disabled:hover:scale-100">
     {isLoading ? (
       <>
         <span className="mr-2 animate-bounce">♪</span>
@@ -64,15 +64,16 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
   const [showCustomPromptInput, setShowCustomPromptInput] = useState(true)
 
   const {
-    result,
     summary,
+    streamingText,
     isLoading,
     error,
     customPrompt,
     setCustomPrompt,
     systemPrompt,
     generateSummary,
-    saveAsDefaultPrompt
+    saveAsDefaultPrompt,
+    usage
   } = useAiSummary(content, onSummaryGenerated, scrapedData)
 
   const handleOpenSettings = useOpenOptionPage()
@@ -83,16 +84,19 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
   )
 
   const handleCopySummary = useCallback(
-    () => summary && copyToClipboard(summary),
-    [summary]
+    () =>
+      (summary || streamingText) && copyToClipboard(summary || streamingText),
+    [summary, streamingText]
   )
+
+  // 使用直接从useAiSummary返回的usage
   const { totalTokens, promptTokens, completionTokens } = useMemo(() => {
     return {
-      totalTokens: result?.usage?.total_tokens,
-      promptTokens: result?.usage?.prompt_tokens,
-      completionTokens: result?.usage?.completion_tokens
+      totalTokens: usage?.total_tokens,
+      promptTokens: usage?.prompt_tokens,
+      completionTokens: usage?.completion_tokens
     }
-  }, [result])
+  }, [usage])
 
   return (
     <div className="mb-4">
@@ -103,7 +107,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
           width="24"
           height="24"
         />
-        AI 助手 (≧▽≦)
+        AI 助手
       </h2>
 
       <div className="rounded-xl border-2 border-indigo-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 shadow-md transition-all hover:shadow-lg">
@@ -116,7 +120,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
               height="20"
             />
             <p className="text-sm text-indigo-600">
-              一键将文章内容变成精简摘要，阅读效率噌噌噌提升！(ﾉ≧∀≦)ﾉ ♪
+              可以用文章内容生成摘要，阅读效率噌噌噌提升！(｡•̀ᴗ-)✧
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -137,9 +141,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
                 width="16"
                 height="16"
               />
-              {showCustomPromptInput
-                ? "收起提示词 (˘▽˘)っ"
-                : "自定义提示词 (｡•̀ᴗ-)✧"}
+              {showCustomPromptInput ? "收起提示词" : "自定义提示词"}
             </button>
 
             <button
@@ -151,7 +153,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
                 width="16"
                 height="16"
               />
-              AI 提供商设置 (・ω・)
+              AI 提供商设置
             </button>
           </div>
         </div>
@@ -182,10 +184,13 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
           <GenerateButton onClick={generateSummary} isLoading={isLoading} />
           {error && <ErrorMessage message={error} />}
         </div>
-        {summary && (
+        {(summary || streamingText) && (
           <>
-            <SummaryResult summary={summary} onCopy={handleCopySummary} />
-
+            <SummaryResult
+              summary={summary}
+              streamingText={streamingText}
+              onCopy={handleCopySummary}
+            />
             {totalTokens && (
               <div className="mt-3 rounded-lg border border-indigo-100 bg-indigo-50 p-2">
                 <div className="flex items-center justify-between">

@@ -5,11 +5,16 @@ import ContentDisplay from "~components/ContentDisplay"
 // 摘要结果组件
 export const SummaryResult = ({
   summary,
+  streamingText,
   onCopy
 }: {
   summary: string
+  streamingText?: string
   onCopy: () => void
 }) => {
+  // 显示流式文本或完整摘要
+  const displayText = summary || streamingText || ""
+
   return (
     <div className="mt-4 rounded-xl border-2 border-dashed border-sky-200 bg-white p-4 shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
       <div className="mb-2 flex items-center justify-between">
@@ -34,7 +39,7 @@ export const SummaryResult = ({
           复制摘要 (≧▽≦)
         </button>
       </div>
-      <ContentDisplay content={summary} isMarkdown isPreviewMode />
+      <ContentDisplay content={displayText} isMarkdown isPreviewMode />
     </div>
   )
 }
