@@ -6,7 +6,7 @@ import { useStorage } from "@plasmohq/storage/hook"
 
 import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import { cn } from "~utils"
-import { generateSummary } from "~utils/ai-service"
+import { generateSummary, getAiConfig } from "~utils/ai-service"
 import { copyToClipboard } from "~utils/clipboard"
 
 import ContentDisplay from "./ContentDisplay"
@@ -26,9 +26,10 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
   const [showPromptInput, setShowPromptInput] = useState(false)
   const [apiKey] = useStorage<string>("ai_api_key", "")
   const [error, setError] = useState<string | null>(null)
+  const [systemPrompt, setSystemPrompt] = useState("")
   // TODO: 流式生成
   // 处理摘要生成
-  const handleGenerateSummary = async () => {
+  const handleGenerateSummary = useCallback(async () => {
     if (!content.trim()) {
       setError("内容为空，无法生成摘要")
       toast.warning("内容为空，无法生成摘要")
@@ -59,10 +60,22 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [content, customPrompt, apiKey, onSummaryGenerated])
 
-  const togglePromptInput = () => {
-    setShowPromptInput(!showPromptInput)
+  const togglePromptInput = async () => {
+    const nextState = !showPromptInput
+    setShowPromptInput(nextState)
+
+    // 当打开提示词输入时，获取系统提示词并设置为默认值
+    if (nextState && !customPrompt) {
+      try {
+        const config = await getAiConfig()
+        setSystemPrompt(config.systemPrompt)
+        setCustomPrompt(config.systemPrompt)
+      } catch (error) {
+        console.error("获取系统提示词失败:", error)
+      }
+    }
   }
 
   const handleOpenSettings = useOpenOptionPage()
@@ -139,13 +152,43 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
 
         {showPromptInput && (
           <div className="mb-3">
-            <textarea
-              value={customPrompt}
-              onChange={(e) => setCustomPrompt(e.target.value)}
-              placeholder="输入自定义提示词（可选），例如：'总结这篇文章的主要观点，列出3-5个要点'"
-              className="w-full rounded-xl border border-sky-200 bg-white p-3 text-sm shadow-sm transition-shadow focus:border-sky-300 focus:outline-none focus:ring-1 focus:ring-sky-300"
-              rows={3}
-            />
+            <div className="mb-2 rounded-lg border border-indigo-100 bg-indigo-50 p-2">
+              <p className="flex items-center text-xs text-indigo-700">
+                <Icon
+                  icon="line-md:information"
+                  className="mr-1 flex-shrink-0 text-indigo-500"
+                  width="16"
+                  height="16"
+                />
+                <span>
+                  以下是系统默认提示词，您可以根据需要修改。自定义提示词将覆盖系统设置中的默认提示词。
+                </span>
+              </p>
+            </div>
+            <div className="relative">
+              <textarea
+                value={customPrompt}
+                onChange={(e) => setCustomPrompt(e.target.value)}
+                placeholder="输入自定义提示词（可选），例如：'总结这篇文章的主要观点，列出3-5个要点'"
+                className="w-full rounded-xl border border-sky-200 bg-white p-3 text-sm shadow-sm transition-all hover:border-sky-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                rows={4}
+              />
+              {customPrompt !== systemPrompt && systemPrompt && (
+                <div className="mt-1.5 text-right">
+                  <button
+                    onClick={() => setCustomPrompt(systemPrompt)}
+                    className="ml-auto flex items-center justify-end text-xs text-indigo-600 hover:text-indigo-800 hover:underline">
+                    <Icon
+                      icon="line-md:restore"
+                      className="mr-0.5"
+                      width="14"
+                      height="14"
+                    />
+                    还原默认提示词
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
