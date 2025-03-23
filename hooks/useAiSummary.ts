@@ -1,5 +1,5 @@
-import { type GenerateTextResult } from "@xsai/generate-text"
-import { useCallback, useEffect, useLayoutEffect, useState } from "react"
+import type { GenerateTextResult } from "@xsai/generate-text"
+import { useCallback, useLayoutEffect, useMemo, useState } from "react"
 import { toast } from "react-toastify"
 
 import { Storage } from "@plasmohq/storage"
@@ -17,6 +17,7 @@ const storage = new Storage({ area: "sync" })
  * AI摘要生成钩子返回值类型
  */
 export interface UseAiSummaryResult {
+  result: GenerateTextResult | null
   /** 生成的摘要内容 */
   summary: string
   /** 是否正在加载 */
@@ -50,7 +51,8 @@ export const useAiSummary = (
 ): UseAiSummaryResult => {
   const [isLoading, setIsLoading] = useState(false)
   const [customPrompt, setCustomPrompt] = useState("")
-  const [summary, setSummary] = useState("")
+  const [result, setResult] = useState<GenerateTextResult | null>(null)
+  const summary = useMemo(() => result?.text || "", [result])
   const [apiKey] = useStorage<string>("ai_api_key", "")
   const [error, setError] = useState<string | null>(null)
   const [systemPrompt, setSystemPrompt] = useState("")
@@ -100,8 +102,7 @@ export const useAiSummary = (
 
     try {
       setIsLoading(true)
-      setSummary("")
-
+      setResult(null)
       // 处理自定义提示词中的模板变量
       let processedPrompt = customPrompt
       if (scrapedData && customPrompt) {
@@ -114,17 +115,16 @@ export const useAiSummary = (
         processedPrompt || undefined
       )
       if (result) {
-        const summaryText = result.text
-        setSummary(summaryText)
-        if (onSummaryGenerated) {
-          onSummaryGenerated(summaryText)
-        }
+        debugLog("generateSummaryText result", result)
+        setResult(result)
+        onSummaryGenerated?.(result.text)
         setError(null)
       } else {
         throw new Error("生成摘要失败")
       }
     } catch (error) {
       setError(error.message || "未知错误")
+      setResult(null)
       console.error("摘要生成失败:", error)
     } finally {
       setIsLoading(false)
@@ -132,6 +132,7 @@ export const useAiSummary = (
   }, [content, customPrompt, apiKey, onSummaryGenerated, scrapedData])
 
   return {
+    result,
     summary,
     isLoading,
     error,

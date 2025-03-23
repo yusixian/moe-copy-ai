@@ -17,7 +17,7 @@ function AiSettingsSection() {
   const [apiKey, setApiKey] = useState<string>("")
   const [baseURL, setBaseURL] = useState<string>("https://api.openai.com/v1/")
   const [defaultSystemPrompt, setDefaultSystemPrompt] = useState<string>(
-    "你是一个专业的文章摘要助手，请提炼文章的核心观点，总结要点。文章内容： {{content}}"
+    "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}"
   )
   const [model, setModel] = useState<string | null>(null)
   const [showTips, setShowTips] = useState(false)
@@ -71,6 +71,7 @@ function AiSettingsSection() {
 
         debugLog("模型列表加载成功，模型如下", models)
         setModelList(models)
+        if (models.length > 0) setModel(models[0].id) // 如果模型列表不为空，则设置默认模型
         toast.success("模型列表加载成功 (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
       } catch (error) {
         console.error("获取模型列表失败:", error)
@@ -194,7 +195,7 @@ function AiSettingsSection() {
                 className="mr-1.5 inline"
                 width={18}
               />
-              AI模型
+              AI 模型
             </label>
             {modelList.length > 0 ? (
               <select

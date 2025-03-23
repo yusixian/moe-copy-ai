@@ -1,8 +1,6 @@
 import { Icon } from "@iconify/react"
-import React from "react"
 
-import ContentDisplay from "../ContentDisplay"
-import IconButton from "./IconButton"
+import ContentDisplay from "~components/ContentDisplay"
 
 // 摘要结果组件
 export const SummaryResult = ({
@@ -36,9 +34,7 @@ export const SummaryResult = ({
           复制摘要 (≧▽≦)
         </button>
       </div>
-      <div className="whitespace-pre-wrap rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 p-3 text-sm leading-relaxed text-slate-700">
-        {summary}
-      </div>
+      <ContentDisplay content={summary} isMarkdown isPreviewMode />
     </div>
   )
 }

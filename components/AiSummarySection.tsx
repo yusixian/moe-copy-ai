@@ -1,12 +1,11 @@
 import { Icon } from "@iconify/react"
-import React, { useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 
 import type { ScrapedContent } from "~constants/types"
 import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import { useAiSummary } from "~hooks/useAiSummary"
 import { copyToClipboard } from "~utils/clipboard"
 
-import IconButton from "./ai/IconButton"
 import PromptInput from "./ai/PromptInput"
 import { SummaryResult } from "./ai/SummaryResult"
 
@@ -63,7 +62,9 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
   scrapedData
 }) => {
   const [showCustomPromptInput, setShowCustomPromptInput] = useState(true)
+
   const {
+    result,
     summary,
     isLoading,
     error,
@@ -75,9 +76,23 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
   } = useAiSummary(content, onSummaryGenerated, scrapedData)
 
   const handleOpenSettings = useOpenOptionPage()
-  const togglePromptInput = () =>
-    setShowCustomPromptInput(!showCustomPromptInput)
-  const handleCopySummary = () => summary && copyToClipboard(summary)
+
+  const togglePromptInput = useCallback(
+    () => setShowCustomPromptInput(!showCustomPromptInput),
+    [showCustomPromptInput]
+  )
+
+  const handleCopySummary = useCallback(
+    () => summary && copyToClipboard(summary),
+    [summary]
+  )
+  const { totalTokens, promptTokens, completionTokens } = useMemo(() => {
+    return {
+      totalTokens: result?.usage?.total_tokens,
+      promptTokens: result?.usage?.prompt_tokens,
+      completionTokens: result?.usage?.completion_tokens
+    }
+  }, [result])
 
   return (
     <div className="mb-4">
@@ -167,9 +182,37 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
           <GenerateButton onClick={generateSummary} isLoading={isLoading} />
           {error && <ErrorMessage message={error} />}
         </div>
-
         {summary && (
-          <SummaryResult summary={summary} onCopy={handleCopySummary} />
+          <>
+            <SummaryResult summary={summary} onCopy={handleCopySummary} />
+
+            {totalTokens && (
+              <div className="mt-3 rounded-lg border border-indigo-100 bg-indigo-50 p-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-xs text-indigo-700">
+                    <Icon
+                      icon="line-md:document-code"
+                      className="mr-1"
+                      width="14"
+                      height="14"
+                    />
+                    <span>Token 消耗统计</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="flex items-center text-xs text-indigo-700">
+                      totalTokens: <b>{totalTokens}</b>
+                    </div>
+                    <div className="flex items-center text-xs text-sky-600">
+                      promptTokens: <b>{promptTokens}</b>
+                    </div>
+                    <div className="flex items-center text-xs text-green-600">
+                      completionTokens: <b>{completionTokens}</b>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
