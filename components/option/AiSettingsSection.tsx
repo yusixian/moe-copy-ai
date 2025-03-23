@@ -104,11 +104,11 @@ function AiSettingsSection() {
   return (
     <OptionSection title="AI设置" icon="line-md:ai">
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-sky-500">
           配置AI接口相关设置，让AI助手更好地为您服务(๑•̀ㅂ•́)و✧
         </span>
         <button
-          className="flex items-center rounded-md border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700"
+          className="flex items-center rounded-md border border-sky-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700"
           onClick={() => setShowTips(!showTips)}>
           <Icon
             icon={showTips ? "mdi:eye-off-outline" : "mdi:eye-outline"}
@@ -125,137 +125,133 @@ function AiSettingsSection() {
             ? "mb-4 max-h-[300px] scale-100 opacity-100"
             : "scale-98 mb-0 max-h-0 overflow-hidden opacity-0"
         }`}>
-        <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
-          <strong className="mb-2 flex items-center text-sky-700">
+        <div className="rounded-lg border border-sky-200 bg-blue-50 p-3">
+          <strong className="mb-2 flex items-center text-sky-600">
             <Icon icon="mdi:information-outline" className="mr-1" width={16} />
-            AI接口小贴士：
+            小贴士：
           </strong>
-          <ol className="ml-5 list-decimal space-y-1 text-gray-600">
+          <ol className="ml-5 list-decimal space-y-1 text-sky-500">
             <li>API密钥请妥善保管，不要泄露给他人 (•̀ᴗ•́)و</li>
             <li>
               不同模型的能力和价格不同，请根据需要选择合适的模型，并注意 token
               消耗
             </li>
-            <li>系统提示词决定了 AI 助手的行为方式，可以根据需要自定义</li>
+            <li>目前仅针对 ds 的 api 测试过，本地 ollama 等后续支持</li>
           </ol>
         </div>
       </div>
 
-      <div className="rounded-lg border border-sky-100 bg-white p-6 shadow-sm">
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              <Icon
-                icon="mdi:key-outline"
-                className="mr-1.5 inline"
-                width={18}
-              />
-              apikey （API 密钥）
-            </label>
+      <div className="space-y-4">
+        <div className="mb-4">
+          <label className="mb-2 block font-medium text-sky-600">
+            <Icon icon="mdi:key-outline" className="mr-1.5 inline" width={18} />
+            apikey （API 密钥）
+          </label>
+          <input
+            type="password"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+            placeholder="sk-..."
+          />
+          <p className="mt-2 text-sm text-sky-500">
+            请输入您的API密钥，用于访问AI服务
+          </p>
+        </div>
+
+        <div className="mb-4">
+          <label className="mb-2 block font-medium text-sky-600">
+            <Icon icon="mdi:web" className="mr-1.5 inline" width={18} />
+            baseURL (API 基础 URL)
+          </label>
+          <div className="flex items-center space-x-2">
             <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
-              placeholder="sk-..."
+              type="text"
+              value={baseURL}
+              onChange={(e) => setBaseURL(e.target.value)}
+              className="flex-1 rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+              placeholder="https://api.openai.com/v1/"
             />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              <Icon icon="mdi:web" className="mr-1.5 inline" width={18} />
-              baseURL (API 基础 URL)
-            </label>
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                value={baseURL}
-                onChange={(e) => setBaseURL(e.target.value)}
-                className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
-                placeholder="https://api.openai.com/v1/"
-              />
-              <button
-                onClick={() => fetchModelList(apiKey, baseURL)}
-                disabled={isLoadingModels}
-                className="flex items-center rounded-md bg-sky-100 px-3 py-2 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-200 hover:text-sky-700 disabled:opacity-50">
-                <Icon
-                  icon={isLoadingModels ? "mdi:loading" : "mdi:refresh"}
-                  className={`mr-1.5 ${isLoadingModels ? "animate-spin" : ""}`}
-                  width={18}
-                />
-                获取模型
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <button
+              onClick={() => fetchModelList(apiKey, baseURL)}
+              disabled={isLoadingModels}
+              className="flex items-center rounded-lg border border-sky-200 bg-blue-50 px-3 py-2 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700 disabled:opacity-50">
               <Icon
-                icon="mdi:robot-excited-outline"
-                className="mr-1.5 inline"
+                icon={isLoadingModels ? "mdi:loading" : "mdi:refresh"}
+                className={`mr-1.5 ${isLoadingModels ? "animate-spin" : ""}`}
                 width={18}
               />
-              AI 模型
-            </label>
-            {modelList.length > 0 ? (
-              <select
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200">
-                {modelList.map((m) => (
-                  <option key={m.id + m.owned_by} value={m.id}>
-                    {m.id} ({m.owned_by})
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  value={model}
-                  onChange={(e) => setModel(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
-                  placeholder="gpt-3.5-turbo"
-                />
-                <p className="text-xs text-amber-500">
-                  请点击"获取模型"按钮获取可用模型列表
-                </p>
-              </div>
-            )}
+              获取模型
+            </button>
           </div>
+          <p className="mt-2 text-sm text-sky-500">请输入API服务的基础URL</p>
+        </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              <Icon
-                icon="mdi:message-text-outline"
-                className="mr-1.5 inline"
-                width={18}
-              />
-              默认系统提示词
-            </label>
-            <textarea
-              value={defaultSystemPrompt}
-              onChange={(e) => setDefaultSystemPrompt(e.target.value)}
-              rows={4}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
-              placeholder="你是一个专业的文章摘要助手，请提炼文章的核心观点，总结要点。"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              系统提示词用于定义AI助手的行为和能力(๑乛◡乛๑)
-            </p>
-          </div>
-
-          <button
-            onClick={saveSettings}
-            className="flex items-center justify-center rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-300">
+        <div className="mb-4">
+          <label className="mb-2 block font-medium text-sky-600">
             <Icon
-              icon="mdi:content-save-outline"
-              className="mr-1.5"
+              icon="mdi:robot-excited-outline"
+              className="mr-1.5 inline"
               width={18}
             />
-            保存设置
-          </button>
+            AI 模型
+          </label>
+          {modelList.length > 0 ? (
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200">
+              {modelList.map((m) => (
+                <option key={m.id + m.owned_by} value={m.id}>
+                  {m.id} ({m.owned_by})
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                placeholder="gpt-3.5-turbo"
+              />
+              <p className="text-sm text-amber-500">
+                请点击"获取模型"按钮获取可用模型列表
+              </p>
+            </div>
+          )}
+          <p className="mt-2 text-sm text-sky-500">选择或输入要使用的AI模型</p>
         </div>
+
+        <div className="mb-4">
+          <label className="mb-2 block font-medium text-sky-600">
+            <Icon
+              icon="mdi:message-text-outline"
+              className="mr-1.5 inline"
+              width={18}
+            />
+            默认系统提示词
+          </label>
+          <textarea
+            value={defaultSystemPrompt}
+            onChange={(e) => setDefaultSystemPrompt(e.target.value)}
+            rows={4}
+            className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+            placeholder="你是一个专业的文章摘要助手，请提炼文章的核心观点，总结要点。"
+          />
+          <p className="mt-2 text-sm text-sky-500">
+            系统提示词用于定义AI助手的行为和能力，不过这里的系统提示词不算系统提示词，还是作为
+            user prompt 的一部分
+          </p>
+        </div>
+
+        <button
+          onClick={saveSettings}
+          className="flex w-full items-center justify-center rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-300">
+          <Icon icon="mdi:content-save-outline" className="mr-1.5" width={18} />
+          保存设置
+        </button>
       </div>
     </OptionSection>
   )
