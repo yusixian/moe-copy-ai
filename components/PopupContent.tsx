@@ -416,7 +416,10 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             </div>
           )}
           {/* 添加AI摘要组件 */}
-          <AiSummarySection content={scrapedData.articleContent} />
+          <AiSummarySection
+            content={scrapedData.articleContent}
+            scrapedData={scrapedData}
+          />
           {/* 页面图片 */}
           {scrapedData.images && scrapedData.images.length > 0 && (
             <div className="mb-4">

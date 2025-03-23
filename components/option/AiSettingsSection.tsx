@@ -17,7 +17,7 @@ function AiSettingsSection() {
   const [apiKey, setApiKey] = useState<string>("")
   const [baseURL, setBaseURL] = useState<string>("https://api.openai.com/v1/")
   const [defaultSystemPrompt, setDefaultSystemPrompt] = useState<string>(
-    "你是一个专业的文章摘要助手，请提炼文章的核心观点，总结要点。"
+    "你是一个专业的文章摘要助手，请提炼文章的核心观点，总结要点。文章内容： {{content}}"
   )
   const [model, setModel] = useState<string | null>(null)
   const [showTips, setShowTips] = useState(false)
