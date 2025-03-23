@@ -1,15 +1,16 @@
 import { Icon } from "@iconify/react"
 import { memo, useCallback, useState } from "react"
 
-import { sendToBackground } from "@plasmohq/messaging"
 import { useStorage } from "@plasmohq/storage/hook"
 
+import AiSummarySection from "~/components/AiSummarySection"
 import ContentSection from "~/components/ContentSection"
 import ImageGrid from "~/components/ImageGrid"
 import MetadataImageSection from "~/components/MetadataImageSection"
 import MetadataTable from "~/components/MetadataTable"
 import SelectorDropdown from "~/components/SelectorDropdown"
 import CatSVG from "~components/svg/CatSVG"
+import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import useScrapedData from "~hooks/useScrapedData"
 import { cn } from "~utils"
 
@@ -63,15 +64,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
   }, [])
 
   // 打开选项页面
-  const handleOpenOptions = useCallback(() => {
-    // 使用sendToBackground发送消息到background脚本打开选项页面
-    sendToBackground({
-      name: "openOptionsPage"
-    }).catch((error) => {
-      console.error("打开选项页面失败:", error)
-    })
-  }, [])
-
+  const handleOpenOptions = useOpenOptionPage()
   // 打开GitHub仓库
   const handleOpenGithub = useCallback(() => {
     window.open("https://github.com/yusixian/moe-copy-ai", "_blank")
@@ -422,7 +415,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               />
             </div>
           )}
-
+          {/* 添加AI摘要组件 */}
+          <AiSummarySection
+            content={scrapedData.articleContent}
+            scrapedData={scrapedData}
+          />
           {/* 页面图片 */}
           {scrapedData.images && scrapedData.images.length > 0 && (
             <div className="mb-4">
@@ -473,7 +470,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
       ) : (
         <div className="rounded-xl border-2 border-sky-200 bg-white p-8 text-center text-gray-500 shadow-md">
           <p className="mb-2">(づ￣ ³￣)づ</p>
-          没有找到内容。点击"刷新内容"按钮重试。
+          没有找到内容。点击"刷新内容"按钮重试或新开标签页重试。
         </div>
       )}
 

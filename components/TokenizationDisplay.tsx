@@ -8,12 +8,14 @@ interface TokenizationDisplayProps {
   className?: string
   content: string
   isVisible: boolean
+  showOnlySummary?: boolean
 }
 
 const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
   content,
   isVisible,
-  className
+  className,
+  showOnlySummary = false
 }) => {
   const [showTokenIds, setShowTokenIds] = useState(false)
 
@@ -30,7 +32,7 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
 
   // 获取每个token对应的文本片段
   const tokenTextPairs = useMemo(() => {
-    if (!tokens.length || !isVisible) return []
+    if (!tokens.length || !isVisible || showOnlySummary) return []
 
     const pairs: { token: number; text: string }[] = []
 
@@ -40,13 +42,13 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
         const text = decode([token])
         pairs.push({ token, text })
       } catch (error) {
-        console.error(`解码token ${token}失败:`, error)
-        pairs.push({ token, text: "�" })
+        console.error(`解码token ${token} 失败:`, error)
+        pairs.push({ token, text: "" })
       }
     }
 
     return pairs
-  }, [tokens, isVisible])
+  }, [tokens, isVisible, showOnlySummary])
 
   // 用于生成随机颜色的函数
   const getTokenColor = (token: number) => {
@@ -61,31 +63,43 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
 
   return (
     <div className={className}>
-      <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-slate-700">分词结果</h3>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowTokenIds(!showTokenIds)}>
-          {showTokenIds ? "隐藏 Token IDs" : "显示 Token IDs"}
-        </Button>
-      </div>
+      {!showOnlySummary && (
+        <>
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="text-sm font-medium text-slate-700">分词结果</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowTokenIds(!showTokenIds)}>
+              {showTokenIds ? "隐藏 Token IDs" : "显示 Token IDs"}
+            </Button>
+          </div>
 
-      <Card className="h-[12.5rem] overflow-auto p-4">
-        <div className="flex flex-wrap gap-1">
-          {tokenTextPairs.map((pair, index) => (
-            <div
-              key={index}
-              className="group relative rounded px-1 py-0.5 text-sm text-slate-700 transition-all hover:shadow-md"
-              style={{ backgroundColor: getTokenColor(pair.token) }}>
-              {showTokenIds ? pair.token : pair.text}
+          <Card className="h-[12.5rem] overflow-auto p-4">
+            <div className="flex flex-wrap gap-1">
+              {tokenTextPairs.map((pair, index) => (
+                <div
+                  key={index}
+                  className="group relative rounded px-1 py-0.5 text-sm text-slate-700 transition-all hover:shadow-md"
+                  style={{ backgroundColor: getTokenColor(pair.token) }}>
+                  {showTokenIds ? pair.token : pair.text}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </Card>
+          </Card>
+        </>
+      )}
 
       <div className="mt-2 text-xs text-slate-500">
-        共 {tokens.length} 个tokens，{content.length} 个字符
+        共 {content.length} 个字符，预计消耗 {tokens.length} 个 token，(使用
+        <a
+          href="https://github.com/niieani/gpt-tokenizer"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:text-blue-600">
+          gpt-tokenizer
+        </a>
+        分词，结果可能有误差，请对比实际消耗 token)
       </div>
     </div>
   )
