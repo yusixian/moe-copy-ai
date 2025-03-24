@@ -1,3 +1,4 @@
+import type { StreamTextChunkResult, StreamTextResult } from "@xsai/stream-text"
 import { useCallback, useLayoutEffect, useState } from "react"
 import { toast } from "react-toastify"
 
@@ -5,10 +6,6 @@ import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import type { ScrapedContent } from "~constants/types"
-import type {
-  StreamTextChunkResult,
-  StreamTextResult
-} from "~node_modules/@xsai/stream-text/dist"
 import { generateSummary, getAiConfig } from "~utils/ai-service"
 import { debugLog } from "~utils/logger"
 import { processTemplate } from "~utils/template"

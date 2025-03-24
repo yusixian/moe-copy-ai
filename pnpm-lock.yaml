@@ -20,9 +20,6 @@ importers:
       '@plasmohq/storage':
         specifier: ^1.15.0
         version: 1.15.0(react@18.2.0)
-      '@xsai/generate-text':
-        specifier: ^0.1.3
-        version: 0.1.3
       '@xsai/model':
         specifier: ^0.1.3
         version: 0.1.3
@@ -1741,9 +1738,6 @@ packages:
 
   '@vue/shared@3.3.4':
     resolution: {integrity: sha512-7OjdcV8vQ74eiz1TZLzZP4JwqM5fA94K6yntPS5Z25r9HDuGNzaGdgvwKYq6S+MxwF0TFRwe50fIR/MYnakdkQ==}
-
-  '@xsai/generate-text@0.1.3':
-    resolution: {integrity: sha512-jdA7w0yPU7ri0tqj1AXgZ2nYj42sN2V7fwhjo9RpbEagZm0jrRBNgRoVaViyQzbZh3CRCPdUVUmLMojq8VOTLw==}
 
   '@xsai/model@0.1.3':
     resolution: {integrity: sha512-C6feX4fl8JjHhjqoXtSnzbAxIf1ML/SLHuPh2q0zvTujBDvM4s1zyRBtH3tngSuVkxtxxGchkuS76eXDjdW6UQ==}
@@ -5464,10 +5458,6 @@ snapshots:
       vue: 3.3.4
 
   '@vue/shared@3.3.4': {}
-
-  '@xsai/generate-text@0.1.3':
-    dependencies:
-      '@xsai/shared-chat': 0.1.3
 
   '@xsai/model@0.1.3':
     dependencies:
