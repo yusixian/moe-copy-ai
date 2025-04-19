@@ -56,7 +56,7 @@ export async function generateSummary(customPrompt?: string) {
         }
       ],
       streamOptions: {
-        usage: true // 启用 usage 统计
+        includeUsage: true // 启用 usage 统计
       }
     })
 
