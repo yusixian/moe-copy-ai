@@ -24,6 +24,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
 }) => {
   const [historyItems, setHistoryItems] = useState<AiChatHistoryItem[]>([])
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null)
+  const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(false)
   const drawerRef = useRef<HTMLDivElement>(null)
 
@@ -102,6 +103,23 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
   const toggleExpand = useCallback((id: string) => {
     setExpandedItemId((prev) => (prev === id ? null : id))
   }, [])
+
+  // 切换完整提示词的展开/折叠状态
+  const togglePromptExpand = useCallback(
+    (itemId: string, e: React.MouseEvent) => {
+      e.stopPropagation() // 防止触发父元素的点击事件
+      setExpandedPrompts((prev) => {
+        const newSet = new Set(prev)
+        if (newSet.has(itemId)) {
+          newSet.delete(itemId)
+        } else {
+          newSet.add(itemId)
+        }
+        return newSet
+      })
+    },
+    []
+  )
 
   // 当抽屉打开时加载历史记录
   useEffect(() => {
@@ -297,12 +315,39 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                             {item.processedPrompt &&
                               item.processedPrompt !== item.prompt && (
                                 <div className="mb-2 rounded-md bg-emerald-50 p-2">
-                                  <p className="mb-1 text-xs font-medium text-emerald-600">
-                                    完整提示词 (已填充):
-                                  </p>
-                                  <p className="whitespace-pre-wrap break-words text-xs text-emerald-700">
-                                    {item.processedPrompt}
-                                  </p>
+                                  <div
+                                    className="flex cursor-pointer items-center justify-between"
+                                    onClick={(e) =>
+                                      togglePromptExpand(item.id, e)
+                                    }>
+                                    <p className="mb-1 text-xs font-medium text-emerald-600">
+                                      完整提示词 (已填充):
+                                    </p>
+                                    <Icon
+                                      icon={
+                                        expandedPrompts.has(item.id)
+                                          ? "line-md:chevron-up"
+                                          : "line-md:chevron-down"
+                                      }
+                                      className="text-emerald-500"
+                                      width="16"
+                                      height="16"
+                                    />
+                                  </div>
+                                  <AnimatePresence initial={false}>
+                                    {expandedPrompts.has(item.id) && (
+                                      <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="overflow-hidden">
+                                        <p className="whitespace-pre-wrap break-words text-xs text-emerald-700">
+                                          {item.processedPrompt}
+                                        </p>
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
                                 </div>
                               )}
 
