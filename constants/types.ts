@@ -56,3 +56,23 @@ export interface SelectorTestResponse {
   content?: string
   error?: string
 }
+
+// AI聊天历史记录条目
+export interface AiChatHistoryItem {
+  id: string
+  timestamp: number
+  url: string
+  prompt: string
+  content: string
+  processedPrompt?: string
+  usage?: {
+    total_tokens?: number
+    prompt_tokens?: number
+    completion_tokens?: number
+  }
+}
+
+// AI聊天历史记录列表
+export interface AiChatHistory {
+  items: AiChatHistoryItem[]
+}
