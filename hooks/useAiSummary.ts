@@ -1,5 +1,7 @@
+import { generateText } from "@xsai/generate-text"
 import type { StreamTextChunkResult, StreamTextResult } from "@xsai/stream-text"
 import { useCallback, useLayoutEffect, useState } from "react"
+import { isMobile } from "react-device-detect"
 import { toast } from "react-toastify"
 
 import { Storage } from "@plasmohq/storage"
@@ -214,141 +216,193 @@ export const useAiSummary = (
         processedPrompt = processTemplate(customPrompt, scrapedData)
       }
       debugLog("processedPrompt", processedPrompt)
-      const result = await generateSummary(processedPrompt)
-      if (result) {
-        debugLog("generateSummaryText result获取成功", result)
-        debugLog("streamText返回值结构:", {
-          textStream: typeof result.textStream,
-          stepStream: typeof result.stepStream,
-          chunkStream: typeof result.chunkStream,
-          hasTextStream: !!result.textStream,
-          hasStepStream: !!result.stepStream,
-          hasChunkStream: !!result.chunkStream
+
+      // 根据是否为移动端选择不同的生成方式
+      if (isMobile) {
+        // 移动端使用非流式生成
+        // TODO: 移动端流式输出好像有问题，等后续 debug，先打补丁
+        debugLog("检测到移动设备，使用直接生成方式")
+
+        // 获取AI配置信息
+        const config = await getAiConfig()
+
+        // 调用generateText直接生成文本
+        const { text, usage } = await generateText({
+          apiKey: apiKey,
+          baseURL: config.baseURL || "https://api.openai.com/v1/",
+          messages: [
+            {
+              content: config.systemPrompt || "你是一个有用的助手",
+              role: "system"
+            },
+            {
+              content: processedPrompt + "\n\n内容: " + content,
+              role: "user"
+            }
+          ],
+          model: config.model || "gpt-3.5-turbo"
         })
 
-        // 保存结果对象
-        setResult(result)
-        setUsage(null) // 初始化usage
+        // 设置生成的文本
+        fullText = text
+        setSummary(text)
+        setStreamingText(text)
+        onSummaryGenerated?.(text)
 
-        // 使用流式接收文本和处理 usage
-        try {
-          // 处理 usage 流
-          const chunkStream =
-            result.chunkStream as unknown as AsyncIterable<StreamTextChunkResult>
-          // TODO: 流这块还得完善，现在只是能跑！
-          // 单独启动一个异步任务处理 chunkStream
-          const processChunkStream = async () => {
-            debugLog("开始处理 chunkStream 获取 usage...")
-
-            try {
-              for await (const chunk of chunkStream) {
-                // 如果 chunk 中有 usage 信息，则更新 usage 状态
-                if (chunk.usage) {
-                  debugLog("接收到 usage 信息:", chunk.usage)
-                  const newUsage = {
-                    total_tokens: chunk.usage.total_tokens,
-                    prompt_tokens: chunk.usage.prompt_tokens,
-                    completion_tokens: chunk.usage.completion_tokens
-                  }
-                  setUsage(newUsage)
-                  currentUsage = newUsage
-                }
-              }
-              debugLog("chunkStream 处理完成")
-            } catch (chunkError) {
-              console.error("chunkStream 处理出错:", chunkError)
-              debugLog("chunkStream 处理详细错误:", {
-                name: chunkError.name,
-                message: chunkError.message,
-                stack: chunkError.stack
-              })
-            }
+        // 设置token使用情况
+        if (usage) {
+          const newUsage = {
+            total_tokens: usage.total_tokens,
+            prompt_tokens: usage.prompt_tokens,
+            completion_tokens: usage.completion_tokens
           }
-
-          // 启动异步处理，但不等待它完成
-          processChunkStream()
-
-          // 处理文本流
-          const textStream =
-            result.textStream as unknown as AsyncIterable<string>
-
-          // 处理文本流
-          debugLog("开始处理textStream...")
-          let chunkCount = 0
-
-          try {
-            for await (const textPart of textStream) {
-              chunkCount++
-              // 每接收 20 个文本块打印一次日志，避免日志过多
-              if (chunkCount % 20 === 0 || chunkCount <= 2) {
-                debugLog(`接收到第${chunkCount}个文本块:`, {
-                  length: textPart.length,
-                  preview:
-                    textPart.slice(0, 20) + (textPart.length > 20 ? "..." : "")
-                })
-              }
-
-              fullText += textPart
-              setStreamingText((prev) => prev + textPart)
-            }
-
-            debugLog(
-              `textStream 处理完成，共接收${chunkCount}个文本块，最终文本长度:${fullText?.length}`
-            )
-          } catch (textStreamError) {
-            console.error("textStream 处理出错:", textStreamError)
-            debugLog("textStream 处理详细错误:", {
-              name: textStreamError.name,
-              message: textStreamError.message,
-              stack: textStreamError.stack
-            })
-            // 即使textStream出错，但如果我们已经收集了一些文本，我们也应该使用它
-            debugLog(
-              "尽管 textStream 出错，仍将使用已收集的文本，长度:",
-              fullText.length
-            )
-          }
-
-          // 无论流处理是否成功，都使用收集的文本
-          if (fullText) {
-            // 流处理完成后使用收集的完整文本
-            setSummary(fullText)
-            onSummaryGenerated?.(fullText)
-            debugLog("处理完成，最终文本长度:", fullText.length)
-
-            // 获取当前usage状态用于保存历史记录
-            const usageForSave = currentUsage || usage || null
-
-            debugLog("准备保存历史记录，当前状态:", {
-              fullTextLength: fullText?.length || 0,
-              hasFullText: !!fullText,
-              hasScrapedData: !!scrapedData,
-              hasUrl: !!scrapedData?.url,
-              usage: usageForSave
-            })
-
-            // 保存到历史记录
-            try {
-              await saveToHistory(fullText, usageForSave)
-              savedToHistory = true
-              debugLog("成功保存到历史记录")
-            } catch (saveError) {
-              console.error("保存历史记录失败:", saveError)
-              debugLog("保存历史记录失败:", saveError)
-            }
-          }
-        } catch (streamError) {
-          console.error("流处理出错:", streamError)
-          debugLog("流处理详细错误:", {
-            name: streamError.name,
-            message: streamError.message,
-            stack: streamError.stack
-          })
+          setUsage(newUsage)
+          currentUsage = newUsage
         }
 
+        // 保存到历史记录
+        await saveToHistory(text, currentUsage)
+        savedToHistory = true
         setError(null)
       } else {
-        throw new Error("生成摘要失败")
+        // 桌面端使用流式生成
+        const result = await generateSummary(processedPrompt)
+        if (result) {
+          debugLog("generateSummaryText result获取成功", result)
+          debugLog("streamText返回值结构:", {
+            textStream: typeof result.textStream,
+            stepStream: typeof result.stepStream,
+            chunkStream: typeof result.chunkStream,
+            hasTextStream: !!result.textStream,
+            hasStepStream: !!result.stepStream,
+            hasChunkStream: !!result.chunkStream
+          })
+
+          // 保存结果对象
+          setResult(result)
+          setUsage(null) // 初始化usage
+
+          // 使用流式接收文本和处理 usage
+          try {
+            // 处理 usage 流
+            const chunkStream =
+              result.chunkStream as unknown as AsyncIterable<StreamTextChunkResult>
+            // TODO: 流这块还得完善，现在只是能跑！
+            // 单独启动一个异步任务处理 chunkStream
+            const processChunkStream = async () => {
+              debugLog("开始处理 chunkStream 获取 usage...")
+
+              try {
+                for await (const chunk of chunkStream) {
+                  // 如果 chunk 中有 usage 信息，则更新 usage 状态
+                  if (chunk.usage) {
+                    debugLog("接收到 usage 信息:", chunk.usage)
+                    const newUsage = {
+                      total_tokens: chunk.usage.total_tokens,
+                      prompt_tokens: chunk.usage.prompt_tokens,
+                      completion_tokens: chunk.usage.completion_tokens
+                    }
+                    setUsage(newUsage)
+                    currentUsage = newUsage
+                  }
+                }
+                debugLog("chunkStream 处理完成")
+              } catch (chunkError) {
+                console.error("chunkStream 处理出错:", chunkError)
+                debugLog("chunkStream 处理详细错误:", {
+                  name: chunkError.name,
+                  message: chunkError.message,
+                  stack: chunkError.stack
+                })
+              }
+            }
+
+            // 启动异步处理，但不等待它完成
+            processChunkStream()
+
+            // 处理文本流
+            const textStream =
+              result.textStream as unknown as AsyncIterable<string>
+
+            // 处理文本流
+            debugLog("开始处理textStream...")
+            let chunkCount = 0
+
+            try {
+              for await (const textPart of textStream) {
+                chunkCount++
+                // 每接收 20 个文本块打印一次日志，避免日志过多
+                if (chunkCount % 20 === 0 || chunkCount <= 2) {
+                  debugLog(`接收到第${chunkCount}个文本块:`, {
+                    length: textPart.length,
+                    preview:
+                      textPart.slice(0, 20) +
+                      (textPart.length > 20 ? "..." : "")
+                  })
+                }
+
+                fullText += textPart
+                setStreamingText((prev) => prev + textPart)
+              }
+
+              debugLog(
+                `textStream 处理完成，共接收${chunkCount}个文本块，最终文本长度:${fullText?.length}`
+              )
+            } catch (textStreamError) {
+              console.error("textStream 处理出错:", textStreamError)
+              debugLog("textStream 处理详细错误:", {
+                name: textStreamError.name,
+                message: textStreamError.message,
+                stack: textStreamError.stack
+              })
+              // 即使textStream出错，但如果我们已经收集了一些文本，我们也应该使用它
+              debugLog(
+                "尽管 textStream 出错，仍将使用已收集的文本，长度:",
+                fullText.length
+              )
+            }
+
+            // 无论流处理是否成功，都使用收集的文本
+            if (fullText) {
+              // 流处理完成后使用收集的完整文本
+              setSummary(fullText)
+              onSummaryGenerated?.(fullText)
+              debugLog("处理完成，最终文本长度:", fullText.length)
+
+              // 获取当前usage状态用于保存历史记录
+              const usageForSave = currentUsage || usage || null
+
+              debugLog("准备保存历史记录，当前状态:", {
+                fullTextLength: fullText?.length || 0,
+                hasFullText: !!fullText,
+                hasScrapedData: !!scrapedData,
+                hasUrl: !!scrapedData?.url,
+                usage: usageForSave
+              })
+
+              // 保存到历史记录
+              try {
+                await saveToHistory(fullText, usageForSave)
+                savedToHistory = true
+                debugLog("成功保存到历史记录")
+              } catch (saveError) {
+                console.error("保存历史记录失败:", saveError)
+                debugLog("保存历史记录失败:", saveError)
+              }
+            }
+          } catch (streamError) {
+            console.error("流处理出错:", streamError)
+            debugLog("流处理详细错误:", {
+              name: streamError.name,
+              message: streamError.message,
+              stack: streamError.stack
+            })
+          }
+
+          setError(null)
+        } else {
+          throw new Error("生成摘要失败")
+        }
       }
     } catch (error) {
       setError(error.message || "未知错误")
