@@ -69,6 +69,28 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
     }
   }, [])
 
+  // 导出历史记录为JSON
+  const handleExport = useCallback(() => {
+    try {
+      const jsonString = JSON.stringify(historyItems, null, 2)
+      const blob = new Blob([jsonString], { type: "application/json" })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+
+      link.href = url
+      link.download = `ai-chat-history-${new Date().toISOString().split("T")[0]}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+
+      toast.success("导出成功 (●'◡'●)")
+    } catch (error) {
+      console.error("导出历史记录失败:", error)
+      toast.error("导出失败 (╥﹏╥)")
+    }
+  }, [historyItems])
+
   // 复制内容
   const handleCopy = useCallback((text: string, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -139,17 +161,30 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
               </h3>
               <div className="flex gap-2">
                 {historyItems.length > 0 && (
-                  <button
-                    onClick={handleClearAll}
-                    className="flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-200">
-                    <Icon
-                      icon="line-md:trash"
-                      className="mr-1"
-                      width="16"
-                      height="16"
-                    />
-                    清空
-                  </button>
+                  <>
+                    <button
+                      onClick={handleExport}
+                      className="flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-200">
+                      <Icon
+                        icon="line-md:cloud-alt-download"
+                        className="mr-1"
+                        width="16"
+                        height="16"
+                      />
+                      导出
+                    </button>
+                    <button
+                      onClick={handleClearAll}
+                      className="flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-200">
+                      <Icon
+                        icon="line-md:trash"
+                        className="mr-1"
+                        width="16"
+                        height="16"
+                      />
+                      清空
+                    </button>
+                  </>
                 )}
                 <button
                   onClick={onClose}
