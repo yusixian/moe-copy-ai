@@ -9,7 +9,6 @@ import ImageGrid from "~/components/ImageGrid"
 import MetadataImageSection from "~/components/MetadataImageSection"
 import MetadataTable from "~/components/MetadataTable"
 import SelectorDropdown from "~/components/SelectorDropdown"
-import CatSVG from "~components/svg/CatSVG"
 import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import useScrapedData from "~hooks/useScrapedData"
 import { cn } from "~utils"
@@ -41,6 +40,18 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
   // 从存储中获取是否显示调试面板的设置
   const [showDebugPanel] = useStorage<string>("show_debug_panel", "true")
 
+  // 从存储中获取悬浮窗显示设置
+  const [showFloatButton, setShowFloatButton] = useStorage<string>(
+    "show_float_button",
+    "true"
+  )
+
+  // 添加临时隐藏状态，使用Plasmo的存储管理
+  const [tempHideButton, setTempHideButton] = useStorage<boolean>(
+    "temp_hide_button",
+    false
+  )
+
   // 添加气泡出现的动画状态
   const [showBubble, setShowBubble] = useState(false)
 
@@ -52,6 +63,20 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
   const handleCatClick = useCallback(() => {
     setShowBubble((prev) => !prev)
   }, [])
+
+  // 处理悬浮窗设置变更
+  const handleFloatButtonToggle = useCallback(() => {
+    const newValue = showFloatButton === "true" ? "false" : "true"
+    setShowFloatButton(newValue)
+  }, [showFloatButton, setShowFloatButton])
+
+  // 处理临时隐藏悬浮窗
+  const handleTempHideFloat = useCallback(() => {
+    setTempHideButton(true)
+    if (onClose) {
+      onClose()
+    }
+  }, [setTempHideButton, onClose])
 
   // 图片加载错误处理
   const handleImageLoadError = useCallback((src: string) => {
@@ -87,25 +112,6 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           <p className="mt-1 text-xs text-blue-500">
             支持原始格式(保留Markdown格式与换行)和紧凑版(无换行，文本更精简)两种模式
           </p>
-
-          <div className="absolute -bottom-16 right-10 z-10 mr-2 h-14 w-14 xs:hidden">
-            <CatSVG
-              className="size-14 cursor-pointer transition-transform hover:scale-110"
-              onClick={handleCatClick}
-            />
-            {/* 对话气泡  */}
-            <div
-              className={`absolute -right-3 bottom-16 w-48 transform rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-sky-100 p-2 text-xs transition-all duration-500 ${
-                showBubble
-                  ? "scale-100 opacity-100"
-                  : "pointer-events-none scale-75 opacity-0"
-              } shadow-sm`}>
-              <div className="absolute -bottom-2 right-8 h-4 w-4 rotate-45 transform border-b border-r border-blue-200 bg-sky-100"></div>
-              <span className="text-center font-medium text-blue-500">
-                喵～抓取中～♪(=^･ω･^=)
-              </span>
-            </div>
-          </div>
         </div>
         <div className="flex items-center gap-2 xs:flex-col">
           {onClose && (
@@ -131,7 +137,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         </div>
       </header>
 
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <button
           onClick={handleRefreshClick}
           disabled={isLoading}
@@ -148,6 +154,30 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             </>
           )}
         </button>
+
+        <div className="flex gap-2">
+          {/* 临时隐藏悬浮窗按钮 */}
+          <button
+            onClick={handleTempHideFloat}
+            className="flex transform items-center gap-1 rounded-lg border border-purple-400 px-3 py-1.5 text-sm text-purple-500 shadow-sm transition-all hover:scale-105 hover:shadow-md hover:brightness-110"
+            title="临时隐藏悬浮窗，刷新后会自动恢复">
+            <Icon icon="line-md:watch" />
+            临时隐藏悬浮窗
+          </button>
+
+          {/* 悬浮窗开关按钮 */}
+          <button
+            onClick={handleFloatButtonToggle}
+            className="flex transform items-center gap-1 rounded-lg border border-sky-500 px-3 py-1.5 text-sm text-sky-500 shadow-sm transition-all hover:scale-105 hover:shadow-md hover:brightness-110"
+            title={
+              showFloatButton === "true"
+                ? "快速关闭网页悬浮窗（可在设置页面更改）"
+                : "快速开启网页悬浮窗（可在设置页面更改）"
+            }>
+            <Icon icon="line-md:cog-filled-loop" />
+            {showFloatButton === "true" ? "永久关闭悬浮窗" : "开启悬浮窗"}
+          </button>
+        </div>
       </div>
 
       {error && (
