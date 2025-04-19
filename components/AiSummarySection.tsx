@@ -6,6 +6,7 @@ import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import { useAiSummary } from "~hooks/useAiSummary"
 import { copyToClipboard } from "~utils/clipboard"
 
+import AiHistoryDrawer from "./ai/AiHistoryDrawer"
 import PromptInput from "./ai/PromptInput"
 import { SummaryResult } from "./ai/SummaryResult"
 
@@ -62,6 +63,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
   scrapedData
 }) => {
   const [showCustomPromptInput, setShowCustomPromptInput] = useState(true)
+  const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false)
 
   const {
     summary,
@@ -71,7 +73,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
     customPrompt,
     setCustomPrompt,
     systemPrompt,
-    generateSummary,
+    generateSummaryText,
     saveAsDefaultPrompt,
     usage
   } = useAiSummary(content, onSummaryGenerated, scrapedData)
@@ -81,6 +83,11 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
   const togglePromptInput = useCallback(
     () => setShowCustomPromptInput(!showCustomPromptInput),
     [showCustomPromptInput]
+  )
+
+  const toggleHistoryDrawer = useCallback(
+    () => setIsHistoryDrawerOpen(!isHistoryDrawerOpen),
+    [isHistoryDrawerOpen]
   )
 
   const handleCopySummary = useCallback(
@@ -145,6 +152,18 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
             </button>
 
             <button
+              onClick={toggleHistoryDrawer}
+              className="flex items-center rounded-md bg-purple-100 px-3 py-1.5 text-xs font-medium text-purple-600 shadow-sm transition-all hover:bg-purple-200 hover:shadow">
+              <Icon
+                icon="mdi:history"
+                className="mr-1.5"
+                width="16"
+                height="16"
+              />
+              历史记录
+            </button>
+
+            <button
               onClick={handleOpenSettings}
               className="flex items-center rounded-md bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-600 shadow-sm transition-all hover:bg-amber-200 hover:shadow">
               <Icon
@@ -181,7 +200,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
         )}
 
         <div className="flex flex-col items-end gap-2">
-          <GenerateButton onClick={generateSummary} isLoading={isLoading} />
+          <GenerateButton onClick={generateSummaryText} isLoading={isLoading} />
           {error && <ErrorMessage message={error} />}
         </div>
         {(summary || streamingText) && (
@@ -220,6 +239,12 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
           </>
         )}
       </div>
+
+      {/* 历史记录抽屉组件 */}
+      <AiHistoryDrawer
+        isOpen={isHistoryDrawerOpen}
+        onClose={toggleHistoryDrawer}
+      />
     </div>
   )
 }

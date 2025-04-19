@@ -37,6 +37,17 @@ const FloatingPopup = () => {
   const [isOpen, setIsOpen] = useState(false)
   // 从存储中获取悬浮窗显示设置，默认为显示
   const [showFloatButton] = useStorage<string>("show_float_button", "true")
+  // 添加临时隐藏状态，使用Plasmo的状态管理
+  const [tempHideButton, setTempHideButton] = useStorage<boolean>(
+    "temp_hide_button",
+    false
+  )
+
+  // 在页面刷新后重置临时隐藏状态
+  useEffect(() => {
+    // 页面加载时重置临时隐藏状态，确保刷新后悬浮窗恢复显示
+    setTempHideButton(false)
+  }, [])
 
   // 使用floating-ui来定位弹窗
   const { refs, floatingStyles, context } = useFloating({
@@ -102,8 +113,8 @@ const FloatingPopup = () => {
     setIsOpen(false)
   }
 
-  // 如果设置为不显示悬浮窗，则直接返回null
-  if (showFloatButton === "false") {
+  // 如果设置为不显示悬浮窗或临时隐藏，则直接返回null
+  if (showFloatButton === "false" || tempHideButton) {
     return null
   }
 

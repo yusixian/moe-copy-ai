@@ -6,6 +6,7 @@ import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import type { ScrapedContent } from "~constants/types"
+import { addAiChatHistoryItem } from "~utils"
 import { generateSummary, getAiConfig } from "~utils/ai-service"
 import { debugLog } from "~utils/logger"
 import { processTemplate } from "~utils/template"
@@ -14,7 +15,7 @@ import { processTemplate } from "~utils/template"
 const storage = new Storage({ area: "sync" })
 
 /**
- * AI摘要生成钩子返回值类型
+ * AI 摘要生成钩子返回值类型
  */
 export interface UseAiSummaryResult {
   result: StreamTextResult | null
@@ -33,7 +34,7 @@ export interface UseAiSummaryResult {
   /** 系统默认提示词 */
   systemPrompt: string
   /** 生成摘要的方法 */
-  generateSummary: () => Promise<void>
+  generateSummaryText: () => Promise<void>
   /** 保存为系统默认提示词 */
   saveAsDefaultPrompt: (prompt: string) => Promise<void>
   /** Token使用情况 */
@@ -96,6 +97,95 @@ export const useAiSummary = (
     fetchSystemPrompt()
   }, [])
 
+  // 保存聊天历史记录
+  const saveToHistory = useCallback(
+    async (text: string, currentUsage: UseAiSummaryResult["usage"]) => {
+      try {
+        // 添加详细的日志
+        debugLog("开始保存历史记录，参数:", {
+          textLength: text?.length || 0,
+          hasText: !!text,
+          hasUrl: !!scrapedData?.url,
+          url: scrapedData?.url,
+          promptLength: customPrompt?.length || 0,
+          usage: currentUsage
+        })
+
+        // 只有当有文本内容和scrapedData时才保存
+        if (text && scrapedData?.url) {
+          debugLog("条件满足，准备调用 addAiChatHistoryItem")
+
+          // 计算处理后的提示词
+          let processedPromptForHistory = customPrompt
+          if (customPrompt) {
+            try {
+              processedPromptForHistory = processTemplate(
+                customPrompt,
+                scrapedData
+              )
+            } catch (templateError) {
+              console.error("处理历史记录的模板时出错:", templateError)
+              debugLog("处理历史记录模板错误，将使用原始prompt")
+            }
+          }
+
+          const historyItem = {
+            url: scrapedData.url,
+            prompt: customPrompt,
+            processedPrompt: processedPromptForHistory,
+            content: text,
+            usage: currentUsage || undefined
+          }
+          debugLog("历史记录项:", historyItem)
+
+          // 设置超时处理
+          const timeoutPromise = new Promise<void>((_, reject) => {
+            setTimeout(() => {
+              reject(new Error("保存历史记录超时"))
+            }, 5000) // 5秒超时
+          })
+
+          try {
+            // 使用Promise.race同时处理正常保存和超时情况
+            await Promise.race([
+              addAiChatHistoryItem(historyItem),
+              timeoutPromise
+            ])
+            debugLog("已保存到聊天历史记录")
+          } catch (innerError) {
+            if (innerError.message === "保存历史记录超时") {
+              debugLog("保存历史记录超时，将重试一次")
+              // 超时后再尝试一次不带超时的保存
+              try {
+                await addAiChatHistoryItem(historyItem)
+                debugLog("重试保存历史记录成功")
+              } catch (retryError) {
+                debugLog("重试保存历史记录失败:", retryError)
+                throw retryError
+              }
+            } else {
+              debugLog("保存历史记录失败，非超时错误:", innerError)
+              throw innerError
+            }
+          }
+        } else {
+          debugLog("条件不满足，无法保存历史记录", {
+            hasText: !!text,
+            hasUrl: !!scrapedData?.url
+          })
+        }
+      } catch (error) {
+        console.error("保存聊天历史记录失败:", error)
+        debugLog("保存历史记录详细错误:", {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        })
+      }
+    },
+    [customPrompt, scrapedData]
+  )
+
   // 处理摘要生成
   const generateSummaryText = useCallback(async () => {
     if (!content.trim()) {
@@ -109,6 +199,10 @@ export const useAiSummary = (
       toast.error("请先在扩展设置中配置AI提供商信息")
       return
     }
+
+    let fullText = ""
+    let currentUsage = null
+    let savedToHistory = false
 
     try {
       setIsLoading(true)
@@ -151,11 +245,13 @@ export const useAiSummary = (
                 // 如果 chunk 中有 usage 信息，则更新 usage 状态
                 if (chunk.usage) {
                   debugLog("接收到 usage 信息:", chunk.usage)
-                  setUsage({
+                  const newUsage = {
                     total_tokens: chunk.usage.total_tokens,
                     prompt_tokens: chunk.usage.prompt_tokens,
                     completion_tokens: chunk.usage.completion_tokens
-                  })
+                  }
+                  setUsage(newUsage)
+                  currentUsage = newUsage
                 }
               }
               debugLog("chunkStream 处理完成")
@@ -173,7 +269,6 @@ export const useAiSummary = (
           processChunkStream()
 
           // 处理文本流
-          let fullText = ""
           const textStream =
             result.textStream as unknown as AsyncIterable<string>
 
@@ -181,29 +276,67 @@ export const useAiSummary = (
           debugLog("开始处理textStream...")
           let chunkCount = 0
 
-          for await (const textPart of textStream) {
-            chunkCount++
-            // 每接收 20 个文本块打印一次日志，避免日志过多
-            if (chunkCount % 20 === 0 || chunkCount <= 2) {
-              debugLog(`接收到第${chunkCount}个文本块:`, {
-                length: textPart.length,
-                preview:
-                  textPart.slice(0, 20) + (textPart.length > 20 ? "..." : "")
-              })
+          try {
+            for await (const textPart of textStream) {
+              chunkCount++
+              // 每接收 20 个文本块打印一次日志，避免日志过多
+              if (chunkCount % 20 === 0 || chunkCount <= 2) {
+                debugLog(`接收到第${chunkCount}个文本块:`, {
+                  length: textPart.length,
+                  preview:
+                    textPart.slice(0, 20) + (textPart.length > 20 ? "..." : "")
+                })
+              }
+
+              fullText += textPart
+              setStreamingText((prev) => prev + textPart)
             }
 
-            fullText += textPart
-            setStreamingText((prev) => prev + textPart)
+            debugLog(
+              `textStream 处理完成，共接收${chunkCount}个文本块，最终文本长度:${fullText?.length}`
+            )
+          } catch (textStreamError) {
+            console.error("textStream 处理出错:", textStreamError)
+            debugLog("textStream 处理详细错误:", {
+              name: textStreamError.name,
+              message: textStreamError.message,
+              stack: textStreamError.stack
+            })
+            // 即使textStream出错，但如果我们已经收集了一些文本，我们也应该使用它
+            debugLog(
+              "尽管 textStream 出错，仍将使用已收集的文本，长度:",
+              fullText.length
+            )
           }
 
-          debugLog(
-            `textStream 处理完成，共接收${chunkCount}个文本块，最终文本长度:${fullText?.length}`
-          )
+          // 无论流处理是否成功，都使用收集的文本
+          if (fullText) {
+            // 流处理完成后使用收集的完整文本
+            setSummary(fullText)
+            onSummaryGenerated?.(fullText)
+            debugLog("处理完成，最终文本长度:", fullText.length)
 
-          // 流处理完成后使用收集的完整文本
-          setSummary(fullText)
-          onSummaryGenerated?.(fullText)
-          debugLog("流式生成全部完成，最终文本:", fullText)
+            // 获取当前usage状态用于保存历史记录
+            const usageForSave = currentUsage || usage || null
+
+            debugLog("准备保存历史记录，当前状态:", {
+              fullTextLength: fullText?.length || 0,
+              hasFullText: !!fullText,
+              hasScrapedData: !!scrapedData,
+              hasUrl: !!scrapedData?.url,
+              usage: usageForSave
+            })
+
+            // 保存到历史记录
+            try {
+              await saveToHistory(fullText, usageForSave)
+              savedToHistory = true
+              debugLog("成功保存到历史记录")
+            } catch (saveError) {
+              console.error("保存历史记录失败:", saveError)
+              debugLog("保存历史记录失败:", saveError)
+            }
+          }
         } catch (streamError) {
           console.error("流处理出错:", streamError)
           debugLog("流处理详细错误:", {
@@ -222,10 +355,34 @@ export const useAiSummary = (
       setResult(null)
       setStreamingText("")
       console.error("摘要生成失败:", error)
+
+      // 如果在整体过程中出错，但已经收集了一些文本，仍然尝试设置并保存
+      if (fullText && !savedToHistory) {
+        debugLog(
+          "尽管生成过程出错，但尝试保存已收集的文本，长度:",
+          fullText.length
+        )
+        setSummary(fullText)
+        onSummaryGenerated?.(fullText)
+
+        try {
+          await saveToHistory(fullText, currentUsage)
+        } catch (finalSaveError) {
+          debugLog("最终尝试保存历史记录失败:", finalSaveError)
+        }
+      }
     } finally {
       setIsLoading(false)
     }
-  }, [content, customPrompt, apiKey, onSummaryGenerated, scrapedData])
+  }, [
+    content,
+    customPrompt,
+    apiKey,
+    onSummaryGenerated,
+    scrapedData,
+    usage,
+    saveToHistory
+  ])
 
   return {
     result,
@@ -236,7 +393,7 @@ export const useAiSummary = (
     customPrompt,
     setCustomPrompt,
     systemPrompt,
-    generateSummary: generateSummaryText,
+    generateSummaryText,
     saveAsDefaultPrompt,
     usage
   }
