@@ -4,12 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "react-toastify"
 
 import type { AiChatHistoryItem } from "~constants/types"
+import { copyToClipboard } from "~utils"
 import {
   clearAiChatHistory,
   deleteAiChatHistoryItem,
   getAiChatHistory
-} from "~utils"
-import { copyToClipboard } from "~utils/clipboard"
+} from "~utils/ai-service"
 
 import ContentDisplay from "../ContentDisplay"
 

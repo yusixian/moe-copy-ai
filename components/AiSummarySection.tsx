@@ -4,7 +4,7 @@ import React, { useCallback, useMemo, useState } from "react"
 import type { ScrapedContent } from "~constants/types"
 import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import { useAiSummary } from "~hooks/useAiSummary"
-import { copyToClipboard } from "~utils/clipboard"
+import { copyToClipboard } from "~utils"
 
 import AiHistoryDrawer from "./ai/AiHistoryDrawer"
 import PromptInput from "./ai/PromptInput"
