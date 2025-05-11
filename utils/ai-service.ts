@@ -257,15 +257,24 @@ export async function deleteAiChatHistoryItem(id: string): Promise<void> {
   try {
     debugLog("开始删除AI聊天历史记录项, id:", id)
     const history = await getAiChatHistory()
-    const beforeCount = history.items.length
-    history.items = history.items.filter((item) => item.id !== id)
-    const afterCount = history.items.length
+
+    // 确保history和history.items都是有效的
+    const validHistory = {
+      items: Array.isArray(history.items) ? history.items : []
+    }
+
+    const beforeCount = validHistory.items.length
+    validHistory.items = validHistory.items.filter((item) => item.id !== id)
+    const afterCount = validHistory.items.length
+
     debugLog("过滤后的历史记录:", {
       beforeCount,
       afterCount,
       removed: beforeCount - afterCount
     })
-    await localStorage.set("ai_chat_history", history)
+
+    // 保存处理后的历史记录
+    await localStorage.set("ai_chat_history", validHistory)
     debugLog("成功删除AI聊天历史记录项")
   } catch (error) {
     console.error("删除AI聊天历史记录失败:", error)

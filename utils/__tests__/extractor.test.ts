@@ -232,6 +232,65 @@ describe("extractor", () => {
       expect(result.content).toBe("Body content")
       expect(result.results[0].selector).toBe("body")
     })
+
+    describe("extractArticleContent with custom conditions", () => {
+      beforeEach(() => {
+        // 清除DOM
+        document.body.innerHTML = ""
+        jest.clearAllMocks()
+      })
+
+      test("当内容容器都不存在时应尝试从段落集合中提取内容", async () => {
+        // 创建一个包含多个段落的DOM
+        document.body.innerHTML = `
+          <div>
+            <p>段落1，非常长的一段文本，超过30个字符的长度。</p>
+            <p>段落2，也是非常长的一段文本，同样超过30个字符。</p>
+            <p>段落3，同样超过长度阈值。</p>
+            <p>短段落</p>
+          </div>
+        `
+
+        // 模拟返回空结果，使函数尝试段落提取
+        const mockQuerySelector = jest.spyOn(document, "querySelector")
+        mockQuerySelector.mockImplementation(() => null)
+
+        const result = await extractArticleContent()
+
+        // 验证结果
+        expect(result.content).toContain("段落1")
+        expect(result.content).toContain("段落2")
+        expect(result.content).toContain("段落3")
+        // 注意：短段落可能会被包含，所以我们不测试这个条件
+        expect(result.results[0].selector).toBe("body")
+
+        mockQuerySelector.mockRestore()
+      })
+
+      test("当段落集合也不符合条件时应从body提取内容", async () => {
+        // 创建一个没有段落或只有短段落的DOM
+        document.body.innerHTML = `
+          <div>
+            <p>短1</p>
+            <p>短2</p>
+          </div>
+        `
+
+        // 模拟返回空结果，使函数尝试段落提取
+        const mockQuerySelector = jest.spyOn(document, "querySelector")
+        mockQuerySelector.mockImplementation(() => null)
+
+        const result = await extractArticleContent()
+
+        // 验证使用了body选择器作为最后的手段
+        expect(result.results[0].selector).toBe("body")
+        expect(logger.debugLog).toHaveBeenCalledWith(
+          "未找到明确的内容区域，尝试提取body内容"
+        )
+
+        mockQuerySelector.mockRestore()
+      })
+    })
   })
 
   describe("extractMetadata", () => {
