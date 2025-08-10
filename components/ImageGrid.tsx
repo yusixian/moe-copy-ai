@@ -3,7 +3,7 @@ import { memo, useState } from "react"
 
 import type { ImageInfo } from "~constants/types"
 
-import { openInNewTab, preventBubbling } from "../utils/clipboard"
+import { openInNewTab, preventBubbling } from "../utils"
 import CopyableTextField from "./CopyableTextField"
 import DownloadButton from "./DownloadButton"
 import { AnimatedContainer } from "./ui/animated-container"

@@ -1,5 +1,6 @@
 // 导入pino和存储API
-import pino, { type LevelWithSilentOrString } from "pino"
+import pino from "pino"
+import type { LevelWithSilentOrString } from "pino"
 
 import { Storage } from "@plasmohq/storage"
 
