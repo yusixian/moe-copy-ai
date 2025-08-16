@@ -330,7 +330,7 @@ describe("extractor", () => {
         </body>
       `)
 
-      let result = await scrapeWebpageContent()
+      let result = await scrapeWebpageContent({ mode: "selector" })
       expect(result.title).toBe("Page Title")
       expect(result.author).toBe("Page Author")
       expect(result.publishDate).toBe("2023-01-01")
@@ -348,10 +348,13 @@ describe("extractor", () => {
       `)
 
       result = await scrapeWebpageContent({
-        title: ".custom-title",
-        author: ".custom-author",
-        date: ".custom-date",
-        content: ".custom-content"
+        mode: "selector",
+        customSelectors: {
+          title: ".custom-title",
+          author: ".custom-author",
+          date: ".custom-date",
+          content: ".custom-content"
+        }
       })
 
       expect(result.title).toBe("Custom Title")

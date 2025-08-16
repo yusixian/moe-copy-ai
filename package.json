@@ -16,6 +16,7 @@
   "dependencies": {
     "@floating-ui/react": "^0.27.5",
     "@iconify/react": "^5.2.0",
+    "@mozilla/readability": "^0.6.0",
     "@plasmohq/messaging": "^0.7.1",
     "@plasmohq/storage": "^1.15.0",
     "@xsai/generate-text": "0.2.0-beta.3",
@@ -23,6 +24,7 @@
     "@xsai/stream-text": "0.2.0-beta.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dompurify": "^3.2.6",
     "gpt-tokenizer": "^2.9.0",
     "markdown-it": "^14.1.0",
     "motion": "^12.4.7",
@@ -39,6 +41,7 @@
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
     "@testing-library/dom": "^10.4.0",
     "@types/chrome": "0.0.258",
+    "@types/dompurify": "^3.2.0",
     "@types/jest": "^29.5.14",
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",
