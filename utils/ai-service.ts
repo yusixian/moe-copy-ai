@@ -74,7 +74,6 @@ let isStorageReady = false
 // 初始化存储系统
 async function initStorage(): Promise<void> {
   try {
-    debugLog("初始化本地存储...")
     // 尝试读写一个测试值来确认本地存储可用
     await localStorage.set("storage_test", { test: "ready" })
     const test = await localStorage.get<{ test: string } | undefined>(

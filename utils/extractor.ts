@@ -7,6 +7,7 @@ import {
   TITLE_SELECTORS
 } from "../constants/config"
 import type {
+  ExtractorOptions,
   ImageInfo,
   ScrapedContent,
   SelectorResultItem,
@@ -14,6 +15,12 @@ import type {
 } from "../constants/types"
 import { cleanContent, extractFormattedText } from "./formatter"
 import { debugLog } from "./logger"
+import {
+  convertHtmlToMarkdown,
+  evaluateContentQuality,
+  extractImagesFromMarkdown,
+  extractWithReadability
+} from "./readability-extractor"
 
 // 存储键
 const STORAGE_KEYS = {
@@ -338,17 +345,18 @@ export function extractMetadata(): Record<string, string> {
   return metadata
 }
 
-// 抓取网页内容的主函数
-export async function scrapeWebpageContent(
-  customSelectors?: Partial<Record<SelectorType, string>>
+// 保留原有的选择器抓取函数作为辅助函数
+async function scrapeWithSelectors(
+  customSelectors?: Partial<Record<SelectorType, string>>,
+  baseContent?: ScrapedContent
 ): Promise<ScrapedContent> {
-  debugLog("开始抓取网页内容")
+  debugLog("使用选择器模式抓取内容")
   if (customSelectors) {
     debugLog("使用自定义选择器:", customSelectors)
   }
 
   // 创建一个对象存储抓取的内容
-  const scrapedContent: ScrapedContent = {
+  const scrapedContent: ScrapedContent = baseContent || {
     title: "",
     url: window.location.href,
     articleContent: "",
@@ -370,21 +378,21 @@ export async function scrapeWebpageContent(
     customSelectors?.title
   )
   scrapedContent.title = title
-  scrapedContent.selectorResults.title = titleResults
+  scrapedContent.selectorResults!.title = titleResults
 
   // 提取作者信息
   const { author, results: authorResults } = await extractAuthor(
     customSelectors?.author
   )
   scrapedContent.author = author
-  scrapedContent.selectorResults.author = authorResults
+  scrapedContent.selectorResults!.author = authorResults
 
   // 提取发布日期
   const { publishDate, results: dateResults } = await extractPublishDate(
     customSelectors?.date
   )
   scrapedContent.publishDate = publishDate
-  scrapedContent.selectorResults.date = dateResults
+  scrapedContent.selectorResults!.date = dateResults
 
   // 提取文章内容
   debugLog("开始抓取文章内容")
@@ -393,21 +401,203 @@ export async function scrapeWebpageContent(
     customSelectors?.content
   )
   scrapedContent.articleContent = content
-  scrapedContent.selectorResults.content = contentResults
+  scrapedContent.selectorResults!.content = contentResults
 
   // 生成清洁版内容
   scrapedContent.cleanedContent = cleanContent(scrapedContent.articleContent)
 
-  // 记录抓取结果
-  debugLog("文章内容抓取完成，长度:", scrapedContent.articleContent.length)
-  debugLog("清洁版内容生成完成，长度:", scrapedContent.cleanedContent.length)
-  debugLog("图片抓取完成，数量:", scrapedContent.images.length)
-
   // 提取元数据
-  scrapedContent.metadata = extractMetadata()
+  scrapedContent.metadata = {
+    ...extractMetadata(),
+    "extraction:mode": "selector"
+  }
+
+  return scrapedContent
+}
+
+// 抓取网页内容的主函数 - 支持多种抓取模式
+export async function scrapeWebpageContent(
+  options?: ExtractorOptions
+): Promise<ScrapedContent> {
+  const {
+    mode = "selector",
+    customSelectors,
+    readabilityConfig
+  } = options || {}
+
+  debugLog("开始抓取网页内容，模式:", mode)
+
+  // 创建基础结果对象
+  const scrapedContent: ScrapedContent = {
+    title: "",
+    url: window.location.href,
+    articleContent: "",
+    cleanedContent: "",
+    author: "",
+    publishDate: "",
+    metadata: {},
+    images: [],
+    selectorResults: {
+      content: [],
+      author: [],
+      date: [],
+      title: []
+    }
+  }
+
+  // 根据模式执行不同的抓取策略
+  switch (mode) {
+    case "readability":
+      try {
+        debugLog("使用 Readability 模式")
+        const readabilityResult = await extractWithReadability()
+
+        if (readabilityResult.success) {
+          // 将 HTML 转换为 Markdown
+          scrapedContent.articleContent = convertHtmlToMarkdown(
+            readabilityResult.content
+          )
+          scrapedContent.title = readabilityResult.metadata.title || ""
+          scrapedContent.author = readabilityResult.metadata.byline || ""
+          scrapedContent.publishDate =
+            readabilityResult.metadata.publishedTime || ""
+
+          // 设置额外的元数据
+          scrapedContent.metadata = {
+            ...scrapedContent.metadata,
+            "extraction:mode": "readability",
+            "readability:siteName": readabilityResult.metadata.siteName || "",
+            "readability:excerpt": readabilityResult.metadata.excerpt || "",
+            "readability:lang": readabilityResult.metadata.lang || "",
+            "readability:length": readabilityResult.metadata.length.toString()
+          }
+
+          debugLog("Readability 抓取成功")
+        } else {
+          debugLog("Readability 抓取失败，回退到选择器模式")
+          const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+          // 添加原始模式信息，用于UI显示
+          fallbackResult.metadata = {
+            ...fallbackResult.metadata,
+            "original:mode": "readability",
+            "fallback:reason": "Readability解析失败，自动切换到选择器模式"
+          }
+          return fallbackResult
+        }
+      } catch (error) {
+        debugLog("Readability 抓取异常，回退到选择器模式:", error)
+        const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+        // 添加原始模式信息，用于UI显示
+        fallbackResult.metadata = {
+          ...fallbackResult.metadata,
+          "original:mode": "readability",
+          "fallback:reason": `Readability解析异常(${error.message || error})，自动切换到选择器模式`
+        }
+        return fallbackResult
+      }
+      break
+
+    case "hybrid":
+      try {
+        debugLog("使用混合模式")
+
+        // 串行执行两种抓取方式，避免DOM冲突
+        debugLog("混合模式：首先执行选择器抓取")
+        const selectorResult = await scrapeWithSelectors(customSelectors, {
+          ...scrapedContent
+        })
+
+        debugLog("混合模式：然后执行 Readability 抓取")
+        const readabilityResult = await extractWithReadability()
+
+        if (readabilityResult.success) {
+          const readabilityContent = convertHtmlToMarkdown(
+            readabilityResult.content
+          )
+          const evaluation = evaluateContentQuality(
+            selectorResult.articleContent,
+            readabilityContent
+          )
+
+          debugLog("混合模式内容评估:", evaluation.reason)
+
+          // 使用质量更高的内容
+          scrapedContent.articleContent = evaluation.betterContent
+
+          // 合并元数据，优先使用 Readability 的元数据
+          if (
+            evaluation.betterContent === readabilityContent ||
+            !selectorResult.title
+          ) {
+            scrapedContent.title =
+              readabilityResult.metadata.title || selectorResult.title
+            scrapedContent.author =
+              readabilityResult.metadata.byline || selectorResult.author
+            scrapedContent.publishDate =
+              readabilityResult.metadata.publishedTime ||
+              selectorResult.publishDate
+          } else {
+            scrapedContent.title = selectorResult.title
+            scrapedContent.author = selectorResult.author
+            scrapedContent.publishDate = selectorResult.publishDate
+          }
+
+          // 合并选择器结果和图片
+          scrapedContent.selectorResults = selectorResult.selectorResults
+          scrapedContent.images = selectorResult.images
+          scrapedContent.metadata = {
+            ...selectorResult.metadata,
+            "extraction:mode": "hybrid",
+            "readability:siteName": readabilityResult.metadata.siteName || "",
+            "readability:excerpt": readabilityResult.metadata.excerpt || "",
+            "readability:lang": readabilityResult.metadata.lang || "",
+            "readability:length": readabilityResult.metadata.length.toString(),
+            "evaluation:reason": evaluation.reason,
+            "evaluation:selectorScore": evaluation.scores.selector.toString(),
+            "evaluation:readabilityScore":
+              evaluation.scores.readability.toString()
+          }
+        } else {
+          debugLog("Readability 在混合模式中失败，使用选择器结果")
+          // 添加原始模式信息，用于UI显示
+          selectorResult.metadata = {
+            ...selectorResult.metadata,
+            "original:mode": "hybrid",
+            "fallback:reason": "混合模式中Readability解析失败，自动使用选择器模式结果"
+          }
+          return selectorResult
+        }
+      } catch (error) {
+        debugLog("混合模式执行异常，回退到选择器模式:", error)
+        const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+        // 添加原始模式信息，用于UI显示
+        fallbackResult.metadata = {
+          ...fallbackResult.metadata,
+          "original:mode": "hybrid",
+          "fallback:reason": `混合模式执行异常(${error.message || error})，自动切换到选择器模式`
+        }
+        return fallbackResult
+      }
+      break
+
+    default: // 'selector'
+      debugLog("使用选择器模式")
+      return await scrapeWithSelectors(customSelectors, scrapedContent)
+  }
+
+  // 生成清洁版内容
+  scrapedContent.cleanedContent = cleanContent(scrapedContent.articleContent)
+
+  // 如果没有提取到图片信息，尝试从内容中解析
+  if (scrapedContent.images.length === 0) {
+    scrapedContent.images = extractImagesFromMarkdown(
+      scrapedContent.articleContent
+    )
+  }
 
   // 将结果输出到控制台
   debugLog("抓取完成，结果概览:", {
+    mode: mode,
     title: scrapedContent.title,
     url: scrapedContent.url,
     author: scrapedContent.author,
@@ -415,14 +605,18 @@ export async function scrapeWebpageContent(
     contentLength: scrapedContent.articleContent.length,
     cleanedContentLength: scrapedContent.cleanedContent.length,
     metadataCount: Object.keys(scrapedContent.metadata).length,
-    imageCount: scrapedContent.images.length,
-    selectorResultsCount: {
-      title: scrapedContent.selectorResults.title.length,
-      author: scrapedContent.selectorResults.author.length,
-      date: scrapedContent.selectorResults.date.length,
-      content: scrapedContent.selectorResults.content.length
-    }
+    imageCount: scrapedContent.images.length
   })
 
   return scrapedContent
+}
+
+// 为了向后兼容，保留原有函数签名的包装函数
+export async function scrapeWebpageContentLegacy(
+  customSelectors?: Partial<Record<SelectorType, string>>
+): Promise<ScrapedContent> {
+  return await scrapeWebpageContent({
+    mode: "selector",
+    customSelectors
+  })
 }

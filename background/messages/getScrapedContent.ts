@@ -2,6 +2,8 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 
 import type { SelectorType } from "~constants/types"
+import { debugLog } from "~utils/logger"
+import { getExtractionMode, getReadabilityConfig } from "~utils/storage"
 
 // 处理获取抓取内容的消息
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
@@ -21,12 +23,20 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
       | Partial<Record<SelectorType, string>>
       | undefined
 
+    // 获取当前的抓取模式和配置
+    const extractionMode = await getExtractionMode()
+    const readabilityConfig = getReadabilityConfig()
+    debugLog("Background: 获取到抓取模式:", extractionMode)
+    debugLog("Background: Readability配置:", readabilityConfig)
+
     // 向内容脚本发送消息请求抓取内容
     chrome.tabs.sendMessage(
       tab.id,
       {
         action: "scrapeContent",
-        customSelectors // 将自定义选择器传递给内容脚本
+        customSelectors, // 将自定义选择器传递给内容脚本
+        mode: extractionMode, // 传递抓取模式
+        readabilityConfig // 传递 Readability 配置
       },
       (response) => {
         if (chrome.runtime.lastError) {

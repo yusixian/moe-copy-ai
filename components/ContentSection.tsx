@@ -1,5 +1,6 @@
+import { Icon } from "@iconify/react"
 import { countTokens } from "gpt-tokenizer"
-import { useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import ContentDisplay from "./ContentDisplay"
 import TokenizationDisplay from "./TokenizationDisplay"
@@ -32,6 +33,8 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
   const [localCleanedContent, setLocalCleanedContent] = useState(cleanedContent)
   // 添加分词显示状态
   const [showTokenization, setShowTokenization] = useState(false)
+  // 添加全屏状态
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   if (!articleContent) {
     return null
@@ -120,6 +123,34 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
     }
   }
 
+  // 切换全屏模式（模拟全屏，适用于弹窗环境）
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen(!isFullscreen)
+  }, [isFullscreen])
+
+  // 监听ESC键和自定义事件退出全屏
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isFullscreen) {
+        setIsFullscreen(false)
+      }
+    }
+
+    const handleExitFullscreen = () => {
+      setIsFullscreen(false)
+    }
+
+    if (isFullscreen) {
+      document.addEventListener("keydown", handleKeyDown)
+      document.addEventListener("exitFullscreen", handleExitFullscreen)
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+      document.removeEventListener("exitFullscreen", handleExitFullscreen)
+    }
+  }, [isFullscreen])
+
   return (
     <div className="relative mb-4">
       <h2 className="absolute right-1 top-1 z-20 flex w-auto items-center justify-between text-lg font-semibold text-sky-600">
@@ -142,6 +173,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
           isMarkdown={isMarkdown}
           isPreviewMode={isPreviewMode}
           isEditable={isEditing}
+          isFullscreen={isFullscreen}
           onContentChange={handleContentUpdate}
         />
       </Card>
@@ -161,6 +193,21 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
             onClick={togglePreview}
             disabled={isEditing}>
             {isPreviewMode ? "查看原文" : "预览 Markdown"}
+          </Button>
+        )}
+
+        {isMarkdown && isPreviewMode && (
+          <Button
+            variant="default"
+            size="sm"
+            onClick={toggleFullscreen}
+            disabled={isEditing}
+            className="flex items-center">
+            <Icon
+              icon="line-md:arrows-diagonal-rotated"
+              className="mr-2 inline-block size-4 flex-shrink-0"
+            />
+            {isFullscreen ? "退出全屏" : "全屏预览"}
           </Button>
         )}
 

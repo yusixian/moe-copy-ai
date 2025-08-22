@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react"
-import { memo, useCallback, useState } from "react"
+import { memo, useCallback } from "react"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
@@ -47,22 +47,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
   )
 
   // 添加临时隐藏状态，使用Plasmo的存储管理
-  const [tempHideButton, setTempHideButton] = useStorage<boolean>(
-    "temp_hide_button",
-    false
-  )
-
-  // 添加气泡出现的动画状态
-  const [showBubble, setShowBubble] = useState(false)
+  const [_, setTempHideButton] = useStorage<boolean>("temp_hide_button", false)
 
   const handleRefreshClick = useCallback(() => {
     handleRefresh()
   }, [handleRefresh])
-
-  // 处理猫猫图标点击事件
-  const handleCatClick = useCallback(() => {
-    setShowBubble((prev) => !prev)
-  }, [])
 
   // 处理悬浮窗设置变更
   const handleFloatButtonToggle = useCallback(() => {
@@ -98,22 +87,23 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
   return (
     <div
       className={cn(
-        "relative max-h-[600px] overflow-y-auto rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 p-4",
+        "relative max-h-[600px] overflow-y-auto rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 p-3 sm:p-4",
         className
       )}>
-      <header className="relative mb-4 flex items-center justify-between rounded-xl border-2 border-sky-200 bg-white p-3 shadow-md">
-        <div>
-          <h1 className="flex items-center text-xl font-bold text-sky-600">
-            Moe Copy AI <span className="ml-2">✨</span> 萌抓
+      <header className="relative mb-4 flex flex-col gap-3 rounded-xl border-2 border-sky-200 bg-white p-3 shadow-md sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="min-w-0 flex-1">
+          <h1 className="flex items-center text-lg font-bold text-sky-600 sm:text-xl">
+            <span className="truncate">Moe Copy AI</span>
+            <span className="ml-2 flex-shrink-0">✨ 萌抓</span>
           </h1>
-          <p className="text-sm text-indigo-600">
+          <p className="text-xs text-indigo-600 sm:text-sm">
             抓取当前页面内容，转换为 AI 易读的格式 (。・ω・。)
           </p>
-          <p className="mt-1 text-xs text-blue-500">
+          <p className="mt-1 hidden text-xs text-blue-500 sm:block">
             支持原始格式(保留Markdown格式与换行)和紧凑版(无换行，文本更精简)两种模式
           </p>
         </div>
-        <div className="flex items-center gap-2 xs:flex-col">
+        <div className="flex flex-shrink-0 items-center justify-end gap-2">
           {onClose && (
             <button
               onClick={onClose}
@@ -137,46 +127,34 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         </div>
       </header>
 
-      <div className="mb-4 flex items-center justify-between">
-        <button
-          onClick={handleRefreshClick}
-          disabled={isLoading}
-          className="flex transform items-center justify-center rounded-xl border border-indigo-300 bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 font-medium text-white shadow-md transition-all hover:scale-105 hover:from-sky-600 hover:to-indigo-600 disabled:opacity-50">
-          {isLoading ? (
-            <>
-              <span className="mr-2 animate-bounce">♪</span>
-              加载中...
-              <span className="ml-2 animate-bounce delay-100">♪</span>
-            </>
-          ) : (
-            <>
-              刷新内容 <span className="ml-2">✨</span>
-            </>
-          )}
-        </button>
-
-        <div className="flex gap-2">
-          {/* 临时隐藏悬浮窗按钮 */}
-          <button
-            onClick={handleTempHideFloat}
-            className="flex transform items-center gap-1 rounded-lg border border-purple-400 px-3 py-1.5 text-sm text-purple-500 shadow-sm transition-all hover:scale-105 hover:shadow-md hover:brightness-110"
-            title="临时隐藏悬浮窗，刷新后会自动恢复">
-            <Icon icon="line-md:watch" />
-            临时隐藏悬浮窗
-          </button>
-
-          {/* 悬浮窗开关按钮 */}
-          <button
-            onClick={handleFloatButtonToggle}
-            className="flex transform items-center gap-1 rounded-lg border border-sky-500 px-3 py-1.5 text-sm text-sky-500 shadow-sm transition-all hover:scale-105 hover:shadow-md hover:brightness-110"
-            title={
-              showFloatButton === "true"
-                ? "快速关闭网页悬浮窗（可在设置页面更改）"
-                : "快速开启网页悬浮窗（可在设置页面更改）"
-            }>
-            <Icon icon="line-md:cog-filled-loop" />
-            {showFloatButton === "true" ? "永久关闭悬浮窗" : "开启悬浮窗"}
-          </button>
+      {/* 悬浮窗开关区域 - 移动端优化 */}
+      <div className="mb-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-sm font-medium text-gray-700">
+            悬浮窗开关：
+          </span>
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
+            {/* 临时隐藏悬浮窗按钮 */}
+            <button
+              onClick={handleTempHideFloat}
+              className="flex transform items-center justify-center gap-1 rounded-lg border border-purple-300 bg-gradient-to-r from-purple-50 to-pink-50 px-3 py-2 text-sm text-purple-600 shadow-sm transition-all hover:scale-105 hover:border-purple-400 hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:shadow-md sm:px-2.5 sm:py-1.5"
+              title="临时隐藏悬浮窗，刷新后会自动恢复">
+              <span className="whitespace-nowrap">临时隐藏一次</span>
+            </button>
+            {/* 悬浮窗开关按钮 */}
+            <button
+              onClick={handleFloatButtonToggle}
+              className="flex transform items-center justify-center gap-1 rounded-lg border border-sky-300 bg-gradient-to-r from-sky-50 to-blue-50 px-3 py-2 text-sm text-sky-600 shadow-sm transition-all hover:scale-105 hover:border-sky-400 hover:bg-gradient-to-r hover:from-sky-100 hover:to-blue-100 hover:shadow-md sm:px-2.5 sm:py-1.5"
+              title={
+                showFloatButton === "true"
+                  ? "快速关闭网页悬浮窗（可在设置页面更改）"
+                  : "快速开启网页悬浮窗（可在设置页面更改）"
+              }>
+              <span className="whitespace-nowrap font-medium">
+                {showFloatButton === "true" ? "永久关闭" : "开启悬浮窗"}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -329,9 +307,14 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         <div className="rounded-xl border-2 border-indigo-200 bg-white p-4 shadow-lg">
           {/* 页面标题 */}
           <div className="mb-4">
-            <h2 className="mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
-              <Icon icon="line-md:hash" width="24" height="24" />
-              标题
+            <h2 className="mb-2 flex flex-wrap items-center gap-2 text-lg font-semibold text-sky-600">
+              <Icon
+                icon="line-md:hash"
+                width="24"
+                height="24"
+                className="flex-shrink-0"
+              />
+              <span>标题</span>
               {titleSelectors.length > 0 && (
                 <SelectorDropdown
                   type="title"
@@ -355,8 +338,14 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 作者信息 */}
           {scrapedData.author && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
-                <Icon icon="line-md:account" width="24" height="24" /> 作者
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 text-lg font-semibold text-sky-600">
+                <Icon
+                  icon="line-md:account"
+                  width="24"
+                  height="24"
+                  className="flex-shrink-0"
+                />
+                <span>作者</span>
                 {authorSelectors.length > 0 && (
                   <SelectorDropdown
                     type="author"
@@ -381,8 +370,14 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 发布日期 */}
           {scrapedData.publishDate && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-1 text-lg font-semibold text-sky-600">
-                <Icon icon="line-md:calendar" width="24" height="24" /> 发布日期
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 text-lg font-semibold text-sky-600">
+                <Icon
+                  icon="line-md:calendar"
+                  width="24"
+                  height="24"
+                  className="flex-shrink-0"
+                />
+                <span>发布日期</span>
                 {dateSelectors.length > 0 && (
                   <SelectorDropdown
                     type="date"
@@ -405,8 +400,14 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
           {/* URL */}
           <div className="mb-4">
-            <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
-              <Icon icon="line-md:link" width="24" height="24" /> URL
+            <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold text-sky-600">
+              <Icon
+                icon="line-md:link"
+                width="24"
+                height="24"
+                className="flex-shrink-0"
+              />
+              <span>URL</span>
             </h2>
             <CopyableTextField
               text={scrapedData.url}
@@ -417,27 +418,162 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 文章内容 */}
           {scrapedData.articleContent && (
             <div className="mb-4">
-              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
-                <Icon
-                  icon="line-md:file-document-twotone"
-                  className="inline"
-                  width="24"
-                  height="24"
-                />
-                文章内容
-                {contentSelectors.length > 0 && (
-                  <SelectorDropdown
-                    type="content"
-                    selectors={contentSelectors}
-                    selectedIndex={selectedSelectorIndices.content}
-                    results={scrapedData?.selectorResults?.content || []}
-                    onChange={(index) => handleSelectorChange("content", index)}
-                    onSelectContent={(selector, contentIndex) =>
-                      handleSelectContent("content", selector, contentIndex)
-                    }
-                  />
+              {/* 标题行 - 移动端优化 */}
+              <div className="mb-3">
+                <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <h2 className="flex flex-wrap items-center gap-2 text-lg font-semibold text-sky-600">
+                    <Icon
+                      icon="line-md:file-document-twotone"
+                      className="inline flex-shrink-0"
+                      width="24"
+                      height="24"
+                    />
+                    <span>文章内容</span>
+                    {contentSelectors.length > 0 && (
+                      <SelectorDropdown
+                        type="content"
+                        selectors={contentSelectors}
+                        selectedIndex={selectedSelectorIndices.content}
+                        results={scrapedData?.selectorResults?.content || []}
+                        onChange={(index) =>
+                          handleSelectorChange("content", index)
+                        }
+                        onSelectContent={(selector, contentIndex) =>
+                          handleSelectContent("content", selector, contentIndex)
+                        }
+                      />
+                    )}
+                  </h2>
+
+                  {/* 刷新按钮 - 移动端独立一行 */}
+                  <button
+                    onClick={handleRefreshClick}
+                    disabled={isLoading}
+                    className="flex transform items-center gap-1 rounded-lg border border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 px-3 py-1.5 text-sm text-emerald-600 shadow-sm transition-all hover:scale-105 hover:border-emerald-400 hover:bg-gradient-to-r hover:from-emerald-100 hover:to-teal-100 disabled:opacity-50 disabled:hover:scale-100 sm:text-xs"
+                    title="刷新✨">
+                    <Icon
+                      icon={
+                        isLoading
+                          ? "line-md:loading-alt-loop"
+                          : "line-md:refresh-twotone"
+                      }
+                      className={isLoading ? "animate-spin" : ""}
+                      width="16"
+                      height="16"
+                    />
+                    <span className="font-medium">
+                      {isLoading ? "正在抓取..." : "刷新✨"}
+                    </span>
+                    <span className="hidden text-xs opacity-75 sm:inline">
+                      {isLoading ? "(｡◕‿◕｡)" : "✨"}
+                    </span>
+                  </button>
+                </div>
+
+                {/* 抓取模式标识 - 独立行，更好的移动端布局 */}
+                {scrapedData.metadata && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {scrapedData.metadata["extraction:mode"] ===
+                      "readability" && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-gradient-to-r from-green-100 to-emerald-100 px-2.5 py-1 text-xs font-medium text-green-700 shadow-sm">
+                        <Icon
+                          icon="line-md:target-twotone"
+                          width="12"
+                          height="12"
+                          className="flex-shrink-0"
+                        />
+                        <span className="whitespace-nowrap">
+                          Readability 模式
+                        </span>
+                      </span>
+                    )}
+                    {scrapedData.metadata["extraction:mode"] === "hybrid" && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-gradient-to-r from-blue-100 to-purple-100 px-2.5 py-1 text-xs font-medium text-blue-700 shadow-sm">
+                        <Icon
+                          icon="line-md:switch-filled"
+                          width="12"
+                          height="12"
+                          className="flex-shrink-0"
+                        />
+                        <span className="whitespace-nowrap">混合模式</span>
+                      </span>
+                    )}
+                    {(!scrapedData.metadata["extraction:mode"] ||
+                      scrapedData.metadata["extraction:mode"] ===
+                        "selector") && (
+                      <>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-gradient-to-r from-slate-100 to-gray-100 px-2.5 py-1 text-xs font-medium text-slate-700 shadow-sm">
+                          <Icon
+                            icon="line-md:settings-twotone"
+                            width="12"
+                            height="12"
+                            className="flex-shrink-0"
+                          />
+                          <span className="whitespace-nowrap">选择器模式</span>
+                        </span>
+                        {/* 如果用户配置的是混合模式，但实际使用的是选择器模式，显示回退提示 */}
+                        {scrapedData.metadata["original:mode"] === "hybrid" && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-gradient-to-r from-orange-100 to-yellow-100 px-2.5 py-1 text-xs font-medium text-orange-700 shadow-sm">
+                            <Icon
+                              icon="line-md:alert-twotone"
+                              width="12"
+                              height="12"
+                              className="flex-shrink-0"
+                            />
+                            <span className="whitespace-nowrap">智能回退</span>
+                            <span className="hidden opacity-75 sm:inline">
+                              (｡•́︿•̀｡)
+                            </span>
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
                 )}
-              </h2>
+              </div>
+
+              {/* 如果是混合模式，显示评估信息 */}
+              {scrapedData.metadata?.["evaluation:reason"] && (
+                <div className="mb-3 rounded-lg border border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50 px-3 py-2 text-xs text-purple-700 shadow-sm">
+                  <div className="flex items-center gap-1.5">
+                    <Icon
+                      icon="line-md:chart-rising-twotone"
+                      width="14"
+                      height="14"
+                      className="text-purple-500"
+                    />
+                    <span className="font-medium">混合模式评估报告</span>
+                    <span className="opacity-75">(◕‿◕)♡</span>
+                  </div>
+                  <p className="mt-1 pl-5">
+                    {scrapedData.metadata["evaluation:reason"]}
+                  </p>
+                </div>
+              )}
+
+              {/* 如果发生了回退，显示回退说明 */}
+              {scrapedData.metadata?.["fallback:reason"] && (
+                <div className="mb-3 rounded-lg border border-orange-200 bg-gradient-to-r from-orange-50 to-yellow-50 px-3 py-2 text-xs text-orange-700 shadow-sm">
+                  <div className="flex items-center gap-1.5">
+                    <Icon
+                      icon="line-md:alert-circle-twotone"
+                      width="14"
+                      height="14"
+                      className="text-orange-500"
+                    />
+                    <span className="font-medium">智能回退说明</span>
+                    <span className="opacity-75">(｡•́︿•̀｡)</span>
+                  </div>
+                  <div className="mt-1 pl-5">
+                    <p className="text-orange-600">
+                      {scrapedData.metadata["fallback:reason"]}
+                    </p>
+                    <p className="mt-1 text-xs text-orange-500 opacity-75">
+                      💡 这是正常的智能回退机制，确保您总能获得内容～
+                    </p>
+                  </div>
+                </div>
+              )}
               <ContentSection
                 articleContent={scrapedData.articleContent}
                 cleanedContent={scrapedData.cleanedContent}
@@ -453,8 +589,14 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 页面图片 */}
           {scrapedData.images && scrapedData.images.length > 0 && (
             <div className="mb-4">
-              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
-                <Icon icon="line-md:image" width="24" height="24" /> 页面图片
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 text-lg font-semibold text-sky-600">
+                <Icon
+                  icon="line-md:image"
+                  width="24"
+                  height="24"
+                  className="flex-shrink-0"
+                />
+                <span>页面图片</span>
                 <span className="text-sm font-normal text-sky-500">
                   ({scrapedData.images.length}张)
                 </span>
@@ -469,13 +611,14 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 元数据 */}
           {Object.keys(scrapedData.metadata).length > 0 && (
             <div>
-              <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+              <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold text-sky-600">
                 <Icon
                   icon="line-md:emoji-grin-twotone"
                   width="24"
                   height="24"
+                  className="flex-shrink-0"
                 />
-                元数据
+                <span>元数据</span>
               </h2>
 
               {/* 元数据图片 */}
