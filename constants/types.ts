@@ -76,3 +76,31 @@ export interface AiChatHistoryItem {
 export interface AiChatHistory {
   items: AiChatHistoryItem[]
 }
+
+// 内容抓取模式
+export type ExtractionMode = "selector" | "readability" | "hybrid"
+
+// Readability.js 解析结果
+export interface ReadabilityResult {
+  title: string | null
+  content: string | null
+  textContent: string | null
+  length: number
+  excerpt: string | null
+  byline: string | null
+  dir: string | null
+  siteName: string | null
+  lang: string | null
+  publishedTime: string | null
+}
+
+// 抓取器选项
+export interface ExtractorOptions {
+  mode: ExtractionMode
+  customSelectors?: Partial<Record<SelectorType, string>>
+  readabilityConfig?: {
+    charThreshold?: number
+    keepClasses?: string[]
+    debug?: boolean
+  }
+}

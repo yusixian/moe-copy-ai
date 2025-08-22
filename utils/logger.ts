@@ -1,5 +1,6 @@
 // 导入pino和存储API
-import pino, { type LevelWithSilentOrString } from "pino"
+import pino from "pino"
+import type { LevelWithSilentOrString } from "pino"
 
 import { Storage } from "@plasmohq/storage"
 
@@ -20,10 +21,10 @@ export type LogLevel =
 async function getLogLevel(): Promise<LogLevel> {
   try {
     const level = await storage.get<LogLevel>("log_level")
-    return level || (isDevelopment() ? "debug" : "error")
+    return level || "silent" // 总是默认使用silent，与UI设置保持一致
   } catch (err) {
     console.error("获取日志级别失败:", err)
-    return isDevelopment() ? "debug" : "error"
+    return "silent" // 出错时也使用silent
   }
 }
 
@@ -38,7 +39,7 @@ export function isDevelopment(): boolean {
 // 创建pino日志实例（初始使用默认配置）
 export const logger = pino({
   name: "moe-copy-ai",
-  level: isDevelopment() ? "debug" : "error", // 初始默认值，后续会更新
+  level: "silent", // 初始默认使用silent，与UI设置保持一致
   browser: {
     asObject: true, // 将日志作为对象传递给console方法，以便正确显示对象
     serialize: true, // 序列化对象
@@ -99,7 +100,10 @@ export const logger = pino({
 // 初始化：从存储中获取日志级别并应用
 getLogLevel().then((level: LevelWithSilentOrString) => {
   logger.level = level
-  logger.debug(`日志级别已设置为: ${level}`)
+  // 只在非silent模式下输出初始化日志
+  if (level !== 'silent') {
+    logger.debug(`日志级别已设置为: ${level}`)
+  }
 })
 
 // 监听日志级别变化
@@ -108,14 +112,19 @@ storage.watch({
     const newLevel = change.newValue as LevelWithSilentOrString
     if (newLevel) {
       logger.level = newLevel
-      logger.debug(`日志级别已更新为: ${newLevel}`)
+      // 只在非silent模式下输出更新日志
+      if (newLevel !== 'silent') {
+        logger.debug(`日志级别已更新为: ${newLevel}`)
+      }
     }
   }
 })
 
 // 增强的日志输出，兼容旧代码
 export function debugLog(...args: any[]): void {
-  if (isDevelopment()) {
+  // 检查当前日志级别是否允许debug输出
+  // pino的level是数字，debug对应20，silent对应Infinity
+  if (logger.levelVal <= 20) { // 20是debug级别的数值
     // 如果只有一个参数
     if (args.length === 1) {
       logger.debug(args[0])

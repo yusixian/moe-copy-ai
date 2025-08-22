@@ -8,8 +8,11 @@ import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import type { ScrapedContent } from "~constants/types"
-import { addAiChatHistoryItem } from "~utils"
-import { generateSummary, getAiConfig } from "~utils/ai-service"
+import {
+  addAiChatHistoryItem,
+  generateSummary,
+  getAiConfig
+} from "~utils/ai-service"
 import { debugLog } from "~utils/logger"
 import { processTemplate } from "~utils/template"
 
