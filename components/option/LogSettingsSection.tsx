@@ -31,34 +31,21 @@ export const LogSettingsSection: React.FC = () => {
         </h3>
         <ul className="space-y-2 text-sm text-sky-600">
           <li className="flex items-center">
-            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-pink-400"></span>
-            <span className="font-semibold">跟踪 (Trace):</span>{" "}
-            <span className="ml-2">最详细的日志级别，包含所有操作的细节</span>
-          </li>
-          <li className="flex items-center">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-sky-400"></span>
             <span className="font-semibold">调试 (Debug):</span>{" "}
-            <span className="ml-2">调试信息，开发环境推荐使用</span>
+            <span className="ml-2">
+              详细的调试信息，包含抓取过程和AI交互细节
+            </span>
           </li>
           <li className="flex items-center">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-blue-500"></span>
             <span className="font-semibold">信息 (Info):</span>{" "}
-            <span className="ml-2">一般信息性消息</span>
-          </li>
-          <li className="flex items-center">
-            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-yellow-400"></span>
-            <span className="font-semibold">警告 (Warn):</span>{" "}
-            <span className="ml-2">潜在问题的警告</span>
+            <span className="ml-2">一般信息性消息，如操作状态和成功提示</span>
           </li>
           <li className="flex items-center">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-orange-400"></span>
             <span className="font-semibold">错误 (Error):</span>{" "}
-            <span className="ml-2">错误信息，不影响主要功能</span>
-          </li>
-          <li className="flex items-center">
-            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-red-400"></span>
-            <span className="font-semibold">致命 (Fatal):</span>{" "}
-            <span className="ml-2">严重错误，影响核心功能</span>
+            <span className="ml-2">错误信息，如抓取失败</span>
           </li>
           <li className="flex items-center">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-gray-400"></span>

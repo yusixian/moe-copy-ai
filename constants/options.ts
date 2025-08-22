@@ -2,12 +2,9 @@ import type { LevelWithSilentOrString } from "pino"
 
 // 定义日志级别选项
 export const LOG_LEVELS: { value: LevelWithSilentOrString; label: string }[] = [
-  { value: "trace", label: "跟踪 (Trace)" },
   { value: "debug", label: "调试 (Debug)" },
   { value: "info", label: "信息 (Info)" },
-  { value: "warn", label: "警告 (Warn)" },
   { value: "error", label: "错误 (Error)" },
-  { value: "fatal", label: "致命 (Fatal)" },
   { value: "silent", label: "静默 (Silent)" }
 ]
 
