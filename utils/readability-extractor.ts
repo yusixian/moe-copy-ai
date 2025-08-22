@@ -117,7 +117,6 @@ ${cleanBodyHTML}
     // 配置 Readability 选项 - 由于已经用DOMPurify清洗过，可以使用更宽松的配置
     const readabilityOptions = {
       charThreshold: 0, // 移除字符数限制，因为DOMPurify已经清洗过
-      debug: true, // 启用调试模式获取更多信息
       maxElemsToParse: 0, // 处理所有元素
       nbTopCandidates: 50, // 大量候选节点，确保不遗漏内容
       keepClasses: true, // 保留CSS类名
