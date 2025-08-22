@@ -49,9 +49,26 @@ export const ExtractionModeSection: React.FC = () => {
     const loadSettings = async () => {
       try {
         const mode = await getExtractionMode()
-        setExtractionModeState(mode)
+        // 确保始终使用从存储中获取的模式，如果获取失败则强制设为混合模式
+        const finalMode = mode || "hybrid"
+        setExtractionModeState(finalMode)
+        // 如果存储中没有值或获取失败，主动设置一次以确保存储中有正确的默认值
+        if (!mode || mode !== finalMode) {
+          try {
+            await setExtractionMode(finalMode)
+          } catch (setError) {
+            console.error("初始化抓取模式失败:", setError)
+          }
+        }
       } catch (error) {
         console.error("加载抓取模式设置失败:", error)
+        // 出错时强制设为混合模式并保存到存储
+        setExtractionModeState("hybrid")
+        try {
+          await setExtractionMode("hybrid")
+        } catch (saveError) {
+          console.error("保存默认抓取模式失败:", saveError)
+        }
       } finally {
         setLoading(false)
       }

@@ -78,17 +78,24 @@ describe("storage", () => {
   describe("setExtractionMode", () => {
     test("应成功设置抓取模式", async () => {
       mockStorageInstance.set.mockResolvedValue(undefined)
+      mockStorageInstance.get.mockResolvedValue("selector")
 
       await setExtractionMode("selector")
 
       expect(mockStorageInstance.set).toHaveBeenCalledWith("extraction_mode", "selector")
+      expect(mockStorageInstance.get).toHaveBeenCalledWith("extraction_mode")
     })
 
-    test("当设置存储值失败时应处理错误", async () => {
+    test("当设置存储值失败时应抛出错误", async () => {
       mockStorageInstance.set.mockRejectedValue(new Error("存储错误"))
 
-      // 应该不抛出异常
-      await expect(setExtractionMode("readability")).resolves.toBeUndefined()
+      // 现在应该抛出异常
+      await expect(setExtractionMode("readability")).rejects.toThrow("存储错误")
+    })
+
+    test("当传入无效模式时应抛出错误", async () => {
+      // 传入无效模式
+      await expect(setExtractionMode("invalid" as any)).rejects.toThrow("无效的抓取模式")
     })
   })
 

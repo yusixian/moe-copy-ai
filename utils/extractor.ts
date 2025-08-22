@@ -475,11 +475,25 @@ export async function scrapeWebpageContent(
           debugLog("Readability 抓取成功")
         } else {
           debugLog("Readability 抓取失败，回退到选择器模式")
-          return await scrapeWithSelectors(customSelectors, scrapedContent)
+          const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+          // 添加原始模式信息，用于UI显示
+          fallbackResult.metadata = {
+            ...fallbackResult.metadata,
+            "original:mode": "readability",
+            "fallback:reason": "Readability解析失败，自动切换到选择器模式"
+          }
+          return fallbackResult
         }
       } catch (error) {
         debugLog("Readability 抓取异常，回退到选择器模式:", error)
-        return await scrapeWithSelectors(customSelectors, scrapedContent)
+        const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+        // 添加原始模式信息，用于UI显示
+        fallbackResult.metadata = {
+          ...fallbackResult.metadata,
+          "original:mode": "readability",
+          "fallback:reason": `Readability解析异常(${error.message || error})，自动切换到选择器模式`
+        }
+        return fallbackResult
       }
       break
 
@@ -545,11 +559,24 @@ export async function scrapeWebpageContent(
           }
         } else {
           debugLog("Readability 在混合模式中失败，使用选择器结果")
+          // 添加原始模式信息，用于UI显示
+          selectorResult.metadata = {
+            ...selectorResult.metadata,
+            "original:mode": "hybrid",
+            "fallback:reason": "混合模式中Readability解析失败，自动使用选择器模式结果"
+          }
           return selectorResult
         }
       } catch (error) {
         debugLog("混合模式执行异常，回退到选择器模式:", error)
-        return await scrapeWithSelectors(customSelectors, scrapedContent)
+        const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+        // 添加原始模式信息，用于UI显示
+        fallbackResult.metadata = {
+          ...fallbackResult.metadata,
+          "original:mode": "hybrid",
+          "fallback:reason": `混合模式执行异常(${error.message || error})，自动切换到选择器模式`
+        }
+        return fallbackResult
       }
       break
 
