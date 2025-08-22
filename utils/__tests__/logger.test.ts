@@ -1,7 +1,5 @@
 import pino from "pino"
 
-import { Storage } from "@plasmohq/storage"
-
 // 模拟chrome API
 const mockChrome = {
   runtime: {
@@ -18,6 +16,7 @@ let transmitSendFunction: Function | null = null
 // 创建pino实例mock
 const mockPinoInstance = {
   level: "debug",
+  levelVal: 20, // debug level value in pino
   debug: jest.fn(),
   info: jest.fn(),
   warn: jest.fn(),
@@ -47,6 +46,26 @@ jest.mock("pino", () => {
       transmitSendFunction = options.browser.transmit.send
     }
     mockPinoInstance.level = options.level || "info"
+    // Set levelVal based on level
+    switch (options.level) {
+      case "debug":
+        mockPinoInstance.levelVal = 20
+        break
+      case "info":
+        mockPinoInstance.levelVal = 30
+        break
+      case "warn":
+        mockPinoInstance.levelVal = 40
+        break
+      case "error":
+        mockPinoInstance.levelVal = 50
+        break
+      case "silent":
+        mockPinoInstance.levelVal = Infinity
+        break
+      default:
+        mockPinoInstance.levelVal = 30 // default to info
+    }
     return mockPinoInstance
   })
   return mockPino
@@ -92,6 +111,9 @@ describe("logger", () => {
 
     // 重置process.env
     process.env = { ...originalEnv }
+    
+    // 确保mockPinoInstance在开发环境下允许debug输出
+    mockPinoInstance.levelVal = 20 // debug level
   })
 
   afterEach(() => {
@@ -121,32 +143,27 @@ describe("logger", () => {
   })
 
   describe("debugLog函数", () => {
-    test("在开发环境中应调用logger.debug", () => {
-      // 强制开发环境
-      process.env.NODE_ENV = "development"
-      global.chrome.runtime.getManifest = jest.fn().mockReturnValue({})
-
+    test("在debug级别下应调用logger.debug", () => {
+      // 设置debug级别
+      mockPinoInstance.levelVal = 20
+      
       debugLog("测试消息")
       expect(mockPinoInstance.debug).toHaveBeenCalledWith("测试消息")
     })
 
     test("带有多个参数时应正确调用logger.debug", () => {
-      // 强制开发环境
-      process.env.NODE_ENV = "development"
-      global.chrome.runtime.getManifest = jest.fn().mockReturnValue({})
-
+      // 设置debug级别
+      mockPinoInstance.levelVal = 20
+      
       const data = { test: "value" }
       debugLog("测试消息", data)
       expect(mockPinoInstance.debug).toHaveBeenCalledWith("测试消息", data)
     })
 
-    test("在非开发环境中不应调用logger.debug", () => {
-      // 强制生产环境
-      process.env.NODE_ENV = "production"
-      global.chrome.runtime.getManifest = jest.fn().mockReturnValue({
-        update_url: "https://example.com/update.xml"
-      })
-
+    test("在silent级别下不应调用logger.debug", () => {
+      // 设置silent级别 (Infinity)
+      mockPinoInstance.levelVal = Infinity
+      
       jest.clearAllMocks()
       debugLog("测试消息")
       expect(mockPinoInstance.debug).not.toHaveBeenCalled()
@@ -174,7 +191,7 @@ describe("logger", () => {
       })
     })
 
-    test("应根据环境设置正确的日志级别", () => {
+    test("应使用默认的silent日志级别", () => {
       jest.isolateModules(() => {
         // 重置
         jest.clearAllMocks()
@@ -191,7 +208,7 @@ describe("logger", () => {
         // 检查pino是否被正确调用
         expect(pino).toHaveBeenCalledWith(
           expect.objectContaining({
-            level: "error"
+            level: "silent"
           })
         )
       })

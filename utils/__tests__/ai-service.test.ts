@@ -1,7 +1,5 @@
 import { streamText } from "@xsai/stream-text"
 
-import { Storage } from "@plasmohq/storage"
-
 import {
   addAiChatHistoryItem,
   clearAiChatHistory,
@@ -12,6 +10,16 @@ import {
 } from "../ai-service"
 import { debugLog } from "../logger"
 import { localStorage, syncStorage } from "../storage"
+
+// Mock console.error to suppress error logs in tests
+const originalConsoleError = console.error
+beforeEach(() => {
+  console.error = jest.fn()
+})
+
+afterEach(() => {
+  console.error = originalConsoleError
+})
 
 // 模拟依赖
 jest.mock("@xsai/stream-text", () => ({
