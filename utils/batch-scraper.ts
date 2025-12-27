@@ -87,45 +87,6 @@ async function scrapeViaFetch(url: string, timeout: number): Promise<BatchScrape
   }
 }
 
-/**
- * 使用后台标签页抓取单个页面（通过消息传递）
- */
-async function scrapeViaTab(url: string, timeout: number): Promise<BatchScrapeResult> {
-  try {
-    debugLog(`[Tab] 开始抓取: ${url}`)
-
-    // 发送消息到 background script 进行标签页抓取
-    const response = await chrome.runtime.sendMessage({
-      action: 'batchScrapeViaTab',
-      url,
-      timeout,
-    })
-
-    if (response.success) {
-      debugLog(`[Tab] 抓取成功: ${url}`)
-      return {
-        url,
-        success: true,
-        title: response.title || extractTitleFromUrl(url),
-        content: response.content || '',
-        method: 'tab',
-      }
-    }
-    throw new Error(response.error || '标签页抓取失败')
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : '未知错误'
-    debugLog(`[Tab] 抓取失败: ${url}`, errorMessage)
-
-    return {
-      url,
-      success: false,
-      title: extractTitleFromUrl(url),
-      content: '',
-      error: errorMessage,
-      method: 'tab',
-    }
-  }
-}
 
 /**
  * 从 URL 提取标题（备用）
@@ -145,23 +106,29 @@ function extractTitleFromUrl(url: string): string {
 }
 
 /**
- * 混合模式抓取单个页面
- * 先尝试 Fetch，失败后回退到标签页
+ * 带重试逻辑的抓取
+ * 失败后根据 retryCount 配置进行重试
  */
-async function scrapeWithHybrid(
+async function scrapeWithRetry(
   url: string,
   options: BatchScrapeOptions
 ): Promise<BatchScrapeResult> {
-  // 先尝试 Fetch
-  const fetchResult = await scrapeViaFetch(url, options.timeout)
+  let lastResult: BatchScrapeResult | null = null
 
-  if (fetchResult.success) {
-    return fetchResult
+  for (let attempt = 0; attempt <= options.retryCount; attempt++) {
+    if (attempt > 0) {
+      debugLog(`[Fetch] 第 ${attempt} 次重试: ${url}`)
+      await delay(options.delayBetweenRequests)
+    }
+
+    lastResult = await scrapeViaFetch(url, options.timeout)
+
+    if (lastResult.success) {
+      return lastResult
+    }
   }
 
-  // Fetch 失败，尝试标签页（如果有重试次数）
-  debugLog(`[Hybrid] Fetch 失败，尝试标签页: ${url}`)
-  return scrapeViaTab(url, options.timeout)
+  return lastResult!
 }
 
 /**
@@ -262,7 +229,7 @@ export class BatchScrapeController {
         onProgress({ ...progress })
 
         // 执行抓取
-        const result = await scrapeWithHybrid(link.url, this.options)
+        const result = await scrapeWithRetry(link.url, this.options)
 
         // 更新结果
         progress.results.push({

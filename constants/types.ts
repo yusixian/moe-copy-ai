@@ -136,7 +136,7 @@ export interface BatchScrapeResult {
   title: string
   content: string
   error?: string
-  method: 'fetch' | 'tab'
+  method: 'fetch'
 }
 
 // 批量抓取进度
@@ -200,9 +200,3 @@ export interface ElementSelectorMessage extends Message {
   links?: ExtractedLink[]
 }
 
-// 批量抓取消息类型
-export interface BatchScrapeMessage extends Message {
-  action: 'batchScrapeViaTab'
-  url: string
-  timeout?: number
-}
