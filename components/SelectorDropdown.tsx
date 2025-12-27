@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react"
 import React, { memo, useCallback, useEffect, useRef, useState } from "react"
+// Note: useCallback is still used in useSelectorState hook for stable callback references
 
 import type { SelectorResultItem, SelectorType } from "~constants/types"
 
@@ -75,29 +76,21 @@ const SelectorItem = memo<SelectorItemProps>(
       }
     }, [showPreview])
 
-    // 优化事件处理函数，避免重复创建
-    const handleTogglePreview = useCallback(
-      (e: React.MouseEvent) => {
-        e.stopPropagation()
-        onTogglePreview(index)
-      },
-      [index, onTogglePreview]
-    )
+    const handleTogglePreview = (e: React.MouseEvent) => {
+      e.stopPropagation()
+      onTogglePreview(index)
+    }
 
-    const handleSelect = useCallback(() => {
+    const handleSelect = () => {
       onSelect(index)
-    }, [index, onSelect])
+    }
 
-    // 优化内容选择处理函数
-    const handleContentSelect = useCallback(
-      (contentIdx: number) => {
-        if (onSelectContent) {
-          onSelectContent(selector, contentIdx)
-          if (closeDropdown) closeDropdown()
-        }
-      },
-      [selector, onSelectContent, closeDropdown]
-    )
+    const handleContentSelect = (contentIdx: number) => {
+      if (onSelectContent) {
+        onSelectContent(selector, contentIdx)
+        if (closeDropdown) closeDropdown()
+      }
+    }
 
     return (
       <li
@@ -390,7 +383,7 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
 
       {/* 下拉菜单 */}
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-hidden rounded-lg border border-sky-200 bg-white shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-auto rounded-lg border border-sky-200 bg-white shadow-lg">
           <div className="border-b border-sky-100 bg-gradient-to-r from-sky-50 to-indigo-50 p-2.5 text-xs text-sky-600">
             <div className="flex items-center">
               <Icon

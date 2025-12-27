@@ -1,5 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 
+import { Storage } from '@plasmohq/storage'
+
 import type {
   BatchProgress,
   BatchScrapeMode,
@@ -8,7 +10,9 @@ import type {
   ExtractedLink,
   SelectedElementInfo,
 } from '~constants/types'
-import { BatchScrapeController, DEFAULT_BATCH_OPTIONS } from '~utils/batch-scraper'
+import { BatchScrapeController } from '~utils/batch-scraper'
+
+const storage = new Storage({ area: 'sync' })
 
 interface UseBatchScrapeReturn {
   // 状态
@@ -21,7 +25,10 @@ interface UseBatchScrapeReturn {
 
   // 操作
   setLinks: (info: SelectedElementInfo | null, links: ExtractedLink[]) => void
-  startScrape: (options?: Partial<BatchScrapeOptions>) => Promise<void>
+  addLink: (url: string, text?: string) => void
+  updateLink: (index: number, url: string, text: string) => void
+  removeLink: (index: number) => void
+  startScrape: (selectedLinks: ExtractedLink[], options?: Partial<BatchScrapeOptions>) => Promise<void>
   pauseScrape: () => void
   resumeScrape: () => void
   cancelScrape: () => void
@@ -50,10 +57,42 @@ export function useBatchScrape(): UseBatchScrapeReturn {
     setError(null)
   }, [])
 
+  // 添加链接
+  const addLink = useCallback((url: string, text?: string) => {
+    setLinksState((prev) => {
+      const maxIndex = prev.length > 0 ? Math.max(...prev.map((l) => l.index)) : -1
+      const newLink: ExtractedLink = {
+        url,
+        text: text || url,
+        index: maxIndex + 1,
+      }
+      return [...prev, newLink]
+    })
+    // 确保在 previewing 模式
+    setMode('previewing')
+  }, [])
+
+  // 更新链接
+  const updateLink = useCallback((index: number, url: string, text: string) => {
+    setLinksState((prev) => prev.map((link) => (link.index === index ? { ...link, url, text } : link)))
+  }, [])
+
+  // 删除链接
+  const removeLink = useCallback((index: number) => {
+    setLinksState((prev) => {
+      const newLinks = prev.filter((link) => link.index !== index)
+      // 如果删除后没有链接了，回到 idle 模式
+      if (newLinks.length === 0) {
+        setMode('idle')
+      }
+      return newLinks
+    })
+  }, [])
+
   // 开始抓取
   const startScrape = useCallback(
-    async (options: Partial<BatchScrapeOptions> = {}) => {
-      if (links.length === 0) {
+    async (selectedLinks: ExtractedLink[], options: Partial<BatchScrapeOptions> = {}) => {
+      if (selectedLinks.length === 0) {
         setError('没有可抓取的链接')
         return
       }
@@ -62,12 +101,25 @@ export function useBatchScrape(): UseBatchScrapeReturn {
       setError(null)
       setResults([])
 
-      const mergedOptions = { ...DEFAULT_BATCH_OPTIONS, ...options }
+      // 从 storage 读取用户配置
+      const concurrency = (await storage.get<string>('batch_concurrency')) || '2'
+      const delay = (await storage.get<string>('batch_delay')) || '500'
+      const timeout = (await storage.get<string>('batch_timeout')) || '30000'
+      const retryCount = (await storage.get<string>('batch_retry')) || '1'
+
+      const mergedOptions: BatchScrapeOptions = {
+        concurrency: parseInt(concurrency, 10),
+        delayBetweenRequests: parseInt(delay, 10),
+        timeout: parseInt(timeout, 10),
+        retryCount: parseInt(retryCount, 10),
+        ...options,
+      }
+
       const controller = new BatchScrapeController(mergedOptions)
       controllerRef.current = controller
 
       try {
-        const scrapeResults = await controller.execute(links, (p) => {
+        const scrapeResults = await controller.execute(selectedLinks, (p) => {
           setProgress({ ...p })
         })
 
@@ -78,7 +130,7 @@ export function useBatchScrape(): UseBatchScrapeReturn {
         setMode('error')
       }
     },
-    [links]
+    []
   )
 
   // 暂停抓取
@@ -120,6 +172,9 @@ export function useBatchScrape(): UseBatchScrapeReturn {
     results,
     error,
     setLinks,
+    addLink,
+    updateLink,
+    removeLink,
     startScrape,
     pauseScrape,
     resumeScrape,

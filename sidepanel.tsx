@@ -33,6 +33,9 @@ function SidePanel() {
     results,
     error,
     setLinks,
+    addLink,
+    updateLink,
+    removeLink,
     startScrape,
     pauseScrape,
     resumeScrape,
@@ -41,11 +44,13 @@ function SidePanel() {
   } = useBatchScrape()
 
   // 当选择器选中元素时，更新批量抓取的链接
+  // setLinks is stable (useCallback with []) so we don't include it in deps
   useEffect(() => {
     if (elementInfo && extractedLinks.length > 0) {
       setLinks(elementInfo, extractedLinks)
     }
-  }, [elementInfo, extractedLinks, setLinks])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [elementInfo, extractedLinks])
 
   // 计算当前模式
   const currentMode: BatchScrapeMode = isSelecting ? 'selecting' : mode
@@ -75,8 +80,8 @@ function SidePanel() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-indigo-50 p-4">
-      <div className="mb-4 flex items-start justify-between">
+    <div className="flex h-screen flex-col bg-gradient-to-br from-sky-50 via-white to-indigo-50 p-4">
+      <div className="mb-4 flex flex-shrink-0 items-start justify-between">
         <div>
           <h1 className="text-lg font-bold text-gray-800">
             {currentView === "batch" ? "批量抓取文档" : "设置"}
@@ -99,24 +104,29 @@ function SidePanel() {
         </button>
       </div>
 
-      {currentView === "batch" ? (
-        <BatchScrapePanel
-          mode={currentMode}
-          elementInfo={elementInfo || scrapeElementInfo}
-          links={links}
-          progress={progress}
-          results={results}
-          error={error}
-          onStartScrape={startScrape}
-          onPause={pauseScrape}
-          onResume={resumeScrape}
-          onCancel={handleCancel}
-          onReset={handleReset}
-          onSelectElement={handleSelectElement}
-        />
-      ) : (
-        <SidePanelSettings />
-      )}
+      <div className="min-h-0 flex-1">
+        {currentView === "batch" ? (
+          <BatchScrapePanel
+            mode={currentMode}
+            elementInfo={elementInfo || scrapeElementInfo}
+            links={links}
+            progress={progress}
+            results={results}
+            error={error}
+            onStartScrape={startScrape}
+            onPause={pauseScrape}
+            onResume={resumeScrape}
+            onCancel={handleCancel}
+            onReset={handleReset}
+            onSelectElement={handleSelectElement}
+            onAddLink={addLink}
+            onUpdateLink={updateLink}
+            onRemoveLink={removeLink}
+          />
+        ) : (
+          <SidePanelSettings />
+        )}
+      </div>
 
       <ToastContainer
         position="bottom-center"

@@ -6,52 +6,20 @@ import { toast } from "react-toastify"
 import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
-import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "~constants/options"
+import {
+  BATCH_CONCURRENCY_OPTIONS,
+  BATCH_DELAY_OPTIONS,
+  BATCH_RETRY_OPTIONS,
+  BATCH_TIMEOUT_OPTIONS,
+  LOG_LEVELS,
+  SCRAPE_TIMING_OPTIONS
+} from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
 
+import { AccordionSection } from "../AccordionSection"
+
 const storage = new Storage({ area: "sync" })
-
-// 折叠面板组件
-function AccordionSection({
-  title,
-  icon,
-  children,
-  defaultOpen = false
-}: {
-  title: string
-  icon: string
-  children: React.ReactNode
-  defaultOpen?: boolean
-}) {
-  const [isOpen, setIsOpen] = useState(defaultOpen)
-
-  return (
-    <div className="overflow-hidden rounded-lg border border-sky-200 bg-white">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-sky-50">
-        <span className="flex items-center gap-2 text-sm font-medium text-sky-700">
-          <Icon icon={icon} width={16} />
-          {title}
-        </span>
-        <Icon
-          icon="mdi:chevron-down"
-          width={18}
-          className={`text-sky-500 transition-transform ${isOpen ? "rotate-180" : ""}`}
-        />
-      </button>
-      <div
-        className={`transition-all duration-200 ${
-          isOpen
-            ? "max-h-[800px] opacity-100"
-            : "max-h-0 overflow-hidden opacity-0"
-        }`}>
-        <div className="border-t border-sky-100 p-3">{children}</div>
-      </div>
-    </div>
-  )
-}
 
 // 紧凑选择框组件
 function CompactSelect({
@@ -335,6 +303,58 @@ function LogSettings() {
   )
 }
 
+// 批量抓取设置
+function BatchScrapeSettings() {
+  const [concurrency, setConcurrency] = useStorage("batch_concurrency", "2")
+  const [delay, setDelay] = useStorage("batch_delay", "500")
+  const [timeout, setBatchTimeout] = useStorage("batch_timeout", "30000")
+  const [retryCount, setRetryCount] = useStorage("batch_retry", "1")
+
+  return (
+    <div className="space-y-3">
+      <CompactSelect
+        label="并发数量"
+        value={concurrency}
+        onChange={(v) => {
+          setConcurrency(v)
+          toast.success("并发数量已保存")
+        }}
+        options={BATCH_CONCURRENCY_OPTIONS}
+      />
+      <CompactSelect
+        label="批次延迟"
+        value={delay}
+        onChange={(v) => {
+          setDelay(v)
+          toast.success("批次延迟已保存")
+        }}
+        options={BATCH_DELAY_OPTIONS}
+      />
+      <CompactSelect
+        label="超时时间"
+        value={timeout}
+        onChange={(v) => {
+          setBatchTimeout(v)
+          toast.success("超时时间已保存")
+        }}
+        options={BATCH_TIMEOUT_OPTIONS}
+      />
+      <CompactSelect
+        label="重试次数"
+        value={retryCount}
+        onChange={(v) => {
+          setRetryCount(v)
+          toast.success("重试次数已保存")
+        }}
+        options={BATCH_RETRY_OPTIONS}
+      />
+      <p className="text-xs text-gray-500">
+        并发越高越快，但可能被目标网站限流
+      </p>
+    </div>
+  )
+}
+
 // 主设置组件
 export default function SidePanelSettings() {
   const [showFloatButton, setShowFloatButton] = useStorage(
@@ -372,6 +392,10 @@ export default function SidePanelSettings() {
 
       <AccordionSection title="日志设置" icon="mdi:file-document-outline">
         <LogSettings />
+      </AccordionSection>
+
+      <AccordionSection title="批量抓取" icon="mdi:file-document-multiple">
+        <BatchScrapeSettings />
       </AccordionSection>
 
       <ToggleRow
