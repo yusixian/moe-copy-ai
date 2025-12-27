@@ -4,16 +4,30 @@ import type { ExtractedLink, LinkFilterOptions, SelectedElementInfo } from '~con
  * 从 DOM 元素中提取所有链接
  */
 export function extractLinksFromElement(element: Element): ExtractedLink[] {
-  const anchors = element.querySelectorAll('a[href]')
   const links: ExtractedLink[] = []
+  let index = 0
 
-  anchors.forEach((anchor, index) => {
+  // 检查元素本身是否是 <a> 标签
+  if (element.tagName.toLowerCase() === 'a' && element.hasAttribute('href')) {
+    const href = element.getAttribute('href')
+    if (href) {
+      links.push({
+        url: href,
+        text: element.textContent?.trim() || href,
+        index: index++,
+      })
+    }
+  }
+
+  // 搜索子孙元素中的链接
+  const anchors = element.querySelectorAll('a[href]')
+  anchors.forEach((anchor) => {
     const href = anchor.getAttribute('href')
     if (href) {
       links.push({
         url: href,
         text: anchor.textContent?.trim() || href,
-        index,
+        index: index++,
       })
     }
   })
@@ -25,12 +39,15 @@ export function extractLinksFromElement(element: Element): ExtractedLink[] {
  * 获取选中元素的信息
  */
 export function getElementInfo(element: Element): SelectedElementInfo {
-  const anchors = element.querySelectorAll('a[href]')
+  const isAnchor = element.tagName.toLowerCase() === 'a' && element.hasAttribute('href')
+  const descendantAnchors = element.querySelectorAll('a[href]')
+  const linkCount = descendantAnchors.length + (isAnchor ? 1 : 0)
+
   return {
     tagName: element.tagName.toLowerCase(),
     className: element.className || '',
     id: element.id || '',
-    linkCount: anchors.length,
+    linkCount,
     outerHTML: element.outerHTML.substring(0, 500), // 限制长度
   }
 }
