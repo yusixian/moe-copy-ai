@@ -39,9 +39,9 @@ function AiSettingsSection() {
       if (savedPrompt) setDefaultSystemPrompt(savedPrompt)
       if (savedModel) setModel(savedModel)
 
-      // 如果有保存的API密钥和基础URL，尝试加载模型列表
+      // 如果有保存的API密钥和基础URL，尝试加载模型列表（静默加载，不弹toast）
       if (savedApiKey && savedBaseURL) {
-        fetchModelList(savedApiKey, savedBaseURL)
+        fetchModelList(savedApiKey, savedBaseURL, false)
       }
     } catch (error) {
       console.error("加载AI设置出错:", error)
@@ -50,7 +50,7 @@ function AiSettingsSection() {
 
   // 获取模型列表
   const fetchModelList = useCallback(
-    async (key: string, url: string) => {
+    async (key: string, url: string, showToast = true) => {
       debugLog("尝试加载模型列表")
       if (!key) {
         toast.warning("请先填写API密钥")
@@ -72,10 +72,10 @@ function AiSettingsSection() {
         debugLog("模型列表加载成功，模型如下", models)
         setModelList(models)
         if (models.length > 0) setModel(models[0].id) // 如果模型列表不为空，则设置默认模型
-        toast.success("模型列表加载成功 (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
+        if (showToast) toast.success("模型列表加载成功 (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
       } catch (error) {
         console.error("获取模型列表失败:", error)
-        toast.error("获取模型列表失败，请检查API设置 (╥﹏╥)")
+        if (showToast) toast.error("获取模型列表失败，请检查API设置 (╥﹏╥)")
       } finally {
         setIsLoadingModels(false)
       }
