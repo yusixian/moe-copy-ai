@@ -3,6 +3,7 @@ import { memo, useMemo, useState } from 'react'
 
 import type { ExtractedLink, SelectedElementInfo } from '~constants/types'
 import { cn } from '~utils'
+import { exportLinksToJson, exportLinksToMarkdown } from '~utils/link-exporter'
 
 interface LinkPreviewListProps {
   elementInfo: SelectedElementInfo | null
@@ -20,6 +21,48 @@ const LinkPreviewList = memo(function LinkPreviewList({
   onReselect,
 }: LinkPreviewListProps) {
   const [showAll, setShowAll] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+
+  // 下载文件
+  const downloadFile = (content: string, filename: string, mimeType: string) => {
+    const blob = new Blob([content], { type: `${mimeType};charset=utf-8` })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  // 导出为 Markdown
+  const handleExportMarkdown = () => {
+    setIsExporting(true)
+    try {
+      const content = exportLinksToMarkdown(links)
+      const date = new Date().toISOString().split('T')[0]
+      downloadFile(content, `links-${date}.md`, 'text/markdown')
+    } catch (error) {
+      console.error('导出 Markdown 失败:', error)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  // 导出为 JSON
+  const handleExportJson = () => {
+    setIsExporting(true)
+    try {
+      const content = exportLinksToJson(links)
+      const date = new Date().toISOString().split('T')[0]
+      downloadFile(content, `links-${date}.json`, 'application/json')
+    } catch (error) {
+      console.error('导出 JSON 失败:', error)
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   // 显示的链接数量
   const displayLinks = useMemo(() => {
@@ -55,12 +98,34 @@ const LinkPreviewList = memo(function LinkPreviewList({
         </div>
       )}
 
-      {/* 链接统计 */}
+      {/* 链接统计和导出 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-2xl font-bold text-emerald-500">{links.length}</span>
           <span className="text-sm text-gray-600">个链接待抓取</span>
         </div>
+        {links.length > 0 && (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-gray-400">导出</span>
+            <button
+              onClick={handleExportMarkdown}
+              disabled={isExporting}
+              className="flex items-center gap-1 text-gray-500 hover:text-sky-600 disabled:opacity-50"
+            >
+              <Icon icon="mdi:file-document-outline" className="h-3.5 w-3.5" />
+              MD
+            </button>
+            <span className="text-gray-300">|</span>
+            <button
+              onClick={handleExportJson}
+              disabled={isExporting}
+              className="flex items-center gap-1 text-gray-500 hover:text-sky-600 disabled:opacity-50"
+            >
+              <Icon icon="mdi:code-json" className="h-3.5 w-3.5" />
+              JSON
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 链接列表 */}
