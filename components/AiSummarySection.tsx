@@ -4,7 +4,6 @@ import React, { useCallback, useMemo, useState } from "react"
 import type { ScrapedContent } from "~constants/types"
 import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import { useAiSummary } from "~hooks/useAiSummary"
-import { copyToClipboard } from "~utils"
 
 import AiHistoryDrawer from "./ai/AiHistoryDrawer"
 import PromptInput from "./ai/PromptInput"
@@ -88,12 +87,6 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
   const toggleHistoryDrawer = useCallback(
     () => setIsHistoryDrawerOpen(!isHistoryDrawerOpen),
     [isHistoryDrawerOpen]
-  )
-
-  const handleCopySummary = useCallback(
-    () =>
-      (summary || streamingText) && copyToClipboard(summary || streamingText),
-    [summary, streamingText]
   )
 
   // 使用直接从useAiSummary返回的usage
@@ -208,7 +201,6 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
             <SummaryResult
               summary={summary}
               streamingText={streamingText}
-              onCopy={handleCopySummary}
             />
             {totalTokens && (
               <div className="mt-3 rounded-lg border border-indigo-100 bg-indigo-50 p-2">

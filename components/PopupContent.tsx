@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react"
+import { useClipboard } from "foxact/use-clipboard"
 import { memo, useCallback } from "react"
 
 import { sendToBackground } from "@plasmohq/messaging"
@@ -37,6 +38,8 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
     handleSelectorChange,
     handleSelectContent
   } = useScrapedData()
+
+  const { copy: copyDebugInfo } = useClipboard()
 
   // 打开侧边栏（批量抓取功能已移至侧边栏）
   const handleOpenSidePanel = async () => {
@@ -245,7 +248,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 className="rounded-full p-1 text-purple-500 transition-colors hover:bg-purple-100"
                 title="复制调试信息"
                 onClick={() => {
-                  navigator.clipboard.writeText(debugInfo)
+                  copyDebugInfo(debugInfo)
                   alert("调试信息已复制到剪贴板 (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
                 }}>
                 <Icon icon="line-md:clipboard-check" width="14" height="14" />

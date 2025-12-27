@@ -1,18 +1,16 @@
 import { Icon } from '@iconify/react'
+import { useClipboard } from 'foxact/use-clipboard'
 import { memo, useMemo, useState } from 'react'
 
 import type { BatchScrapeResult } from '~constants/types'
+import { cn } from '~utils'
 import { aggregateToSingleMarkdown } from '~utils/content-aggregator'
 import { exportAsZip } from '~utils/zip-exporter'
-
-import { cn } from '~utils'
 
 interface ScrapeResultsPanelProps {
   results: BatchScrapeResult[]
   onReset: () => void
 }
-
-type ExportFormat = 'markdown' | 'zip'
 
 const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
   results,
@@ -20,6 +18,7 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
 }: ScrapeResultsPanelProps) {
   const [isExporting, setIsExporting] = useState(false)
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
+  const { copy, copied } = useClipboard({ timeout: 2000 })
 
   // 统计
   const stats = useMemo(() => {
@@ -44,6 +43,12 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
+  }
+
+  // 复制全部内容
+  const handleCopyAll = () => {
+    const { content } = aggregateToSingleMarkdown(results)
+    copy(content)
   }
 
   // 导出为 Markdown
@@ -155,6 +160,32 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
           </div>
         ))}
       </div>
+
+      {/* 复制按钮 */}
+      <button
+        onClick={handleCopyAll}
+        disabled={stats.successCount === 0}
+        className={cn(
+          'flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-all',
+          stats.successCount === 0
+            ? 'cursor-not-allowed bg-gray-200 text-gray-500'
+            : copied
+              ? 'bg-emerald-500 text-white shadow-md'
+              : 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-md hover:from-violet-600 hover:to-purple-600'
+        )}
+      >
+        {copied ? (
+          <>
+            <Icon icon="mdi:check" className="h-4 w-4" />
+            已复制
+          </>
+        ) : (
+          <>
+            <Icon icon="mdi:content-copy" className="h-4 w-4" />
+            复制全部
+          </>
+        )}
+      </button>
 
       {/* 导出按钮 */}
       <div className="flex gap-3">
