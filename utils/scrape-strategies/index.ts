@@ -1,12 +1,14 @@
 import type { ScrapeStrategyType } from '~constants/types'
 
 import { BackgroundTabsStrategy } from './background-tabs-strategy'
+import { CurrentTabStrategy } from './current-tab-strategy'
 import { FetchStrategy } from './fetch-strategy'
 import type { ScrapeStrategy } from './types'
 
 export type { ScrapeOptions, ScrapeStrategy } from './types'
 export { FetchStrategy } from './fetch-strategy'
 export { BackgroundTabsStrategy } from './background-tabs-strategy'
+export { CurrentTabStrategy } from './current-tab-strategy'
 
 /**
  * 创建抓取策略实例
@@ -18,8 +20,7 @@ export function createScrapeStrategy(type: ScrapeStrategyType): ScrapeStrategy {
     case 'background-tabs':
       return new BackgroundTabsStrategy()
     case 'current-tab':
-      // TODO: 实现 CurrentTabStrategy
-      throw new Error('current-tab 策略尚未实现')
+      return new CurrentTabStrategy()
     default:
       throw new Error(`未知的抓取策略: ${type}`)
   }

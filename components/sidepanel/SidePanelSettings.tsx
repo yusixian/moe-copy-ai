@@ -321,7 +321,7 @@ function BatchScrapeSettings() {
       {/* 策略选择 - 使用按钮组 */}
       <div className="space-y-2">
         <label className="text-xs text-gray-600">抓取策略</label>
-        <div className="grid grid-cols-2 gap-1">
+        <div className="grid grid-cols-3 gap-1">
           {BATCH_STRATEGY_OPTIONS.map((s) => (
             <button
               key={s.value}
@@ -329,7 +329,7 @@ function BatchScrapeSettings() {
                 setStrategy(s.value)
                 toast.success("抓取策略已保存")
               }}
-              className={`rounded-md px-2 py-1.5 text-center text-xs transition-all ${
+              className={`rounded-md px-1.5 py-1.5 text-center text-xs transition-all ${
                 strategy === s.value
                   ? "bg-sky-500 text-white shadow-sm"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
