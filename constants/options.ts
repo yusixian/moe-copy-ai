@@ -59,3 +59,9 @@ export const BATCH_RETRY_OPTIONS = [
   { value: "2", label: "2次" },
   { value: "3", label: "3次" }
 ]
+
+// 批量抓取 - 抓取策略
+export const BATCH_STRATEGY_OPTIONS = [
+  { value: "fetch", label: "Fetch API", desc: "直接获取 HTML，速度快但无法处理 JS 渲染" },
+  { value: "background-tabs", label: "后台标签页", desc: "在后台打开标签页抓取，支持 JS 渲染和登录态" }
+]

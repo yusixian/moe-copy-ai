@@ -10,6 +10,7 @@ import {
   BATCH_CONCURRENCY_OPTIONS,
   BATCH_DELAY_OPTIONS,
   BATCH_RETRY_OPTIONS,
+  BATCH_STRATEGY_OPTIONS,
   BATCH_TIMEOUT_OPTIONS,
   LOG_LEVELS,
   SCRAPE_TIMING_OPTIONS
@@ -305,13 +306,43 @@ function LogSettings() {
 
 // 批量抓取设置
 function BatchScrapeSettings() {
+  const [strategy, setStrategy] = useStorage("batch_strategy", "fetch")
   const [concurrency, setConcurrency] = useStorage("batch_concurrency", "2")
   const [delay, setDelay] = useStorage("batch_delay", "500")
   const [timeout, setBatchTimeout] = useStorage("batch_timeout", "30000")
   const [retryCount, setRetryCount] = useStorage("batch_retry", "1")
 
+  const currentStrategyDesc = BATCH_STRATEGY_OPTIONS.find(
+    (s) => s.value === strategy
+  )?.desc
+
   return (
     <div className="space-y-3">
+      {/* 策略选择 - 使用按钮组 */}
+      <div className="space-y-2">
+        <label className="text-xs text-gray-600">抓取策略</label>
+        <div className="grid grid-cols-2 gap-1">
+          {BATCH_STRATEGY_OPTIONS.map((s) => (
+            <button
+              key={s.value}
+              onClick={() => {
+                setStrategy(s.value)
+                toast.success("抓取策略已保存")
+              }}
+              className={`rounded-md px-2 py-1.5 text-center text-xs transition-all ${
+                strategy === s.value
+                  ? "bg-sky-500 text-white shadow-sm"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+        {currentStrategyDesc && (
+          <p className="text-xs text-gray-500">{currentStrategyDesc}</p>
+        )}
+      </div>
+
       <CompactSelect
         label="并发数量"
         value={concurrency}
