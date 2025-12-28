@@ -198,5 +198,26 @@ export interface ElementSelectorMessage extends Message {
   action: 'activateSelector' | 'deactivateSelector' | 'elementSelected' | 'selectionCancelled'
   elementInfo?: SelectedElementInfo
   links?: ExtractedLink[]
+  purpose?: ElementSelectorPurpose
+  content?: ExtractedContent
+}
+
+// ==================== 内容提取相关类型 ====================
+
+// 元素选择器用途
+export type ElementSelectorPurpose = 'link-extraction' | 'content-extraction'
+
+// 内容输出格式
+export type ContentOutputFormat = 'html' | 'markdown' | 'text'
+
+// 内容提取模式
+export type ContentExtractionMode = 'idle' | 'selecting' | 'extracted' | 'error'
+
+// 提取的内容
+export interface ExtractedContent {
+  html: string      // element.outerHTML (完整)
+  markdown: string  // 转换后的 Markdown
+  text: string      // element.textContent
+  elementInfo: SelectedElementInfo
 }
 
