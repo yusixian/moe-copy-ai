@@ -129,6 +129,9 @@ export type BatchScrapeMode = 'idle' | 'selecting' | 'previewing' | 'scraping' |
 // 单页抓取状态
 export type PageScrapeStatus = 'pending' | 'fetching' | 'extracting' | 'success' | 'failed'
 
+// 抓取策略类型
+export type ScrapeStrategyType = 'fetch' | 'background-tabs' | 'current-tab'
+
 // 单页抓取结果
 export interface BatchScrapeResult {
   url: string
@@ -136,7 +139,7 @@ export interface BatchScrapeResult {
   title: string
   content: string
   error?: string
-  method: 'fetch'
+  method: ScrapeStrategyType
 }
 
 // 批量抓取进度

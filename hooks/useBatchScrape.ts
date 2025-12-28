@@ -5,12 +5,12 @@ import { Storage } from '@plasmohq/storage'
 import type {
   BatchProgress,
   BatchScrapeMode,
-  BatchScrapeOptions,
   BatchScrapeResult,
   ExtractedLink,
+  ScrapeStrategyType,
   SelectedElementInfo,
 } from '~constants/types'
-import { BatchScrapeController } from '~utils/batch-scraper'
+import { BatchScrapeController, type ExtendedBatchScrapeOptions } from '~utils/batch-scraper'
 
 const storage = new Storage({ area: 'sync' })
 
@@ -28,7 +28,7 @@ interface UseBatchScrapeReturn {
   addLink: (url: string, text?: string) => void
   updateLink: (index: number, url: string, text: string) => void
   removeLink: (index: number) => void
-  startScrape: (selectedLinks: ExtractedLink[], options?: Partial<BatchScrapeOptions>) => Promise<void>
+  startScrape: (selectedLinks: ExtractedLink[], options?: Partial<ExtendedBatchScrapeOptions>) => Promise<void>
   pauseScrape: () => void
   resumeScrape: () => void
   cancelScrape: () => void
@@ -91,7 +91,7 @@ export function useBatchScrape(): UseBatchScrapeReturn {
 
   // 开始抓取
   const startScrape = useCallback(
-    async (selectedLinks: ExtractedLink[], options: Partial<BatchScrapeOptions> = {}) => {
+    async (selectedLinks: ExtractedLink[], options: Partial<ExtendedBatchScrapeOptions> = {}) => {
       if (selectedLinks.length === 0) {
         setError('没有可抓取的链接')
         return
@@ -106,12 +106,14 @@ export function useBatchScrape(): UseBatchScrapeReturn {
       const delay = (await storage.get<string>('batch_delay')) || '500'
       const timeout = (await storage.get<string>('batch_timeout')) || '30000'
       const retryCount = (await storage.get<string>('batch_retry')) || '1'
+      const strategy = (await storage.get<ScrapeStrategyType>('batch_strategy')) || 'fetch'
 
-      const mergedOptions: BatchScrapeOptions = {
+      const mergedOptions: ExtendedBatchScrapeOptions = {
         concurrency: parseInt(concurrency, 10),
         delayBetweenRequests: parseInt(delay, 10),
         timeout: parseInt(timeout, 10),
         retryCount: parseInt(retryCount, 10),
+        strategy,
         ...options,
       }
 
