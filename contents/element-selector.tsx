@@ -49,11 +49,15 @@ function HighlightOverlay({
 function InfoPanel({
   elementInfo,
   links,
+  sameDomainOnly,
+  onToggleSameDomain,
   onConfirm,
   onCancel,
 }: {
   elementInfo: SelectedElementInfo | null
   links: ExtractedLink[]
+  sameDomainOnly: boolean
+  onToggleSameDomain: () => void
   onConfirm: () => void
   onCancel: () => void
 }) {
@@ -103,28 +107,58 @@ function InfoPanel({
 
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
           padding: '12px 0',
           borderTop: '1px solid #e5e7eb',
           borderBottom: '1px solid #e5e7eb',
           marginBottom: '12px',
         }}
       >
-        <div>
-          <span style={{ fontSize: '24px', fontWeight: '700', color: '#10b981' }}>
-            {links.length}
-          </span>
-          <span style={{ fontSize: '14px', color: '#6b7280', marginLeft: '8px' }}>
-            个链接
-          </span>
-        </div>
-        {links.length > 0 && (
-          <div style={{ fontSize: '12px', color: '#9ca3af' }}>
-            点击确认开始批量抓取
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '8px',
+          }}
+        >
+          <div>
+            <span style={{ fontSize: '24px', fontWeight: '700', color: '#10b981' }}>
+              {links.length}
+            </span>
+            <span style={{ fontSize: '14px', color: '#6b7280', marginLeft: '8px' }}>
+              个链接
+            </span>
           </div>
-        )}
+          {links.length > 0 && (
+            <div style={{ fontSize: '12px', color: '#9ca3af' }}>
+              点击确认开始批量抓取
+            </div>
+          )}
+        </div>
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '13px',
+            color: '#4b5563',
+            cursor: 'pointer',
+            userSelect: 'none',
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={sameDomainOnly}
+            onChange={onToggleSameDomain}
+            style={{
+              width: '16px',
+              height: '16px',
+              accentColor: '#10b981',
+              cursor: 'pointer',
+            }}
+          />
+          仅同域名链接
+        </label>
       </div>
 
       <div style={{ display: 'flex', gap: '8px' }}>
@@ -174,6 +208,7 @@ function ElementSelector() {
   const [selectedRect, setSelectedRect] = useState<DOMRect | null>(null)
   const [elementInfo, setElementInfo] = useState<SelectedElementInfo | null>(null)
   const [extractedLinks, setExtractedLinks] = useState<ExtractedLink[]>([])
+  const [sameDomainOnly, setSameDomainOnly] = useState(false)
 
   // 使用 ref 访问最新状态，避免事件监听器循环依赖
   const hoveredElementRef = useRef<Element | null>(null)
@@ -194,7 +229,20 @@ function ElementSelector() {
     setHoveredRect(null)
     setElementInfo(null)
     setExtractedLinks([])
+    setSameDomainOnly(false)
     hoveredElementRef.current = null
+  }
+
+  // 切换同域名过滤
+  const handleToggleSameDomain = () => {
+    if (!selectedElement) return
+    const newValue = !sameDomainOnly
+    setSameDomainOnly(newValue)
+    const links = extractAndProcessLinks(selectedElement, window.location.href, {
+      ...DEFAULT_FILTER_OPTIONS,
+      sameDomainOnly: newValue,
+    })
+    setExtractedLinks(links)
   }
 
   // 确认选择
@@ -343,6 +391,8 @@ function ElementSelector() {
         <InfoPanel
           elementInfo={elementInfo}
           links={extractedLinks}
+          sameDomainOnly={sameDomainOnly}
+          onToggleSameDomain={handleToggleSameDomain}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />

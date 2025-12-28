@@ -225,7 +225,7 @@ export function extractAndProcessLinks(
  * 默认过滤选项
  */
 export const DEFAULT_FILTER_OPTIONS: LinkFilterOptions = {
-  sameDomainOnly: true,
+  sameDomainOnly: false,
   excludeAnchors: true,
   excludeJavaScript: true,
 }
