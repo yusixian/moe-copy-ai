@@ -25,7 +25,9 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dompurify": "^3.2.6",
+    "foxact": "^0.2.49",
     "gpt-tokenizer": "^2.9.0",
+    "jszip": "^3.10.1",
     "markdown-it": "^14.1.0",
     "motion": "^12.4.7",
     "pino": "^9.6.0",
@@ -60,6 +62,12 @@
   "manifest": {
     "host_permissions": [
       "https://*/*"
-    ]
+    ],
+    "permissions": [
+      "sidePanel"
+    ],
+    "side_panel": {
+      "default_path": "sidepanel.html"
+    }
   }
 }

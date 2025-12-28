@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react"
-import { useEffect, useMemo, useState } from "react"
+import { useClipboard } from "foxact/use-clipboard"
+import { useEffect, useMemo } from "react"
 
 import { cn } from "~/utils"
 
@@ -63,28 +64,23 @@ export const CopyableTextField: React.FC<CopyableTextFieldProps> = ({
   rows = 3,
   placeholder = ""
 }) => {
-  const [isCopied, setIsCopied] = useState(false)
+  const { copy, copied } = useClipboard({ timeout: 2000 })
   const isLongText = useMemo(
     () => !isUrl && text.length > textareaThreshold,
     [text, textareaThreshold, isUrl]
   )
+
   // 复制功能
   const handleCopy = preventBubbling(() => {
-    navigator.clipboard.writeText(text).then(() => {
-      setIsCopied(true)
-      onCopied?.()
-    })
+    copy(text)
   })
 
-  // 复制状态重置
+  // 触发 onCopied 回调
   useEffect(() => {
-    if (isCopied) {
-      const timer = setTimeout(() => {
-        setIsCopied(false)
-      }, 2000)
-      return () => clearTimeout(timer)
+    if (copied) {
+      onCopied?.()
     }
-  }, [isCopied])
+  }, [copied, onCopied])
 
   return (
     <div className={cn("relative", className)}>
@@ -117,10 +113,10 @@ export const CopyableTextField: React.FC<CopyableTextFieldProps> = ({
                 ? "absolute right-0 top-0 border-none opacity-80 hover:opacity-100"
                 : "rounded-l-none rounded-r-md shadow-none",
               {
-                "border-green-200 bg-green-50": isCopied
+                "border-green-200 bg-green-50": copied
               }
             )}>
-            {isCopied ? (
+            {copied ? (
               <AnimatedContainer animation="fadeIn">
                 <Icon
                   icon="line-md:check-all"

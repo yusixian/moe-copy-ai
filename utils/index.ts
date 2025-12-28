@@ -1,8 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-import { logger } from "./logger"
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -41,21 +39,6 @@ export function generateUUID(): string {
     const v = c === "x" ? r : (r & 0x3) | 0x8
     return v.toString(16)
   })
-}
-
-/**
- * 复制文本到剪贴板
- * @param text 要复制的文本
- * @returns Promise，成功时返回true，失败时抛出错误
- */
-export const copyToClipboard = async (text: string): Promise<boolean> => {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch (err) {
-    logger.error("复制失败:", err)
-    return false
-  }
 }
 
 /**
