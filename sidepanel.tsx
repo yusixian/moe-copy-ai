@@ -19,13 +19,17 @@ type SidePanelView = "batch" | "extraction" | "settings"
 function SidePanel() {
   const [currentView, setCurrentView] = useState<SidePanelView>("batch")
 
+  const [isSelectingNextPage, setIsSelectingNextPage] = useState(false)
+
   const {
     isSelecting,
     elementInfo,
     extractedLinks,
+    nextPageButton,
     activateSelector,
     deactivateSelector,
     clearSelection,
+    clearNextPageButton,
   } = useElementSelector()
 
   const {
@@ -35,6 +39,7 @@ function SidePanel() {
     progress,
     results,
     error,
+    paginationProgress,
     setLinks,
     addLink,
     updateLink,
@@ -65,18 +70,39 @@ function SidePanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [elementInfo, extractedLinks])
 
+  // 当选择完成时，重置 isSelectingNextPage 状态
+  useEffect(() => {
+    if (!isSelecting && isSelectingNextPage) {
+      setIsSelectingNextPage(false)
+    }
+  }, [isSelecting, isSelectingNextPage])
+
   // 计算当前模式
-  const currentMode: BatchScrapeMode = isSelecting ? 'selecting' : mode
+  // 如果正在选择下一页按钮，保持在 previewing 模式
+  const currentMode: BatchScrapeMode = (isSelecting && !isSelectingNextPage) ? 'selecting' : mode
 
   // 处理选择元素
   const handleSelectElement = useCallback(() => {
+    setIsSelectingNextPage(false)
     activateSelector()
   }, [activateSelector])
+
+  // 处理选择下一页按钮
+  const handleSelectNextPage = useCallback(() => {
+    setIsSelectingNextPage(true)
+    activateSelector('next-page-button')
+  }, [activateSelector])
+
+  // 处理清除下一页按钮选择
+  const handleClearNextPage = useCallback(() => {
+    clearNextPageButton()
+  }, [clearNextPageButton])
 
   // 处理取消选择
   const handleCancel = useCallback(() => {
     if (isSelecting) {
       deactivateSelector()
+      setIsSelectingNextPage(false)
     } else {
       cancelScrape()
     }
@@ -85,8 +111,9 @@ function SidePanel() {
   // 处理重置
   const handleReset = useCallback(() => {
     clearSelection()
+    clearNextPageButton()
     reset()
-  }, [clearSelection, reset])
+  }, [clearSelection, clearNextPageButton, reset])
 
   // 视图标题和描述
   const viewConfig = {
@@ -170,8 +197,11 @@ function SidePanel() {
             elementInfo={elementInfo || scrapeElementInfo}
             links={links}
             progress={progress}
+            paginationProgress={paginationProgress}
             results={results}
             error={error}
+            nextPageButton={nextPageButton}
+            isSelectingNextPage={isSelectingNextPage && isSelecting}
             onStartScrape={startScrape}
             onPause={pauseScrape}
             onResume={resumeScrape}
@@ -181,6 +211,8 @@ function SidePanel() {
             onAddLink={addLink}
             onUpdateLink={updateLink}
             onRemoveLink={removeLink}
+            onSelectNextPage={handleSelectNextPage}
+            onClearNextPage={handleClearNextPage}
           />
         )}
         {currentView === "extraction" && (

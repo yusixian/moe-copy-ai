@@ -61,10 +61,14 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
+      "https://*/*",
+      "http://*/*"
     ],
     "permissions": [
-      "sidePanel"
+      "sidePanel",
+      "scripting",
+      "tabs",
+      "activeTab"
     ],
     "side_panel": {
       "default_path": "sidepanel.html"

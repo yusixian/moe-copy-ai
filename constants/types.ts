@@ -121,6 +121,7 @@ export interface SelectedElementInfo {
   id: string
   linkCount: number
   outerHTML: string
+  selector?: string // 用于定位元素的 CSS 选择器
 }
 
 // 批量抓取状态模式
@@ -168,6 +169,12 @@ export interface BatchScrapeOptions {
   delayBetweenRequests: number
 }
 
+// 分页抓取选项
+export interface PaginationOptions {
+  maxPages: number
+  delayBetweenPages: number
+}
+
 // 链接过滤选项
 export interface LinkFilterOptions {
   sameDomainOnly: boolean
@@ -208,7 +215,14 @@ export interface ElementSelectorMessage extends Message {
 // ==================== 内容提取相关类型 ====================
 
 // 元素选择器用途
-export type ElementSelectorPurpose = 'link-extraction' | 'content-extraction'
+export type ElementSelectorPurpose = 'link-extraction' | 'content-extraction' | 'next-page-button'
+
+// 下一页按钮信息
+export interface NextPageButtonInfo {
+  selector: string
+  text: string
+  description?: string
+}
 
 // 内容输出格式
 export type ContentOutputFormat = 'html' | 'markdown' | 'text'

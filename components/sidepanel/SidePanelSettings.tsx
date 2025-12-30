@@ -13,6 +13,8 @@ import {
   BATCH_STRATEGY_OPTIONS,
   BATCH_TIMEOUT_OPTIONS,
   LOG_LEVELS,
+  PAGINATION_DELAY_OPTIONS,
+  PAGINATION_MAX_PAGES_OPTIONS,
   SCRAPE_TIMING_OPTIONS
 } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
@@ -312,6 +314,10 @@ function BatchScrapeSettings() {
   const [timeout, setBatchTimeout] = useStorage("batch_timeout", "30000")
   const [retryCount, setRetryCount] = useStorage("batch_retry", "1")
 
+  // 分页设置
+  const [maxPages, setMaxPages] = useStorage("pagination_max_pages", "5")
+  const [pageDelay, setPageDelay] = useStorage("pagination_delay", "2000")
+
   const currentStrategyDesc = BATCH_STRATEGY_OPTIONS.find(
     (s) => s.value === strategy
   )?.desc
@@ -379,9 +385,32 @@ function BatchScrapeSettings() {
         }}
         options={BATCH_RETRY_OPTIONS}
       />
-      <p className="text-xs text-gray-500">
-        并发越高越快，但可能被目标网站限流
-      </p>
+
+      {/* 分页抓取设置 */}
+      <div className="mt-4 flex gap-2 border-t border-gray-200 pt-3">
+        <div className="flex-1">
+          <CompactSelect
+            label="最大页数"
+            value={maxPages}
+            onChange={(v) => {
+              setMaxPages(v)
+              toast.success("最大页数已保存")
+            }}
+            options={PAGINATION_MAX_PAGES_OPTIONS}
+          />
+        </div>
+        <div className="flex-1">
+          <CompactSelect
+            label="翻页延迟"
+            value={pageDelay}
+            onChange={(v) => {
+              setPageDelay(v)
+              toast.success("翻页延迟已保存")
+            }}
+            options={PAGINATION_DELAY_OPTIONS}
+          />
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import type { ElementSelectorPurpose, ExtractedContent, ExtractedLink, SelectedElementInfo } from '~constants/types'
+import type { ElementSelectorPurpose, ExtractedContent, ExtractedLink, NextPageButtonInfo, SelectedElementInfo } from '~constants/types'
 
 interface UseElementSelectorReturn {
   isSelecting: boolean
   elementInfo: SelectedElementInfo | null
   extractedLinks: ExtractedLink[]
   extractedContent: ExtractedContent | null
+  nextPageButton: NextPageButtonInfo | null
   activateSelector: (purpose?: ElementSelectorPurpose) => Promise<void>
   deactivateSelector: () => void
   clearSelection: () => void
+  clearNextPageButton: () => void
 }
 
 /**
@@ -21,6 +23,7 @@ export function useElementSelector(): UseElementSelectorReturn {
   const [elementInfo, setElementInfo] = useState<SelectedElementInfo | null>(null)
   const [extractedLinks, setExtractedLinks] = useState<ExtractedLink[]>([])
   const [extractedContent, setExtractedContent] = useState<ExtractedContent | null>(null)
+  const [nextPageButton, setNextPageButton] = useState<NextPageButtonInfo | null>(null)
 
   // 激活选择器
   const activateSelector = useCallback(async (purpose: ElementSelectorPurpose = 'link-extraction') => {
@@ -58,6 +61,12 @@ export function useElementSelector(): UseElementSelectorReturn {
     setElementInfo(null)
     setExtractedLinks([])
     setExtractedContent(null)
+    // Note: We don't reset nextPageButton here as it might be needed even after deactivating
+  }, [])
+
+  // 清除下一页按钮选择
+  const clearNextPageButton = useCallback(() => {
+    setNextPageButton(null)
   }, [])
 
   // 清除选择（保留数据）
@@ -73,23 +82,31 @@ export function useElementSelector(): UseElementSelectorReturn {
       links?: ExtractedLink[]
       content?: ExtractedContent
       purpose?: ElementSelectorPurpose
+      nextPageButton?: NextPageButtonInfo
     }) => {
       if (message.action === 'elementSelected') {
         setIsSelecting(false)
-        if (message.elementInfo) {
-          setElementInfo(message.elementInfo)
+        // 只有非下一页按钮选择时才更新 elementInfo，避免覆盖链接容器信息
+        if (message.purpose !== 'next-page-button') {
+          if (message.elementInfo) {
+            setElementInfo(message.elementInfo)
+          }
+          if (message.links) {
+            setExtractedLinks(message.links)
+          }
+          if (message.content) {
+            setExtractedContent(message.content)
+          }
         }
-        if (message.links) {
-          setExtractedLinks(message.links)
-        }
-        if (message.content) {
-          setExtractedContent(message.content)
+        if (message.nextPageButton) {
+          setNextPageButton(message.nextPageButton)
         }
       } else if (message.action === 'selectionCancelled') {
         setIsSelecting(false)
         setElementInfo(null)
         setExtractedLinks([])
         setExtractedContent(null)
+        // Note: We don't reset nextPageButton here as the user might have cancelled a different selection
       }
     }
 
@@ -104,9 +121,11 @@ export function useElementSelector(): UseElementSelectorReturn {
     elementInfo,
     extractedLinks,
     extractedContent,
+    nextPageButton,
     activateSelector,
     deactivateSelector,
     clearSelection,
+    clearNextPageButton,
   }
 }
 

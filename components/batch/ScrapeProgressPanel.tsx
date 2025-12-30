@@ -13,8 +13,15 @@ const formatElapsedTime = (startTime: number): string => {
   return `${mins}m ${secs}s`
 }
 
+interface PaginationProgress {
+  currentPage: number
+  maxPages: number
+  isLoadingNextPage: boolean
+}
+
 interface ScrapeProgressPanelProps {
   progress: BatchProgress | null
+  paginationProgress?: PaginationProgress | null
   onPause: () => void
   onResume: () => void
   onCancel: () => void
@@ -22,6 +29,7 @@ interface ScrapeProgressPanelProps {
 
 const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
   progress,
+  paginationProgress,
   onPause,
   onResume,
   onCancel,
@@ -115,6 +123,28 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
           />
         </div>
       </div>
+
+      {/* 分页进度 */}
+      {paginationProgress && (
+        <div className="rounded-lg bg-indigo-50 p-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Icon
+                icon={paginationProgress.isLoadingNextPage ? 'mdi:loading' : 'mdi:book-open-page-variant'}
+                className={cn('h-4 w-4 text-indigo-500', paginationProgress.isLoadingNextPage && 'animate-spin')}
+              />
+              <span className="text-sm font-medium text-indigo-700">
+                {paginationProgress.isLoadingNextPage ? '正在加载下一页...' : `第 ${paginationProgress.currentPage} 页`}
+              </span>
+            </div>
+            {paginationProgress.maxPages > 0 && (
+              <span className="text-xs text-indigo-500">
+                最多 {paginationProgress.maxPages} 页
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* 当前抓取 */}
       {progress.current && (

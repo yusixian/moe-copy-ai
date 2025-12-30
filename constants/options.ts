@@ -66,3 +66,20 @@ export const BATCH_STRATEGY_OPTIONS = [
   { value: "background-tabs", label: "后台标签页", desc: "在后台打开标签页抓取，支持 JS 渲染和登录态" },
   { value: "current-tab", label: "当前标签页", desc: "在当前标签页依次访问，用户可见过程，完成后返回原页面" }
 ]
+
+// 分页抓取 - 最大页数
+export const PAGINATION_MAX_PAGES_OPTIONS = [
+  { value: "3", label: "3 页" },
+  { value: "5", label: "5 页" },
+  { value: "10", label: "10 页" },
+  { value: "20", label: "20 页" },
+  { value: "0", label: "无限制" }
+]
+
+// 分页抓取 - 页面间延迟
+export const PAGINATION_DELAY_OPTIONS = [
+  { value: "1000", label: "1 秒" },
+  { value: "2000", label: "2 秒" },
+  { value: "3000", label: "3 秒" },
+  { value: "5000", label: "5 秒" }
+]

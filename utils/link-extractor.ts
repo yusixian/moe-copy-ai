@@ -1,5 +1,8 @@
 import type { ExtractedLink, LinkFilterOptions, SelectedElementInfo } from '~constants/types'
 
+import { debugLog } from './logger'
+import { generateUniqueSelector } from './selector-generator'
+
 /**
  * 从 DOM 元素中提取所有链接
  */
@@ -43,12 +46,24 @@ export function getElementInfo(element: Element): SelectedElementInfo {
   const descendantAnchors = element.querySelectorAll('a[href]')
   const linkCount = descendantAnchors.length + (isAnchor ? 1 : 0)
 
+  // 生成选择器（使用 selector-generator 中的函数）
+  let selector = ''
+  try {
+    selector = generateUniqueSelector(element, { allowMultiple: true })
+  } catch (err) {
+    debugLog('[LinkExtractor] 生成选择器失败:', err)
+    selector = element.tagName.toLowerCase()
+  }
+
+  debugLog('[LinkExtractor] 链接容器选择器:', selector)
+
   return {
     tagName: element.tagName.toLowerCase(),
     className: element.className || '',
     id: element.id || '',
     linkCount,
     outerHTML: element.outerHTML.substring(0, 500), // 限制长度
+    selector,
   }
 }
 
