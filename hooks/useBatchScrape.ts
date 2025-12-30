@@ -21,6 +21,7 @@ interface PaginationProgress {
   currentPage: number
   maxPages: number
   isLoadingNextPage: boolean
+  currentUrl?: string
 }
 
 interface UseBatchScrapeReturn {
@@ -157,10 +158,13 @@ export function useBatchScrape(): UseBatchScrapeReturn {
 
           // 更新分页进度
           if (paginationEnabled) {
+            // 获取当前标签页 URL
+            const currentTab = await chrome.tabs.get(tabId!)
             setPaginationProgress({
               currentPage,
               maxPages,
               isLoadingNextPage: false,
+              currentUrl: currentTab?.url,
             })
           }
 
@@ -192,11 +196,12 @@ export function useBatchScrape(): UseBatchScrapeReturn {
           }
 
           // 更新状态：正在加载下一页
-          setPaginationProgress({
+          setPaginationProgress((prev) => ({
             currentPage,
             maxPages,
             isLoadingNextPage: true,
-          })
+            currentUrl: prev?.currentUrl,
+          }))
 
           // 等待翻页延迟
           await new Promise((resolve) => setTimeout(resolve, delayBetweenPages))

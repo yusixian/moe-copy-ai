@@ -17,6 +17,7 @@ interface PaginationProgress {
   currentPage: number
   maxPages: number
   isLoadingNextPage: boolean
+  currentUrl?: string
 }
 
 interface ScrapeProgressPanelProps {
@@ -143,6 +144,11 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
               </span>
             )}
           </div>
+          {paginationProgress.currentUrl && (
+            <div className="mt-2 truncate text-xs text-indigo-600">
+              {paginationProgress.currentUrl}
+            </div>
+          )}
         </div>
       )}
 
