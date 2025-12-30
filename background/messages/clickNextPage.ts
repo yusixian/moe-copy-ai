@@ -16,18 +16,6 @@ export interface ClickNextPageResponse {
 }
 
 /**
- * 使用 XPath 查找元素
- */
-function findElementByXPath(xpath: string): Element | null {
-  try {
-    const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
-    return result.singleNodeValue as Element | null
-  } catch {
-    return null
-  }
-}
-
-/**
  * 点击下一页按钮并等待页面加载
  */
 const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPageResponse> = async (req, res) => {
