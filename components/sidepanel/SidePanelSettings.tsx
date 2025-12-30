@@ -10,8 +10,11 @@ import {
   BATCH_CONCURRENCY_OPTIONS,
   BATCH_DELAY_OPTIONS,
   BATCH_RETRY_OPTIONS,
+  BATCH_STRATEGY_OPTIONS,
   BATCH_TIMEOUT_OPTIONS,
   LOG_LEVELS,
+  PAGINATION_DELAY_OPTIONS,
+  PAGINATION_MAX_PAGES_OPTIONS,
   SCRAPE_TIMING_OPTIONS
 } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
@@ -305,13 +308,47 @@ function LogSettings() {
 
 // 批量抓取设置
 function BatchScrapeSettings() {
+  const [strategy, setStrategy] = useStorage("batch_strategy", "fetch")
   const [concurrency, setConcurrency] = useStorage("batch_concurrency", "2")
   const [delay, setDelay] = useStorage("batch_delay", "500")
   const [timeout, setBatchTimeout] = useStorage("batch_timeout", "30000")
   const [retryCount, setRetryCount] = useStorage("batch_retry", "1")
 
+  // 分页设置
+  const [maxPages, setMaxPages] = useStorage("pagination_max_pages", "5")
+  const [pageDelay, setPageDelay] = useStorage("pagination_delay", "2000")
+
+  const currentStrategyDesc = BATCH_STRATEGY_OPTIONS.find(
+    (s) => s.value === strategy
+  )?.desc
+
   return (
     <div className="space-y-3">
+      {/* 策略选择 - 使用按钮组 */}
+      <div className="space-y-2">
+        <label className="text-xs text-gray-600">抓取策略</label>
+        <div className="grid grid-cols-3 gap-1">
+          {BATCH_STRATEGY_OPTIONS.map((s) => (
+            <button
+              key={s.value}
+              onClick={() => {
+                setStrategy(s.value)
+                toast.success("抓取策略已保存")
+              }}
+              className={`rounded-md px-1.5 py-1.5 text-center text-xs transition-all ${
+                strategy === s.value
+                  ? "bg-sky-500 text-white shadow-sm"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+        {currentStrategyDesc && (
+          <p className="text-xs text-gray-500">{currentStrategyDesc}</p>
+        )}
+      </div>
+
       <CompactSelect
         label="并发数量"
         value={concurrency}
@@ -348,9 +385,32 @@ function BatchScrapeSettings() {
         }}
         options={BATCH_RETRY_OPTIONS}
       />
-      <p className="text-xs text-gray-500">
-        并发越高越快，但可能被目标网站限流
-      </p>
+
+      {/* 分页抓取设置 */}
+      <div className="mt-4 flex gap-2 border-t border-gray-200 pt-3">
+        <div className="flex-1">
+          <CompactSelect
+            label="最大页数"
+            value={maxPages}
+            onChange={(v) => {
+              setMaxPages(v)
+              toast.success("最大页数已保存")
+            }}
+            options={PAGINATION_MAX_PAGES_OPTIONS}
+          />
+        </div>
+        <div className="flex-1">
+          <CompactSelect
+            label="翻页延迟"
+            value={pageDelay}
+            onChange={(v) => {
+              setPageDelay(v)
+              toast.success("翻页延迟已保存")
+            }}
+            options={PAGINATION_DELAY_OPTIONS}
+          />
+        </div>
+      </div>
     </div>
   )
 }

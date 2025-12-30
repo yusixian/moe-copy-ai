@@ -2,9 +2,11 @@ import cssText from 'data-text:~styles/element-selector.css'
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo'
 import { useEffect, useRef, useState } from 'react'
 
-import type { ElementSelectorPurpose, ExtractedContent, ExtractedLink, SelectedElementInfo } from '~constants/types'
+import type { ElementSelectorPurpose, ExtractedContent, ExtractedLink, NextPageButtonInfo, SelectedElementInfo } from '~constants/types'
 import { extractContentFromElement } from '~utils/content-extractor'
 import { DEFAULT_FILTER_OPTIONS, extractAndProcessLinks, getElementInfo } from '~utils/link-extractor'
+import { debugLog } from '~utils/logger'
+import { generateNextPageButtonSelector } from '~utils/selector-generator'
 
 // z-index 常量 - 使用最大安全值确保覆盖层在最顶层
 const Z_INDEX = {
@@ -63,6 +65,7 @@ function InfoPanel({
   onCancel,
   purpose,
   contentPreview,
+  nextPageButton,
 }: {
   elementInfo: SelectedElementInfo | null
   links: ExtractedLink[]
@@ -72,10 +75,12 @@ function InfoPanel({
   onCancel: () => void
   purpose: ElementSelectorPurpose
   contentPreview?: string
+  nextPageButton?: NextPageButtonInfo | null
 }) {
   if (!elementInfo) return null
 
   const isContentMode = purpose === 'content-extraction'
+  const isNextPageButtonMode = purpose === 'next-page-button'
 
   return (
     <div
@@ -127,7 +132,34 @@ function InfoPanel({
           marginBottom: '12px',
         }}
       >
-        {isContentMode ? (
+        {isNextPageButtonMode ? (
+          // 下一页按钮选择模式：显示按钮信息
+          <div>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
+              已选中下一页按钮
+            </div>
+            <div
+              style={{
+                fontSize: '13px',
+                color: '#374151',
+                backgroundColor: '#ecfdf5',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                border: '1px solid #a7f3d0',
+              }}
+            >
+              <div style={{ fontWeight: '500', marginBottom: '4px' }}>
+                {nextPageButton?.text || '下一页'}
+              </div>
+              <div style={{ fontSize: '11px', color: '#6b7280', wordBreak: 'break-all' }}>
+                {nextPageButton?.selector}
+              </div>
+            </div>
+            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '8px' }}>
+              确认后将在抓取完成时自动点击此按钮加载下一页
+            </div>
+          </div>
+        ) : isContentMode ? (
           // 内容提取模式：显示内容预览
           <div>
             <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
@@ -224,17 +256,17 @@ function InfoPanel({
         </button>
         <button
           onClick={onConfirm}
-          disabled={!isContentMode && links.length === 0}
+          disabled={!isContentMode && !isNextPageButtonMode && links.length === 0}
           style={{
             flex: 1,
             padding: '10px 16px',
             borderRadius: '8px',
             border: 'none',
-            backgroundColor: (isContentMode || links.length > 0) ? '#10b981' : '#d1d5db',
+            backgroundColor: (isContentMode || isNextPageButtonMode || links.length > 0) ? '#10b981' : '#d1d5db',
             color: 'white',
             fontSize: '14px',
             fontWeight: '500',
-            cursor: (isContentMode || links.length > 0) ? 'pointer' : 'not-allowed',
+            cursor: (isContentMode || isNextPageButtonMode || links.length > 0) ? 'pointer' : 'not-allowed',
           }}
         >
           确认选择
@@ -255,6 +287,7 @@ function ElementSelector() {
   const [sameDomainOnly, setSameDomainOnly] = useState(false)
   const [purpose, setPurpose] = useState<ElementSelectorPurpose>('link-extraction')
   const [extractedContent, setExtractedContent] = useState<ExtractedContent | null>(null)
+  const [nextPageButtonInfo, setNextPageButtonInfo] = useState<NextPageButtonInfo | null>(null)
 
   // 使用 ref 访问最新状态，避免事件监听器循环依赖
   const hoveredElementRef = useRef<Element | null>(null)
@@ -263,6 +296,7 @@ function ElementSelector() {
   const extractedLinksRef = useRef<ExtractedLink[]>([])
   const purposeRef = useRef<ElementSelectorPurpose>('link-extraction')
   const extractedContentRef = useRef<ExtractedContent | null>(null)
+  const nextPageButtonInfoRef = useRef<NextPageButtonInfo | null>(null)
 
   // 同步 ref 和 state
   selectedElementRef.current = selectedElement
@@ -270,6 +304,7 @@ function ElementSelector() {
   extractedLinksRef.current = extractedLinks
   purposeRef.current = purpose
   extractedContentRef.current = extractedContent
+  nextPageButtonInfoRef.current = nextPageButtonInfo
 
   // 重置所有状态
   const resetState = () => {
@@ -282,6 +317,7 @@ function ElementSelector() {
     setSameDomainOnly(false)
     setPurpose('link-extraction')
     setExtractedContent(null)
+    setNextPageButtonInfo(null)
     hoveredElementRef.current = null
   }
 
@@ -308,6 +344,16 @@ function ElementSelector() {
         purpose: currentPurpose,
         elementInfo: elementInfoRef.current,
         content: extractedContentRef.current,
+      })
+    } else if (currentPurpose === 'next-page-button') {
+      // 下一页按钮选择模式：发送按钮信息
+      if (!nextPageButtonInfoRef.current) return
+
+      chrome.runtime.sendMessage({
+        action: 'elementSelected',
+        purpose: currentPurpose,
+        elementInfo: elementInfoRef.current,
+        nextPageButton: nextPageButtonInfoRef.current,
       })
     } else {
       // 链接提取模式：发送链接列表
@@ -336,7 +382,11 @@ function ElementSelector() {
 
   // 监听来自 popup 的消息
   useEffect(() => {
-    const handleMessage = (message: { action: string; purpose?: ElementSelectorPurpose }) => {
+    const handleMessage = (
+      message: { action: string; purpose?: ElementSelectorPurpose },
+      _sender: chrome.runtime.MessageSender,
+      sendResponse: (response: { success: boolean }) => void
+    ) => {
       if (message.action === 'activateSelector') {
         const msgPurpose = message.purpose || 'link-extraction'
         setIsActive(true)
@@ -347,12 +397,16 @@ function ElementSelector() {
         setElementInfo(null)
         setExtractedLinks([])
         setExtractedContent(null)
+        setNextPageButtonInfo(null)
         hoveredElementRef.current = null
+        sendResponse({ success: true })
       } else if (message.action === 'deactivateSelector') {
         // 发送取消消息
         chrome.runtime.sendMessage({ action: 'selectionCancelled' })
         resetState()
+        sendResponse({ success: true })
       }
+      // 不需要异步响应，不返回 true
     }
 
     chrome.runtime.onMessage.addListener(handleMessage)
@@ -408,6 +462,24 @@ function ElementSelector() {
           // 内容提取模式：提取完整内容
           const content = extractContentFromElement(element)
           setExtractedContent(content)
+        } else if (purposeRef.current === 'next-page-button') {
+          // 下一页按钮选择模式：使用专用的下一页按钮选择器生成（XPath）
+          try {
+            const selectorResult = generateNextPageButtonSelector(element)
+            const text = element.textContent?.trim() || element.getAttribute('aria-label') || '下一页'
+            debugLog('[ElementSelector] 下一页按钮 XPath:', {
+              element: `<${element.tagName.toLowerCase()}> "${text}"`,
+              xpath: selectorResult.xpath,
+              description: selectorResult.description,
+            })
+            setNextPageButtonInfo({
+              xpath: selectorResult.xpath,
+              text,
+              description: selectorResult.description,
+            })
+          } catch (err) {
+            debugLog('[ElementSelector] 生成 XPath 失败:', err)
+          }
         } else {
           // 链接提取模式：提取链接
           const links = extractAndProcessLinks(element, window.location.href, DEFAULT_FILTER_OPTIONS)
@@ -473,6 +545,7 @@ function ElementSelector() {
           onCancel={handleCancel}
           purpose={purpose}
           contentPreview={extractedContent?.text?.substring(0, 200)}
+          nextPageButton={nextPageButtonInfo}
         />
       )}
 
@@ -495,7 +568,9 @@ function ElementSelector() {
         >
           {purpose === 'content-extraction'
             ? '点击选择要提取内容的元素区域 · 按 ESC 取消'
-            : '点击选择包含链接的元素区域 · 按 ESC 取消'}
+            : purpose === 'next-page-button'
+              ? '点击选择"下一页"按钮 · 按 ESC 取消'
+              : '点击选择包含链接的元素区域 · 按 ESC 取消'}
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
 import { Icon } from '@iconify/react'
 import { memo, useMemo, useState } from 'react'
 
-import type { ExtractedLink, SelectedElementInfo } from '~constants/types'
+import type { ExtractedLink, NextPageButtonInfo, SelectedElementInfo } from '~constants/types'
 import { useSelectionSet } from '~hooks/useSelectionSet'
 import { cn } from '~utils'
 import { downloadTextFile } from '~utils/download'
@@ -10,23 +10,31 @@ import { exportLinksToJson, exportLinksToMarkdown } from '~utils/link-exporter'
 interface LinkPreviewListProps {
   elementInfo: SelectedElementInfo | null
   links: ExtractedLink[]
-  onStartScrape: (selectedLinks: ExtractedLink[]) => void
+  nextPageButton: NextPageButtonInfo | null
+  isSelectingNextPage: boolean
+  onStartScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string) => void
   onCancel: () => void
   onReselect: () => void
   onAddLink: (url: string, text?: string) => void
   onUpdateLink: (index: number, url: string, text: string) => void
   onRemoveLink: (index: number) => void
+  onSelectNextPage: () => void
+  onClearNextPage: () => void
 }
 
 const LinkPreviewList = memo(function LinkPreviewList({
   elementInfo,
   links,
+  nextPageButton,
+  isSelectingNextPage,
   onStartScrape,
   onCancel,
   onReselect,
   onAddLink,
   onUpdateLink,
   onRemoveLink,
+  onSelectNextPage,
+  onClearNextPage,
 }: LinkPreviewListProps) {
   const [showAll, setShowAll] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
@@ -327,6 +335,57 @@ const LinkPreviewList = memo(function LinkPreviewList({
         </button>
       )}
 
+      {/* 下一页按钮选择 */}
+      <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Icon icon="mdi:page-next-outline" className="h-4 w-4 text-indigo-500" />
+            <span className="text-sm font-medium text-gray-700">自动翻页（可选）</span>
+          </div>
+          {nextPageButton && (
+            <button
+              onClick={onClearNextPage}
+              className="text-xs text-gray-400 hover:text-red-500"
+            >
+              清除
+            </button>
+          )}
+        </div>
+        {isSelectingNextPage ? (
+          <div className="flex items-center gap-2 rounded-md bg-indigo-100 px-3 py-2">
+            <Icon icon="mdi:loading" className="h-4 w-4 animate-spin text-indigo-500" />
+            <span className="text-sm text-indigo-700">请在页面上点击"下一页"按钮...</span>
+          </div>
+        ) : nextPageButton ? (
+          <div className="flex items-center justify-between rounded-md bg-emerald-50 px-3 py-2">
+            <div className="flex items-center gap-2">
+              <Icon icon="mdi:check-circle" className="h-4 w-4 text-emerald-500" />
+              <div>
+                <div className="text-sm font-medium text-gray-700">{nextPageButton.text}</div>
+                <div className="max-w-[200px] truncate text-xs text-gray-400">{nextPageButton.xpath}</div>
+              </div>
+            </div>
+            <button
+              onClick={onSelectNextPage}
+              className="text-xs text-indigo-600 hover:text-indigo-700"
+            >
+              重新选择
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={onSelectNextPage}
+            className="flex w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-gray-300 py-2 text-sm text-gray-500 transition-colors hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-600"
+          >
+            <Icon icon="mdi:cursor-default-click" className="h-4 w-4" />
+            选择"下一页"按钮
+          </button>
+        )}
+        <p className="mt-2 text-xs text-gray-400">
+          选择后，抓取完当前页会自动点击下一页继续抓取
+        </p>
+      </div>
+
       {/* 操作按钮 */}
       <div className="flex gap-3">
         <button
@@ -336,7 +395,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
           取消
         </button>
         <button
-          onClick={() => onStartScrape(selectedLinks)}
+          onClick={() => onStartScrape(selectedLinks, nextPageButton?.xpath, elementInfo?.selector)}
           disabled={selectedCount === 0}
           className={cn(
             'flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium text-white transition-all',

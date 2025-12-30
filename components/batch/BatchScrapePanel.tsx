@@ -6,6 +6,7 @@ import type {
   BatchScrapeMode,
   BatchScrapeResult,
   ExtractedLink,
+  NextPageButtonInfo,
   SelectedElementInfo
 } from "~constants/types"
 import { cn } from "~utils"
@@ -14,14 +15,23 @@ import LinkPreviewList from "./LinkPreviewList"
 import ScrapeProgressPanel from "./ScrapeProgressPanel"
 import ScrapeResultsPanel from "./ScrapeResultsPanel"
 
+interface PaginationProgress {
+  currentPage: number
+  maxPages: number
+  isLoadingNextPage: boolean
+}
+
 interface BatchScrapePanelProps {
   mode: BatchScrapeMode
   elementInfo: SelectedElementInfo | null
   links: ExtractedLink[]
   progress: BatchProgress | null
+  paginationProgress?: PaginationProgress | null
   results: BatchScrapeResult[]
   error: string | null
-  onStartScrape: (selectedLinks: ExtractedLink[]) => void
+  nextPageButton: NextPageButtonInfo | null
+  isSelectingNextPage: boolean
+  onStartScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string) => void
   onPause: () => void
   onResume: () => void
   onCancel: () => void
@@ -30,6 +40,8 @@ interface BatchScrapePanelProps {
   onAddLink: (url: string, text?: string) => void
   onUpdateLink: (index: number, url: string, text: string) => void
   onRemoveLink: (index: number) => void
+  onSelectNextPage: () => void
+  onClearNextPage: () => void
 }
 
 const BatchScrapePanel = memo(function BatchScrapePanel({
@@ -37,8 +49,11 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
   elementInfo,
   links,
   progress,
+  paginationProgress,
   results,
   error,
+  nextPageButton,
+  isSelectingNextPage,
   onStartScrape,
   onPause,
   onResume,
@@ -47,7 +62,9 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
   onSelectElement,
   onAddLink,
   onUpdateLink,
-  onRemoveLink
+  onRemoveLink,
+  onSelectNextPage,
+  onClearNextPage,
 }: BatchScrapePanelProps) {
   // 根据模式渲染不同内容
   const renderContent = () => {
@@ -109,12 +126,16 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
           <LinkPreviewList
             elementInfo={elementInfo}
             links={links}
+            nextPageButton={nextPageButton}
+            isSelectingNextPage={isSelectingNextPage}
             onStartScrape={onStartScrape}
             onCancel={onReset}
             onReselect={onSelectElement}
             onAddLink={onAddLink}
             onUpdateLink={onUpdateLink}
             onRemoveLink={onRemoveLink}
+            onSelectNextPage={onSelectNextPage}
+            onClearNextPage={onClearNextPage}
           />
         )
 
@@ -122,6 +143,7 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
         return (
           <ScrapeProgressPanel
             progress={progress}
+            paginationProgress={paginationProgress}
             onPause={onPause}
             onResume={onResume}
             onCancel={onCancel}
