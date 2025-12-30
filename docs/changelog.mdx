@@ -13,12 +13,6 @@ description: 记录 MoeCopy AI 的所有版本更新、新功能、改进和修�
 - **次版本号**：向下兼容的功能性新增
 - **修订号**：向下兼容的问题修正
 
-### 发布周期
-
-- **正式版**：每 2-3 周发布
-- **测试版**：每周发布（如有）
-- **紧急修复**：随时发布
-
 ### 更新方式
 
 1. **Chrome 商店用户**：自动更新
@@ -29,14 +23,68 @@ description: 记录 MoeCopy AI 的所有版本更新、新功能、改进和修�
 感谢所有为 MoeCopy AI 做出贡献的开发者！
 
 - [@yusixian](https://github.com/yusixian) - 项目作者
-- 以及所有提交 Issue 和 PR 的朋友们
+- [@hyoban](https://github.com/hyoban) - 批量抓取功能贡献者
+- 以及所有提交 Issue 和 PR 的朋友们！
 
 ## 反馈渠道
 
+- [MoeCopy AI Feedback](https://moecopy.featurebase.app/)
 - [GitHub Issues](https://github.com/yusixian/moe-copy-ai/issues)
 - [GitHub Discussions](https://github.com/yusixian/moe-copy-ai/discussions)
 - 邮箱：i@cosine.ren
 
+## [v0.2.0] - 2025-12-31
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.2.0)
+
+### 新功能
+
+- **侧边栏 (Side Panel)** - 全新的扩展侧边栏界面，提供更高效的工作流程
+
+  - 分段式标签导航，在批量抓取和内容提取之间快速切换
+  - 独立的设置面板，无需离开当前页面即可调整配置
+
+- **批量抓取功能** - 一次性抓取多个链接中的文档内容
+
+  - 可视化元素选择器，在页面上直接选择包含链接的区域
+  - 智能链接提取，自动识别并预览所有可抓取的链接
+  - 支持手动添加、编辑、删除链接
+  - 同域名过滤选项，只保留与当前页面同域名的链接
+  - **正则过滤** - 使用正则表达式精确筛选链接
+    - 匹配目标：URL / 文本 / 两者
+    - 过滤模式：排除匹配项 / 仅保留匹配项
+    - 8 个内置预设规则（排除图片、锚点、分页、登录注册、静态资源、媒体；仅保留文档、网页）
+    - 翻页抓取时自动应用相同的过滤规则
+  - **分页抓取** - 支持选择"下一页"按钮，自动翻页并收集所有链接
+  - **三种抓取策略**：
+    - Fetch API：直接获取页面 HTML，速度快但无法处理 JS 渲染
+    - 后台标签页：在后台标签页中加载页面，支持 JS 渲染和登录态
+    - 当前标签页：在当前标签页中依次访问，用户可见整个过程
+  - 实时进度显示，支持暂停/继续/取消
+  - **ZIP 导出** - 将所有抓取结果打包为 ZIP 文件，包含索引文件和单独的 Markdown 文档
+
+- **内容提取功能** - 选择页面元素，提取其内容为多种格式
+
+  - 可视化元素选择器
+  - 多格式输出：HTML / Markdown / 纯文本
+  - 一键复制到剪贴板
+
+- **模型选择改进** - 新增 ModelSelectInput 组件
+  - 支持从 API 获取可用模型列表
+  - 自定义输入模型名称
+  - 下拉选择与输入框结合
+
+### 改进
+
+- 重构 AI 设置逻辑，抽取 `useAiSettings` hook
+- 优化侧边栏设置面板 UI
+- 使用 foxact 的 clipboard hook 优化复制功能
+
+### 贡献者
+
+感谢 [@hyoban](https://github.com/hyoban) 贡献的抓取策略功能！
+
+**Full Changelog**: https://github.com/yusixian/moe-copy-ai/compare/0.1.6...0.2.0
 
 ## [v0.1.6] - 2025-08-22
 
@@ -75,7 +123,7 @@ description: 记录 MoeCopy AI 的所有版本更新、新功能、改进和修�
 
 - [x] 新增 **自定义抓取选择器** - 允许用户自定义简单的 CSS 选择器规则和排序
 - [x] 优化 **字数与Token统计** - 优化估算的 AI 模型 token 数量
-- [x] 新增 **分词展示** - 使用 [gpt-tokenizer](https://github.com/niieani/gpt-tokenizer) 
+- [x] 新增 **分词展示** - 使用 [gpt-tokenizer](https://github.com/niieani/gpt-tokenizer)
 
 ## [v0.1.1] - 2025-03-03
 

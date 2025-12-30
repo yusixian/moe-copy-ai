@@ -75,6 +75,81 @@ interface SelectorTestResponse {
 }
 ```
 
+#### openSidePanel <Badge>v0.2.0 新增</Badge>
+
+打开侧边栏面板：
+
+```typescript
+{
+  action: "openSidePanel"
+}
+```
+
+#### extractLinksFromPage <Badge>v0.2.0 新增</Badge>
+
+从页面指定元素中提取链接：
+
+```typescript
+// 请求
+interface ExtractLinksRequest {
+  action: "extractLinksFromPage"
+  selector: string // CSS 选择器
+}
+
+// 响应
+interface ExtractLinksResponse {
+  success: boolean
+  links?: ExtractedLink[]
+  elementInfo?: SelectedElementInfo
+  error?: string
+}
+```
+
+#### scrapeViaTab <Badge>v0.2.0 新增</Badge>
+
+通过后台标签页抓取指定 URL 的内容：
+
+```typescript
+// 请求
+interface ScrapeViaTabRequest {
+  action: "scrapeViaTab"
+  url: string
+  timeout?: number
+}
+
+// 响应
+interface ScrapeViaTabResponse {
+  success: boolean
+  data?: {
+    title: string
+    content: string
+    url: string
+  }
+  error?: string
+}
+```
+
+#### clickNextPage <Badge>v0.2.0 新增</Badge>
+
+点击下一页按钮并提取新链接：
+
+```typescript
+// 请求
+interface ClickNextPageRequest {
+  action: "clickNextPage"
+  xpath: string // 下一页按钮的 XPath
+  linkContainerSelector: string // 链接容器的选择器
+}
+
+// 响应
+interface ClickNextPageResponse {
+  success: boolean
+  links?: ExtractedLink[]
+  hasNextPage?: boolean
+  error?: string
+}
+```
+
 ## 数据结构
 
 ### ScrapedContent
@@ -126,6 +201,96 @@ interface SelectorResultItem {
   selector: string // 使用的选择器
   content: string // 第一个匹配内容
   allContent?: string[] // 所有匹配内容
+}
+```
+
+### ExtractedLink <Badge>v0.2.0 新增</Badge>
+
+提取的链接信息：
+
+```typescript
+interface ExtractedLink {
+  url: string    // 链接地址
+  text: string   // 链接文本
+  index: number  // 在列表中的索引
+}
+```
+
+### SelectedElementInfo <Badge>v0.2.0 新增</Badge>
+
+选中元素的信息：
+
+```typescript
+interface SelectedElementInfo {
+  tagName: string      // 标签名
+  className: string    // 类名
+  id: string           // ID
+  linkCount: number    // 包含的链接数量
+  outerHTML: string    // 外层 HTML
+  selector?: string    // 用于定位元素的 CSS 选择器
+}
+```
+
+### BatchScrapeResult <Badge>v0.2.0 新增</Badge>
+
+单页抓取结果：
+
+```typescript
+interface BatchScrapeResult {
+  url: string
+  success: boolean
+  title: string
+  content: string
+  error?: string
+  method: ScrapeStrategyType // 'fetch' | 'background-tabs' | 'current-tab'
+}
+```
+
+### BatchProgress <Badge>v0.2.0 新增</Badge>
+
+批量抓取进度：
+
+```typescript
+interface BatchProgress {
+  total: number
+  completed: number
+  current: {
+    url: string
+    status: PageScrapeStatus // 'pending' | 'fetching' | 'extracting' | 'success' | 'failed'
+  } | null
+  results: Array<{
+    url: string
+    status: 'success' | 'failed'
+    title?: string
+    error?: string
+  }>
+  startTime: number
+  isPaused: boolean
+}
+```
+
+### ExtractedContent <Badge>v0.2.0 新增</Badge>
+
+内容提取结果（多格式）：
+
+```typescript
+interface ExtractedContent {
+  html: string       // element.outerHTML (完整 HTML)
+  markdown: string   // 转换后的 Markdown
+  text: string       // element.textContent (纯文本)
+  elementInfo: SelectedElementInfo
+}
+```
+
+### NextPageButtonInfo <Badge>v0.2.0 新增</Badge>
+
+下一页按钮信息：
+
+```typescript
+interface NextPageButtonInfo {
+  xpath: string        // XPath 路径
+  text: string         // 按钮文本
+  description?: string // 描述
 }
 ```
 
@@ -263,6 +428,150 @@ interface UsageStats {
 }
 
 const { text, usage } = await generateTextWithUsage(options)
+```
+
+## 抓取策略 API <Badge>v0.2.0 新增</Badge>
+
+批量抓取支持三种策略，每种策略适用于不同场景。
+
+### 策略类型
+
+```typescript
+type ScrapeStrategyType = 'fetch' | 'background-tabs' | 'current-tab'
+```
+
+| 策略 | 描述 | 并发支持 | 适用场景 |
+| --- | --- | --- | --- |
+| `fetch` | 使用 Fetch API 直接获取 | 支持 | 静态页面，速度快 |
+| `background-tabs` | 在后台标签页中加载 | 支持 | JS 渲染页面，需要登录态 |
+| `current-tab` | 在当前标签页中依次访问 | 不支持 | 需要监控过程，调试用 |
+
+### 创建策略实例
+
+```typescript
+import { createScrapeStrategy } from '~utils/scrape-strategies'
+
+const strategy = createScrapeStrategy('fetch')
+
+// 执行抓取
+const result = await strategy.scrape(url, options)
+```
+
+### 策略接口
+
+```typescript
+interface ScrapeStrategy {
+  scrape(url: string, options?: ScrapeOptions): Promise<BatchScrapeResult>
+}
+
+interface ScrapeOptions {
+  timeout?: number
+  signal?: AbortSignal
+}
+```
+
+### 获取策略信息
+
+```typescript
+import { getStrategyInfo } from '~utils/scrape-strategies'
+
+const info = getStrategyInfo('background-tabs')
+// { name: '后台标签页', description: '...', supportsConcurrency: true }
+```
+
+## 链接过滤 API <Badge>v0.2.0 新增</Badge>
+
+### 过滤类型
+
+```typescript
+import type { FilterTarget, FilterMode } from '~constants/link-filter-presets'
+
+type FilterTarget = 'url' | 'text' | 'both'
+type FilterMode = 'exclude' | 'include'
+```
+
+### 预设规则
+
+```typescript
+import { LINK_FILTER_PRESETS } from '~constants/link-filter-presets'
+
+interface PresetFilter {
+  id: string
+  name: string
+  pattern: string    // 正则表达式
+  target: FilterTarget
+  mode: FilterMode
+  description: string
+}
+```
+
+内置预设：
+- `exclude-images` - 排除图片链接
+- `exclude-anchors` - 排除锚点链接
+- `exclude-pagination` - 排除分页链接
+- `exclude-auth` - 排除登录/注册
+- `exclude-assets` - 排除静态资源
+- `exclude-media` - 排除媒体链接
+- `include-docs` - 仅保留文档链接
+- `include-html` - 仅保留网页链接
+
+### 使用过滤 Hook
+
+```typescript
+import { useLinkFilter } from '~hooks/useLinkFilter'
+
+const {
+  pattern,
+  target,
+  mode,
+  isValid,
+  error,
+  filteredLinks,
+  setPattern,
+  setTarget,
+  setMode,
+  applyPreset,
+  clear
+} = useLinkFilter(links)
+```
+
+## ZIP 导出 API <Badge>v0.2.0 新增</Badge>
+
+### 导出为 ZIP
+
+```typescript
+import { exportAsZip, generateZipFilename } from '~utils/zip-exporter'
+
+const blob = await exportAsZip(results, {
+  includeIndex: true,
+  filenameFormat: 'title', // 'title' | 'url' | 'index'
+  maxFilenameLength: 50
+})
+
+// 下载 ZIP 文件
+const filename = generateZipFilename() // 'batch-scrape-2025-12-31.zip'
+downloadBlob(blob, filename)
+```
+
+### 导出选项
+
+```typescript
+interface ZipExportOptions {
+  includeIndex: boolean      // 是否包含 index.md 索引文件
+  filenameFormat: 'title' | 'url' | 'index'  // 文件命名方式
+  maxFilenameLength: number  // 文件名最大长度
+}
+```
+
+### ZIP 文件结构
+
+```
+batch-scrape-2025-12-31.zip
+├── index.md           # 汇总索引（可选）
+└── docs/
+    ├── 001-文章标题.md
+    ├── 002-另一篇文章.md
+    └── ...
 ```
 
 ## 提取器 API
@@ -441,8 +750,9 @@ export function throttle<T extends (...args: any[]) => any>(
 
 完整的 TypeScript 类型定义位于：
 
-- `constants/types.ts` - 核心类型
-- `utils/index.ts` - 工具函数类型
+- `constants/types.ts` - 核心类型（包含批量抓取、内容提取相关类型）
+- `constants/link-filter-presets.ts` - 链接过滤预设和类型
+- `utils/scrape-strategies/types.ts` - 抓取策略类型
 
 ### 测试工具
 
