@@ -463,22 +463,22 @@ function ElementSelector() {
           const content = extractContentFromElement(element)
           setExtractedContent(content)
         } else if (purposeRef.current === 'next-page-button') {
-          // 下一页按钮选择模式：使用专用的下一页按钮选择器生成
+          // 下一页按钮选择模式：使用专用的下一页按钮选择器生成（XPath）
           try {
             const selectorResult = generateNextPageButtonSelector(element)
             const text = element.textContent?.trim() || element.getAttribute('aria-label') || '下一页'
-            debugLog('[ElementSelector] 下一页按钮选择器:', {
+            debugLog('[ElementSelector] 下一页按钮 XPath:', {
               element: `<${element.tagName.toLowerCase()}> "${text}"`,
-              selector: selectorResult.selector,
+              xpath: selectorResult.xpath,
               description: selectorResult.description,
             })
             setNextPageButtonInfo({
-              selector: selectorResult.selector,
+              xpath: selectorResult.xpath,
               text,
               description: selectorResult.description,
             })
           } catch (err) {
-            debugLog('[ElementSelector] 生成选择器失败:', err)
+            debugLog('[ElementSelector] 生成 XPath 失败:', err)
           }
         } else {
           // 链接提取模式：提取链接

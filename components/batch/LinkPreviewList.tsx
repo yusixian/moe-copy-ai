@@ -12,7 +12,7 @@ interface LinkPreviewListProps {
   links: ExtractedLink[]
   nextPageButton: NextPageButtonInfo | null
   isSelectingNextPage: boolean
-  onStartScrape: (selectedLinks: ExtractedLink[], nextPageSelector?: string, linkContainerSelector?: string) => void
+  onStartScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string) => void
   onCancel: () => void
   onReselect: () => void
   onAddLink: (url: string, text?: string) => void
@@ -362,7 +362,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
               <Icon icon="mdi:check-circle" className="h-4 w-4 text-emerald-500" />
               <div>
                 <div className="text-sm font-medium text-gray-700">{nextPageButton.text}</div>
-                <div className="max-w-[200px] truncate text-xs text-gray-400">{nextPageButton.selector}</div>
+                <div className="max-w-[200px] truncate text-xs text-gray-400">{nextPageButton.xpath}</div>
               </div>
             </div>
             <button
@@ -395,7 +395,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
           取消
         </button>
         <button
-          onClick={() => onStartScrape(selectedLinks, nextPageButton?.selector, elementInfo?.selector)}
+          onClick={() => onStartScrape(selectedLinks, nextPageButton?.xpath, elementInfo?.selector)}
           disabled={selectedCount === 0}
           className={cn(
             'flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium text-white transition-all',

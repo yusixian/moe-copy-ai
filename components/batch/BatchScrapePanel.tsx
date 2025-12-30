@@ -31,7 +31,7 @@ interface BatchScrapePanelProps {
   error: string | null
   nextPageButton: NextPageButtonInfo | null
   isSelectingNextPage: boolean
-  onStartScrape: (selectedLinks: ExtractedLink[], nextPageSelector?: string, linkContainerSelector?: string) => void
+  onStartScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string) => void
   onPause: () => void
   onResume: () => void
   onCancel: () => void

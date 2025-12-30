@@ -4,7 +4,7 @@ import { debugLog } from "~utils/logger"
 
 export interface ClickNextPageRequest {
   tabId: number
-  nextPageSelector: string
+  nextPageXPath: string
   timeout?: number
 }
 
@@ -16,23 +16,44 @@ export interface ClickNextPageResponse {
 }
 
 /**
+ * 使用 XPath 查找元素
+ */
+function findElementByXPath(xpath: string): Element | null {
+  try {
+    const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+    return result.singleNodeValue as Element | null
+  } catch {
+    return null
+  }
+}
+
+/**
  * 点击下一页按钮并等待页面加载
  */
 const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPageResponse> = async (req, res) => {
-  const { tabId, nextPageSelector, timeout = 10000 } = req.body || {}
+  const { tabId, nextPageXPath, timeout = 10000 } = req.body || {}
 
-  if (!tabId || !nextPageSelector) {
-    return res.send({ success: false, hasNextPage: false, error: "tabId 和 nextPageSelector 不能为空" })
+  if (!tabId || !nextPageXPath) {
+    return res.send({ success: false, hasNextPage: false, error: "tabId 和 nextPageXPath 不能为空" })
   }
 
   try {
-    console.log(`[ClickNextPage] 在标签页 ${tabId} 点击下一页: ${nextPageSelector}`)
+    console.log(`[ClickNextPage] 在标签页 ${tabId} 点击下一页: ${nextPageXPath}`)
 
     // 先检查下一页按钮是否存在
     const checkResults = await chrome.scripting.executeScript({
       target: { tabId },
-      func: (selector: string) => {
-        const el = document.querySelector(selector)
+      func: (xpath: string) => {
+        const findElement = (xp: string): Element | null => {
+          try {
+            const result = document.evaluate(xp, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+            return result.singleNodeValue as Element | null
+          } catch {
+            return null
+          }
+        }
+
+        const el = findElement(xpath)
 
         if (!el) return { exists: false }
 
@@ -44,7 +65,7 @@ const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPag
 
         return { exists: true, isDisabled }
       },
-      args: [nextPageSelector],
+      args: [nextPageXPath],
     })
 
     const checkResult = checkResults[0]?.result
@@ -66,14 +87,23 @@ const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPag
     // 点击下一页按钮
     await chrome.scripting.executeScript({
       target: { tabId },
-      func: (selector: string) => {
-        const el = document.querySelector(selector)
+      func: (xpath: string) => {
+        const findElement = (xp: string): Element | null => {
+          try {
+            const result = document.evaluate(xp, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+            return result.singleNodeValue as Element | null
+          } catch {
+            return null
+          }
+        }
+
+        const el = findElement(xpath)
 
         if (el && el instanceof HTMLElement) {
           el.click()
         }
       },
-      args: [nextPageSelector],
+      args: [nextPageXPath],
     })
 
     // 等待页面加载完成

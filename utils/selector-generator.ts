@@ -392,79 +392,189 @@ export function getSelectorMatchInfo(selector: string): {
  * 下一页按钮选择器结果
  */
 export interface NextPageSelectorResult {
-  /** CSS 选择器表达式 */
-  selector: string
+  /** XPath 表达式 */
+  xpath: string
   /** 用于显示的描述 */
   description: string
+  /** 元素的文本内容（用于显示） */
+  textContent?: string
 }
 
 /**
- * 专门为下一页按钮生成稳定的 CSS 选择器
- * 使用多种策略确保选择器的稳定性和唯一性
+ * 转义 XPath 字符串中的引号
+ */
+function escapeXPathString(str: string): string {
+  if (!str.includes("'")) {
+    return `'${str}'`
+  }
+  if (!str.includes('"')) {
+    return `"${str}"`
+  }
+  // 包含两种引号，使用 concat
+  return `concat('${str.replace(/'/g, "',\"'\",'")}')`.replace(/'',/g, '').replace(/,''$/g, '')
+}
+
+/**
+ * 使用 XPath 统计匹配的元素数量
+ */
+function countXPathMatches(xpath: string): number {
+  try {
+    const result = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null)
+    return result.snapshotLength
+  } catch {
+    return 0
+  }
+}
+
+/**
+ * 获取元素的简洁文本内容（去除多余空白）
+ */
+function getElementText(element: Element): string {
+  return (element.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 50)
+}
+
+/**
+ * 专门为下一页按钮生成稳定的 XPath 选择器
+ * 使用多种策略确保选择器的稳定性和唯一性，包含文本内容匹配
  */
 export function generateNextPageButtonSelector(element: Element): NextPageSelectorResult {
   const tag = element.tagName.toLowerCase()
+  const textContent = getElementText(element)
 
   // 策略 1: rel="next" (最标准的分页标识)
   if (element.getAttribute('rel') === 'next') {
-    const selector = `${tag}[rel="next"]`
-    if (countMatches(selector) === 1) {
-      return { selector, description: 'rel="next"' }
+    const xpath = `//${tag}[@rel='next']`
+    if (countXPathMatches(xpath) === 1) {
+      return { xpath, description: 'rel="next"', textContent }
     }
   }
 
   // 策略 2: aria-label 匹配
   const ariaLabel = element.getAttribute('aria-label')
   if (ariaLabel && !isDynamicValue(ariaLabel)) {
-    const selector = `${tag}[aria-label="${CSS.escape(ariaLabel)}"]`
-    if (countMatches(selector) === 1) {
-      return { selector, description: `aria-label="${ariaLabel}"` }
+    const xpath = `//${tag}[@aria-label=${escapeXPathString(ariaLabel)}]`
+    if (countXPathMatches(xpath) === 1) {
+      return { xpath, description: `aria-label="${ariaLabel}"`, textContent }
     }
   }
 
-  // 策略 3: title 属性匹配
+  // 策略 3: 精确文本匹配
+  if (textContent && textContent.length <= 20) {
+    const xpath = `//${tag}[normalize-space(text())=${escapeXPathString(textContent)}]`
+    if (countXPathMatches(xpath) === 1) {
+      return { xpath, description: `text="${textContent}"`, textContent }
+    }
+  }
+
+  // 策略 4: title 属性匹配
   const title = element.getAttribute('title')
   if (title && !isDynamicValue(title)) {
-    const selector = `${tag}[title="${CSS.escape(title)}"]`
-    if (countMatches(selector) === 1) {
-      return { selector, description: `title="${title}"` }
+    const xpath = `//${tag}[@title=${escapeXPathString(title)}]`
+    if (countXPathMatches(xpath) === 1) {
+      return { xpath, description: `title="${title}"`, textContent }
     }
   }
 
-  // 策略 4: class 包含 next 相关词
+  // 策略 5: class 包含 next 相关词 + 文本
   const classList = Array.from(element.classList)
   const nextClass = classList.find((c) => /next|forward/i.test(c) && !isDynamicValue(c))
+  if (nextClass && textContent) {
+    const xpath = `//${tag}[contains(@class, '${nextClass}') and normalize-space()=${escapeXPathString(textContent)}]`
+    if (countXPathMatches(xpath) === 1) {
+      return { xpath, description: `class="${nextClass}" + text`, textContent }
+    }
+  }
   if (nextClass) {
-    const selector = `${tag}.${CSS.escape(nextClass)}`
-    if (countMatches(selector) === 1) {
-      return { selector, description: `class="${nextClass}"` }
+    const xpath = `//${tag}[contains(@class, '${nextClass}')]`
+    if (countXPathMatches(xpath) === 1) {
+      return { xpath, description: `class="${nextClass}"`, textContent }
     }
   }
 
-  // 策略 5: data 属性
+  // 策略 6: data 属性
   for (const attr of Array.from(element.attributes)) {
     if (attr.name.startsWith('data-') && /next|page/i.test(attr.name)) {
       if (attr.value && !isDynamicValue(attr.value)) {
-        const selector = `${tag}[${attr.name}="${CSS.escape(attr.value)}"]`
-        if (countMatches(selector) === 1) {
-          return { selector, description: `${attr.name}="${attr.value}"` }
+        const xpath = `//${tag}[@${attr.name}=${escapeXPathString(attr.value)}]`
+        if (countXPathMatches(xpath) === 1) {
+          return { xpath, description: `${attr.name}="${attr.value}"`, textContent }
         }
       }
     }
   }
 
-  // 策略 6: 使用通用选择器生成器
-  const cssSelector = generateUniqueSelector(element, { allowMultiple: false })
-  return { selector: cssSelector, description: '唯一选择器' }
+  // 策略 7: 稳定类名 + 文本内容组合
+  const stableClasses = getStableClasses(element)
+  if (stableClasses.length > 0 && textContent) {
+    const classCondition = stableClasses.slice(0, 2).map(c => `contains(@class, '${c}')`).join(' and ')
+    const xpath = `//${tag}[${classCondition} and normalize-space()=${escapeXPathString(textContent)}]`
+    if (countXPathMatches(xpath) === 1) {
+      return { xpath, description: `class + text="${textContent}"`, textContent }
+    }
+  }
+
+  // 策略 8: 生成 XPath 路径
+  const xpathPath = generateXPathFromElement(element)
+  return { xpath: xpathPath, description: '路径定位', textContent }
+}
+
+/**
+ * 根据元素生成 XPath 路径
+ */
+function generateXPathFromElement(element: Element): string {
+  const parts: string[] = []
+  let current: Element | null = element
+
+  while (current && current !== document.body && current !== document.documentElement) {
+    const tag = current.tagName.toLowerCase()
+    const parent = current.parentElement
+
+    if (!parent) break
+
+    // 如果有稳定 ID，以它为锚点
+    if (current.id && !isDynamicValue(current.id)) {
+      parts.unshift(`//${tag}[@id='${current.id}']`)
+      break
+    }
+
+    // 计算同名兄弟中的索引
+    const siblings = Array.from(parent.children).filter(
+      (child) => child.tagName === current!.tagName
+    )
+    const index = siblings.indexOf(current) + 1
+
+    if (siblings.length === 1) {
+      parts.unshift(tag)
+    } else {
+      parts.unshift(`${tag}[${index}]`)
+    }
+
+    current = parent
+
+    if (parts.length >= 5) break
+  }
+
+  if (parts[0]?.startsWith('//')) {
+    return parts.join('/')
+  }
+  return '//' + parts.join('/')
+}
+
+/**
+ * 根据 XPath 查找元素
+ */
+export function findElementByXPath(xpath: string): Element | null {
+  try {
+    const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+    return result.singleNodeValue as Element | null
+  } catch {
+    return null
+  }
 }
 
 /**
  * 根据选择器结果查找元素
  */
 export function findElementBySelector(selectorResult: NextPageSelectorResult): Element | null {
-  try {
-    return document.querySelector(selectorResult.selector)
-  } catch {
-    return null
-  }
+  return findElementByXPath(selectorResult.xpath)
 }

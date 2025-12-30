@@ -39,7 +39,7 @@ interface UseBatchScrapeReturn {
   addLink: (url: string, text?: string) => void
   updateLink: (index: number, url: string, text: string) => void
   removeLink: (index: number) => void
-  startScrape: (selectedLinks: ExtractedLink[], nextPageSelector?: string, linkContainerSelector?: string, options?: Partial<ExtendedBatchScrapeOptions>) => Promise<void>
+  startScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string, options?: Partial<ExtendedBatchScrapeOptions>) => Promise<void>
   pauseScrape: () => void
   resumeScrape: () => void
   cancelScrape: () => void
@@ -104,7 +104,7 @@ export function useBatchScrape(): UseBatchScrapeReturn {
 
   // 开始抓取
   const startScrape = useCallback(
-    async (selectedLinks: ExtractedLink[], nextPageSelector?: string, linkContainerSelector?: string, options: Partial<ExtendedBatchScrapeOptions> = {}) => {
+    async (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string, options: Partial<ExtendedBatchScrapeOptions> = {}) => {
       if (selectedLinks.length === 0) {
         setError('没有可抓取的链接')
         return
@@ -134,9 +134,9 @@ export function useBatchScrape(): UseBatchScrapeReturn {
         ...options,
       }
 
-      // 分页配置：使用传入的 nextPageSelector
-      const paginationEnabled = !!nextPageSelector
-      debugLog('[BatchScrape] 分页配置:', { enabled: paginationEnabled, selector: nextPageSelector })
+      // 分页配置：使用传入的 nextPageXPath
+      const paginationEnabled = !!nextPageXPath
+      debugLog('[BatchScrape] 分页配置:', { enabled: paginationEnabled, xpath: nextPageXPath })
       const allResults: BatchScrapeResult[] = []
       let currentPage = 1
       let linksToScrape = selectedLinks
@@ -210,15 +210,15 @@ export function useBatchScrape(): UseBatchScrapeReturn {
 
           // 点击下一页
           debugLog('[BatchScrape] 准备点击下一页')
-          // paginationEnabled 为 true 时 nextPageSelector 必定存在
+          // paginationEnabled 为 true 时 nextPageXPath 必定存在
           const clickResult = await sendToBackground<
-            { tabId: number; nextPageSelector: string },
+            { tabId: number; nextPageXPath: string },
             { success: boolean; hasNextPage: boolean; error?: string }
           >({
             name: 'clickNextPage',
             body: {
               tabId,
-              nextPageSelector: nextPageSelector as string,
+              nextPageXPath: nextPageXPath as string,
             },
           })
 

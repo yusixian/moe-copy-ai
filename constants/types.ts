@@ -219,7 +219,7 @@ export type ElementSelectorPurpose = 'link-extraction' | 'content-extraction' | 
 
 // 下一页按钮信息
 export interface NextPageButtonInfo {
-  selector: string
+  xpath: string
   text: string
   description?: string
 }
