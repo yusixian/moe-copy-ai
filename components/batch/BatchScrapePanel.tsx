@@ -11,6 +11,8 @@ import type {
 } from "~constants/types"
 import { cn } from "~utils"
 
+import { AccordionSection } from "../AccordionSection"
+import { BatchScrapeSettings } from "./BatchScrapeSettings"
 import LinkPreviewList from "./LinkPreviewList"
 import ScrapeProgressPanel from "./ScrapeProgressPanel"
 import ScrapeResultsPanel from "./ScrapeResultsPanel"
@@ -31,7 +33,11 @@ interface BatchScrapePanelProps {
   error: string | null
   nextPageButton: NextPageButtonInfo | null
   isSelectingNextPage: boolean
-  onStartScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string) => void
+  onStartScrape: (
+    selectedLinks: ExtractedLink[],
+    nextPageXPath?: string,
+    linkContainerSelector?: string
+  ) => void
   onPause: () => void
   onResume: () => void
   onCancel: () => void
@@ -64,34 +70,45 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
   onUpdateLink,
   onRemoveLink,
   onSelectNextPage,
-  onClearNextPage,
+  onClearNextPage
 }: BatchScrapePanelProps) {
   // 根据模式渲染不同内容
   const renderContent = () => {
     switch (mode) {
       case "idle":
         return (
-          <div className="flex flex-col items-center justify-center gap-4 py-8">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-sky-100 to-indigo-100">
-              <Icon
-                icon="line-md:document-list"
-                className="h-8 w-8 text-sky-500"
-              />
+          <div className="flex flex-col gap-4 py-4">
+            {/* 顶部介绍区域 */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sky-100 to-indigo-100">
+                <Icon
+                  icon="line-md:document-list"
+                  className="h-7 w-7 text-sky-500"
+                />
+              </div>
+              <div className="text-center">
+                <h3 className="mb-1 text-base font-semibold text-gray-800">
+                  批量抓取文档
+                </h3>
+                <p className="text-sm text-gray-500">
+                  选择页面上包含链接的区域，批量抓取所有文档
+                </p>
+              </div>
+              <button
+                onClick={onSelectElement}
+                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 px-6 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-sky-600 hover:to-indigo-600 hover:shadow-lg">
+                <Icon icon="mdi:cursor-default-click" className="h-5 w-5" />
+                选择元素区域
+              </button>
             </div>
-            <div className="text-center">
-              <h3 className="mb-1 text-base font-semibold text-gray-800">
-                批量抓取文档
-              </h3>
-              <p className="text-sm text-gray-500">
-                选择页面上包含链接的区域，批量抓取所有文档
-              </p>
-            </div>
-            <button
-              onClick={onSelectElement}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 px-6 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-sky-600 hover:to-indigo-600 hover:shadow-lg">
-              <Icon icon="mdi:cursor-default-click" className="h-5 w-5" />
-              选择元素区域
-            </button>
+
+            {/* 快捷设置区域 */}
+            <AccordionSection
+              title="抓取设置"
+              icon="mdi:cog-outline"
+              defaultOpen={false}>
+              <BatchScrapeSettings compact showToast={false} />
+            </AccordionSection>
           </div>
         )
 

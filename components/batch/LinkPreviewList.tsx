@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react'
-import { memo, useMemo, useState } from 'react'
+import { memo, useState } from 'react'
 
 import type { ExtractedLink, NextPageButtonInfo, SelectedElementInfo } from '~constants/types'
 import { useSelectionSet } from '~hooks/useSelectionSet'
@@ -36,7 +36,6 @@ const LinkPreviewList = memo(function LinkPreviewList({
   onSelectNextPage,
   onClearNextPage,
 }: LinkPreviewListProps) {
-  const [showAll, setShowAll] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
 
   // 编辑状态
@@ -124,16 +123,6 @@ const LinkPreviewList = memo(function LinkPreviewList({
     }
   }
 
-  // 显示的链接数量
-  const displayLinks = useMemo(() => {
-    if (showAll || links.length <= 10) {
-      return links
-    }
-    return links.slice(0, 10)
-  }, [links, showAll])
-
-  const hasMore = links.length > 10
-
   return (
     <div className="flex flex-col gap-4">
       {/* 元素信息 */}
@@ -201,12 +190,12 @@ const LinkPreviewList = memo(function LinkPreviewList({
 
       {/* 链接列表 */}
       <div className="max-h-64 overflow-y-auto rounded-lg border border-gray-200">
-        {displayLinks.map((link, idx) => (
+        {links.map((link, idx) => (
           <div
             key={link.index}
             className={cn(
               'flex items-start gap-3 px-3 py-2 transition-colors hover:bg-gray-50',
-              idx !== displayLinks.length - 1 && 'border-b border-gray-100',
+              idx !== links.length - 1 && 'border-b border-gray-100',
               !isSelected(link.index) && 'opacity-50'
             )}
           >
@@ -281,13 +270,6 @@ const LinkPreviewList = memo(function LinkPreviewList({
           </div>
         ))}
       </div>
-
-      {/* 显示更多 */}
-      {hasMore && !showAll && (
-        <button onClick={() => setShowAll(true)} className="text-center text-sm text-sky-600 hover:text-sky-700">
-          显示全部 {links.length} 个链接
-        </button>
-      )}
 
       {/* 添加链接 */}
       {isAdding ? (
