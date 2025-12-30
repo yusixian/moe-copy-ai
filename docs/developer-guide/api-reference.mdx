@@ -1,0 +1,487 @@
+---
+title: API 参考
+description: MoeCopy AI 的技术 API 文档和开发者参考
+---
+
+# API 参考
+
+本文档详细介绍 MoeCopy AI 的内部 API、消息通信机制和扩展接口。
+
+## 消息通信 API
+
+MoeCopy AI 使用 Chrome Extension 的消息传递机制进行组件间通信。
+
+### 消息格式
+
+所有消息遵循统一格式：
+
+```typescript
+interface Message {
+  action: string
+  [key: string]: any
+}
+```
+
+### 核心消息类型
+
+#### scrapeContent
+
+从当前页面提取内容：
+
+```typescript
+// 请求
+{
+  action: "scrapeContent",
+  options?: {
+    mode?: ExtractionMode
+    customSelectors?: Partial<Record<SelectorType, string>>
+  }
+}
+
+// 响应
+interface ScrapeResponse {
+  success: boolean
+  data?: ScrapedContent
+  error?: string
+}
+```
+
+#### testSelector
+
+测试 CSS 选择器：
+
+```typescript
+// 请求
+interface SelectorTestRequest {
+  action: "testSelector"
+  selector: string
+}
+
+// 响应
+interface SelectorTestResponse {
+  matches: number
+  content?: string
+  error?: string
+}
+```
+
+#### openOptionsPage
+
+打开扩展选项页面：
+
+```typescript
+{
+  action: "openOptionsPage"
+}
+```
+
+## 数据结构
+
+### ScrapedContent
+
+提取内容的完整结构：
+
+```typescript
+interface ScrapedContent {
+  // 基础信息
+  title: string
+  url: string
+  author: string
+  publishDate: string
+
+  // 内容
+  articleContent: string // 原始 HTML
+  cleanedContent: string // 清理后的文本
+
+  // 元数据
+  metadata: Record<string, string>
+
+  // 图片
+  images: ImageInfo[]
+
+  // 选择器结果（调试用）
+  selectorResults?: Record<SelectorType, SelectorResultItem[]>
+}
+```
+
+### ImageInfo
+
+图片信息结构：
+
+```typescript
+interface ImageInfo {
+  src: string // 图片 URL
+  alt: string // 替代文本
+  title: string // 标题
+  index: number // 在文档中的索引
+}
+```
+
+### SelectorResultItem
+
+选择器匹配结果：
+
+```typescript
+interface SelectorResultItem {
+  selector: string // 使用的选择器
+  content: string // 第一个匹配内容
+  allContent?: string[] // 所有匹配内容
+}
+```
+
+## 存储 API
+
+### 设置存储
+
+使用 Chrome 同步存储保存用户设置：
+
+```typescript
+import { Storage } from "@plasmohq/storage"
+
+const storage = new Storage()
+
+// 保存设置
+await storage.set("settings", {
+  extractionMode: "hybrid",
+  showFloatButton: true
+})
+
+// 读取设置
+const settings = await storage.get("settings")
+```
+
+### 本地存储
+
+AI 聊天历史使用本地存储：
+
+```typescript
+// 保存聊天历史
+interface AiChatHistoryItem {
+  id: string
+  timestamp: number
+  url: string
+  prompt: string
+  content: string
+  processedPrompt?: string
+  usage?: {
+    total_tokens?: number
+    prompt_tokens?: number
+    completion_tokens?: number
+  }
+}
+
+// 存储操作
+const history = (await storage.get("aiChatHistory")) || { items: [] }
+history.items.push(newItem)
+await storage.set("aiChatHistory", history)
+```
+
+## 工具函数
+
+### 文本处理
+
+```typescript
+// 清理 HTML
+export function cleanHtml(html: string): string
+
+// 提取纯文本
+export function extractText(element: Element): string
+
+// 格式化日期
+export function formatDate(dateString: string): string
+```
+
+### 选择器工具
+
+```typescript
+// 查找元素
+export function findElements(
+  selectors: string[],
+  root?: Document | Element
+): Element[]
+
+// 获取元素文本
+export function getElementText(
+  element: Element,
+  options?: { trim?: boolean }
+): string
+```
+
+### 模板引擎
+
+支持变量替换的简单模板引擎：
+
+```typescript
+export function processTemplate(
+  template: string,
+  variables: Record<string, any>
+): string
+
+// 使用示例
+const result = processTemplate("标题：{{title}}\n作者：{{author}}", {
+  title: "示例文章",
+  author: "张三"
+})
+```
+
+## AI 服务接口
+
+### 初始化 AI 客户端
+
+```typescript
+import { createAiClient } from "~/utils/ai-service"
+
+const client = createAiClient({
+  apiKey: "your-api-key",
+  apiUrl: "https://api.openai.com/v1",
+  model: "gpt-4o-mini"
+})
+```
+
+### 生成文本
+
+```typescript
+const stream = await generateText({
+  prompt: "总结这篇文章",
+  content: articleContent,
+  systemPrompt: "你是一个专业的内容摘要助手"
+})
+
+// 处理流式响应
+for await (const chunk of stream) {
+  console.log(chunk)
+}
+```
+
+### 使用统计
+
+```typescript
+interface UsageStats {
+  promptTokens: number
+  completionTokens: number
+  totalTokens: number
+}
+
+const { text, usage } = await generateTextWithUsage(options)
+```
+
+## 提取器 API
+
+### 创建提取器实例
+
+```typescript
+import { createExtractor } from "~/utils/extractor"
+
+const extractor = createExtractor({
+  mode: "hybrid",
+  customSelectors: {
+    content: ".custom-content",
+    title: "h1.custom-title"
+  },
+  readabilityConfig: {
+    charThreshold: 500
+  }
+})
+```
+
+### 提取内容
+
+```typescript
+const result = await extractor.extract(document)
+
+// 结果包含
+{
+  title: string
+  content: string
+  author: string
+  publishDate: string
+  images: ImageInfo[]
+  metadata: Record<string, string>
+}
+```
+
+## 日志系统
+
+### 配置日志
+
+```typescript
+import { logger } from "~/utils/logger"
+
+// 设置日志级别
+logger.setLevel("debug")
+
+// 使用日志
+logger.debug("调试信息", { data })
+logger.info("一般信息")
+logger.error("错误信息", error)
+```
+
+### 日志格式
+
+```typescript
+interface LogEntry {
+  level: string
+  timestamp: number
+  message: string
+  data?: any
+  error?: Error
+}
+```
+
+## 错误处理
+
+### 错误类型
+
+```typescript
+// 基础错误类
+export class MoeCopyError extends Error {
+  code: string
+  details?: any
+}
+
+// 具体错误类型
+export class ExtractionError extends MoeCopyError
+export class SelectorError extends MoeCopyError
+export class ApiError extends MoeCopyError
+```
+
+### 错误处理示例
+
+```typescript
+try {
+  const content = await extractor.extract(document)
+} catch (error) {
+  if (error instanceof ExtractionError) {
+    // 处理提取错误
+    logger.error("提取失败", error)
+  } else if (error instanceof ApiError) {
+    // 处理 API 错误
+    logger.error("API 调用失败", error)
+  }
+}
+```
+
+## 扩展生命周期
+
+### Background Script
+
+```typescript
+// background.ts
+chrome.runtime.onInstalled.addListener(() => {
+  // 安装或更新时执行
+  initializeExtension()
+})
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // 处理消息
+  handleMessage(message, sender, sendResponse)
+  return true // 异步响应
+})
+```
+
+### Content Script
+
+```typescript
+// contents/scraper.ts
+// 页面加载完成后注入
+window.addEventListener("load", () => {
+  initializeScraper()
+})
+
+// 监听来自扩展的消息
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "scrapeContent") {
+    const content = scrapeCurrentPage()
+    sendResponse(content)
+  }
+})
+```
+
+## 性能优化
+
+### 缓存机制
+
+```typescript
+// 简单的内存缓存
+const cache = new Map<string, CacheEntry>()
+
+interface CacheEntry {
+  data: any
+  expires: number
+}
+
+export function getCached<T>(key: string): T | null {
+  const entry = cache.get(key)
+  if (entry && entry.expires > Date.now()) {
+    return entry.data
+  }
+  return null
+}
+```
+
+### 防抖和节流
+
+```typescript
+// 防抖函数
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): T
+
+// 节流函数
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): T
+```
+
+## 开发工具
+
+### 类型定义
+
+完整的 TypeScript 类型定义位于：
+
+- `constants/types.ts` - 核心类型
+- `utils/index.ts` - 工具函数类型
+
+### 测试工具
+
+```typescript
+// 模拟 Chrome API
+import { mockChrome } from "~/test-utils"
+
+beforeEach(() => {
+  global.chrome = mockChrome()
+})
+
+// 测试提取器
+it("should extract content", async () => {
+  const extractor = createExtractor()
+  const result = await extractor.extract(mockDocument)
+  expect(result.title).toBe("Test Title")
+})
+```
+
+## 版本兼容性
+
+### Chrome Manifest V3
+
+MoeCopy AI 完全兼容 Manifest V3：
+
+- 使用 Service Worker 替代 Background Page
+- 遵循新的权限模型
+- 支持新的 API 限制
+
+### 浏览器兼容性
+
+- Chrome 88+
+- Edge 88+
+- 其他基于 Chromium 的浏览器
+
+## 贡献指南
+
+欢迎贡献代码！请查看 [GitHub 仓库](https://github.com/yusixian/moe-copy-ai) 了解：
+
+- 代码规范
+- 提交指南
+- 问题反馈

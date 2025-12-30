@@ -1,0 +1,5 @@
+{
+  "title": "MoeCopy AI 文档",
+  "defaultOpen": true,
+  "pages": ["index", "features", "user-guide", "developer-guide", "changelog"]
+}
