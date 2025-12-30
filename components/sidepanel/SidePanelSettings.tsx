@@ -10,6 +10,7 @@ import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
 
+import { ModelSelectInput } from "../ai/ModelSelectInput"
 import { AccordionSection } from "../AccordionSection"
 import {
   BatchScrapeSettings,
@@ -126,19 +127,24 @@ function AiSettings() {
       if (savedModel) setModel(savedModel)
 
       if (savedApiKey && savedBaseURL) {
-        fetchModels(savedApiKey, savedBaseURL)
+        fetchModels(savedApiKey, savedBaseURL, savedModel)
       }
     }
     load()
   }, [])
 
-  const fetchModels = async (key: string, url: string) => {
+  const fetchModels = async (
+    key: string,
+    url: string,
+    currentModel?: string | null
+  ) => {
     if (!key || !url) return
     setIsLoadingModels(true)
     try {
       const models = await listModels({ apiKey: key, baseURL: url })
       setModelList(models)
-      if (models.length > 0 && !model) setModel(models[0].id)
+      // 仅当没有已保存模型时才设置默认模型
+      if (models.length > 0 && !currentModel) setModel(models[0].id)
       toast.success("模型列表已加载")
     } catch {
       toast.error("获取模型失败")
@@ -179,7 +185,7 @@ function AiSettings() {
             placeholder="https://api.openai.com/v1/"
           />
           <button
-            onClick={() => fetchModels(apiKey, baseURL)}
+            onClick={() => fetchModels(apiKey, baseURL, model)}
             disabled={isLoadingModels}
             className="rounded bg-sky-100 px-2 py-1 text-xs text-sky-600 hover:bg-sky-200 disabled:opacity-50">
             <Icon
@@ -193,26 +199,12 @@ function AiSettings() {
 
       <div>
         <label className="mb-1 block text-xs text-gray-600">模型</label>
-        {modelList.length > 0 ? (
-          <select
-            value={model || ""}
-            onChange={(e) => setModel(e.target.value)}
-            className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none">
-            {modelList.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.id}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <input
-            type="text"
-            value={model || ""}
-            onChange={(e) => setModel(e.target.value)}
-            className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
-            placeholder="gpt-3.5-turbo"
-          />
-        )}
+        <ModelSelectInput
+          value={model}
+          onChange={setModel}
+          options={modelList}
+          compact
+        />
       </div>
 
       <div>

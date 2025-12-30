@@ -7,6 +7,7 @@ import { Storage } from "@plasmohq/storage"
 
 import { debugLog } from "~utils/logger"
 
+import { ModelSelectInput } from "../ai/ModelSelectInput"
 import OptionSection from "./OptionSection"
 
 // 创建存储实例
@@ -41,7 +42,7 @@ function AiSettingsSection() {
 
       // 如果有保存的API密钥和基础URL，尝试加载模型列表（静默加载，不弹toast）
       if (savedApiKey && savedBaseURL) {
-        fetchModelList(savedApiKey, savedBaseURL, false)
+        fetchModelList(savedApiKey, savedBaseURL, false, savedModel)
       }
     } catch (error) {
       console.error("加载AI设置出错:", error)
@@ -50,7 +51,12 @@ function AiSettingsSection() {
 
   // 获取模型列表
   const fetchModelList = useCallback(
-    async (key: string, url: string, showToast = true) => {
+    async (
+      key: string,
+      url: string,
+      showToast = true,
+      currentModel?: string | null
+    ) => {
       debugLog("尝试加载模型列表")
       if (!key) {
         toast.warning("请先填写API密钥")
@@ -71,7 +77,8 @@ function AiSettingsSection() {
 
         debugLog("模型列表加载成功，模型如下", models)
         setModelList(models)
-        if (models.length > 0) setModel(models[0].id) // 如果模型列表不为空，则设置默认模型
+        // 仅当没有已保存模型时才设置默认模型
+        if (models.length > 0 && !currentModel) setModel(models[0].id)
         if (showToast) toast.success("模型列表加载成功 (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
       } catch (error) {
         console.error("获取模型列表失败:", error)
@@ -80,7 +87,7 @@ function AiSettingsSection() {
         setIsLoadingModels(false)
       }
     },
-    [storage]
+    []
   )
 
   // 保存设置
@@ -173,7 +180,7 @@ function AiSettingsSection() {
               placeholder="https://api.openai.com/v1/"
             />
             <button
-              onClick={() => fetchModelList(apiKey, baseURL)}
+              onClick={() => fetchModelList(apiKey, baseURL, true, model)}
               disabled={isLoadingModels}
               className="flex items-center rounded-lg border border-sky-200 bg-blue-50 px-3 py-2 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700 disabled:opacity-50">
               <Icon
@@ -196,31 +203,11 @@ function AiSettingsSection() {
             />
             AI 模型
           </label>
-          {modelList.length > 0 ? (
-            <select
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200">
-              {modelList.map((m) => (
-                <option key={m.id + m.owned_by} value={m.id}>
-                  {m.id} ({m.owned_by})
-                </option>
-              ))}
-            </select>
-          ) : (
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
-                placeholder="gpt-3.5-turbo"
-              />
-              <p className="text-sm text-amber-500">
-                请点击"获取模型"按钮获取可用模型列表
-              </p>
-            </div>
-          )}
+          <ModelSelectInput
+            value={model}
+            onChange={setModel}
+            options={modelList}
+          />
           <p className="mt-2 text-sm text-sky-500">选择或输入要使用的AI模型</p>
         </div>
 
