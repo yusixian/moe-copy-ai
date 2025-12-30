@@ -106,7 +106,7 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
             <AccordionSection
               title="抓取设置"
               icon="mdi:cog-outline"
-              defaultOpen={false}>
+              defaultOpen>
               <BatchScrapeSettings compact showToast={false} />
             </AccordionSection>
           </div>
@@ -140,20 +140,25 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
 
       case "previewing":
         return (
-          <LinkPreviewList
-            elementInfo={elementInfo}
-            links={links}
-            nextPageButton={nextPageButton}
-            isSelectingNextPage={isSelectingNextPage}
-            onStartScrape={onStartScrape}
-            onCancel={onReset}
-            onReselect={onSelectElement}
-            onAddLink={onAddLink}
-            onUpdateLink={onUpdateLink}
-            onRemoveLink={onRemoveLink}
-            onSelectNextPage={onSelectNextPage}
-            onClearNextPage={onClearNextPage}
-          />
+          <div className="flex flex-col gap-4">
+            <AccordionSection title="抓取设置" icon="mdi:cog-outline">
+              <BatchScrapeSettings compact showToast={false} />
+            </AccordionSection>
+            <LinkPreviewList
+              elementInfo={elementInfo}
+              links={links}
+              nextPageButton={nextPageButton}
+              isSelectingNextPage={isSelectingNextPage}
+              onStartScrape={onStartScrape}
+              onCancel={onReset}
+              onReselect={onSelectElement}
+              onAddLink={onAddLink}
+              onUpdateLink={onUpdateLink}
+              onRemoveLink={onRemoveLink}
+              onSelectNextPage={onSelectNextPage}
+              onClearNextPage={onClearNextPage}
+            />
+          </div>
         )
 
       case "scraping":
