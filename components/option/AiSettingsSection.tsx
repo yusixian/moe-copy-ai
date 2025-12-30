@@ -1,112 +1,28 @@
 import { Icon } from "@iconify/react"
-import { listModels } from "@xsai/model"
-import { useCallback, useLayoutEffect, useState } from "react"
-import { toast } from "react-toastify"
+import { useState } from "react"
 
-import { Storage } from "@plasmohq/storage"
-
-import { debugLog } from "~utils/logger"
+import { useAiSettings } from "~hooks/useAiSettings"
 
 import { ModelSelectInput } from "../ai/ModelSelectInput"
 import OptionSection from "./OptionSection"
 
-// 创建存储实例
-const storage = new Storage({ area: "sync" })
-
-// AI设置组件
 function AiSettingsSection() {
-  const [apiKey, setApiKey] = useState<string>("")
-  const [baseURL, setBaseURL] = useState<string>("https://api.openai.com/v1/")
-  const [defaultSystemPrompt, setDefaultSystemPrompt] = useState<string>(
-    "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}"
-  )
-  const [model, setModel] = useState<string | null>(null)
   const [showTips, setShowTips] = useState(false)
-  const [modelList, setModelList] = useState<
-    { id: string; object: string; created: number; owned_by: string }[]
-  >([])
-  const [isLoadingModels, setIsLoadingModels] = useState(false)
 
-  // 加载保存的设置
-  const loadSettings = useCallback(async () => {
-    try {
-      const savedApiKey = await storage.get<string>("ai_api_key")
-      const savedBaseURL = await storage.get<string>("ai_base_url")
-      const savedPrompt = await storage.get<string>("ai_system_prompt")
-      const savedModel = await storage.get<string>("ai_model")
-
-      if (savedApiKey) setApiKey(savedApiKey)
-      if (savedBaseURL) setBaseURL(savedBaseURL)
-      if (savedPrompt) setDefaultSystemPrompt(savedPrompt)
-      if (savedModel) setModel(savedModel)
-
-      // 如果有保存的API密钥和基础URL，尝试加载模型列表（静默加载，不弹toast）
-      if (savedApiKey && savedBaseURL) {
-        fetchModelList(savedApiKey, savedBaseURL, false, savedModel)
-      }
-    } catch (error) {
-      console.error("加载AI设置出错:", error)
-    }
-  }, [storage])
-
-  // 获取模型列表
-  const fetchModelList = useCallback(
-    async (
-      key: string,
-      url: string,
-      showToast = true,
-      currentModel?: string | null
-    ) => {
-      debugLog("尝试加载模型列表")
-      if (!key) {
-        toast.warning("请先填写API密钥")
-        return
-      }
-
-      if (!url) {
-        toast.warning("请先填写API基础URL")
-        return
-      }
-
-      setIsLoadingModels(true)
-      try {
-        const models = await listModels({
-          apiKey: key,
-          baseURL: url
-        })
-
-        debugLog("模型列表加载成功，模型如下", models)
-        setModelList(models)
-        // 仅当没有已保存模型时才设置默认模型
-        if (models.length > 0 && !currentModel) setModel(models[0].id)
-        if (showToast) toast.success("模型列表加载成功 (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
-      } catch (error) {
-        console.error("获取模型列表失败:", error)
-        if (showToast) toast.error("获取模型列表失败，请检查API设置 (╥﹏╥)")
-      } finally {
-        setIsLoadingModels(false)
-      }
-    },
-    []
-  )
-
-  // 保存设置
-  const saveSettings = useCallback(async () => {
-    try {
-      await storage.set("ai_api_key", apiKey)
-      await storage.set("ai_base_url", baseURL)
-      await storage.set("ai_system_prompt", defaultSystemPrompt)
-      await storage.set("ai_model", model)
-      toast.success("AI设置已保存 (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
-    } catch (error) {
-      toast.error("保存设置失败 (╥﹏╥)")
-      console.error("保存AI设置出错:", error)
-    }
-  }, [apiKey, baseURL, defaultSystemPrompt, model, storage])
-
-  useLayoutEffect(() => {
-    loadSettings()
-  }, [loadSettings])
+  const {
+    apiKey,
+    setApiKey,
+    baseURL,
+    setBaseURL,
+    systemPrompt,
+    setSystemPrompt,
+    model,
+    setModel,
+    modelList,
+    isLoadingModels,
+    fetchModels,
+    saveSettings
+  } = useAiSettings()
 
   return (
     <OptionSection title="AI设置" icon="line-md:ai">
@@ -180,7 +96,7 @@ function AiSettingsSection() {
               placeholder="https://api.openai.com/v1/"
             />
             <button
-              onClick={() => fetchModelList(apiKey, baseURL, true, model)}
+              onClick={() => fetchModels()}
               disabled={isLoadingModels}
               className="flex items-center rounded-lg border border-sky-200 bg-blue-50 px-3 py-2 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700 disabled:opacity-50">
               <Icon
@@ -221,8 +137,8 @@ function AiSettingsSection() {
             默认系统提示词
           </label>
           <textarea
-            value={defaultSystemPrompt}
-            onChange={(e) => setDefaultSystemPrompt(e.target.value)}
+            value={systemPrompt}
+            onChange={(e) => setSystemPrompt(e.target.value)}
             rows={4}
             className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
             placeholder="你是一个专业的文章摘要助手，请提炼文章的核心观点，总结要点。"

@@ -1,13 +1,12 @@
 import { Icon } from "@iconify/react"
-import { listModels } from "@xsai/model"
 import { useLayoutEffect, useState } from "react"
 import { toast } from "react-toastify"
 
-import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
+import { useAiSettings } from "~hooks/useAiSettings"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
 
 import { ModelSelectInput } from "../ai/ModelSelectInput"
@@ -16,8 +15,6 @@ import {
   BatchScrapeSettings,
   CompactSelect
 } from "../batch/BatchScrapeSettings"
-
-const storage = new Storage({ area: "sync" })
 
 // 开关行组件（用于单选项设置）
 function ToggleRow({
@@ -103,63 +100,20 @@ function ExtractionModeSettings() {
 
 // AI 设置
 function AiSettings() {
-  const [apiKey, setApiKey] = useState("")
-  const [baseURL, setBaseURL] = useState("https://api.openai.com/v1/")
-  const [model, setModel] = useState<string | null>(null)
-  const [systemPrompt, setSystemPrompt] = useState(
-    "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}"
-  )
-  const [modelList, setModelList] = useState<
-    { id: string; owned_by: string }[]
-  >([])
-  const [isLoadingModels, setIsLoadingModels] = useState(false)
-
-  useLayoutEffect(() => {
-    const load = async () => {
-      const savedApiKey = await storage.get<string>("ai_api_key")
-      const savedBaseURL = await storage.get<string>("ai_base_url")
-      const savedPrompt = await storage.get<string>("ai_system_prompt")
-      const savedModel = await storage.get<string>("ai_model")
-
-      if (savedApiKey) setApiKey(savedApiKey)
-      if (savedBaseURL) setBaseURL(savedBaseURL)
-      if (savedPrompt) setSystemPrompt(savedPrompt)
-      if (savedModel) setModel(savedModel)
-
-      if (savedApiKey && savedBaseURL) {
-        fetchModels(savedApiKey, savedBaseURL, savedModel)
-      }
-    }
-    load()
-  }, [])
-
-  const fetchModels = async (
-    key: string,
-    url: string,
-    currentModel?: string | null
-  ) => {
-    if (!key || !url) return
-    setIsLoadingModels(true)
-    try {
-      const models = await listModels({ apiKey: key, baseURL: url })
-      setModelList(models)
-      // 仅当没有已保存模型时才设置默认模型
-      if (models.length > 0 && !currentModel) setModel(models[0].id)
-      toast.success("模型列表已加载")
-    } catch {
-      toast.error("获取模型失败")
-    } finally {
-      setIsLoadingModels(false)
-    }
-  }
-
-  const save = async () => {
-    await storage.set("ai_api_key", apiKey)
-    await storage.set("ai_base_url", baseURL)
-    await storage.set("ai_system_prompt", systemPrompt)
-    await storage.set("ai_model", model)
-    toast.success("AI 设置已保存")
-  }
+  const {
+    apiKey,
+    setApiKey,
+    baseURL,
+    setBaseURL,
+    systemPrompt,
+    setSystemPrompt,
+    model,
+    setModel,
+    modelList,
+    isLoadingModels,
+    fetchModels,
+    saveSettings
+  } = useAiSettings()
 
   return (
     <div className="space-y-3">
@@ -185,7 +139,7 @@ function AiSettings() {
             placeholder="https://api.openai.com/v1/"
           />
           <button
-            onClick={() => fetchModels(apiKey, baseURL, model)}
+            onClick={() => fetchModels()}
             disabled={isLoadingModels}
             className="rounded bg-sky-100 px-2 py-1 text-xs text-sky-600 hover:bg-sky-200 disabled:opacity-50">
             <Icon
@@ -218,7 +172,7 @@ function AiSettings() {
       </div>
 
       <button
-        onClick={save}
+        onClick={saveSettings}
         className="flex w-full items-center justify-center gap-1 rounded bg-sky-500 py-1.5 text-xs font-medium text-white hover:bg-sky-600">
         <Icon icon="mdi:content-save" width={14} />
         保存
