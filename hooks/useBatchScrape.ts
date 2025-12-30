@@ -11,8 +11,16 @@ import type {
   ScrapeStrategyType,
   SelectedElementInfo,
 } from '~constants/types'
+import type { FilterMode, FilterTarget } from '~constants/link-filter-presets'
 import { BatchScrapeController, type ExtendedBatchScrapeOptions } from '~utils/batch-scraper'
 import { debugLog } from '~utils/logger'
+
+// 链接过滤配置
+export interface LinkFilterConfig {
+  pattern: string
+  target: FilterTarget
+  mode: FilterMode
+}
 
 const storage = new Storage({ area: 'sync' })
 
@@ -39,7 +47,7 @@ interface UseBatchScrapeReturn {
   addLink: (url: string, text?: string) => void
   updateLink: (index: number, url: string, text: string) => void
   removeLink: (index: number) => void
-  startScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string, options?: Partial<ExtendedBatchScrapeOptions>) => Promise<void>
+  startScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string, filterConfig?: LinkFilterConfig, options?: Partial<ExtendedBatchScrapeOptions>) => Promise<void>
   pauseScrape: () => void
   resumeScrape: () => void
   cancelScrape: () => void
@@ -102,9 +110,37 @@ export function useBatchScrape(): UseBatchScrapeReturn {
     })
   }, [])
 
+  // 应用过滤规则到链接
+  const applyFilter = useCallback((links: ExtractedLink[], filterConfig?: LinkFilterConfig): ExtractedLink[] => {
+    if (!filterConfig?.pattern?.trim()) {
+      return links
+    }
+
+    try {
+      const regex = new RegExp(filterConfig.pattern, 'i')
+      return links.filter((link) => {
+        let matches = false
+        switch (filterConfig.target) {
+          case 'url':
+            matches = regex.test(link.url)
+            break
+          case 'text':
+            matches = regex.test(link.text)
+            break
+          case 'both':
+            matches = regex.test(link.url) || regex.test(link.text)
+            break
+        }
+        return filterConfig.mode === 'include' ? matches : !matches
+      })
+    } catch {
+      return links
+    }
+  }, [])
+
   // 开始抓取
   const startScrape = useCallback(
-    async (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string, options: Partial<ExtendedBatchScrapeOptions> = {}) => {
+    async (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string, filterConfig?: LinkFilterConfig, options: Partial<ExtendedBatchScrapeOptions> = {}) => {
       if (selectedLinks.length === 0) {
         setError('没有可抓取的链接')
         return
@@ -251,10 +287,14 @@ export function useBatchScrape(): UseBatchScrapeReturn {
             break
           }
 
+          // 应用用户的正则过滤规则
+          const filteredByRegex = applyFilter(extractResult.links, filterConfig)
+          debugLog(`[BatchScrape] 第 ${currentPage + 1} 页: 正则过滤后 ${filteredByRegex.length}/${extractResult.links.length} 个`)
+
           // 过滤掉已抓取的链接
           const existingUrls = new Set(allResults.map((r) => r.url))
-          const newLinks = extractResult.links.filter((l) => !existingUrls.has(l.url))
-          debugLog(`[BatchScrape] 第 ${currentPage + 1} 页: 提取 ${extractResult.links.length} 个, 新增 ${newLinks.length} 个`)
+          const newLinks = filteredByRegex.filter((l) => !existingUrls.has(l.url))
+          debugLog(`[BatchScrape] 第 ${currentPage + 1} 页: 提取 ${extractResult.links.length} 个, 过滤后 ${filteredByRegex.length} 个, 新增 ${newLinks.length} 个`)
 
           if (newLinks.length === 0) {
             debugLog(`[BatchScrape] 第 ${currentPage + 1} 页没有新链接，停止分页`)
@@ -273,7 +313,7 @@ export function useBatchScrape(): UseBatchScrapeReturn {
         setPaginationProgress(null)
       }
     },
-    []
+    [applyFilter]
   )
 
   // 暂停抓取

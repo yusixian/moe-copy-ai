@@ -1,18 +1,22 @@
 import { Icon } from '@iconify/react'
-import { memo, useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 
 import type { ExtractedLink, NextPageButtonInfo, SelectedElementInfo } from '~constants/types'
+import type { LinkFilterConfig } from '~hooks/useBatchScrape'
+import { useLinkFilter } from '~hooks/useLinkFilter'
 import { useSelectionSet } from '~hooks/useSelectionSet'
 import { cn } from '~utils'
 import { downloadTextFile } from '~utils/download'
 import { exportLinksToJson, exportLinksToMarkdown } from '~utils/link-exporter'
+
+import LinkFilterBar from './LinkFilterBar'
 
 interface LinkPreviewListProps {
   elementInfo: SelectedElementInfo | null
   links: ExtractedLink[]
   nextPageButton: NextPageButtonInfo | null
   isSelectingNextPage: boolean
-  onStartScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string) => void
+  onStartScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string, filterConfig?: LinkFilterConfig) => void
   onCancel: () => void
   onReselect: () => void
   onAddLink: (url: string, text?: string) => void
@@ -45,6 +49,20 @@ const LinkPreviewList = memo(function LinkPreviewList({
   // 添加链接状态
   const [isAdding, setIsAdding] = useState(false)
   const [addForm, setAddForm] = useState({ url: '', text: '' })
+
+  // 过滤功能
+  const {
+    filterState,
+    setPattern,
+    setTarget,
+    setMode,
+    applyPreset,
+    clearFilter,
+    filterLinks
+  } = useLinkFilter()
+
+  // 过滤后的链接
+  const filteredLinks = useMemo(() => filterLinks(links), [filterLinks, links])
 
   // 开始编辑
   const startEdit = (link: ExtractedLink) => {
@@ -82,7 +100,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
     setAddForm({ url: '', text: '' })
   }
 
-  // 使用 useSelectionSet 管理选中状态
+  // 使用 useSelectionSet 管理选中状态（基于过滤后的链接）
   const {
     selectedItems: selectedLinks,
     selectedCount,
@@ -91,8 +109,8 @@ const LinkPreviewList = memo(function LinkPreviewList({
     toggle: toggleLink,
     toggleAll
   } = useSelectionSet({
-    items: links,
-    getKey: (_, index) => index
+    items: filteredLinks,
+    getKey: (link) => link.index
   })
 
   // 导出为 Markdown
@@ -147,6 +165,24 @@ const LinkPreviewList = memo(function LinkPreviewList({
         </div>
       )}
 
+      {/* 过滤栏 */}
+      {links.length > 0 && (
+        <LinkFilterBar
+          links={links}
+          filteredLinks={filteredLinks}
+          pattern={filterState.pattern}
+          target={filterState.target}
+          mode={filterState.mode}
+          isValid={filterState.isValid}
+          error={filterState.error}
+          onPatternChange={setPattern}
+          onTargetChange={setTarget}
+          onModeChange={setMode}
+          onApplyPreset={applyPreset}
+          onClear={clearFilter}
+        />
+      )}
+
       {/* 链接统计和导出 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -161,7 +197,10 @@ const LinkPreviewList = memo(function LinkPreviewList({
           </label>
           <span className="text-gray-300">|</span>
           <span className="text-sm text-gray-600">
-            已选 <span className="font-bold text-emerald-500">{selectedCount}</span>/{links.length}
+            已选 <span className="font-bold text-emerald-500">{selectedCount}</span>/{filteredLinks.length}
+            {filteredLinks.length !== links.length && (
+              <span className="ml-1 text-xs text-gray-400">(共{links.length})</span>
+            )}
           </span>
         </div>
         {links.length > 0 && (
@@ -190,12 +229,12 @@ const LinkPreviewList = memo(function LinkPreviewList({
 
       {/* 链接列表 */}
       <div className="max-h-64 overflow-y-auto rounded-lg border border-gray-200">
-        {links.map((link, idx) => (
+        {filteredLinks.map((link, idx) => (
           <div
             key={link.index}
             className={cn(
               'flex items-start gap-3 px-3 py-2 transition-colors hover:bg-gray-50',
-              idx !== links.length - 1 && 'border-b border-gray-100',
+              idx !== filteredLinks.length - 1 && 'border-b border-gray-100',
               !isSelected(link.index) && 'opacity-50'
             )}
           >
@@ -377,7 +416,16 @@ const LinkPreviewList = memo(function LinkPreviewList({
           取消
         </button>
         <button
-          onClick={() => onStartScrape(selectedLinks, nextPageButton?.xpath, elementInfo?.selector)}
+          onClick={() => onStartScrape(
+            selectedLinks,
+            nextPageButton?.xpath,
+            elementInfo?.selector,
+            filterState.pattern ? {
+              pattern: filterState.pattern,
+              target: filterState.target,
+              mode: filterState.mode
+            } : undefined
+          )}
           disabled={selectedCount === 0}
           className={cn(
             'flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium text-white transition-all',
@@ -387,7 +435,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
           )}
         >
           <Icon icon="mdi:play" className="h-4 w-4" />
-          开始抓取 ({selectedCount}/{links.length})
+          开始抓取 ({selectedCount}/{filteredLinks.length})
         </button>
       </div>
     </div>

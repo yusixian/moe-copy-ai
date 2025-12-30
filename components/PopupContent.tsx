@@ -128,9 +128,10 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           )}
           <button
             onClick={handleOpenSidePanel}
-            className="transform rounded-full p-2 text-emerald-500 transition hover:rotate-12 hover:bg-emerald-50"
+            className="flex transform items-center gap-1.5 rounded-lg border border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 px-3 py-1.5 text-sm font-medium text-emerald-600 shadow-sm transition-all hover:scale-105 hover:border-emerald-400 hover:from-emerald-100 hover:to-teal-100 hover:shadow-md"
             title="批量抓取文档（在侧边栏中打开）">
-            <Icon icon="line-md:document-list" width="24" height="24" />
+            <Icon icon="mdi:file-document-multiple-outline" width="18" height="18" />
+            <span className="whitespace-nowrap">批量抓取</span>
           </button>
           <button
             onClick={handleOpenGithub}

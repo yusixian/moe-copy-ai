@@ -9,6 +9,7 @@ import type {
   NextPageButtonInfo,
   SelectedElementInfo
 } from "~constants/types"
+import type { LinkFilterConfig } from "~hooks/useBatchScrape"
 import { cn } from "~utils"
 
 import { AccordionSection } from "../AccordionSection"
@@ -36,7 +37,8 @@ interface BatchScrapePanelProps {
   onStartScrape: (
     selectedLinks: ExtractedLink[],
     nextPageXPath?: string,
-    linkContainerSelector?: string
+    linkContainerSelector?: string,
+    filterConfig?: LinkFilterConfig
   ) => void
   onPause: () => void
   onResume: () => void
