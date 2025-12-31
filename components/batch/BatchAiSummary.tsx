@@ -133,7 +133,6 @@ const BatchAiSummary = memo(function BatchAiSummary({
           <div className="flex items-center gap-2">
             <span
               className={`flex items-center gap-1 text-xs ${modelId ? "text-gray-500" : "text-amber-500"}`}>
-              <Icon icon="mdi:chip" width={14} />
               {modelId || "未选择模型"}
             </span>
             <button
@@ -143,7 +142,11 @@ const BatchAiSummary = memo(function BatchAiSummary({
               className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 py-2 text-xs font-medium text-white shadow-sm transition-all hover:from-sky-600 hover:to-indigo-600 disabled:cursor-not-allowed disabled:opacity-50">
               {isLoading ? (
                 <>
-                  <Icon icon="mdi:loading" width={14} className="animate-spin" />
+                  <Icon
+                    icon="mdi:loading"
+                    width={14}
+                    className="animate-spin"
+                  />
                   生成中...
                 </>
               ) : (

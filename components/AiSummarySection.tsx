@@ -197,19 +197,18 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
           <div className="flex items-center gap-2">
             <span
               className={`flex items-center gap-1 text-xs ${modelId ? "text-gray-500" : "text-amber-500"}`}>
-              <Icon icon="mdi:chip" width={14} height={14} />
               {modelId || "未选择模型"}
             </span>
-            <GenerateButton onClick={generateSummaryText} isLoading={isLoading} />
+            <GenerateButton
+              onClick={generateSummaryText}
+              isLoading={isLoading}
+            />
           </div>
           {error && <ErrorMessage message={error} />}
         </div>
         {(summary || streamingText) && (
           <>
-            <SummaryResult
-              summary={summary}
-              streamingText={streamingText}
-            />
+            <SummaryResult summary={summary} streamingText={streamingText} />
             {totalTokens && (
               <div className="mt-3 rounded-lg border border-indigo-100 bg-indigo-50 p-2">
                 <div className="flex items-center justify-between">
