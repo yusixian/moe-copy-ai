@@ -14,7 +14,7 @@ export function ModelSelectInput({
   value,
   onChange,
   options,
-  placeholder = "gpt-3.5-turbo",
+  placeholder = "请选择模型",
   compact = false
 }: ModelSelectInputProps) {
   // 转换 options 格式

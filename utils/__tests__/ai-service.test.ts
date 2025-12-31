@@ -98,7 +98,7 @@ describe("AI服务测试", () => {
         baseURL: "https://api.openai.com/v1/",
         systemPrompt:
           "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}",
-        model: "gpt-3.5-turbo"
+        model: ""
       })
     })
 
@@ -204,7 +204,7 @@ describe("AI服务测试", () => {
       expect(streamText).toHaveBeenCalledWith({
         apiKey: "test-api-key",
         baseURL: "https://api.openai.com/v1/",
-        model: "gpt-3.5-turbo",
+        model: "",
         messages: [
           {
             role: "user",

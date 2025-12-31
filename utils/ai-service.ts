@@ -16,7 +16,7 @@ export async function getAiConfig() {
     const systemPrompt =
       (await syncStorage.get<string>("ai_system_prompt")) ||
       "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}"
-    const model = (await syncStorage.get<string>("ai_model")) || "gpt-3.5-turbo"
+    const model = (await syncStorage.get<string>("ai_model")) || ""
 
     return {
       apiKey,

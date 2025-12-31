@@ -74,7 +74,8 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
     systemPrompt,
     generateSummaryText,
     saveAsDefaultPrompt,
-    usage
+    usage,
+    modelId
   } = useAiSummary(content, onSummaryGenerated, scrapedData)
 
   const handleOpenSettings = useOpenOptionPage()
@@ -193,7 +194,14 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
         )}
 
         <div className="flex flex-col items-end gap-2">
-          <GenerateButton onClick={generateSummaryText} isLoading={isLoading} />
+          <div className="flex items-center gap-2">
+            <span
+              className={`flex items-center gap-1 text-xs ${modelId ? "text-gray-500" : "text-amber-500"}`}>
+              <Icon icon="mdi:chip" width={14} height={14} />
+              {modelId || "未选择模型"}
+            </span>
+            <GenerateButton onClick={generateSummaryText} isLoading={isLoading} />
+          </div>
           {error && <ErrorMessage message={error} />}
         </div>
         {(summary || streamingText) && (
