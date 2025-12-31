@@ -1,32 +1,15 @@
 import {
   cn,
-  copyToClipboard,
   detectMarkdown,
   generateUUID,
   openInNewTab,
   preventBubbling
 } from "../index"
-import * as logger from "../logger"
-
-// 模拟clipboard API
-Object.defineProperty(navigator, "clipboard", {
-  value: {
-    writeText: jest.fn().mockImplementation((text) => Promise.resolve(text))
-  },
-  configurable: true
-})
 
 // 模拟window.open
 window.open = jest
   .fn()
   .mockImplementation(() => ({ test: "windowRef" }) as unknown as Window)
-
-// 模拟logger
-jest.mock("../logger", () => ({
-  logger: {
-    error: jest.fn()
-  }
-}))
 
 describe("utils/index", () => {
   beforeEach(() => {
@@ -115,25 +98,6 @@ describe("utils/index", () => {
         uuids.add(generateUUID())
       }
       expect(uuids.size).toBe(10)
-    })
-  })
-
-  describe("copyToClipboard", () => {
-    test("应成功复制文本到剪贴板", async () => {
-      const result = await copyToClipboard("测试文本")
-      expect(result).toBe(true)
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith("测试文本")
-    })
-
-    test("应处理复制失败的情况", async () => {
-      // 模拟复制失败
-      ;(navigator.clipboard.writeText as jest.Mock).mockRejectedValueOnce(
-        new Error("复制失败")
-      )
-
-      const result = await copyToClipboard("测试文本")
-      expect(result).toBe(false)
-      expect(logger.logger.error).toHaveBeenCalled()
     })
   })
 

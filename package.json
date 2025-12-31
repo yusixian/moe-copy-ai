@@ -1,7 +1,7 @@
 {
   "name": "moe-copy-ai",
   "displayName": "Moe Copy AI",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "✨ 萌萌哒的 AI 网页数据提取助手 ✨",
   "author": "cos <i@cosine.ren>",
   "scripts": {
@@ -25,7 +25,9 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dompurify": "^3.2.6",
+    "foxact": "^0.2.49",
     "gpt-tokenizer": "^2.9.0",
+    "jszip": "^3.10.1",
     "markdown-it": "^14.1.0",
     "motion": "^12.4.7",
     "pino": "^9.6.0",
@@ -59,7 +61,17 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
-    ]
+      "https://*/*",
+      "http://*/*"
+    ],
+    "permissions": [
+      "sidePanel",
+      "scripting",
+      "tabs",
+      "activeTab"
+    ],
+    "side_panel": {
+      "default_path": "sidepanel.html"
+    }
   }
 }

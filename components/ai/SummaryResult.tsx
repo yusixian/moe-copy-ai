@@ -1,28 +1,24 @@
 import { Icon } from "@iconify/react"
-import { useCallback, useState } from "react"
+import { useClipboard } from "foxact/use-clipboard"
 
 import ContentDisplay from "~components/ContentDisplay"
 
 // 摘要结果组件
 export const SummaryResult = ({
   summary,
-  streamingText,
-  onCopy
+  streamingText
 }: {
   summary: string
   streamingText?: string
-  onCopy: () => void
 }) => {
   // 显示流式文本或完整摘要
   const displayText = summary || streamingText || ""
-  const [copied, setCopied] = useState(false)
+  const { copy, copied } = useClipboard({ timeout: 2000 })
 
-  const handleCopy = useCallback(() => {
-    if (copied) return
-    onCopy()
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }, [onCopy])
+  const handleCopy = () => {
+    if (!displayText) return
+    copy(displayText)
+  }
 
   return (
     <div className="mt-4 rounded-xl border-2 border-dashed border-sky-200 bg-white p-4 shadow-sm transition-all hover:border-sky-300 hover:shadow-md">

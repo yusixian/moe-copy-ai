@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react"
+import { useClipboard } from "foxact/use-clipboard"
 import { countTokens } from "gpt-tokenizer"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
@@ -24,8 +25,8 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
 }) => {
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [showCleanedContent, setShowCleanedContent] = useState(false)
-  // 添加动画状态
-  const [copySuccess, setCopySuccess] = useState(false)
+  // 复制功能
+  const { copy, copied: copySuccess } = useClipboard({ timeout: 2000 })
   // 添加编辑状态
   const [isEditing, setIsEditing] = useState(false)
   // 本地维护内容状态，使编辑即时生效
@@ -82,13 +83,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
 
   // 复制内容
   const handleCopy = () => {
-    navigator.clipboard
-      .writeText(currentContent)
-      .then(() => {
-        setCopySuccess(true)
-        setTimeout(() => setCopySuccess(false), 2000)
-      })
-      .catch((err) => console.error("复制失败:", err))
+    copy(currentContent)
   }
 
   // 切换编辑模式

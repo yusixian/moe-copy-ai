@@ -1,6 +1,8 @@
 import { Icon } from "@iconify/react"
+import { useClipboard } from "foxact/use-clipboard"
 import { memo, useCallback } from "react"
 
+import { sendToBackground } from "@plasmohq/messaging"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import AiSummarySection from "~/components/AiSummarySection"
@@ -36,6 +38,18 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
     handleSelectorChange,
     handleSelectContent
   } = useScrapedData()
+
+  const { copy: copyDebugInfo } = useClipboard()
+
+  // 打开侧边栏（批量抓取功能已移至侧边栏）
+  const handleOpenSidePanel = async () => {
+    try {
+      // 通过 Plasmo messaging 打开侧边栏（兼容内容脚本和扩展页面）
+      await sendToBackground({ name: "openSidePanel" })
+    } catch (error) {
+      console.error('打开侧边栏失败:', error)
+    }
+  }
 
   // 从存储中获取是否显示调试面板的设置
   const [showDebugPanel] = useStorage<string>("show_debug_panel", "true")
@@ -112,6 +126,13 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               <Icon icon="line-md:close" width="24" height="24" />
             </button>
           )}
+          <button
+            onClick={handleOpenSidePanel}
+            className="flex transform items-center gap-1.5 rounded-lg border border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 px-3 py-1.5 text-sm font-medium text-emerald-600 shadow-sm transition-all hover:scale-105 hover:border-emerald-400 hover:from-emerald-100 hover:to-teal-100 hover:shadow-md"
+            title="批量抓取文档（在侧边栏中打开）">
+            <Icon icon="mdi:file-document-multiple-outline" width="18" height="18" />
+            <span className="whitespace-nowrap">批量抓取</span>
+          </button>
           <button
             onClick={handleOpenGithub}
             className="transform rounded-full p-2 text-sky-500 transition hover:rotate-12 hover:bg-blue-50"
@@ -228,7 +249,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 className="rounded-full p-1 text-purple-500 transition-colors hover:bg-purple-100"
                 title="复制调试信息"
                 onClick={() => {
-                  navigator.clipboard.writeText(debugInfo)
+                  copyDebugInfo(debugInfo)
                   alert("调试信息已复制到剪贴板 (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
                 }}>
                 <Icon icon="line-md:clipboard-check" width="14" height="14" />

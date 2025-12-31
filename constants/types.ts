@@ -104,3 +104,137 @@ export interface ExtractorOptions {
     debug?: boolean
   }
 }
+
+// ==================== 批量抓取相关类型 ====================
+
+// 提取的链接
+export interface ExtractedLink {
+  url: string
+  text: string
+  index: number
+}
+
+// 选中的元素信息
+export interface SelectedElementInfo {
+  tagName: string
+  className: string
+  id: string
+  linkCount: number
+  outerHTML: string
+  selector?: string // 用于定位元素的 CSS 选择器
+}
+
+// 批量抓取状态模式
+export type BatchScrapeMode = 'idle' | 'selecting' | 'previewing' | 'scraping' | 'completed' | 'error'
+
+// 单页抓取状态
+export type PageScrapeStatus = 'pending' | 'fetching' | 'extracting' | 'success' | 'failed'
+
+// 抓取策略类型
+export type ScrapeStrategyType = 'fetch' | 'background-tabs' | 'current-tab'
+
+// 单页抓取结果
+export interface BatchScrapeResult {
+  url: string
+  success: boolean
+  title: string
+  content: string
+  error?: string
+  method: ScrapeStrategyType
+}
+
+// 批量抓取进度
+export interface BatchProgress {
+  total: number
+  completed: number
+  current: {
+    url: string
+    status: PageScrapeStatus
+  } | null
+  results: Array<{
+    url: string
+    status: 'success' | 'failed'
+    title?: string
+    error?: string
+  }>
+  startTime: number
+  isPaused: boolean
+}
+
+// 批量抓取选项
+export interface BatchScrapeOptions {
+  concurrency: number
+  timeout: number
+  retryCount: number
+  delayBetweenRequests: number
+}
+
+// 分页抓取选项
+export interface PaginationOptions {
+  maxPages: number
+  delayBetweenPages: number
+}
+
+// 链接过滤选项
+export interface LinkFilterOptions {
+  sameDomainOnly: boolean
+  excludeAnchors: boolean
+  excludeJavaScript: boolean
+  excludePatterns?: RegExp[]
+}
+
+// ZIP 导出选项
+export interface ZipExportOptions {
+  includeIndex: boolean
+  filenameFormat: 'title' | 'url' | 'index'
+  maxFilenameLength: number
+}
+
+// 聚合内容结果
+export interface AggregatedContent {
+  toc: string
+  content: string
+  metadata: {
+    totalPages: number
+    successCount: number
+    failedCount: number
+    totalChars: number
+    scrapedAt: string
+  }
+}
+
+// 元素选择器消息类型
+export interface ElementSelectorMessage extends Message {
+  action: 'activateSelector' | 'deactivateSelector' | 'elementSelected' | 'selectionCancelled'
+  elementInfo?: SelectedElementInfo
+  links?: ExtractedLink[]
+  purpose?: ElementSelectorPurpose
+  content?: ExtractedContent
+}
+
+// ==================== 内容提取相关类型 ====================
+
+// 元素选择器用途
+export type ElementSelectorPurpose = 'link-extraction' | 'content-extraction' | 'next-page-button'
+
+// 下一页按钮信息
+export interface NextPageButtonInfo {
+  xpath: string
+  text: string
+  description?: string
+}
+
+// 内容输出格式
+export type ContentOutputFormat = 'html' | 'markdown' | 'text'
+
+// 内容提取模式
+export type ContentExtractionMode = 'idle' | 'selecting' | 'extracted' | 'error'
+
+// 提取的内容
+export interface ExtractedContent {
+  html: string      // element.outerHTML (完整)
+  markdown: string  // 转换后的 Markdown
+  text: string      // element.textContent
+  elementInfo: SelectedElementInfo
+}
+

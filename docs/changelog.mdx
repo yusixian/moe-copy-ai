@@ -1,0 +1,146 @@
+---
+title: 更新日志
+description: 记录 MoeCopy AI 的所有版本更新、新功能、改进和修复。
+---
+
+## 版本说明
+
+### 版本号规则
+
+采用语义化版本号：`主版本号.次版本号.修订号`
+
+- **主版本号**：不兼容的 API 修改
+- **次版本号**：向下兼容的功能性新增
+- **修订号**：向下兼容的问题修正
+
+### 更新方式
+
+1. **Chrome 商店用户**：自动更新
+2. **开发版用户**：手动更新或使用 Git
+
+## 贡献者
+
+感谢所有为 MoeCopy AI 做出贡献的开发者！
+
+- [@yusixian](https://github.com/yusixian) - 项目作者
+- [@hyoban](https://github.com/hyoban) - 批量抓取功能贡献者
+- 以及所有提交 Issue 和 PR 的朋友们！
+
+## 反馈渠道
+
+- [MoeCopy AI Feedback](https://moecopy.featurebase.app/)
+- [GitHub Issues](https://github.com/yusixian/moe-copy-ai/issues)
+- [GitHub Discussions](https://github.com/yusixian/moe-copy-ai/discussions)
+- 邮箱：i@cosine.ren
+
+## [v0.2.0] - 2025-12-31
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.2.0)
+
+### 新功能
+
+- **侧边栏 (Side Panel)** - 全新的扩展侧边栏界面，提供更高效的工作流程
+
+  - 分段式标签导航，在批量抓取和内容提取之间快速切换
+  - 独立的设置面板，无需离开当前页面即可调整配置
+
+- **批量抓取功能** - 一次性抓取多个链接中的文档内容
+
+  - 可视化元素选择器，在页面上直接选择包含链接的区域
+  - 智能链接提取，自动识别并预览所有可抓取的链接
+  - 支持手动添加、编辑、删除链接
+  - 同域名过滤选项，只保留与当前页面同域名的链接
+  - **正则过滤** - 使用正则表达式精确筛选链接
+    - 匹配目标：URL / 文本 / 两者
+    - 过滤模式：排除匹配项 / 仅保留匹配项
+    - 8 个内置预设规则（排除图片、锚点、分页、登录注册、静态资源、媒体；仅保留文档、网页）
+    - 翻页抓取时自动应用相同的过滤规则
+  - **分页抓取** - 支持选择"下一页"按钮，自动翻页并收集所有链接
+  - **三种抓取策略**：
+    - Fetch API：直接获取页面 HTML，速度快但无法处理 JS 渲染
+    - 后台标签页：在后台标签页中加载页面，支持 JS 渲染和登录态
+    - 当前标签页：在当前标签页中依次访问，用户可见整个过程
+  - 实时进度显示，支持暂停/继续/取消
+  - **ZIP 导出** - 将所有抓取结果打包为 ZIP 文件，包含索引文件和单独的 Markdown 文档
+
+- **内容提取功能** - 选择页面元素，提取其内容为多种格式
+
+  - 可视化元素选择器
+  - 多格式输出：HTML / Markdown / 纯文本
+  - 一键复制到剪贴板
+
+- **模型选择改进** - 新增 ModelSelectInput 组件
+  - 支持从 API 获取可用模型列表
+  - 自定义输入模型名称
+  - 下拉选择与输入框结合
+
+### 改进
+
+- 重构 AI 设置逻辑，抽取 `useAiSettings` hook
+- 优化侧边栏设置面板 UI
+- 使用 foxact 的 clipboard hook 优化复制功能
+
+### 贡献者
+
+感谢 [@hyoban](https://github.com/hyoban) 贡献的抓取策略功能！
+
+**Full Changelog**: https://github.com/yusixian/moe-copy-ai/compare/0.1.6...0.2.0
+
+## [v0.1.6] - 2025-08-22
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.1.6)
+
+- [x] 新增 Readability 抓取模式和混合抓取模式：使用 Mozilla Firefox 阅读模式的核心算法 @mozilla/readability，智能识别和提取文章主体内容，也保留着原来的选择器模式。
+- [x] 新增全屏预览：预览抓取到的 Markdown 内容时支持全屏预览模式，提供更佳的阅读体验
+
+**Full Changelog**: https://github.com/yusixian/moe-copy-ai/compare/0.1.5...0.1.6
+
+## [v0.1.5] - 2025-04-09
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.1.5)
+
+- [x] Fix 移动端降级使用 generate-text 而不是流式输出
+
+## [v0.1.4] - 2025-03-24
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.1.4)
+
+- [x] 新增自动保存摘要历史记录，方便后续查看和参考
+- [x] 新增查看历史记录弹窗功能，可导出 JSON
+- [x] 新增临时关闭悬浮窗功能
+- [x] 修复移动端 AI 摘要失效问题
+
+## [v0.1.3] - 2025-03-24
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.1.3)
+
+- [x] 新增 AI 内容摘要功能，接 API
+- [x] 流式传输 streamText 浅尝试
+
+## [v0.1.2] - 2025-03-16
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.1.2)
+
+- [x] 新增 **自定义抓取选择器** - 允许用户自定义简单的 CSS 选择器规则和排序
+- [x] 优化 **字数与Token统计** - 优化估算的 AI 模型 token 数量
+- [x] 新增 **分词展示** - 使用 [gpt-tokenizer](https://github.com/niieani/gpt-tokenizer)
+
+## [v0.1.1] - 2025-03-03
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.1.1)
+
+初次发布
+
+- **一键解析**: 点击插件图标或浮动按钮，快速解析当前网页内容
+- **实时编辑**: 支持手动编辑提取的内容，满足自定义需求
+- **内容实时预览**: 在编辑内容时可实时预览效果
+- **智能识别**: 自动识别文章主体、标题、作者和发布日期
+- **多层级优先级抓取**: 按照预设的选择器优先级，确保抓取准确内容
+- **双版本输出**:
+  - 原始格式版: 保留 Markdown 格式和原始换行，适合需要保留格式的场景
+  - 紧凑版: 清理多余空格和换行，使文本更加精简，优化AI模型输入
+- **智能清理**: 自动去除干扰元素、多余空白和无意义内容
+- **字数与Token统计**: 显示内容实际字数和估算的 AI 模型 token 数量
+- **移动端适配**: 响应式设计，支持移动设备使用
+- **智能图片提取**: 从文章中提取出所有图片及其元信息
+- **页面元数据**: 自动提取 og:title、og:description 等元标签信息，以表格形式展示

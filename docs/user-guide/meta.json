@@ -1,0 +1,7 @@
+{
+  "title": "用户指南",
+  "description": "面向终端用户的使用指南",
+  "icon": "User",
+  "defaultOpen": true,
+  "pages": ["getting-started", "installation", "configuration", "usage", "faq"]
+}

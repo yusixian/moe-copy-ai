@@ -1,10 +1,10 @@
 import { Icon } from "@iconify/react"
+import { useClipboard } from "foxact/use-clipboard"
 import { AnimatePresence, motion } from "motion/react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "react-toastify"
 
 import type { AiChatHistoryItem } from "~constants/types"
-import { copyToClipboard } from "~utils"
 import {
   clearAiChatHistory,
   deleteAiChatHistoryItem,
@@ -27,6 +27,14 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(false)
   const drawerRef = useRef<HTMLDivElement>(null)
+  const { copy, copied } = useClipboard({ timeout: 2000 })
+
+  // 复制成功时显示 toast
+  useEffect(() => {
+    if (copied) {
+      toast.success("已复制到剪贴板 (●ˇ∀ˇ●)")
+    }
+  }, [copied])
 
   // 加载历史记录
   const loadHistory = useCallback(async () => {
@@ -93,11 +101,13 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
   }, [historyItems])
 
   // 复制内容
-  const handleCopy = useCallback((text: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    copyToClipboard(text)
-    toast.success("已复制到剪贴板 (●ˇ∀ˇ●)")
-  }, [])
+  const handleCopy = useCallback(
+    (text: string, e: React.MouseEvent) => {
+      e.stopPropagation()
+      copy(text)
+    },
+    [copy]
+  )
 
   // 切换展开/折叠状态
   const toggleExpand = useCallback((id: string) => {

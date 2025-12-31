@@ -1,0 +1,124 @@
+---
+title: 配置说明
+description: MoeCopy AI 的详细配置选项和参数说明
+---
+
+# 配置说明
+
+MoeCopy AI 提供了丰富的配置选项，让您可以根据需求定制扩展的行为。
+
+## 访问配置页面
+
+有多种方式打开配置页面：
+
+1. **右键菜单**：右键点击扩展图标 → 选择"选项"
+2. **扩展管理**：在 `chrome://extensions/` 中找到 MoeCopy AI → 点击"详情" → "扩展程序选项"
+3. **快捷入口**：在扩展弹窗中点击设置图标
+
+## 配置选项详解
+
+### 基础设置
+
+### AI 设置
+
+API 密钥存在本地，请妥善保管，不要泄露给他人
+不同模型的能力和价格不同，请根据需要选择合适的模型，并注意 token 消耗
+
+#### API 配置
+
+- 填入 apikey 与 baseUrl
+- 点击获取模型列表
+
+#### 提示词模板
+
+预定义的提示词模板，支持变量替换：
+
+```
+可用变量：
+{{content}} - 文章内容
+{{title}} - 文章标题
+{{url}} - 文章URL
+{{author}} - 作者
+{{publishDate}} - 发布日期
+{{cleanedContent}} - 清理后的内容
+{{meta.xxx}} - 元数据中的字段
+```
+
+#### 抓取模式
+
+选择内容提取的方式：
+ 
+- **选择器模式**：使用 CSS 选择器精确提取
+- **Readability 模式**：使用 Mozilla Readability 算法
+- **混合模式**：智能切换，优先选择器
+
+#### 抓取时机
+
+控制何时触发内容提取：
+
+- **自动抓取**：页面加载完成后自动提取
+- **手动抓取**：仅在用户点击悬浮球打开时提取
+
+### 界面设置
+
+#### 悬浮按钮
+
+控制页面右下角的快捷入口：
+
+- **显示**：在支持的页面显示悬浮球
+- **隐藏**：仅通过扩展图标访问
+
+#### 主题设置
+
+- **跟随系统**：自动适应系统深浅色主题
+- **浅色模式**：始终使用浅色主题
+- **深色模式**：始终使用深色主题
+
+### 选择器配置
+
+#### 内容选择器
+
+用于提取文章正文的 CSS 选择器：
+
+```css
+/* 默认选择器 */
+main, #content, .content, .article-content
+
+/* 自定义示例 */
+.custom-article-body
+#post-content
+div[itemprop="articleBody"]
+```
+
+#### 标题选择器
+
+```css
+/* 默认选择器 */
+h1, meta[property="og:title"]
+
+/* 自定义示例 */
+.article-title
+h1.post-title
+```
+
+#### 作者选择器
+
+```css
+/* 默认选择器 */
+meta[name="author"], [class*="author"]
+
+/* 自定义示例 */
+.author-name
+span.by-author
+```
+
+#### 日期选择器
+
+```css
+/* 默认选择器 */
+meta[property="article:published_time"], time
+
+/* 自定义示例 */
+.publish-date
+time[datetime]
+```

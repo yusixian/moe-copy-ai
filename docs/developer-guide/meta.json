@@ -1,0 +1,7 @@
+{
+  "title": "开发者文档",
+  "description": "面向开发者的技术文档",
+  "icon": "Code",
+  "defaultOpen": false,
+  "pages": ["api-reference", "changelog"]
+}
