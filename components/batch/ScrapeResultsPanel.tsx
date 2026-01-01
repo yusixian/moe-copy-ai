@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react"
 import { useClipboard } from "foxact/use-clipboard"
 import { memo, useCallback, useMemo, useState } from "react"
 
+import { Button } from "~/components/ui/button"
 import type { BatchScrapeResult } from "~constants/types"
 import { useSelectionSet } from "~hooks/useSelectionSet"
 import { cn } from "~utils"
@@ -34,7 +35,6 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
 
   const {
     selectedItems: selectedResults,
-    selectedCount,
     isSelected,
     selectAll,
     deselectAll,
@@ -176,26 +176,17 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
       {/* 选择操作栏 */}
       <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={selectAll}
-            className="flex items-center gap-1 rounded px-2 py-1 text-sky-600 text-xs hover:bg-sky-100">
-            <Icon icon="mdi:checkbox-multiple-marked" className="h-3.5 w-3.5" />
+          <Button variant="ghost" size="xs" onClick={selectAll}>
+            <Icon icon="mdi:checkbox-multiple-marked" className="mr-1 h-3.5 w-3.5" />
             全选
-          </button>
-          <button
-            type="button"
-            onClick={deselectAll}
-            className="flex items-center gap-1 rounded px-2 py-1 text-gray-600 text-xs hover:bg-gray-200">
-            <Icon
-              icon="mdi:checkbox-multiple-blank-outline"
-              className="h-3.5 w-3.5"
-            />
+          </Button>
+          <Button variant="ghost" size="xs" onClick={deselectAll}>
+            <Icon icon="mdi:checkbox-multiple-blank-outline" className="mr-1 h-3.5 w-3.5" />
             取消
-          </button>
+          </Button>
         </div>
         <span className="text-gray-500 text-xs">
-          已选 <b className="text-sky-600">{selectedStats.count}</b> /{" "}
+          已选 <b className="text-blue-600">{selectedStats.count}</b> /{" "}
           {stats.successCount}
         </span>
       </div>
@@ -209,8 +200,9 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
               "border-gray-100 border-b last:border-b-0",
               expandedIndex === index && "bg-gray-50"
             )}>
-            <div
-              className="flex cursor-pointer items-center gap-2 px-3 py-2 hover:bg-gray-50"
+            <button
+              type="button"
+              className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 hover:bg-gray-50"
               onClick={() => toggleExpand(index)}>
               {/* Checkbox - 仅成功项可勾选 */}
               {result.success ? (
@@ -264,7 +256,7 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
                   expandedIndex === index && "rotate-180"
                 )}
               />
-            </div>
+            </button>
             {expandedIndex === index && (
               <div className="border-gray-100 border-t bg-white px-3 py-2">
                 {/* URL + Copy JSON button */}
@@ -272,27 +264,19 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
                   <span className="flex-1 truncate text-gray-500 text-xs">
                     {result.url}
                   </span>
-                  <button
+                  <Button
+                    variant={copiedItemIndex === index ? "success" : "secondary"}
+                    size="xs"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleCopyItemJson(result, index)
-                    }}
-                    className={cn(
-                      "flex flex-shrink-0 items-center gap-1 rounded px-2 py-1 text-xs transition-colors",
-                      copiedItemIndex === index
-                        ? "bg-emerald-100 text-emerald-600"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    )}>
+                    }}>
                     <Icon
-                      icon={
-                        copiedItemIndex === index
-                          ? "mdi:check"
-                          : "mdi:code-json"
-                      }
-                      className="h-3.5 w-3.5"
+                      icon={copiedItemIndex === index ? "mdi:check" : "mdi:code-json"}
+                      className="mr-1 h-3.5 w-3.5"
                     />
                     {copiedItemIndex === index ? "已复制" : "JSON"}
-                  </button>
+                  </Button>
                 </div>
                 {/* Content */}
                 {result.success ? (
@@ -310,22 +294,21 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
                         "..."}
                     </div>
                     {result.content.length > 500 && (
-                      <button
+                      <Button
+                        variant="outline"
+                        size="xs"
+                        fullWidth
+                        className="mt-2"
                         onClick={(e) => {
                           e.stopPropagation()
                           toggleFullContent(index)
-                        }}
-                        className="mt-2 flex w-full items-center justify-center gap-1 rounded border border-gray-200 bg-white py-1 text-gray-500 text-xs transition-colors hover:bg-gray-50">
+                        }}>
                         <Icon
-                          icon={
-                            fullContentItems.has(index)
-                              ? "mdi:chevron-up"
-                              : "mdi:chevron-down"
-                          }
-                          className="h-4 w-4"
+                          icon={fullContentItems.has(index) ? "mdi:chevron-up" : "mdi:chevron-down"}
+                          className="mr-1 h-4 w-4"
                         />
                         {fullContentItems.has(index) ? "收起" : "展开全部"}
-                      </button>
+                      </Button>
                     )}
                   </div>
                 ) : (
@@ -338,68 +321,46 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
       </div>
 
       {/* 复制按钮 */}
-      <button
+      <Button
+        variant={copied ? "success" : "default"}
+        size="lg"
+        fullWidth
         onClick={handleCopyAll}
-        disabled={selectedStats.count === 0}
-        className={cn(
-          "flex w-full items-center justify-center gap-2 rounded-lg py-2.5 font-medium text-sm transition-all",
-          selectedStats.count === 0
-            ? "cursor-not-allowed bg-gray-200 text-gray-500"
-            : copied
-              ? "bg-emerald-500 text-white shadow-md"
-              : "bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-md hover:from-violet-600 hover:to-purple-600"
-        )}>
-        {copied ? (
-          <>
-            <Icon icon="mdi:check" className="h-4 w-4" />
-            已复制
-          </>
-        ) : (
-          <>
-            <Icon icon="mdi:content-copy" className="h-4 w-4" />
-            复制选中 ({selectedStats.count})
-          </>
-        )}
-      </button>
+        disabled={selectedStats.count === 0}>
+        <Icon icon={copied ? "mdi:check" : "mdi:content-copy"} className="mr-1 h-4 w-4" />
+        {copied ? "已复制" : `复制选中 (${selectedStats.count})`}
+      </Button>
 
       {/* 导出按钮 */}
       <div className="flex gap-3">
-        <button
+        <Button
+          variant="default"
+          size="md"
+          fullWidth
           onClick={handleExportMarkdown}
-          disabled={isExporting || selectedStats.count === 0}
-          className={cn(
-            "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 font-medium text-sm transition-all",
-            selectedStats.count > 0 && !isExporting
-              ? "bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-md hover:from-sky-600 hover:to-indigo-600"
-              : "cursor-not-allowed bg-gray-200 text-gray-500"
-          )}>
-          <Icon icon="mdi:file-document-outline" className="h-4 w-4" />
+          disabled={isExporting || selectedStats.count === 0}>
+          <Icon icon="mdi:file-document-outline" className="mr-1 h-4 w-4" />
           导出 MD
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="success"
+          size="md"
+          fullWidth
           onClick={handleExportZip}
-          disabled={isExporting || selectedStats.count === 0}
-          className={cn(
-            "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 font-medium text-sm transition-all",
-            selectedStats.count > 0 && !isExporting
-              ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md hover:from-emerald-600 hover:to-teal-600"
-              : "cursor-not-allowed bg-gray-200 text-gray-500"
-          )}>
-          <Icon icon="mdi:folder-zip-outline" className="h-4 w-4" />
+          disabled={isExporting || selectedStats.count === 0}>
+          <Icon icon="mdi:folder-zip-outline" className="mr-1 h-4 w-4" />
           导出 ZIP
-        </button>
+        </Button>
       </div>
 
       {/* AI 总结 */}
       {selectedStats.count > 0 && <BatchAiSummary results={selectedResults} />}
 
       {/* 重新开始 */}
-      <button
-        onClick={onReset}
-        className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
-        <Icon icon="mdi:refresh" className="h-4 w-4" />
+      <Button variant="outline" size="md" fullWidth onClick={onReset}>
+        <Icon icon="mdi:refresh" className="mr-1 h-4 w-4" />
         重新开始
-      </button>
+      </Button>
     </div>
   )
 })

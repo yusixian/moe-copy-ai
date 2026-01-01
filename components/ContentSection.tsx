@@ -37,10 +37,6 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
   // 添加全屏状态
   const [isFullscreen, setIsFullscreen] = useState(false)
 
-  if (!articleContent) {
-    return null
-  }
-
   // 获取当前要显示的内容
   const currentContent = useMemo(() => {
     const content = showCleanedContent
@@ -146,6 +142,10 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
     }
   }, [isFullscreen])
 
+  if (!articleContent) {
+    return null
+  }
+
   return (
     <div className="relative mb-4">
       <h2 className="absolute top-1 right-1 z-20 flex w-auto items-center justify-between font-semibold text-lg text-sky-600">
@@ -221,22 +221,11 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
         </Button>
 
         <Button
-          variant={copySuccess ? "success" : "copy"}
+          variant={copySuccess ? "success" : "default"}
           size="sm"
           onClick={handleCopy}>
-          {copySuccess ? "成功" : "复制"}
+          {copySuccess ? "已复制" : "复制"}
         </Button>
-
-        {/* 复制成功动画 */}
-        {copySuccess && (
-          <div className="-top-12 -translate-y-1 absolute right-0 transform rounded-full border border-green-200 bg-gradient-to-br from-green-50 to-emerald-100 px-4 py-2 text-green-600 text-xs shadow-md">
-            <div className="flex items-center">
-              <span className="mr-1">(っ◔◡◔)っ</span>
-              内容已复制到剪贴板!
-              <span className="ml-1 inline-block animate-pulse">♥</span>
-            </div>
-          </div>
-        )}
       </div>
       <TokenizationDisplay
         className="mt-4"

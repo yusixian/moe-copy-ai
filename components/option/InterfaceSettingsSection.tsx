@@ -13,7 +13,7 @@ export const InterfaceSettingsSection: React.FC = () => {
         options={FLOAT_BUTTON_OPTIONS}
         storageKey="show_float_button"
         defaultValue="true"
-        description="控制是否在网页中显示悬浮球。关闭后将不会在浏览的网页中显示悬浮窗，您仍可以通过浏览器扩展图标使用功能 (=^･ω･^=)"
+        description="控制是否在网页中显示悬浮球。关闭后将不会在浏览的网页中显示悬浮窗，您仍可以通过浏览器扩展图标使用功能"
       />
     </OptionSection>
   )

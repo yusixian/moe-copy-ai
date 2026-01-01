@@ -35,7 +35,7 @@ export interface ScrapedContent {
 // 消息接口
 export interface Message {
   action: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface ScrapeResponse {

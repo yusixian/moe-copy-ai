@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react"
 import { memo, useMemo, useState } from "react"
 
+import { Button } from "~/components/ui/button"
 import type {
   ExtractedLink,
   NextPageButtonInfo,
@@ -172,12 +173,10 @@ const LinkPreviewList = memo(function LinkPreviewList({
               </span>
             )}
           </div>
-          <button
-            onClick={onReselect}
-            className="flex items-center gap-1 text-sky-600 text-xs hover:text-sky-700">
-            <Icon icon="mdi:refresh" className="h-3.5 w-3.5" />
+          <Button variant="ghost" size="xs" onClick={onReselect}>
+            <Icon icon="mdi:refresh" className="mr-1 h-3.5 w-3.5" />
             重新选择
-          </button>
+          </Button>
         </div>
       )}
 
@@ -226,21 +225,22 @@ const LinkPreviewList = memo(function LinkPreviewList({
         {links.length > 0 && (
           <div className="flex items-center gap-2 text-xs">
             <span className="text-gray-400">导出</span>
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={handleExportMarkdown}
-              disabled={isExporting}
-              className="flex items-center gap-1 text-gray-500 hover:text-sky-600 disabled:opacity-50">
-              <Icon icon="mdi:file-document-outline" className="h-3.5 w-3.5" />
+              disabled={isExporting}>
+              <Icon icon="mdi:file-document-outline" className="mr-1 h-3.5 w-3.5" />
               MD
-            </button>
-            <span className="text-gray-300">|</span>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={handleExportJson}
-              disabled={isExporting}
-              className="flex items-center gap-1 text-gray-500 hover:text-sky-600 disabled:opacity-50">
-              <Icon icon="mdi:code-json" className="h-3.5 w-3.5" />
+              disabled={isExporting}>
+              <Icon icon="mdi:code-json" className="mr-1 h-3.5 w-3.5" />
               JSON
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -287,17 +287,13 @@ const LinkPreviewList = memo(function LinkPreviewList({
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
                 <div className="flex gap-2">
-                  <button
-                    onClick={saveEdit}
-                    className="flex items-center gap-1 rounded bg-emerald-500 px-2 py-0.5 text-white text-xs hover:bg-emerald-600">
-                    <Icon icon="mdi:check" className="h-3 w-3" />
+                  <Button variant="success" size="xs" onClick={saveEdit}>
+                    <Icon icon="mdi:check" className="mr-1 h-3 w-3" />
                     保存
-                  </button>
-                  <button
-                    onClick={cancelEdit}
-                    className="flex items-center gap-1 rounded bg-gray-200 px-2 py-0.5 text-gray-700 text-xs hover:bg-gray-300">
+                  </Button>
+                  <Button variant="secondary" size="xs" onClick={cancelEdit}>
                     取消
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -312,18 +308,22 @@ const LinkPreviewList = memo(function LinkPreviewList({
                   </div>
                 </div>
                 <div className="flex flex-shrink-0 items-center gap-1">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
                     onClick={() => startEdit(link)}
-                    className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-sky-600"
                     title="编辑">
                     <Icon icon="mdi:pencil" className="h-4 w-4" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-red-500 hover:bg-red-50 hover:text-red-600"
                     onClick={() => onRemoveLink(link.index)}
-                    className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-red-500"
                     title="删除">
                     <Icon icon="mdi:close" className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
               </>
             )}
@@ -352,27 +352,29 @@ const LinkPreviewList = memo(function LinkPreviewList({
             className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="default"
+              size="sm"
               onClick={handleAddLink}
-              disabled={!addForm.url.trim()}
-              className="flex items-center gap-1 rounded bg-sky-500 px-3 py-1 text-sm text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50">
-              <Icon icon="mdi:plus" className="h-4 w-4" />
+              disabled={!addForm.url.trim()}>
+              <Icon icon="mdi:plus" className="mr-1 h-4 w-4" />
               添加
-            </button>
-            <button
-              onClick={cancelAdd}
-              className="rounded bg-gray-200 px-3 py-1 text-gray-700 text-sm hover:bg-gray-300">
+            </Button>
+            <Button variant="secondary" size="sm" onClick={cancelAdd}>
               取消
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
-        <button
-          onClick={() => setIsAdding(true)}
-          className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-300 border-dashed py-2 text-gray-500 text-sm transition-colors hover:border-sky-400 hover:bg-sky-50 hover:text-sky-600">
-          <Icon icon="mdi:plus" className="h-4 w-4" />
+        <Button
+          variant="outline"
+          size="sm"
+          fullWidth
+          className="border-dashed"
+          onClick={() => setIsAdding(true)}>
+          <Icon icon="mdi:plus" className="mr-1 h-4 w-4" />
           添加链接
-        </button>
+        </Button>
       )}
 
       {/* 下一页按钮选择 */}
@@ -388,11 +390,13 @@ const LinkPreviewList = memo(function LinkPreviewList({
             </span>
           </div>
           {nextPageButton && (
-            <button
-              onClick={onClearNextPage}
-              className="text-gray-400 text-xs hover:text-red-500">
+            <Button
+              variant="ghost"
+              size="xs"
+              className="text-gray-400 hover:text-red-500"
+              onClick={onClearNextPage}>
               清除
-            </button>
+            </Button>
           )}
         </div>
         {isSelectingNextPage ? (
@@ -421,19 +425,20 @@ const LinkPreviewList = memo(function LinkPreviewList({
                 </div>
               </div>
             </div>
-            <button
-              onClick={onSelectNextPage}
-              className="text-indigo-600 text-xs hover:text-indigo-700">
+            <Button variant="ghost" size="xs" onClick={onSelectNextPage}>
               重新选择
-            </button>
+            </Button>
           </div>
         ) : (
-          <button
-            onClick={onSelectNextPage}
-            className="flex w-full items-center justify-center gap-1.5 rounded-md border border-gray-300 border-dashed py-2 text-gray-500 text-sm transition-colors hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-600">
-            <Icon icon="mdi:cursor-default-click" className="h-4 w-4" />
+          <Button
+            variant="outline"
+            size="sm"
+            fullWidth
+            className="border-dashed"
+            onClick={onSelectNextPage}>
+            <Icon icon="mdi:cursor-default-click" className="mr-1 h-4 w-4" />
             选择"下一页"按钮
-          </button>
+          </Button>
         )}
         <p className="mt-2 text-gray-400 text-xs">
           选择后，抓取完当前页会自动点击下一页继续抓取
@@ -442,12 +447,13 @@ const LinkPreviewList = memo(function LinkPreviewList({
 
       {/* 操作按钮 */}
       <div className="flex gap-3">
-        <button
-          onClick={onCancel}
-          className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2.5 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
+        <Button variant="outline" size="lg" fullWidth onClick={onCancel}>
           取消
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="success"
+          size="lg"
+          fullWidth
           onClick={() =>
             onStartScrape(
               selectedLinks,
@@ -462,16 +468,10 @@ const LinkPreviewList = memo(function LinkPreviewList({
                 : undefined
             )
           }
-          disabled={selectedCount === 0}
-          className={cn(
-            "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 font-medium text-sm text-white transition-all",
-            selectedCount > 0
-              ? "bg-gradient-to-r from-emerald-500 to-teal-500 shadow-md hover:from-emerald-600 hover:to-teal-600 hover:shadow-lg"
-              : "cursor-not-allowed bg-gray-300"
-          )}>
-          <Icon icon="mdi:play" className="h-4 w-4" />
+          disabled={selectedCount === 0}>
+          <Icon icon="mdi:play" className="mr-1 h-4 w-4" />
           开始抓取 ({selectedCount}/{filteredLinks.length})
-        </button>
+        </Button>
       </div>
     </div>
   )

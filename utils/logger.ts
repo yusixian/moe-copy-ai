@@ -121,6 +121,7 @@ storage.watch({
 })
 
 // 增强的日志输出，兼容旧代码
+// biome-ignore lint/suspicious/noExplicitAny: pino logger requires flexible typing
 export function debugLog(...args: any[]): void {
   // 检查当前日志级别是否允许debug输出
   // pino的level是数字，debug对应20，silent对应Infinity

@@ -1,5 +1,8 @@
+import { Icon } from "@iconify/react"
 import MarkdownIt from "markdown-it"
 import { useEffect, useMemo, useRef } from "react"
+
+import { Button } from "~/components/ui/button"
 
 interface ContentDisplayProps {
   content: string
@@ -79,7 +82,8 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
                   className="h-4 w-4 text-sky-600"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                  aria-hidden="true">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -97,28 +101,18 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
                 </p>
               </div>
             </div>
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={(e) => {
                 e.stopPropagation()
                 // 通过事件冒泡通知父组件退出全屏
                 const event = new CustomEvent("exitFullscreen")
                 document.dispatchEvent(event)
-              }}
-              className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              }}>
+              <Icon icon="mdi:close" className="mr-1.5 h-4 w-4" />
               关闭
-            </button>
+            </Button>
           </div>
           {/* 全屏内容区域 */}
           <div

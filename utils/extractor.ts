@@ -373,26 +373,36 @@ async function scrapeWithSelectors(
     }
   }
 
+  // 确保 selectorResults 已初始化
+  if (!scrapedContent.selectorResults) {
+    scrapedContent.selectorResults = {
+      content: [],
+      author: [],
+      date: [],
+      title: []
+    }
+  }
+
   // 提取标题
   const { title, results: titleResults } = await extractTitle(
     customSelectors?.title
   )
   scrapedContent.title = title
-  scrapedContent.selectorResults!.title = titleResults
+  scrapedContent.selectorResults.title = titleResults
 
   // 提取作者信息
   const { author, results: authorResults } = await extractAuthor(
     customSelectors?.author
   )
   scrapedContent.author = author
-  scrapedContent.selectorResults!.author = authorResults
+  scrapedContent.selectorResults.author = authorResults
 
   // 提取发布日期
   const { publishDate, results: dateResults } = await extractPublishDate(
     customSelectors?.date
   )
   scrapedContent.publishDate = publishDate
-  scrapedContent.selectorResults!.date = dateResults
+  scrapedContent.selectorResults.date = dateResults
 
   // 提取文章内容
   debugLog("开始抓取文章内容")
@@ -401,7 +411,7 @@ async function scrapeWithSelectors(
     customSelectors?.content
   )
   scrapedContent.articleContent = content
-  scrapedContent.selectorResults!.content = contentResults
+  scrapedContent.selectorResults.content = contentResults
 
   // 生成清洁版内容
   scrapedContent.cleanedContent = cleanContent(scrapedContent.articleContent)
@@ -422,7 +432,7 @@ export async function scrapeWebpageContent(
   const {
     mode = "selector",
     customSelectors,
-    readabilityConfig
+    readabilityConfig: _readabilityConfig
   } = options || {}
 
   debugLog("开始抓取网页内容，模式:", mode)

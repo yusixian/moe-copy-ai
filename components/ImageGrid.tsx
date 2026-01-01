@@ -85,7 +85,7 @@ const ImageCard = memo(
         )}
       </div>
       <div className="truncate border-sky-100/50 border-t bg-gradient-to-r from-blue-50/80 to-sky-50/80 p-2 text-center font-medium text-sky-700 text-xs">
-        {img.alt || img.title || `图片 #${img.index} ✨`}
+        {img.alt || img.title || `图片 #${img.index}`}
       </div>
 
       <div className="border-sky-100/50 border-t bg-gradient-to-r from-blue-50/60 to-sky-50/60 px-3 py-2 transition-all duration-300">
@@ -182,7 +182,7 @@ export const ImageGrid: React.FC<ImageGridProps> = ({
       <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
         {images.map((img, index) => (
           <ImageCard
-            key={index}
+            key={img.src || `img-${index}`}
             img={img}
             index={index}
             isHovered={hoveredIndex === index}

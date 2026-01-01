@@ -5,6 +5,24 @@ import type { ImageInfo, ReadabilityResult } from "../constants/types"
 import { debugLog } from "./logger"
 
 /**
+ * Readability.parse() 的实际返回类型
+ * 注意：@mozilla/readability 的类型定义中 content 是 T (泛型)，
+ * 但实际返回的是 HTML 字符串
+ */
+interface ReadabilityParseResult {
+  title: string
+  content: string
+  textContent: string
+  length: number
+  excerpt: string
+  byline: string
+  dir: string
+  siteName: string
+  lang: string
+  publishedTime: string
+}
+
+/**
  * 使用 DOMPurify + Readability.js 提取网页内容
  * 先用DOMPurify清洗整个body，然后用Readability进行智能提取
  */
@@ -154,11 +172,11 @@ ${cleanBodyHTML}
     debugLog("Readability 配置:", readabilityOptions)
 
     // 执行内容提取
-    let article: any
+    let article: ReadabilityParseResult | null
     try {
       debugLog("开始执行 Readability 解析")
       const reader = new Readability(documentForReadability, readabilityOptions)
-      article = reader.parse()
+      article = reader.parse() as ReadabilityParseResult | null
 
       debugLog("Readability 解析完成:", {
         success: !!article,
@@ -686,10 +704,10 @@ export function extractImagesFromMarkdown(
 ): ImageInfo[] {
   const images: ImageInfo[] = []
   const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g
-  let match: RegExpExecArray | null
+  let match: RegExpExecArray | null = imageRegex.exec(markdownContent)
   let index = 0
 
-  while ((match = imageRegex.exec(markdownContent)) !== null) {
+  while (match !== null) {
     images.push({
       src: match[2],
       alt: match[1] || `图片#${index}`,
@@ -697,6 +715,7 @@ export function extractImagesFromMarkdown(
       index: index
     })
     index++
+    match = imageRegex.exec(markdownContent)
   }
 
   return images

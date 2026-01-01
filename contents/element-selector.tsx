@@ -1,6 +1,6 @@
 import cssText from "data-text:~styles/element-selector.css"
 import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import type {
   ElementSelectorPurpose,
@@ -279,6 +279,7 @@ function InfoPanel({
 
       <div style={{ display: "flex", gap: "8px" }}>
         <button
+          type="button"
           onClick={onCancel}
           style={{
             flex: 1,
@@ -294,6 +295,7 @@ function InfoPanel({
           取消
         </button>
         <button
+          type="button"
           onClick={onConfirm}
           disabled={
             !isContentMode && !isNextPageButtonMode && links.length === 0
@@ -358,7 +360,7 @@ function ElementSelector() {
   nextPageButtonInfoRef.current = nextPageButtonInfo
 
   // 重置所有状态
-  const resetState = () => {
+  const resetState = useCallback(() => {
     setIsActive(false)
     setSelectedElement(null)
     setSelectedRect(null)
@@ -370,7 +372,7 @@ function ElementSelector() {
     setExtractedContent(null)
     setNextPageButtonInfo(null)
     hoveredElementRef.current = null
-  }
+  }, [])
 
   // 切换同域名过滤
   const handleToggleSameDomain = () => {

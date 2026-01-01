@@ -77,6 +77,17 @@ export const useScrapedData = () => {
     setDebugInfo((prev) => prev + (prev ? "\n" : "") + info)
   }, [])
 
+  // 选择器类型名称映射 (moved before usage)
+  const getSelectorTypeName = useCallback((type: SelectorType): string => {
+    const nameMap: Record<SelectorType, string> = {
+      content: "内容",
+      author: "作者",
+      date: "日期",
+      title: "标题"
+    }
+    return nameMap[type]
+  }, [])
+
   const initLoadSelectors = useCallback(async () => {
     try {
       const selectorCounts = Object.entries(DEFAULT_SELECTORS_MAP)
@@ -143,7 +154,10 @@ export const useScrapedData = () => {
           addDebugInfo(`使用自定义选择器: ${JSON.stringify(overrideSelectors)}`)
         }
 
-        const response = await sendToBackground<any, ScrapeResponse>({
+        const response = await sendToBackground<
+          { selectors?: Partial<Record<SelectorType, string>> },
+          ScrapeResponse
+        >({
           name: "getScrapedContent",
           body: {
             selectors: overrideSelectors
@@ -192,17 +206,6 @@ export const useScrapedData = () => {
     },
     [addDebugInfo]
   )
-
-  // 选择器类型名称映射
-  const getSelectorTypeName = (type: SelectorType): string => {
-    const nameMap: Record<SelectorType, string> = {
-      content: "内容",
-      author: "作者",
-      date: "日期",
-      title: "标题"
-    }
-    return nameMap[type]
-  }
 
   // 检查选择器有效性
   const isValidSelector = useCallback(

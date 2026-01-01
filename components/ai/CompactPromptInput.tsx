@@ -58,7 +58,11 @@ const CompactPromptInput = ({
     <div className="space-y-2">
       {/* 标题行 */}
       <div className="flex items-center justify-between">
-        <label className="font-medium text-gray-600 text-xs">提示词</label>
+        <label
+          htmlFor="compact-prompt-input"
+          className="font-medium text-gray-600 text-xs">
+          提示词
+        </label>
         {supportedPlaceholders && supportedPlaceholders.length > 0 && (
           <button
             type="button"
@@ -72,6 +76,7 @@ const CompactPromptInput = ({
 
       {/* 输入框 */}
       <textarea
+        id="compact-prompt-input"
         value={customPrompt}
         onChange={(e) => setCustomPrompt(e.target.value)}
         disabled={disabled}

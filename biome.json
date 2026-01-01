@@ -25,6 +25,12 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "suspicious": {
+        "noUnknownAtRules": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      },
       "nursery": {
         "useSortedClasses": {
           "level": "warn",
@@ -32,6 +38,11 @@
           "options": {}
         }
       }
+    }
+  },
+  "css": {
+    "linter": {
+      "enabled": false
     }
   },
   "files": {

@@ -3,6 +3,7 @@ import { useStorage } from "@plasmohq/storage/hook"
 import { useLayoutEffect, useState } from "react"
 import { toast } from "react-toastify"
 
+import { Button } from "~/components/ui/button"
 import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
 import { useAiSettings } from "~hooks/useAiSettings"
@@ -33,6 +34,7 @@ function ToggleRow({
         {label}
       </span>
       <button
+        type="button"
         onClick={() => onChange(!checked)}
         className={`relative h-5 w-9 rounded-full transition-colors ${
           checked ? "bg-sky-500" : "bg-gray-300"
@@ -78,6 +80,7 @@ function ExtractionModeSettings() {
       <div className="grid grid-cols-3 gap-1">
         {modes.map((m) => (
           <button
+            type="button"
             key={m.value}
             onClick={() => handleChange(m.value as ExtractionMode)}
             className={`rounded-md px-2 py-1.5 text-center text-xs transition-all ${
@@ -116,8 +119,13 @@ function AiSettings() {
   return (
     <div className="space-y-3">
       <div>
-        <label className="mb-1 block text-gray-600 text-xs">API Key</label>
+        <label
+          htmlFor="sp-api-key"
+          className="mb-1 block text-gray-600 text-xs">
+          API Key
+        </label>
         <input
+          id="sp-api-key"
           type="password"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
@@ -127,31 +135,41 @@ function AiSettings() {
       </div>
 
       <div>
-        <label className="mb-1 block text-gray-600 text-xs">Base URL</label>
+        <label
+          htmlFor="sp-base-url"
+          className="mb-1 block text-gray-600 text-xs">
+          Base URL
+        </label>
         <div className="flex gap-1">
           <input
+            id="sp-base-url"
             type="text"
             value={baseURL}
             onChange={(e) => setBaseURL(e.target.value)}
             className="flex-1 rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
             placeholder="https://api.openai.com/v1/"
           />
-          <button
+          <Button
+            variant="secondary"
+            size="icon"
             onClick={() => fetchModels()}
             disabled={isLoadingModels}
-            className="rounded bg-sky-100 px-2 py-1 text-sky-600 text-xs hover:bg-sky-200 disabled:opacity-50">
+            className="h-7 w-7">
             <Icon
               icon={isLoadingModels ? "mdi:loading" : "mdi:refresh"}
               width={14}
               className={isLoadingModels ? "animate-spin" : ""}
             />
-          </button>
+          </Button>
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-gray-600 text-xs">模型</label>
+        <label htmlFor="sp-model" className="mb-1 block text-gray-600 text-xs">
+          模型
+        </label>
         <ModelSelectInput
+          id="sp-model"
           value={model}
           onChange={setModel}
           options={modelList}
@@ -160,8 +178,13 @@ function AiSettings() {
       </div>
 
       <div>
-        <label className="mb-1 block text-gray-600 text-xs">系统提示词</label>
+        <label
+          htmlFor="sp-system-prompt"
+          className="mb-1 block text-gray-600 text-xs">
+          系统提示词
+        </label>
         <textarea
+          id="sp-system-prompt"
           value={systemPrompt}
           onChange={(e) => setSystemPrompt(e.target.value)}
           rows={3}
@@ -169,12 +192,10 @@ function AiSettings() {
         />
       </div>
 
-      <button
-        onClick={saveSettings}
-        className="flex w-full items-center justify-center gap-1 rounded bg-sky-500 py-1.5 font-medium text-white text-xs hover:bg-sky-600">
-        <Icon icon="mdi:content-save" width={14} />
+      <Button fullWidth size="sm" onClick={saveSettings}>
+        <Icon icon="mdi:content-save" width={14} className="mr-1" />
         保存
-      </button>
+      </Button>
     </div>
   )
 }
@@ -273,10 +294,12 @@ export default function SidePanelSettings() {
       />
 
       {/* 选择器设置 - 跳转到完整设置页 */}
-      <button
+      <Button
+        variant="outline"
+        fullWidth
         onClick={openFullSettings}
-        className="flex w-full items-center justify-between rounded-lg border border-sky-200 bg-white p-3 text-left transition-colors hover:bg-sky-50">
-        <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
+        className="justify-between p-3">
+        <span className="flex items-center gap-2 font-medium text-sm">
           <Icon icon="mdi:code-braces" width={16} />
           选择器设置
         </span>
@@ -284,7 +307,7 @@ export default function SidePanelSettings() {
           打开完整设置
           <Icon icon="mdi:open-in-new" width={14} />
         </span>
-      </button>
+      </Button>
     </div>
   )
 }

@@ -42,10 +42,10 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
         <thead className="bg-gradient-to-r from-blue-100 to-indigo-100">
           <tr>
             <th className="w-1/5 px-3 py-2 text-left font-medium text-sky-600 text-xs uppercase tracking-wider">
-              属性 🏷️
+              属性
             </th>
             <th className="w-4/5 px-3 py-2 text-left font-medium text-sky-600 text-xs uppercase tracking-wider">
-              值 ✨
+              值
             </th>
           </tr>
         </thead>
@@ -88,7 +88,7 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
         </tbody>
       </table>
       <div className="border-blue-100 border-t bg-blue-50 p-1 text-center text-sky-400 text-xs">
-        ✨ 元数据可以帮助 AI 更好地理解页面内容 ✨
+        元数据可以帮助 AI 更好地理解页面内容
       </div>
     </div>
   )

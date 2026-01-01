@@ -32,7 +32,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
   // 复制成功时显示 toast
   useEffect(() => {
     if (copied) {
-      toast.success("已复制到剪贴板 (●ˇ∀ˇ●)")
+      toast.success("已复制到剪贴板")
     }
   }, [copied])
 
@@ -57,10 +57,10 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
     try {
       await deleteAiChatHistoryItem(id)
       setHistoryItems((prev) => prev.filter((item) => item.id !== id))
-      toast.success("已删除记录 (￣▽￣)")
+      toast.success("已删除记录")
     } catch (error) {
       console.error("删除历史记录失败:", error)
-      toast.error("删除失败 (╥﹏╥)")
+      toast.error("删除失败")
     }
   }, [])
 
@@ -70,10 +70,10 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
       try {
         await clearAiChatHistory()
         setHistoryItems([])
-        toast.success("已清空所有历史记录 (・ω・)ノ")
+        toast.success("已清空所有历史记录")
       } catch (error) {
         console.error("清空历史记录失败:", error)
-        toast.error("清空失败 (╥﹏╥)")
+        toast.error("清空失败")
       }
     }
   }, [])
@@ -93,10 +93,10 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
 
-      toast.success("导出成功 (●'◡'●)")
+      toast.success("导出成功")
     } catch (error) {
       console.error("导出历史记录失败:", error)
-      toast.error("导出失败 (╥﹏╥)")
+      toast.error("导出失败")
     }
   }, [historyItems])
 
@@ -176,7 +176,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
             exit={{ scaleY: 0, opacity: 0 }}
             transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
             onClick={stopPropagation}
-            className="-inset-x-0.5 -bottom-1 fixed z-50 flex h-[80vh] origin-bottom flex-col overflow-hidden rounded-xl bg-white shadow-xl">
+            className="fixed -inset-x-0.5 -bottom-1 z-50 flex h-[80vh] origin-bottom flex-col overflow-hidden rounded-xl bg-white shadow-xl">
             <div className="flex items-center justify-between border-indigo-100 border-b bg-sky-50 p-4">
               <h3 className="flex items-center font-semibold text-lg text-sky-600">
                 <Icon
@@ -191,6 +191,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                 {historyItems.length > 0 && (
                   <>
                     <button
+                      type="button"
                       onClick={handleExport}
                       className="flex items-center rounded-md bg-blue-100 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-200">
                       <Icon
@@ -202,6 +203,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                       导出
                     </button>
                     <button
+                      type="button"
                       onClick={handleClearAll}
                       className="flex items-center rounded-md bg-red-100 px-2 py-1 font-medium text-red-600 text-xs hover:bg-red-200">
                       <Icon
@@ -215,6 +217,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                   </>
                 )}
                 <button
+                  type="button"
                   onClick={onClose}
                   className="flex items-center rounded-md bg-sky-100 px-2 py-1 font-medium text-sky-600 text-xs hover:bg-sky-200">
                   <Icon icon="line-md:close" width="16" height="16" />
@@ -244,7 +247,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                     height="32"
                   />
                   <p className="text-center text-sm">
-                    还没有聊天记录 (´･ω･`)
+                    还没有聊天记录
                     <br />
                     与AI聊天后会自动保存
                   </p>
@@ -252,9 +255,10 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
               ) : (
                 <div className="flex flex-col gap-3">
                   {historyItems.map((item) => (
-                    <div
+                    <button
+                      type="button"
                       key={item.id}
-                      className="cursor-pointer rounded-xl border border-sky-100 bg-white p-3 shadow-sm transition-all hover:border-sky-200 hover:shadow"
+                      className="cursor-pointer rounded-xl border border-sky-100 bg-white p-3 text-left shadow-sm transition-all hover:border-sky-200 hover:shadow"
                       onClick={() => toggleExpand(item.id)}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
@@ -279,6 +283,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                         </div>
                         <div className="flex items-center gap-1">
                           <button
+                            type="button"
                             onClick={(e) => handleCopy(item.content, e)}
                             className="rounded-full p-1 text-sky-500 hover:bg-sky-100"
                             title="复制内容">
@@ -289,6 +294,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                             />
                           </button>
                           <button
+                            type="button"
                             onClick={(e) => handleDelete(item.id, e)}
                             className="rounded-full p-1 text-red-500 hover:bg-red-100"
                             title="删除记录">
@@ -325,8 +331,9 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                             {item.processedPrompt &&
                               item.processedPrompt !== item.prompt && (
                                 <div className="mb-2 rounded-md bg-emerald-50 p-2">
-                                  <div
-                                    className="flex cursor-pointer items-center justify-between"
+                                  <button
+                                    type="button"
+                                    className="flex w-full cursor-pointer items-center justify-between"
                                     onClick={(e) =>
                                       togglePromptExpand(item.id, e)
                                     }>
@@ -343,7 +350,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                                       width="16"
                                       height="16"
                                     />
-                                  </div>
+                                  </button>
                                   <AnimatePresence initial={false}>
                                     {expandedPrompts.has(item.id) && (
                                       <motion.div
@@ -395,7 +402,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                           </motion.div>
                         )}
                       </AnimatePresence>
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}

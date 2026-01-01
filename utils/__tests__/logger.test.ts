@@ -11,7 +11,7 @@ const mockChrome = {
 const originalEnv = process.env
 
 // 保存传输函数
-let transmitSendFunction: Function | null = null
+let transmitSendFunction: ((...args: unknown[]) => void) | null = null
 
 // 创建pino实例mock
 const mockPinoInstance = {
@@ -24,8 +24,10 @@ const mockPinoInstance = {
   fatal: jest.fn()
 }
 
-// Watch回调函数
-let watchCallback: Function | null = null
+// Watch回调函数 - 接收一个包含 newValue 的对象
+let watchCallback:
+  | ((change: { newValue: string | null; oldValue?: string }) => void)
+  | null = null
 
 // 模拟Storage
 const mockStorage = {
@@ -79,9 +81,11 @@ jest.mock("@plasmohq/storage", () => {
 })
 
 describe("logger", () => {
+  // biome-ignore lint/suspicious/noExplicitAny: test mocking requires flexible typing
   let _logger: any
-  let debugLog: any
-  let isDevelopment: any
+  // biome-ignore lint/suspicious/noExplicitAny: test mocking requires flexible typing
+  let debugLog: (...args: any[]) => void
+  let isDevelopment: () => boolean
 
   beforeAll(() => {
     // 设置全局chrome对象
@@ -306,7 +310,7 @@ describe("logger", () => {
           transmitSendFunction(level, testLogEvent)
 
           // 确定期望的console方法
-          let expectedMethod
+          let expectedMethod: string
           switch (level) {
             case "debug":
               expectedMethod = "debug"

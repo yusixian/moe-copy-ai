@@ -36,7 +36,7 @@ export const MetadataImage: React.FC<MetadataImageProps> = ({
         />
       </div>
       <div className="border-sky-200 border-t bg-gradient-to-r from-blue-50 to-indigo-50 p-1.5 text-center text-sky-600 text-xs">
-        {label} ✨
+        {label}
       </div>
     </div>
   )

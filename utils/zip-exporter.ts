@@ -22,6 +22,7 @@ export const DEFAULT_ZIP_OPTIONS: ZipExportOptions = {
 function sanitizeFilename(name: string, maxLength: number): string {
   // 移除或替换非法字符
   let sanitized = name
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: intentional control char range for Windows filename sanitization
     .replace(/[<>:"/\\|?*\x00-\x1f]/g, "") // Windows 非法字符
     .replace(/[\s.]+/g, "-") // 空格和点号替换为连字符
     .replace(/-+/g, "-") // 多个连字符合并

@@ -82,13 +82,20 @@ export class BatchScrapeController {
    * 带重试逻辑的抓取
    */
   private async scrapeWithRetry(url: string): Promise<BatchScrapeResult> {
-    let lastResult: BatchScrapeResult | null = null
+    // 初始抓取
+    let lastResult = await this.strategy.scrape(url, {
+      timeout: this.options.timeout,
+      retryCount: this.options.retryCount
+    })
 
-    for (let attempt = 0; attempt <= this.options.retryCount; attempt++) {
-      if (attempt > 0) {
-        debugLog(`[BatchScrape] 第 ${attempt} 次重试: ${url}`)
-        await delay(this.options.delayBetweenRequests)
-      }
+    if (lastResult.success) {
+      return lastResult
+    }
+
+    // 重试逻辑
+    for (let attempt = 1; attempt <= this.options.retryCount; attempt++) {
+      debugLog(`[BatchScrape] 第 ${attempt} 次重试: ${url}`)
+      await delay(this.options.delayBetweenRequests)
 
       lastResult = await this.strategy.scrape(url, {
         timeout: this.options.timeout,
@@ -100,7 +107,7 @@ export class BatchScrapeController {
       }
     }
 
-    return lastResult!
+    return lastResult
   }
 
   /**

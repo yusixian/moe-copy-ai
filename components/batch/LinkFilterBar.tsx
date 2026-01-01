@@ -1,5 +1,7 @@
 import { Icon } from "@iconify/react"
 import { memo, useEffect, useRef, useState } from "react"
+
+import { Button } from "~/components/ui/button"
 import {
   type FilterMode,
   type FilterTarget,
@@ -78,7 +80,7 @@ const LinkFilterBar = memo(function LinkFilterBar({
           <Icon
             icon="mdi:regex"
             className={cn(
-              "-translate-y-1/2 absolute top-1/2 left-2.5 h-4 w-4",
+              "absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2",
               !isValid ? "text-red-400" : "text-gray-400"
             )}
           />
@@ -95,41 +97,40 @@ const LinkFilterBar = memo(function LinkFilterBar({
             )}
           />
           {hasFilter && (
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={onClear}
-              className="-translate-y-1/2 absolute top-1/2 right-2 rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              className="absolute top-1/2 right-2 h-5 w-5 -translate-y-1/2"
               title="清除过滤">
               <Icon icon="mdi:close" className="h-4 w-4" />
-            </button>
+            </Button>
           )}
         </div>
 
         {/* 预设按钮 */}
         <div className="relative" ref={presetRef}>
-          <button
-            onClick={() => setIsPresetOpen(!isPresetOpen)}
-            className={cn(
-              "flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-sm transition-colors",
-              isPresetOpen
-                ? "border-sky-400 bg-sky-50 text-sky-600"
-                : "border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50"
-            )}>
+          <Button
+            variant={isPresetOpen ? "secondary" : "outline"}
+            size="sm"
+            onClick={() => setIsPresetOpen(!isPresetOpen)}>
             <Icon icon="mdi:lightning-bolt" className="h-4 w-4" />
-            <span className="hidden sm:inline">预设</span>
+            <span className="ml-1 hidden sm:inline">预设</span>
             <Icon
               icon="mdi:chevron-down"
               className={cn(
-                "h-4 w-4 transition-transform",
+                "ml-1 h-4 w-4 transition-transform",
                 isPresetOpen && "rotate-180"
               )}
             />
-          </button>
+          </Button>
 
           {/* 预设下拉菜单 */}
           {isPresetOpen && (
             <div className="absolute top-full right-0 z-10 mt-1 w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
               {LINK_FILTER_PRESETS.map((preset) => (
                 <button
+                  type="button"
                   key={preset.id}
                   onClick={() => {
                     onApplyPreset(preset)

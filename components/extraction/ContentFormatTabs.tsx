@@ -57,6 +57,7 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
         <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
           {formatTabs.map((tab) => (
             <button
+              type="button"
               key={tab.id}
               onClick={() => setActiveFormat(tab.id)}
               className={cn(
@@ -74,6 +75,7 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
         {/* Markdown 预览切换 */}
         {activeFormat === "markdown" && (
           <button
+            type="button"
             onClick={() => setIsPreviewMode(!isPreviewMode)}
             className="flex items-center gap-1 rounded-md px-2 py-1 text-gray-500 text-xs hover:bg-gray-100">
             <Icon
@@ -111,6 +113,7 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
           词 · {stats.tokens.toLocaleString()} tokens
         </div>
         <button
+          type="button"
           onClick={() => copy(currentContent)}
           className={cn(
             "flex items-center gap-1 rounded-md px-3 py-1.5 font-medium text-xs transition-colors",

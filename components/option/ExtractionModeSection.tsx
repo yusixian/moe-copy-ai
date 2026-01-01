@@ -31,7 +31,7 @@ const EXTRACTION_MODE_OPTIONS = [
   {
     label: "混合模式",
     value: "hybrid",
-    description: "同时使用两种方式，自动选择更好的结果，推荐使用 (〃∀〃)",
+    description: "同时使用两种方式，自动选择更好的结果，推荐使用",
     icon: "radix-icons:mix",
     color: "purple",
     borderColor: "border-purple-300",
@@ -105,7 +105,6 @@ export const ExtractionModeSection: React.FC = () => {
           </div>
           <div className="text-center text-purple-500 text-sm">
             <span className="animate-bounce">加载中...</span>
-            <span className="ml-2 animate-pulse">(&gt;ω&lt;)</span>
           </div>
         </div>
       </OptionSection>
@@ -198,7 +197,6 @@ export const ExtractionModeSection: React.FC = () => {
                         className="text-purple-500"
                       />
                       <span>推荐</span>
-                      <span className="opacity-70">♡</span>
                     </span>
                   )}
                 </div>

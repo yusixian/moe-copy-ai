@@ -85,6 +85,7 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
       <div className="flex gap-3">
         {progress.isPaused ? (
           <button
+            type="button"
             onClick={onResume}
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2.5 font-medium text-sm text-white transition-colors hover:bg-emerald-600">
             <Icon icon="mdi:play" className="h-4 w-4" />
@@ -92,6 +93,7 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
           </button>
         ) : (
           <button
+            type="button"
             onClick={onPause}
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-amber-500 py-2.5 font-medium text-sm text-white transition-colors hover:bg-amber-600">
             <Icon icon="mdi:pause" className="h-4 w-4" />
@@ -99,6 +101,7 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
           </button>
         )}
         <button
+          type="button"
           onClick={onCancel}
           className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2.5 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
           <Icon icon="mdi:close" className="h-4 w-4" />

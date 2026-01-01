@@ -1,6 +1,8 @@
 import { Icon } from "@iconify/react"
 import { useState } from "react"
 
+import { Button } from "~/components/ui/button"
+
 interface AccordionSectionProps {
   title: string
   icon: string
@@ -20,10 +22,11 @@ export function AccordionSection({
 
   return (
     <div className="overflow-hidden rounded-lg border border-sky-200 bg-white">
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        fullWidth
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-sky-50">
+        className="justify-between p-3 hover:bg-sky-50">
         <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
           <Icon icon={icon} width={16} />
           {title}
@@ -33,7 +36,7 @@ export function AccordionSection({
           width={18}
           className={`text-sky-500 transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
-      </button>
+      </Button>
       <div
         className={`transition-all duration-200 ${
           isOpen

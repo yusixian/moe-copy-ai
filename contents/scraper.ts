@@ -14,8 +14,18 @@ import { getExtractionMode, getReadabilityConfig } from "../utils/storage"
 // 创建存储实例
 const storage = new Storage({ area: "sync" })
 
+// 抓取数据类型
+interface CachedScrapeData {
+  articleContent?: string
+  cleanedContent?: string
+  title?: string
+  metadata: Record<string, string>
+  success?: boolean
+  error?: string
+}
+
 // 缓存抓取结果，避免重复抓取
-let cachedScrapedData: any = null
+let cachedScrapedData: CachedScrapeData | null = null
 let cacheUrl: string = ""
 
 // 在页面加载完成后，检查用户配置决定是否自动抓取

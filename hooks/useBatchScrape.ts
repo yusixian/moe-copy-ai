@@ -237,9 +237,9 @@ export function useBatchScrape(): UseBatchScrapeReturn {
           )
 
           // 更新分页进度
-          if (paginationEnabled) {
+          if (paginationEnabled && tabId !== undefined) {
             // 获取当前标签页 URL
-            const currentTab = await chrome.tabs.get(tabId!)
+            const currentTab = await chrome.tabs.get(tabId)
             setPaginationProgress({
               currentPage,
               maxPages,

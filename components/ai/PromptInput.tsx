@@ -83,6 +83,7 @@ const PromptInput = ({
           {supportedPlaceholders && supportedPlaceholders.length > 0 && (
             <div>
               <button
+                type="button"
                 onClick={() => setShowPlaceholders(!showPlaceholders)}
                 className="flex items-center rounded-md bg-sky-100 px-3 py-1.5 font-medium text-sky-600 text-sm shadow-sm transition-all hover:bg-sky-200 hover:shadow">
                 <Icon
@@ -95,15 +96,14 @@ const PromptInput = ({
                   width="18"
                   height="18"
                 />
-                {showPlaceholders
-                  ? "隐藏占位符 (。_。)"
-                  : "查看可用占位符 (・ω・)"}
+                {showPlaceholders ? "隐藏占位符" : "查看占位符"}
               </button>
             </div>
           )}
           <div className="flex items-center gap-2">
             {canSaveAsDefault && (
               <button
+                type="button"
                 onClick={handleSaveAsDefault}
                 className="flex items-center rounded-md bg-purple-100 px-3 py-1.5 font-medium text-purple-600 text-sm shadow-sm transition-all hover:bg-purple-200 hover:shadow">
                 <Icon
@@ -117,6 +117,7 @@ const PromptInput = ({
             )}
             {customPrompt !== systemPrompt && systemPrompt && (
               <button
+                type="button"
                 onClick={() => setCustomPrompt(systemPrompt)}
                 className="flex items-center rounded-md bg-indigo-100 px-3 py-1.5 font-medium text-indigo-600 text-sm shadow-sm transition-all hover:bg-indigo-200 hover:shadow">
                 <Icon
@@ -130,6 +131,7 @@ const PromptInput = ({
             )}
             {hasPlaceholders && scrapedData && (
               <button
+                type="button"
                 onClick={() => setShowPreview(!showPreview)}
                 className="flex items-center rounded-md bg-emerald-100 px-3 py-1.5 font-medium text-emerald-600 text-sm shadow-sm transition-all hover:bg-emerald-200 hover:shadow">
                 <Icon
@@ -154,6 +156,7 @@ const PromptInput = ({
               <div className="flex flex-wrap gap-2">
                 {supportedPlaceholders.map((info) => (
                   <button
+                    type="button"
                     key={info.placeholder}
                     onClick={() => insertPlaceholder(info.placeholder)}
                     className="rounded-md bg-white px-2.5 py-1 text-sky-700 text-sm shadow-sm hover:bg-sky-100"

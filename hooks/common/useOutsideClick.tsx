@@ -10,7 +10,7 @@ import { useEffect } from "react"
 const useOutsideClick = <T extends HTMLElement = HTMLElement>(
   ref: RefObject<T> | RefObject<T>[],
   callback: (event: MouseEvent) => void,
-  deps: any[] = []
+  deps: unknown[] = []
 ): void => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

@@ -159,6 +159,7 @@ export function Combobox({
                       listRef.current[index] = node
                     }}
                     role="option"
+                    tabIndex={0}
                     aria-selected={index === activeIndex}
                     {...getItemProps({
                       onClick: () => handleSelect(opt.id)

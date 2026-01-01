@@ -10,9 +10,9 @@ import { Button } from "./ui/button"
 
 // 防止事件冒泡的工具函数
 const preventBubbling =
-  (callback: Function) => (e: React.MouseEvent<HTMLElement>) => {
+  (callback: () => void) => (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation()
-    callback(e)
+    callback()
   }
 
 interface CopyableTextFieldProps {
@@ -105,10 +105,10 @@ export const CopyableTextField: React.FC<CopyableTextFieldProps> = ({
           )}
           <Button
             onClick={handleCopy}
-            variant="copy"
+            variant="secondary"
             size="icon"
             className={cn(
-              "border border-sky-200/70 bg-white transition-all duration-200 hover:bg-sky-50",
+              "border border-blue-200/70 bg-white transition-all duration-200 hover:bg-blue-50",
               isLongText
                 ? "absolute top-0 right-0 border-none opacity-80 hover:opacity-100"
                 : "rounded-r-md rounded-l-none shadow-none",

@@ -51,6 +51,7 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
               </p>
             </div>
             <button
+              type="button"
               onClick={onStartSelection}
               className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-2.5 font-medium text-sm text-white shadow-md transition-all hover:from-amber-600 hover:to-orange-600 hover:shadow-lg">
               <Icon icon="mdi:cursor-default-click" className="h-5 w-5" />
@@ -77,6 +78,7 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
               </p>
             </div>
             <button
+              type="button"
               onClick={onCancel}
               className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
               <Icon icon="mdi:close" className="h-4 w-4" />
@@ -120,6 +122,7 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
 
             {/* 底部操作按钮 */}
             <button
+              type="button"
               onClick={onReset}
               className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
               <Icon icon="mdi:refresh" className="h-4 w-4" />
@@ -141,6 +144,7 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
               <p className="text-red-500 text-sm">{error || "未知错误"}</p>
             </div>
             <button
+              type="button"
               onClick={onReset}
               className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-200">
               <Icon icon="mdi:refresh" className="h-4 w-4" />

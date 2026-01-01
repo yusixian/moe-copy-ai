@@ -98,7 +98,8 @@ describe("storage", () => {
 
     test("当传入无效模式时应抛出错误", async () => {
       // 传入无效模式
-      await expect(setExtractionMode("invalid" as any)).rejects.toThrow(
+      // @ts-expect-error: Testing invalid mode input
+      await expect(setExtractionMode("invalid")).rejects.toThrow(
         "无效的抓取模式"
       )
     })

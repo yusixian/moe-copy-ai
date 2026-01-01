@@ -101,6 +101,7 @@ const SelectorItem = memo<SelectorItemProps>(
             : "hover:bg-blue-50"
         }`}>
         <button
+          type="button"
           className="flex w-full items-center justify-between gap-2 p-3 text-left text-xs"
           onClick={handleSelect}>
           <div className="flex items-center">
@@ -138,6 +139,7 @@ const SelectorItem = memo<SelectorItemProps>(
             )}
             {hasContent && (
               <button
+                type="button"
                 className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
                   showPreview
                     ? "bg-sky-100 text-sky-600 hover:bg-sky-200"
@@ -167,7 +169,7 @@ const SelectorItem = memo<SelectorItemProps>(
               <div className="space-y-3">
                 {allPreviewContents?.map((content, idx) => (
                   <div
-                    key={idx}
+                    key={`preview-${idx}-${content.slice(0, 20)}`}
                     className="overflow-hidden rounded-lg border border-sky-100 bg-white shadow-sm transition-all hover:shadow-md">
                     <div className="flex items-center justify-between border-sky-50 border-b bg-gradient-to-r from-sky-50 to-blue-50 px-2 py-2">
                       <span className="flex items-center font-medium text-sky-600 text-xs">
@@ -176,6 +178,7 @@ const SelectorItem = memo<SelectorItemProps>(
                       </span>
                       {onSelectContent && (
                         <button
+                          type="button"
                           className="flex min-h-[32px] items-center rounded-full border border-sky-200 bg-white px-3 py-1 font-medium text-sky-600 text-xs shadow-sm transition-all hover:bg-sky-100 hover:shadow"
                           onClick={() => handleContentSelect(idx)}
                           title="将此结果设为当前选择器的内容">
@@ -196,11 +199,12 @@ const SelectorItem = memo<SelectorItemProps>(
                 ))}
               </div>
             ) : (
-              <div
-                className="max-h-32 cursor-pointer overflow-auto rounded-lg border border-sky-100 bg-white p-2 text-gray-700 shadow-sm md:max-h-40"
+              <button
+                type="button"
+                className="max-h-32 w-full cursor-pointer overflow-auto rounded-lg border border-sky-100 bg-white p-2 text-left text-gray-700 shadow-sm md:max-h-40"
                 onClick={() => handleContentSelect(0)}>
                 {previewContent}
-              </div>
+              </button>
             )}
           </div>
         )}
@@ -233,6 +237,7 @@ const DropdownToggle = memo<{
   selectedText: string
 }>(({ isOpen, toggleOpen, selectedText }) => (
   <button
+    type="button"
     onClick={toggleOpen}
     className="flex min-h-[36px] items-center rounded-lg border border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50 px-3 py-1.5 font-medium text-sky-600 text-xs shadow-sm transition-all hover:shadow">
     <span className="mr-2 max-w-[12.5rem] truncate font-mono md:max-w-[9.375rem]">
@@ -403,7 +408,7 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
 
               return (
                 <SelectorItem
-                  key={index}
+                  key={selector}
                   selector={selector}
                   index={index}
                   isSelected={index === selectedIndex}

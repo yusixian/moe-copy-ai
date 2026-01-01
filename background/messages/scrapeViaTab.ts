@@ -72,30 +72,44 @@ const handler: PlasmoMessaging.MessageHandler<
     const readabilityConfig = getReadabilityConfig()
 
     // 向内容脚本发送抓取请求
-    const response = await new Promise<any>((resolve, reject) => {
-      const timeoutId = setTimeout(() => {
-        reject(new Error("内容抓取超时"))
-      }, timeout)
+    interface ScrapeContentResponse {
+      title?: string
+      cleanedContent?: string
+      articleContent?: string
+    }
+    const response = await new Promise<ScrapeContentResponse>(
+      (resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          reject(new Error("内容抓取超时"))
+        }, timeout)
 
-      chrome.tabs.sendMessage(
-        tabId!,
-        {
-          action: "scrapeContent",
-          mode: extractionMode,
-          readabilityConfig
-        },
-        (result) => {
-          clearTimeout(timeoutId)
-          if (chrome.runtime.lastError) {
-            reject(
-              new Error(chrome.runtime.lastError.message || "内容脚本通信失败")
-            )
-          } else {
-            resolve(result)
-          }
+        if (tabId === undefined) {
+          reject(new Error("标签页 ID 无效"))
+          return
         }
-      )
-    })
+
+        chrome.tabs.sendMessage(
+          tabId,
+          {
+            action: "scrapeContent",
+            mode: extractionMode,
+            readabilityConfig
+          },
+          (result) => {
+            clearTimeout(timeoutId)
+            if (chrome.runtime.lastError) {
+              reject(
+                new Error(
+                  chrome.runtime.lastError.message || "内容脚本通信失败"
+                )
+              )
+            } else {
+              resolve(result)
+            }
+          }
+        )
+      }
+    )
 
     debugLog(`[ScrapeViaTab] 抓取成功: ${url}`)
 

@@ -10,6 +10,7 @@ interface FloatingButtonProps {
 const FloatingButton = ({ onClick, isOpen }: FloatingButtonProps) => {
   return (
     <button
+      type="button"
       className={cn(
         "fixed right-3 bottom-10 z-[1000] flex h-10 w-10 items-center justify-center rounded-full border border-opacity-60 opacity-70 shadow-md transition-all duration-300 hover:opacity-100",
         isOpen

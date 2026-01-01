@@ -96,6 +96,7 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
                 </p>
               </div>
               <button
+                type="button"
                 onClick={onSelectElement}
                 className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 px-6 py-2.5 font-medium text-sm text-white shadow-md transition-all hover:from-sky-600 hover:to-indigo-600 hover:shadow-lg">
                 <Icon icon="mdi:cursor-default-click" className="h-5 w-5" />
@@ -131,6 +132,7 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
               </p>
             </div>
             <button
+              type="button"
               onClick={onCancel}
               className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
               <Icon icon="mdi:close" className="h-4 w-4" />
@@ -189,6 +191,7 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
               <p className="text-red-500 text-sm">{error || "未知错误"}</p>
             </div>
             <button
+              type="button"
               onClick={onReset}
               className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-200">
               <Icon icon="mdi:refresh" className="h-4 w-4" />

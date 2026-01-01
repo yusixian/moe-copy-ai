@@ -399,14 +399,15 @@ export function cleanContent(content: string): string {
 
   // 提取并保存代码块
   const codeBlockRegex = /```[\s\S]*?```/g
-  let match: RegExpExecArray | null
+  let match: RegExpExecArray | null = codeBlockRegex.exec(content)
   let index = 0
 
-  while ((match = codeBlockRegex.exec(content)) !== null) {
+  while (match !== null) {
     const placeholder = `__CODE_BLOCK_${index}__`
     tempContent = tempContent.replace(match[0], placeholder)
     codeBlocks.push(match[0])
     index++
+    match = codeBlockRegex.exec(content)
   }
 
   // 清理非代码块部分
