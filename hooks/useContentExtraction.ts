@@ -1,7 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from "react"
 
-import type { ContentExtractionMode, ExtractedContent, SelectedElementInfo } from '~constants/types'
-import useElementSelector from './useElementSelector'
+import type {
+  ContentExtractionMode,
+  ExtractedContent,
+  SelectedElementInfo
+} from "~constants/types"
+import useElementSelector from "./useElementSelector"
 
 interface UseContentExtractionReturn {
   mode: ContentExtractionMode
@@ -18,7 +22,7 @@ interface UseContentExtractionReturn {
  * 用于管理内容提取功能的状态
  */
 export function useContentExtraction(): UseContentExtractionReturn {
-  const [mode, setMode] = useState<ContentExtractionMode>('idle')
+  const [mode, setMode] = useState<ContentExtractionMode>("idle")
   const [error, setError] = useState<string | null>(null)
 
   const {
@@ -27,16 +31,16 @@ export function useContentExtraction(): UseContentExtractionReturn {
     extractedContent,
     activateSelector,
     deactivateSelector,
-    clearSelection,
+    clearSelection
   } = useElementSelector()
 
   // 同步选择状态到 mode
   useEffect(() => {
     if (isSelecting) {
-      setMode('selecting')
+      setMode("selecting")
       setError(null)
     } else if (extractedContent) {
-      setMode('extracted')
+      setMode("extracted")
     }
   }, [isSelecting, extractedContent])
 
@@ -44,24 +48,24 @@ export function useContentExtraction(): UseContentExtractionReturn {
   const startSelection = useCallback(async () => {
     try {
       setError(null)
-      await activateSelector('content-extraction')
+      await activateSelector("content-extraction")
     } catch (err) {
-      setError(err instanceof Error ? err.message : '启动选择器失败')
-      setMode('error')
+      setError(err instanceof Error ? err.message : "启动选择器失败")
+      setMode("error")
     }
   }, [activateSelector])
 
   // 取消选择
   const cancelSelection = useCallback(() => {
     deactivateSelector()
-    setMode('idle')
+    setMode("idle")
     setError(null)
   }, [deactivateSelector])
 
   // 重置状态
   const reset = useCallback(() => {
     clearSelection()
-    setMode('idle')
+    setMode("idle")
     setError(null)
   }, [clearSelection])
 
@@ -72,7 +76,7 @@ export function useContentExtraction(): UseContentExtractionReturn {
     error,
     startSelection,
     cancelSelection,
-    reset,
+    reset
   }
 }
 

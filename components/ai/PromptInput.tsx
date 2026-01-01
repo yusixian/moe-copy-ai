@@ -58,7 +58,7 @@ const PromptInput = ({
   return (
     <div className="mb-3">
       <div className="mb-2 rounded-lg border border-indigo-100 bg-indigo-50 p-2">
-        <p className="flex items-center text-xs text-indigo-700">
+        <p className="flex items-center text-indigo-700 text-xs">
           <Icon
             icon="line-md:information"
             className="mr-1 flex-shrink-0 text-indigo-500"
@@ -83,8 +83,9 @@ const PromptInput = ({
           {supportedPlaceholders && supportedPlaceholders.length > 0 && (
             <div>
               <button
+                type="button"
                 onClick={() => setShowPlaceholders(!showPlaceholders)}
-                className="flex items-center rounded-md bg-sky-100 px-3 py-1.5 text-sm font-medium text-sky-600 shadow-sm transition-all hover:bg-sky-200 hover:shadow">
+                className="flex items-center rounded-md bg-sky-100 px-3 py-1.5 font-medium text-sky-600 text-sm shadow-sm transition-all hover:bg-sky-200 hover:shadow">
                 <Icon
                   icon={
                     showPlaceholders
@@ -95,17 +96,16 @@ const PromptInput = ({
                   width="18"
                   height="18"
                 />
-                {showPlaceholders
-                  ? "隐藏占位符 (。_。)"
-                  : "查看可用占位符 (・ω・)"}
+                {showPlaceholders ? "隐藏占位符" : "查看占位符"}
               </button>
             </div>
           )}
           <div className="flex items-center gap-2">
             {canSaveAsDefault && (
               <button
+                type="button"
                 onClick={handleSaveAsDefault}
-                className="flex items-center rounded-md bg-purple-100 px-3 py-1.5 text-sm font-medium text-purple-600 shadow-sm transition-all hover:bg-purple-200 hover:shadow">
+                className="flex items-center rounded-md bg-purple-100 px-3 py-1.5 font-medium text-purple-600 text-sm shadow-sm transition-all hover:bg-purple-200 hover:shadow">
                 <Icon
                   icon="line-md:check-list-3"
                   className="mr-1.5"
@@ -117,8 +117,9 @@ const PromptInput = ({
             )}
             {customPrompt !== systemPrompt && systemPrompt && (
               <button
+                type="button"
                 onClick={() => setCustomPrompt(systemPrompt)}
-                className="flex items-center rounded-md bg-indigo-100 px-3 py-1.5 text-sm font-medium text-indigo-600 shadow-sm transition-all hover:bg-indigo-200 hover:shadow">
+                className="flex items-center rounded-md bg-indigo-100 px-3 py-1.5 font-medium text-indigo-600 text-sm shadow-sm transition-all hover:bg-indigo-200 hover:shadow">
                 <Icon
                   icon="line-md:restore"
                   className="mr-1.5"
@@ -130,8 +131,9 @@ const PromptInput = ({
             )}
             {hasPlaceholders && scrapedData && (
               <button
+                type="button"
                 onClick={() => setShowPreview(!showPreview)}
-                className="flex items-center rounded-md bg-emerald-100 px-3 py-1.5 text-sm font-medium text-emerald-600 shadow-sm transition-all hover:bg-emerald-200 hover:shadow">
+                className="flex items-center rounded-md bg-emerald-100 px-3 py-1.5 font-medium text-emerald-600 text-sm shadow-sm transition-all hover:bg-emerald-200 hover:shadow">
                 <Icon
                   icon={showPreview ? "line-md:eye-off" : "line-md:eye"}
                   className="mr-1.5"
@@ -148,15 +150,16 @@ const PromptInput = ({
           supportedPlaceholders &&
           supportedPlaceholders.length > 0 && (
             <div className="mt-1 rounded-md border border-sky-100 bg-sky-50 p-2">
-              <p className="mb-1 text-xs text-sky-700">
+              <p className="mb-1 text-sky-700 text-xs">
                 点击以下占位符插入到提示词中：
               </p>
               <div className="flex flex-wrap gap-2">
                 {supportedPlaceholders.map((info) => (
                   <button
+                    type="button"
                     key={info.placeholder}
                     onClick={() => insertPlaceholder(info.placeholder)}
-                    className="rounded-md bg-white px-2.5 py-1 text-sm text-sky-700 shadow-sm hover:bg-sky-100"
+                    className="rounded-md bg-white px-2.5 py-1 text-sky-700 text-sm shadow-sm hover:bg-sky-100"
                     title={info.description}>
                     {info.placeholder} {info.description}
                   </button>
@@ -167,7 +170,7 @@ const PromptInput = ({
 
         {showPreview && hasPlaceholders && scrapedData && (
           <div className="mt-2 rounded-md border border-emerald-100 bg-emerald-50 p-2">
-            <p className="mb-1 flex items-center text-xs font-medium text-emerald-700">
+            <p className="mb-1 flex items-center font-medium text-emerald-700 text-xs">
               <Icon
                 icon="line-md:document-code"
                 className="mr-1 flex-shrink-0"
@@ -176,7 +179,7 @@ const PromptInput = ({
               />
               占位符替换后的预览：
             </p>
-            <div className="max-h-40 overflow-y-auto rounded-md bg-white p-2 text-xs text-slate-700">
+            <div className="max-h-40 overflow-y-auto rounded-md bg-white p-2 text-slate-700 text-xs">
               {getPreviewContent()}
             </div>
 

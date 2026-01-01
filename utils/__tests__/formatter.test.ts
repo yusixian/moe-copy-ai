@@ -1,4 +1,4 @@
-import { SKIP_TAGS } from "../../constants/config"
+import type { ImageInfo } from "~constants/types"
 import { cleanContent, extractFormattedText, formatContent } from "../formatter"
 
 describe("formatter", () => {
@@ -87,7 +87,7 @@ describe("formatter", () => {
           <img src="test.jpg" alt="测试图片">
         </div>
       `)
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(element, imagesArray)
       expect(result).toContain("![测试图片](test.jpg)")
       expect(imagesArray.length).toBe(1)
@@ -124,7 +124,7 @@ describe("formatter", () => {
           </figure>
         </div>
       `)
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(element, imagesArray)
       expect(result).toContain("![图片描述](test.jpg)")
       expect(result).toContain("*图片说明*")
@@ -142,7 +142,7 @@ describe("formatter", () => {
           </figure>
         </div>
       `)
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(element, imagesArray)
       expect(result).toContain("![图片说明](test.jpg)")
       expect(result).toContain("*图片说明*")
@@ -160,8 +160,8 @@ describe("formatter", () => {
           </figure>
         </div>
       `)
-      const imagesArray: any[] = []
-      const result = extractFormattedText(element, imagesArray)
+      const imagesArray: ImageInfo[] = []
+      const _result = extractFormattedText(element, imagesArray)
       expect(imagesArray.length).toBe(0)
     })
 
@@ -171,8 +171,8 @@ describe("formatter", () => {
           <img src="data:image/png;base64,iVBORw0KGgoAAAANSUh" alt="内联图片">
         </div>
       `)
-      const imagesArray: any[] = []
-      const result = extractFormattedText(element, imagesArray)
+      const imagesArray: ImageInfo[] = []
+      const _result = extractFormattedText(element, imagesArray)
       expect(imagesArray.length).toBe(0)
     })
 
@@ -182,7 +182,7 @@ describe("formatter", () => {
           <p>这是一个包含<img src="test.jpg" alt="内嵌图片">的段落</p>
         </div>
       `)
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(element, imagesArray)
       expect(result).toContain("![内嵌图片](test.jpg)")
       expect(imagesArray.length).toBe(1)
@@ -309,7 +309,7 @@ describe("formatter", () => {
           </a>
         </div>
       `)
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(element, imagesArray)
       expect(result).toContain("![链接图片](test.jpg)")
       expect(imagesArray.length).toBe(1)
@@ -363,7 +363,7 @@ describe("formatter", () => {
           </a>
         </div>
       `)
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(element, imagesArray)
       expect(result).toContain("![缩略图](large-image.jpg)")
       expect(imagesArray.length).toBe(1)
@@ -379,7 +379,7 @@ describe("formatter", () => {
           </a>
         </div>
       `)
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(element, imagesArray)
       expect(result).toContain("![缩略图](large-image.jpg)")
       expect(imagesArray.length).toBe(1)
@@ -391,7 +391,7 @@ describe("formatter", () => {
           <img src="test.jpg">
         </div>
       `)
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(element, imagesArray)
       expect(result).toMatch(/!\[图片#\d+\]\(test\.jpg\)/)
       expect(imagesArray.length).toBe(1)
@@ -414,7 +414,7 @@ describe("formatter", () => {
       `
 
       const link = document.querySelector("a") as HTMLAnchorElement
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(link, imagesArray)
 
       // 验证链接被正确格式化
@@ -579,7 +579,7 @@ describe("formatter", () => {
       `
 
       const link = document.querySelector("a") as HTMLAnchorElement
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(link, imagesArray)
 
       // 验证使用了链接href作为图片源
@@ -597,7 +597,7 @@ describe("formatter", () => {
       `
 
       const link = document.querySelector("a") as HTMLAnchorElement
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(link, imagesArray)
 
       // 验证使用了链接href作为图片源
@@ -613,7 +613,7 @@ describe("formatter", () => {
       `
 
       const link = document.querySelector("a") as HTMLAnchorElement
-      const imagesArray: any[] = []
+      const imagesArray: ImageInfo[] = []
       const result = extractFormattedText(link, imagesArray)
 
       // 验证链接被正确格式化

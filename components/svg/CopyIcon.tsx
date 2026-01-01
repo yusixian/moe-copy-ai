@@ -12,7 +12,7 @@ export interface CopyIconHandle {
   stopAnimation: () => void
 }
 
-interface CopyIconProps extends HTMLAttributes<HTMLDivElement> {
+interface CopyIconProps extends HTMLAttributes<HTMLSpanElement> {
   size?: number
 }
 
@@ -38,7 +38,7 @@ const CopyIcon = forwardRef<CopyIconHandle, CopyIconProps>(
     })
 
     const handleMouseEnter = useCallback(
-      (e: React.MouseEvent<HTMLDivElement>) => {
+      (e: React.MouseEvent<HTMLSpanElement>) => {
         if (!isControlledRef.current) {
           controls.start("animate")
         } else {
@@ -49,7 +49,7 @@ const CopyIcon = forwardRef<CopyIconHandle, CopyIconProps>(
     )
 
     const handleMouseLeave = useCallback(
-      (e: React.MouseEvent<HTMLDivElement>) => {
+      (e: React.MouseEvent<HTMLSpanElement>) => {
         if (!isControlledRef.current) {
           controls.start("normal")
         } else {
@@ -59,7 +59,9 @@ const CopyIcon = forwardRef<CopyIconHandle, CopyIconProps>(
       [controls, onMouseLeave]
     )
     return (
-      <div
+      <span
+        role="img"
+        aria-label="Copy"
         className={cn(
           `flex cursor-pointer select-none items-center justify-center rounded-md transition-colors duration-200`,
           className
@@ -76,7 +78,8 @@ const CopyIcon = forwardRef<CopyIconHandle, CopyIconProps>(
           stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
-          strokeLinejoin="round">
+          strokeLinejoin="round"
+          aria-hidden="true">
           <motion.rect
             width="14"
             height="14"
@@ -101,7 +104,7 @@ const CopyIcon = forwardRef<CopyIconHandle, CopyIconProps>(
             animate={controls}
           />
         </svg>
-      </div>
+      </span>
     )
   }
 )

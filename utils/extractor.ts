@@ -242,7 +242,7 @@ export async function extractTitle(
     try {
       const elements = document.querySelectorAll(selector)
       let firstContent = ""
-      let allContent: string[] = []
+      const allContent: string[] = []
       if (elements.length > 0) {
         for (const element of elements) {
           let content = ""
@@ -373,26 +373,36 @@ async function scrapeWithSelectors(
     }
   }
 
+  // 确保 selectorResults 已初始化
+  if (!scrapedContent.selectorResults) {
+    scrapedContent.selectorResults = {
+      content: [],
+      author: [],
+      date: [],
+      title: []
+    }
+  }
+
   // 提取标题
   const { title, results: titleResults } = await extractTitle(
     customSelectors?.title
   )
   scrapedContent.title = title
-  scrapedContent.selectorResults!.title = titleResults
+  scrapedContent.selectorResults.title = titleResults
 
   // 提取作者信息
   const { author, results: authorResults } = await extractAuthor(
     customSelectors?.author
   )
   scrapedContent.author = author
-  scrapedContent.selectorResults!.author = authorResults
+  scrapedContent.selectorResults.author = authorResults
 
   // 提取发布日期
   const { publishDate, results: dateResults } = await extractPublishDate(
     customSelectors?.date
   )
   scrapedContent.publishDate = publishDate
-  scrapedContent.selectorResults!.date = dateResults
+  scrapedContent.selectorResults.date = dateResults
 
   // 提取文章内容
   debugLog("开始抓取文章内容")
@@ -401,7 +411,7 @@ async function scrapeWithSelectors(
     customSelectors?.content
   )
   scrapedContent.articleContent = content
-  scrapedContent.selectorResults!.content = contentResults
+  scrapedContent.selectorResults.content = contentResults
 
   // 生成清洁版内容
   scrapedContent.cleanedContent = cleanContent(scrapedContent.articleContent)
@@ -422,7 +432,7 @@ export async function scrapeWebpageContent(
   const {
     mode = "selector",
     customSelectors,
-    readabilityConfig
+    readabilityConfig: _readabilityConfig
   } = options || {}
 
   debugLog("开始抓取网页内容，模式:", mode)
@@ -475,7 +485,10 @@ export async function scrapeWebpageContent(
           debugLog("Readability 抓取成功")
         } else {
           debugLog("Readability 抓取失败，回退到选择器模式")
-          const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+          const fallbackResult = await scrapeWithSelectors(
+            customSelectors,
+            scrapedContent
+          )
           // 添加原始模式信息，用于UI显示
           fallbackResult.metadata = {
             ...fallbackResult.metadata,
@@ -486,7 +499,10 @@ export async function scrapeWebpageContent(
         }
       } catch (error) {
         debugLog("Readability 抓取异常，回退到选择器模式:", error)
-        const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+        const fallbackResult = await scrapeWithSelectors(
+          customSelectors,
+          scrapedContent
+        )
         // 添加原始模式信息，用于UI显示
         fallbackResult.metadata = {
           ...fallbackResult.metadata,
@@ -563,13 +579,17 @@ export async function scrapeWebpageContent(
           selectorResult.metadata = {
             ...selectorResult.metadata,
             "original:mode": "hybrid",
-            "fallback:reason": "混合模式中Readability解析失败，自动使用选择器模式结果"
+            "fallback:reason":
+              "混合模式中Readability解析失败，自动使用选择器模式结果"
           }
           return selectorResult
         }
       } catch (error) {
         debugLog("混合模式执行异常，回退到选择器模式:", error)
-        const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+        const fallbackResult = await scrapeWithSelectors(
+          customSelectors,
+          scrapedContent
+        )
         // 添加原始模式信息，用于UI显示
         fallbackResult.metadata = {
           ...fallbackResult.metadata,

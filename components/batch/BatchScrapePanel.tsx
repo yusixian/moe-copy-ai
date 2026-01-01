@@ -10,7 +10,6 @@ import type {
   SelectedElementInfo
 } from "~constants/types"
 import type { LinkFilterConfig } from "~hooks/useBatchScrape"
-import { cn } from "~utils"
 
 import { AccordionSection } from "../AccordionSection"
 import { BatchScrapeSettings } from "./BatchScrapeSettings"
@@ -89,16 +88,17 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
                 />
               </div>
               <div className="text-center">
-                <h3 className="mb-1 text-base font-semibold text-gray-800">
+                <h3 className="mb-1 font-semibold text-base text-gray-800">
                   批量抓取文档
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-gray-500 text-sm">
                   选择页面上包含链接的区域，批量抓取所有文档
                 </p>
               </div>
               <button
+                type="button"
                 onClick={onSelectElement}
-                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 px-6 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-sky-600 hover:to-indigo-600 hover:shadow-lg">
+                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 px-6 py-2.5 font-medium text-sm text-white shadow-md transition-all hover:from-sky-600 hover:to-indigo-600 hover:shadow-lg">
                 <Icon icon="mdi:cursor-default-click" className="h-5 w-5" />
                 选择元素区域
               </button>
@@ -124,16 +124,17 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
               />
             </div>
             <div className="text-center">
-              <h3 className="mb-1 text-base font-semibold text-gray-800">
+              <h3 className="mb-1 font-semibold text-base text-gray-800">
                 正在选择元素...
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-gray-500 text-sm">
                 请在页面上点击包含链接的区域
               </p>
             </div>
             <button
+              type="button"
               onClick={onCancel}
-              className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+              className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
               <Icon icon="mdi:close" className="h-4 w-4" />
               取消
             </button>
@@ -184,14 +185,15 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
               <Icon icon="mdi:alert-circle" className="h-8 w-8 text-red-500" />
             </div>
             <div className="text-center">
-              <h3 className="mb-1 text-base font-semibold text-gray-800">
+              <h3 className="mb-1 font-semibold text-base text-gray-800">
                 抓取失败
               </h3>
-              <p className="text-sm text-red-500">{error || "未知错误"}</p>
+              <p className="text-red-500 text-sm">{error || "未知错误"}</p>
             </div>
             <button
+              type="button"
               onClick={onReset}
-              className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200">
+              className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-200">
               <Icon icon="mdi:refresh" className="h-4 w-4" />
               重新开始
             </button>

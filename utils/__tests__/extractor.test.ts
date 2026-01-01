@@ -23,14 +23,14 @@ function setDocumentHTML(html: string): void {
 }
 
 // 设置Storage模拟函数
-function mockStorage(getValue: any = null, rejectError: boolean = false) {
+function mockStorage(getValue: unknown = null, rejectError: boolean = false) {
   const get = rejectError
     ? jest.fn().mockRejectedValue(new Error("存储访问错误"))
     : jest.fn().mockResolvedValue(getValue)
 
   const mockObj = { get, set: jest.fn() }
   ;(Storage as jest.MockedClass<typeof Storage>).mockImplementation(
-    () => mockObj as any
+    () => mockObj as unknown as Storage
   )
   return mockObj
 }
@@ -306,7 +306,7 @@ describe("extractor", () => {
 
       const metadata = extractMetadata()
       expect(Object.keys(metadata).length).toBe(2)
-      expect(metadata["description"]).toBe("Page description")
+      expect(metadata.description).toBe("Page description")
       expect(metadata["og:image"]).toBe("image.jpg")
 
       // 测试空文档

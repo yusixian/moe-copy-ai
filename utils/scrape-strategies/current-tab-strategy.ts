@@ -1,9 +1,9 @@
-import { sendToBackground } from '@plasmohq/messaging'
+import { sendToBackground } from "@plasmohq/messaging"
 
-import type { BatchScrapeResult } from '~constants/types'
+import type { BatchScrapeResult } from "~constants/types"
 
-import { debugLog } from '../logger'
-import type { ScrapeOptions, ScrapeStrategy } from './types'
+import { debugLog } from "../logger"
+import type { ScrapeOptions, ScrapeStrategy } from "./types"
 
 /**
  * 从 URL 提取标题（备用）
@@ -11,10 +11,12 @@ import type { ScrapeOptions, ScrapeStrategy } from './types'
 function extractTitleFromUrl(url: string): string {
   try {
     const urlObj = new URL(url)
-    const pathParts = urlObj.pathname.split('/').filter(Boolean)
+    const pathParts = urlObj.pathname.split("/").filter(Boolean)
     if (pathParts.length > 0) {
       const lastPart = pathParts[pathParts.length - 1]
-      return decodeURIComponent(lastPart.replace(/[-_]/g, ' ').replace(/\.\w+$/, ''))
+      return decodeURIComponent(
+        lastPart.replace(/[-_]/g, " ").replace(/\.\w+$/, "")
+      )
     }
     return urlObj.hostname
   } catch {
@@ -29,7 +31,7 @@ function extractTitleFromUrl(url: string): string {
  * 缺点：不支持并发、会占用用户当前标签页
  */
 export class CurrentTabStrategy implements ScrapeStrategy {
-  readonly type = 'current-tab' as const
+  readonly type = "current-tab" as const
   readonly supportsConcurrency = false
 
   private currentTabId: number | null = null
@@ -59,15 +61,18 @@ export class CurrentTabStrategy implements ScrapeStrategy {
     this.originalUrl = null
   }
 
-  async scrape(url: string, options: ScrapeOptions): Promise<BatchScrapeResult> {
+  async scrape(
+    url: string,
+    options: ScrapeOptions
+  ): Promise<BatchScrapeResult> {
     if (!this.currentTabId) {
       return {
         url,
         success: false,
         title: extractTitleFromUrl(url),
-        content: '',
-        error: '无法获取当前标签页',
-        method: 'current-tab',
+        content: "",
+        error: "无法获取当前标签页",
+        method: "current-tab"
       }
     }
 
@@ -78,17 +83,17 @@ export class CurrentTabStrategy implements ScrapeStrategy {
         { url: string; timeout: number; background: boolean; tabId: number },
         { success: boolean; title?: string; content?: string; error?: string }
       >({
-        name: 'scrapeViaTab',
+        name: "scrapeViaTab",
         body: {
           url,
           timeout: options.timeout,
           background: false,
-          tabId: this.currentTabId,
-        },
+          tabId: this.currentTabId
+        }
       })
 
       if (!response.success) {
-        throw new Error(response.error || '抓取失败')
+        throw new Error(response.error || "抓取失败")
       }
 
       debugLog(`[CurrentTabStrategy] 抓取成功: ${url}`)
@@ -97,20 +102,20 @@ export class CurrentTabStrategy implements ScrapeStrategy {
         url,
         success: true,
         title: response.title || extractTitleFromUrl(url),
-        content: response.content || '',
-        method: 'current-tab',
+        content: response.content || "",
+        method: "current-tab"
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '未知错误'
+      const errorMessage = error instanceof Error ? error.message : "未知错误"
       debugLog(`[CurrentTabStrategy] 抓取失败: ${url}`, errorMessage)
 
       return {
         url,
         success: false,
         title: extractTitleFromUrl(url),
-        content: '',
+        content: "",
         error: errorMessage,
-        method: 'current-tab',
+        method: "current-tab"
       }
     }
   }

@@ -1,6 +1,6 @@
 import { streamText } from "@xsai/stream-text"
 
-import { AiChatHistory, AiChatHistoryItem } from "~constants/types"
+import type { AiChatHistory, AiChatHistoryItem } from "~constants/types"
 import { generateUUID } from "~utils"
 
 import { debugLog } from "./logger"
@@ -146,7 +146,7 @@ export async function addAiChatHistoryItem(
     // 检查storage对象
     debugLog("storage对象信息:", {
       type: typeof localStorage,
-      area: (localStorage as any).area,
+      area: (localStorage as unknown as { area?: string }).area,
       isReady: isStorageReady,
       methods: Object.keys(localStorage)
     })

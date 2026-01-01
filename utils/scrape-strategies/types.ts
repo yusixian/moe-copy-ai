@@ -1,4 +1,4 @@
-import type { BatchScrapeResult, ScrapeStrategyType } from '~constants/types'
+import type { BatchScrapeResult, ScrapeStrategyType } from "~constants/types"
 
 /**
  * 单页抓取选项

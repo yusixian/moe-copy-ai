@@ -18,15 +18,24 @@ export interface ExtractLinksResponse {
 /**
  * 从指定标签页提取链接
  */
-const handler: PlasmoMessaging.MessageHandler<ExtractLinksRequest, ExtractLinksResponse> = async (req, res) => {
-  const { tabId, linkContainerSelector, sameDomainOnly = false } = req.body || {}
+const handler: PlasmoMessaging.MessageHandler<
+  ExtractLinksRequest,
+  ExtractLinksResponse
+> = async (req, res) => {
+  const {
+    tabId,
+    linkContainerSelector,
+    sameDomainOnly = false
+  } = req.body || {}
 
   if (!tabId) {
     return res.send({ success: false, error: "tabId 不能为空" })
   }
 
   try {
-    console.log(`[ExtractLinks] 从标签页 ${tabId} 提取链接, 选择器: ${linkContainerSelector}`)
+    console.log(
+      `[ExtractLinks] 从标签页 ${tabId} 提取链接, 选择器: ${linkContainerSelector}`
+    )
 
     // 在目标标签页中执行脚本提取链接
     const results = await chrome.scripting.executeScript({
@@ -36,7 +45,9 @@ const handler: PlasmoMessaging.MessageHandler<ExtractLinksRequest, ExtractLinksR
         const currentDomain = new URL(currentUrl).hostname
 
         console.log(`[ExtractLinks] 当前页面: ${currentUrl}`)
-        console.log(`[ExtractLinks] 页面所有链接数量: ${document.querySelectorAll('a[href]').length}`)
+        console.log(
+          `[ExtractLinks] 页面所有链接数量: ${document.querySelectorAll("a[href]").length}`
+        )
 
         // 获取容器元素
         let container: Element | null = null
@@ -51,8 +62,10 @@ const handler: PlasmoMessaging.MessageHandler<ExtractLinksRequest, ExtractLinksR
             if (matched.length === 1) {
               // 唯一匹配，直接使用
               container = matched[0]
-              const linkCount = container.querySelectorAll('a[href]').length
-              console.log(`[ExtractLinks] ✓ 唯一匹配: <${container.tagName.toLowerCase()}> → ${linkCount} 个链接`)
+              const linkCount = container.querySelectorAll("a[href]").length
+              console.log(
+                `[ExtractLinks] ✓ 唯一匹配: <${container.tagName.toLowerCase()}> → ${linkCount} 个链接`
+              )
             } else if (matched.length > 1) {
               // 多个匹配，选择包含最多链接的元素
               console.log(`[ExtractLinks] ⚠️ 多个匹配，选择链接最多的容器:`)
@@ -60,10 +73,14 @@ const handler: PlasmoMessaging.MessageHandler<ExtractLinksRequest, ExtractLinksR
               let bestContainer: Element | null = null
 
               Array.from(matched).forEach((el, i) => {
-                const linkCount = el.querySelectorAll('a[href]').length
-                const classes = el.className ? `.${String(el.className).split(' ').slice(0, 2).join('.')}` : ''
-                const id = el.id ? `#${el.id}` : ''
-                console.log(`[ExtractLinks]   [${i}] <${el.tagName.toLowerCase()}${id}${classes}> → ${linkCount} 个链接`)
+                const linkCount = el.querySelectorAll("a[href]").length
+                const classes = el.className
+                  ? `.${String(el.className).split(" ").slice(0, 2).join(".")}`
+                  : ""
+                const id = el.id ? `#${el.id}` : ""
+                console.log(
+                  `[ExtractLinks]   [${i}] <${el.tagName.toLowerCase()}${id}${classes}> → ${linkCount} 个链接`
+                )
 
                 if (linkCount > maxLinks) {
                   maxLinks = linkCount
@@ -73,7 +90,9 @@ const handler: PlasmoMessaging.MessageHandler<ExtractLinksRequest, ExtractLinksR
 
               if (bestContainer && maxLinks > 0) {
                 container = bestContainer
-                console.log(`[ExtractLinks] ✓ 选中: 包含 ${maxLinks} 个链接的容器`)
+                console.log(
+                  `[ExtractLinks] ✓ 选中: 包含 ${maxLinks} 个链接的容器`
+                )
               } else {
                 console.log(`[ExtractLinks] ✗ 所有匹配元素都没有链接`)
               }
@@ -94,11 +113,11 @@ const handler: PlasmoMessaging.MessageHandler<ExtractLinksRequest, ExtractLinksR
         const seenUrls = new Set<string>()
 
         const processAnchor = (anchor: Element) => {
-          const href = anchor.getAttribute('href')
+          const href = anchor.getAttribute("href")
           if (!href) return
 
           // 跳过锚点和 javascript
-          if (href.startsWith('#') || href.startsWith('javascript:')) return
+          if (href.startsWith("#") || href.startsWith("javascript:")) return
 
           // 解析完整 URL
           let fullUrl: string
@@ -127,14 +146,17 @@ const handler: PlasmoMessaging.MessageHandler<ExtractLinksRequest, ExtractLinksR
         }
 
         if (useDocument) {
-          document.querySelectorAll('a[href]').forEach(processAnchor)
+          document.querySelectorAll("a[href]").forEach(processAnchor)
         } else if (container) {
           // 检查容器本身是否是链接
-          if (container.tagName.toLowerCase() === 'a' && container.hasAttribute('href')) {
+          if (
+            container.tagName.toLowerCase() === "a" &&
+            container.hasAttribute("href")
+          ) {
             processAnchor(container)
           }
           // 提取容器内的链接
-          container.querySelectorAll('a[href]').forEach(processAnchor)
+          container.querySelectorAll("a[href]").forEach(processAnchor)
         }
 
         console.log(`[ExtractLinks] ========== 提取结果 ==========`)
@@ -142,12 +164,14 @@ const handler: PlasmoMessaging.MessageHandler<ExtractLinksRequest, ExtractLinksR
         if (links.length > 0) {
           console.log(`[ExtractLinks] 前 3 个链接:`)
           links.slice(0, 3).forEach((l, i) => {
-            console.log(`[ExtractLinks]   [${i}] ${l.text.slice(0, 30)}... → ${l.url.slice(0, 60)}...`)
+            console.log(
+              `[ExtractLinks]   [${i}] ${l.text.slice(0, 30)}... → ${l.url.slice(0, 60)}...`
+            )
           })
         }
         return links
       },
-      args: [linkContainerSelector || null, sameDomainOnly],
+      args: [linkContainerSelector || null, sameDomainOnly]
     })
 
     const links = results[0]?.result || []
@@ -158,7 +182,7 @@ const handler: PlasmoMessaging.MessageHandler<ExtractLinksRequest, ExtractLinksR
     debugLog(`[ExtractLinks] 提取失败:`, error)
     res.send({
       success: false,
-      error: error instanceof Error ? error.message : "提取链接失败",
+      error: error instanceof Error ? error.message : "提取链接失败"
     })
   }
 }

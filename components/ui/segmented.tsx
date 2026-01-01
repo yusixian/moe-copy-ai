@@ -54,7 +54,7 @@ export const Segmented = <T extends string | number = string | number>({
   return (
     <div
       className={cn(
-        "flex w-fit cursor-pointer select-none rounded-lg bg-gray-100 p-1 text-xs font-medium",
+        "flex w-fit cursor-pointer select-none rounded-lg bg-gray-100 p-1 font-medium text-xs",
         className
       )}>
       {options.map((option) => {

@@ -1,23 +1,50 @@
-import type { ExtractedContent, SelectedElementInfo } from '~constants/types'
+import type { ExtractedContent, SelectedElementInfo } from "~constants/types"
 
-import { convertHtmlToMarkdown } from './readability-extractor'
+import { convertHtmlToMarkdown } from "./readability-extractor"
 
 // 块级元素 - 前后需要换行
 const BLOCK_ELEMENTS = new Set([
-  'div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-  'article', 'section', 'header', 'footer', 'main', 'nav', 'aside',
-  'ul', 'ol', 'li', 'dl', 'dt', 'dd',
-  'table', 'thead', 'tbody', 'tfoot', 'tr',
-  'blockquote', 'pre', 'figure', 'figcaption',
-  'form', 'fieldset', 'legend',
-  'hr',
+  "div",
+  "p",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "article",
+  "section",
+  "header",
+  "footer",
+  "main",
+  "nav",
+  "aside",
+  "ul",
+  "ol",
+  "li",
+  "dl",
+  "dt",
+  "dd",
+  "table",
+  "thead",
+  "tbody",
+  "tfoot",
+  "tr",
+  "blockquote",
+  "pre",
+  "figure",
+  "figcaption",
+  "form",
+  "fieldset",
+  "legend",
+  "hr"
 ])
 
 // 表格单元格 - 用 Tab 分隔
-const TABLE_CELLS = new Set(['td', 'th'])
+const TABLE_CELLS = new Set(["td", "th"])
 
 // 标题元素 - 前后需要额外空行
-const HEADING_ELEMENTS = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+const HEADING_ELEMENTS = new Set(["h1", "h2", "h3", "h4", "h5", "h6"])
 
 /**
  * 智能提取带格式的纯文本
@@ -41,7 +68,7 @@ function extractFormattedText(element: Element): string {
     const tag = el.tagName.toLowerCase()
 
     // 跳过隐藏元素和脚本/样式
-    if (['script', 'style', 'noscript', 'svg'].includes(tag)) return
+    if (["script", "style", "noscript", "svg"].includes(tag)) return
 
     const isBlock = BLOCK_ELEMENTS.has(tag)
     const isHeading = HEADING_ELEMENTS.has(tag)
@@ -49,15 +76,15 @@ function extractFormattedText(element: Element): string {
 
     // 块级元素前添加换行
     if (isBlock && result.length > 0) {
-      result.push('\n')
-      if (isHeading) result.push('\n') // 标题前额外空行
+      result.push("\n")
+      if (isHeading) result.push("\n") // 标题前额外空行
     }
 
     // 表格单元格前添加 Tab（同行分隔）
     if (isTableCell && result.length > 0) {
       const lastChar = result[result.length - 1]
-      if (lastChar !== '\n' && lastChar !== '\t') {
-        result.push('\t')
+      if (lastChar !== "\n" && lastChar !== "\t") {
+        result.push("\t")
       }
     }
 
@@ -68,24 +95,25 @@ function extractFormattedText(element: Element): string {
 
     // 块级元素后添加换行
     if (isBlock) {
-      result.push('\n')
-      if (isHeading) result.push('\n') // 标题后额外空行
+      result.push("\n")
+      if (isHeading) result.push("\n") // 标题后额外空行
     }
 
     // <br> 标签
-    if (tag === 'br') {
-      result.push('\n')
+    if (tag === "br") {
+      result.push("\n")
     }
   }
 
   traverse(element)
 
   // 清理：合并多余的换行和空格
-  return result.join('')
-    .replace(/\n{3,}/g, '\n\n')  // 最多两个连续换行
-    .replace(/[ \t]+/g, ' ')     // 合并空格
-    .replace(/\n /g, '\n')       // 移除行首空格
-    .replace(/ \n/g, '\n')       // 移除行尾空格
+  return result
+    .join("")
+    .replace(/\n{3,}/g, "\n\n") // 最多两个连续换行
+    .replace(/[ \t]+/g, " ") // 合并空格
+    .replace(/\n /g, "\n") // 移除行首空格
+    .replace(/ \n/g, "\n") // 移除行尾空格
     .trim()
 }
 
@@ -95,10 +123,10 @@ function extractFormattedText(element: Element): string {
 export function getElementInfo(element: Element): SelectedElementInfo {
   return {
     tagName: element.tagName.toLowerCase(),
-    className: element.className || '',
-    id: element.id || '',
-    linkCount: element.querySelectorAll('a[href]').length,
-    outerHTML: element.outerHTML.substring(0, 500), // 限制长度用于显示
+    className: element.className || "",
+    id: element.id || "",
+    linkCount: element.querySelectorAll("a[href]").length,
+    outerHTML: element.outerHTML.substring(0, 500) // 限制长度用于显示
   }
 }
 
@@ -111,11 +139,11 @@ export function extractContentFromElement(element: Element): ExtractedContent {
   const text = extractFormattedText(element) // 使用智能文本提取
 
   // 转换 HTML 为 Markdown
-  let markdown = ''
+  let markdown = ""
   try {
     markdown = convertHtmlToMarkdown(html)
   } catch (error) {
-    console.error('Markdown 转换失败:', error)
+    console.error("Markdown 转换失败:", error)
     // 回退到纯文本
     markdown = text
   }
@@ -124,7 +152,7 @@ export function extractContentFromElement(element: Element): ExtractedContent {
     html,
     markdown,
     text,
-    elementInfo: getElementInfo(element),
+    elementInfo: getElementInfo(element)
   }
 }
 
@@ -139,12 +167,12 @@ export function getContentStats(content: ExtractedContent): {
 } {
   const wordCount = content.text
     .split(/\s+/)
-    .filter(word => word.length > 0).length
+    .filter((word) => word.length > 0).length
 
   return {
     htmlLength: content.html.length,
     markdownLength: content.markdown.length,
     textLength: content.text.length,
-    wordCount,
+    wordCount
   }
 }

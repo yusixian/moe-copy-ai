@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react"
 import { ToastContainer } from "react-toastify"
 
 import BatchScrapePanel from "~components/batch/BatchScrapePanel"
+import { Button } from "~components/ui/button"
 import ContentExtractionPanel from "~components/extraction/ContentExtractionPanel"
 import SidePanelSettings from "~components/sidepanel/SidePanelSettings"
 import Segmented, { type SegmentedOption } from "~components/ui/segmented"
@@ -82,7 +83,7 @@ function SidePanel() {
       setLinks(elementInfo, extractedLinks)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [elementInfo, extractedLinks])
+  }, [elementInfo, extractedLinks, setLinks])
 
   // 当选择完成时，重置 isSelectingNextPage 状态
   useEffect(() => {
@@ -161,25 +162,21 @@ function SidePanel() {
             onChange={(value) => setCurrentView(value)}
             className="flex-1"
           />
-          <button
+          <Button
+            variant={currentView === "settings" ? "secondary" : "ghost"}
+            size="icon"
             onClick={() => setCurrentView("settings")}
-            className={cn(
-              "rounded-lg p-2 transition-colors",
-              currentView === "settings"
-                ? "bg-white text-gray-700 shadow-sm"
-                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-            )}
             title="设置">
             <Icon icon="mdi:cog" width={18} />
-          </button>
+          </Button>
         </div>
 
         {/* 标题 */}
         <div>
-          <h1 className="text-lg font-bold text-gray-800">
+          <h1 className="font-bold text-gray-800 text-lg">
             {currentConfig.title}
           </h1>
-          <p className="text-sm text-gray-500">{currentConfig.description}</p>
+          <p className="text-gray-500 text-sm">{currentConfig.description}</p>
         </div>
       </div>
 

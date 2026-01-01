@@ -23,7 +23,6 @@ export const CornerDots = ({
         return ["bg-pink-200", "bg-pink-200", "bg-pink-200", "bg-pink-200"]
       case "mixed":
         return ["bg-pink-200", "bg-sky-200", "bg-sky-200", "bg-pink-200"]
-      case "blue":
       default:
         return ["bg-sky-200", "bg-sky-200", "bg-sky-200", "bg-sky-200"]
     }
@@ -32,13 +31,13 @@ export const CornerDots = ({
   const [topLeft, topRight, bottomLeft, bottomRight] = getColors()
 
   return (
-    <div className="absolute left-0 top-0 size-full">
+    <div className="absolute top-0 left-0 size-full">
       <div
-        className={`absolute left-1.5 top-1.5 h-${size} w-${size} rounded-full ${topLeft}`}
+        className={`absolute top-1.5 left-1.5 h-${size} w-${size} rounded-full ${topLeft}`}
         style={{ opacity }}
       />
       <div
-        className={`absolute right-1.5 top-1.5 h-${size} w-${size} rounded-full ${topRight}`}
+        className={`absolute top-1.5 right-1.5 h-${size} w-${size} rounded-full ${topRight}`}
         style={{ opacity }}
       />
       <div
@@ -46,7 +45,7 @@ export const CornerDots = ({
         style={{ opacity }}
       />
       <div
-        className={`absolute bottom-1.5 right-1.5 h-${size} w-${size} rounded-full ${bottomRight}`}
+        className={`absolute right-1.5 bottom-1.5 h-${size} w-${size} rounded-full ${bottomRight}`}
         style={{ opacity }}
       />
     </div>

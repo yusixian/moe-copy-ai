@@ -52,7 +52,7 @@ const CardHeader = forwardRef<
   <div
     ref={ref}
     className={cn(
-      "group relative flex cursor-pointer items-center justify-between border-b border-sky-200 bg-gradient-to-r from-sky-100 to-indigo-100 p-2 transition-all duration-300",
+      "group relative flex cursor-pointer items-center justify-between border-sky-200 border-b bg-gradient-to-r from-sky-100 to-indigo-100 p-2 transition-all duration-300",
       className
     )}
     {...props}

@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react"
-import React from "react"
+import type React from "react"
 
 interface OptionSectionProps {
   title: string
@@ -14,7 +14,7 @@ export const OptionSection: React.FC<OptionSectionProps> = ({
 }) => {
   return (
     <div className="mb-6 rounded-xl border-2 border-sky-200 bg-white p-6 shadow-md">
-      <h2 className="mb-4 flex items-center text-xl font-semibold text-sky-600">
+      <h2 className="mb-4 flex items-center font-semibold text-sky-600 text-xl">
         <Icon icon={icon} className="mr-2" />
         {title}
       </h2>

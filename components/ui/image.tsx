@@ -82,7 +82,7 @@ const Image = forwardRef<HTMLImageElement, ImageProps>(
             {...props}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center p-2 text-sm text-red-500">
+          <div className="flex flex-col items-center justify-center p-2 text-red-500 text-sm">
             <span className="mb-1">(˃̣̣̥⌓˂̣̣̥) </span>
             <span>图片加载失败</span>
           </div>

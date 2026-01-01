@@ -3,7 +3,8 @@
 /* 确保选择器元素不受页面样式影响 */
 [data-element-selector] {
   all: initial;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 [data-element-selector] * {

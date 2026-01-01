@@ -35,7 +35,7 @@ export interface ScrapedContent {
 // 消息接口
 export interface Message {
   action: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface ScrapeResponse {
@@ -125,13 +125,24 @@ export interface SelectedElementInfo {
 }
 
 // 批量抓取状态模式
-export type BatchScrapeMode = 'idle' | 'selecting' | 'previewing' | 'scraping' | 'completed' | 'error'
+export type BatchScrapeMode =
+  | "idle"
+  | "selecting"
+  | "previewing"
+  | "scraping"
+  | "completed"
+  | "error"
 
 // 单页抓取状态
-export type PageScrapeStatus = 'pending' | 'fetching' | 'extracting' | 'success' | 'failed'
+export type PageScrapeStatus =
+  | "pending"
+  | "fetching"
+  | "extracting"
+  | "success"
+  | "failed"
 
 // 抓取策略类型
-export type ScrapeStrategyType = 'fetch' | 'background-tabs' | 'current-tab'
+export type ScrapeStrategyType = "fetch" | "background-tabs" | "current-tab"
 
 // 单页抓取结果
 export interface BatchScrapeResult {
@@ -153,7 +164,7 @@ export interface BatchProgress {
   } | null
   results: Array<{
     url: string
-    status: 'success' | 'failed'
+    status: "success" | "failed"
     title?: string
     error?: string
   }>
@@ -186,7 +197,7 @@ export interface LinkFilterOptions {
 // ZIP 导出选项
 export interface ZipExportOptions {
   includeIndex: boolean
-  filenameFormat: 'title' | 'url' | 'index'
+  filenameFormat: "title" | "url" | "index"
   maxFilenameLength: number
 }
 
@@ -205,7 +216,11 @@ export interface AggregatedContent {
 
 // 元素选择器消息类型
 export interface ElementSelectorMessage extends Message {
-  action: 'activateSelector' | 'deactivateSelector' | 'elementSelected' | 'selectionCancelled'
+  action:
+    | "activateSelector"
+    | "deactivateSelector"
+    | "elementSelected"
+    | "selectionCancelled"
   elementInfo?: SelectedElementInfo
   links?: ExtractedLink[]
   purpose?: ElementSelectorPurpose
@@ -215,7 +230,10 @@ export interface ElementSelectorMessage extends Message {
 // ==================== 内容提取相关类型 ====================
 
 // 元素选择器用途
-export type ElementSelectorPurpose = 'link-extraction' | 'content-extraction' | 'next-page-button'
+export type ElementSelectorPurpose =
+  | "link-extraction"
+  | "content-extraction"
+  | "next-page-button"
 
 // 下一页按钮信息
 export interface NextPageButtonInfo {
@@ -225,16 +243,15 @@ export interface NextPageButtonInfo {
 }
 
 // 内容输出格式
-export type ContentOutputFormat = 'html' | 'markdown' | 'text'
+export type ContentOutputFormat = "html" | "markdown" | "text"
 
 // 内容提取模式
-export type ContentExtractionMode = 'idle' | 'selecting' | 'extracted' | 'error'
+export type ContentExtractionMode = "idle" | "selecting" | "extracted" | "error"
 
 // 提取的内容
 export interface ExtractedContent {
-  html: string      // element.outerHTML (完整)
-  markdown: string  // 转换后的 Markdown
-  text: string      // element.textContent
+  html: string // element.outerHTML (完整)
+  markdown: string // 转换后的 Markdown
+  text: string // element.textContent
   elementInfo: SelectedElementInfo
 }
-

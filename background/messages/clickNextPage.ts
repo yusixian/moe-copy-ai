@@ -18,15 +18,24 @@ export interface ClickNextPageResponse {
 /**
  * 点击下一页按钮并等待页面加载
  */
-const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPageResponse> = async (req, res) => {
+const handler: PlasmoMessaging.MessageHandler<
+  ClickNextPageRequest,
+  ClickNextPageResponse
+> = async (req, res) => {
   const { tabId, nextPageXPath, timeout = 10000 } = req.body || {}
 
   if (!tabId || !nextPageXPath) {
-    return res.send({ success: false, hasNextPage: false, error: "tabId 和 nextPageXPath 不能为空" })
+    return res.send({
+      success: false,
+      hasNextPage: false,
+      error: "tabId 和 nextPageXPath 不能为空"
+    })
   }
 
   try {
-    console.log(`[ClickNextPage] 在标签页 ${tabId} 点击下一页: ${nextPageXPath}`)
+    console.log(
+      `[ClickNextPage] 在标签页 ${tabId} 点击下一页: ${nextPageXPath}`
+    )
 
     // 先检查下一页按钮是否存在
     const checkResults = await chrome.scripting.executeScript({
@@ -34,7 +43,13 @@ const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPag
       func: (xpath: string) => {
         const findElement = (xp: string): Element | null => {
           try {
-            const result = document.evaluate(xp, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+            const result = document.evaluate(
+              xp,
+              document,
+              null,
+              XPathResult.FIRST_ORDERED_NODE_TYPE,
+              null
+            )
             return result.singleNodeValue as Element | null
           } catch {
             return null
@@ -47,13 +62,13 @@ const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPag
 
         // 检查是否被禁用
         const isDisabled =
-          el.hasAttribute('disabled') ||
-          el.classList.contains('disabled') ||
-          el.getAttribute('aria-disabled') === 'true'
+          el.hasAttribute("disabled") ||
+          el.classList.contains("disabled") ||
+          el.getAttribute("aria-disabled") === "true"
 
         return { exists: true, isDisabled }
       },
-      args: [nextPageXPath],
+      args: [nextPageXPath]
     })
 
     const checkResult = checkResults[0]?.result
@@ -78,7 +93,13 @@ const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPag
       func: (xpath: string) => {
         const findElement = (xp: string): Element | null => {
           try {
-            const result = document.evaluate(xp, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+            const result = document.evaluate(
+              xp,
+              document,
+              null,
+              XPathResult.FIRST_ORDERED_NODE_TYPE,
+              null
+            )
             return result.singleNodeValue as Element | null
           } catch {
             return null
@@ -91,7 +112,7 @@ const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPag
           el.click()
         }
       },
-      args: [nextPageXPath],
+      args: [nextPageXPath]
     })
 
     // 等待页面加载完成
@@ -104,14 +125,14 @@ const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPag
     res.send({
       success: true,
       hasNextPage: true,
-      newUrl: newTab.url,
+      newUrl: newTab.url
     })
   } catch (error) {
     debugLog(`[ClickNextPage] 失败:`, error)
     res.send({
       success: false,
       hasNextPage: false,
-      error: error instanceof Error ? error.message : "点击下一页失败",
+      error: error instanceof Error ? error.message : "点击下一页失败"
     })
   }
 }
@@ -119,8 +140,12 @@ const handler: PlasmoMessaging.MessageHandler<ClickNextPageRequest, ClickNextPag
 /**
  * 等待页面导航完成
  */
-function waitForNavigation(tabId: number, timeout: number, originalUrl?: string): Promise<void> {
-  return new Promise((resolve, reject) => {
+function waitForNavigation(
+  tabId: number,
+  timeout: number,
+  originalUrl?: string
+): Promise<void> {
+  return new Promise((resolve, _reject) => {
     const timeoutId = setTimeout(() => {
       chrome.tabs.onUpdated.removeListener(listener)
       // 超时但不报错，可能是单页应用不会触发导航
@@ -129,7 +154,11 @@ function waitForNavigation(tabId: number, timeout: number, originalUrl?: string)
 
     let navigationStarted = false
 
-    const listener = (updatedTabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
+    const listener = (
+      updatedTabId: number,
+      changeInfo: chrome.tabs.TabChangeInfo,
+      _tab: chrome.tabs.Tab
+    ) => {
       if (updatedTabId !== tabId) return
 
       // 检测到 URL 变化或加载状态变化
@@ -137,7 +166,7 @@ function waitForNavigation(tabId: number, timeout: number, originalUrl?: string)
         navigationStarted = true
       }
 
-      if (changeInfo.status === 'complete' && navigationStarted) {
+      if (changeInfo.status === "complete" && navigationStarted) {
         clearTimeout(timeoutId)
         chrome.tabs.onUpdated.removeListener(listener)
         // 给页面一点时间执行 JS

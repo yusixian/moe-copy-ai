@@ -1,12 +1,11 @@
-import { useCallback, useMemo, useState } from 'react'
-
-import type { ExtractedLink } from '~constants/types'
+import { useCallback, useMemo, useState } from "react"
 import {
   DEFAULT_FILTER_STATE,
   type FilterMode,
   type FilterTarget,
   type PresetFilter
-} from '~constants/link-filter-presets'
+} from "~constants/link-filter-presets"
+import type { ExtractedLink } from "~constants/types"
 
 export interface LinkFilterState {
   pattern: string
@@ -30,17 +29,20 @@ export interface UseLinkFilterReturn {
 /**
  * 验证正则表达式是否有效
  */
-function validateRegex(pattern: string): { isValid: boolean; error: string | null } {
+function validateRegex(pattern: string): {
+  isValid: boolean
+  error: string | null
+} {
   if (!pattern.trim()) {
     return { isValid: true, error: null }
   }
   try {
-    new RegExp(pattern, 'i')
+    new RegExp(pattern, "i")
     return { isValid: true, error: null }
   } catch (e) {
     return {
       isValid: false,
-      error: e instanceof Error ? e.message : '无效的正则表达式'
+      error: e instanceof Error ? e.message : "无效的正则表达式"
     }
   }
 }
@@ -50,7 +52,9 @@ function validateRegex(pattern: string): { isValid: boolean; error: string | nul
  */
 export function useLinkFilter(): UseLinkFilterReturn {
   const [pattern, setPatternState] = useState(DEFAULT_FILTER_STATE.pattern)
-  const [target, setTarget] = useState<FilterTarget>(DEFAULT_FILTER_STATE.target)
+  const [target, setTarget] = useState<FilterTarget>(
+    DEFAULT_FILTER_STATE.target
+  )
   const [mode, setMode] = useState<FilterMode>(DEFAULT_FILTER_STATE.mode)
 
   // 验证正则表达式
@@ -82,9 +86,9 @@ export function useLinkFilter(): UseLinkFilterReturn {
 
   // 清除过滤
   const clearFilter = useCallback(() => {
-    setPatternState('')
-    setTarget('url')
-    setMode('exclude')
+    setPatternState("")
+    setTarget("url")
+    setMode("exclude")
   }, [])
 
   // 过滤链接
@@ -96,26 +100,26 @@ export function useLinkFilter(): UseLinkFilterReturn {
       }
 
       try {
-        const regex = new RegExp(pattern, 'i')
+        const regex = new RegExp(pattern, "i")
 
         return links.filter((link) => {
           let matches = false
 
           // 根据目标匹配
           switch (target) {
-            case 'url':
+            case "url":
               matches = regex.test(link.url)
               break
-            case 'text':
+            case "text":
               matches = regex.test(link.text)
               break
-            case 'both':
+            case "both":
               matches = regex.test(link.url) || regex.test(link.text)
               break
           }
 
           // 根据模式决定是保留还是排除
-          return mode === 'include' ? matches : !matches
+          return mode === "include" ? matches : !matches
         })
       } catch {
         return links

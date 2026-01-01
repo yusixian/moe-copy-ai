@@ -37,10 +37,6 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
   // 添加全屏状态
   const [isFullscreen, setIsFullscreen] = useState(false)
 
-  if (!articleContent) {
-    return null
-  }
-
   // 获取当前要显示的内容
   const currentContent = useMemo(() => {
     const content = showCleanedContent
@@ -146,11 +142,15 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
     }
   }, [isFullscreen])
 
+  if (!articleContent) {
+    return null
+  }
+
   return (
     <div className="relative mb-4">
-      <h2 className="absolute right-1 top-1 z-20 flex w-auto items-center justify-between text-lg font-semibold text-sky-600">
+      <h2 className="absolute top-1 right-1 z-20 flex w-auto items-center justify-between font-semibold text-lg text-sky-600">
         {currentContent?.length ? (
-          <div className="flex w-auto items-center gap-1.5 rounded-full bg-gradient-to-r from-sky-50 to-indigo-50 px-3 py-1 text-xs font-medium text-sky-600 shadow-sm ring-1 ring-sky-100 transition-opacity hover:opacity-80">
+          <div className="flex w-auto items-center gap-1.5 rounded-full bg-gradient-to-r from-sky-50 to-indigo-50 px-3 py-1 font-medium text-sky-600 text-xs shadow-sm ring-1 ring-sky-100 transition-opacity hover:opacity-80">
             <span className="flex items-center">
               {currentContent.length} 字符
             </span>
@@ -221,22 +221,11 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
         </Button>
 
         <Button
-          variant={copySuccess ? "success" : "copy"}
+          variant={copySuccess ? "success" : "default"}
           size="sm"
           onClick={handleCopy}>
-          {copySuccess ? "成功" : "复制"}
+          {copySuccess ? "已复制" : "复制"}
         </Button>
-
-        {/* 复制成功动画 */}
-        {copySuccess && (
-          <div className="absolute -top-12 right-0 -translate-y-1 transform rounded-full border border-green-200 bg-gradient-to-br from-green-50 to-emerald-100 px-4 py-2 text-xs text-green-600 shadow-md">
-            <div className="flex items-center">
-              <span className="mr-1">(っ◔◡◔)っ</span>
-              内容已复制到剪贴板!
-              <span className="ml-1 inline-block animate-pulse">♥</span>
-            </div>
-          </div>
-        )}
       </div>
       <TokenizationDisplay
         className="mt-4"

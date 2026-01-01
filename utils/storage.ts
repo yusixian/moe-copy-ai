@@ -50,14 +50,19 @@ export async function setExtractionMode(mode: ExtractionMode): Promise<void> {
     if (!validModes.includes(mode)) {
       throw new Error(`无效的抓取模式: ${mode}`)
     }
-    
+
     await syncStorage.set(STORAGE_KEYS.EXTRACTION_MODE, mode)
     debugLog("抓取模式已设置为:", mode)
-    
+
     // 验证设置是否成功
-    const savedMode = await syncStorage.get<ExtractionMode>(STORAGE_KEYS.EXTRACTION_MODE)
+    const savedMode = await syncStorage.get<ExtractionMode>(
+      STORAGE_KEYS.EXTRACTION_MODE
+    )
     if (savedMode !== mode) {
-      debugLog("警告: 设置的抓取模式与保存的不一致", { expected: mode, actual: savedMode })
+      debugLog("警告: 设置的抓取模式与保存的不一致", {
+        expected: mode,
+        actual: savedMode
+      })
     }
   } catch (error) {
     debugLog("设置抓取模式时出错:", error)

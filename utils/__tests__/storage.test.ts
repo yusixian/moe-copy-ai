@@ -38,10 +38,10 @@ describe("storage", () => {
     test("应为同步存储和本地存储使用不同区域", () => {
       // 导入Storage类用于测试
       const { Storage } = require("@plasmohq/storage")
-      
+
       // 创建我们自己的实例以验证参数传递
-      const mockSyncStorage = new Storage({ area: "sync" })
-      const mockLocalStorage = new Storage({ area: "local" })
+      const _mockSyncStorage = new Storage({ area: "sync" })
+      const _mockLocalStorage = new Storage({ area: "local" })
 
       expect(Storage).toHaveBeenCalled()
       expect(jest.mocked(Storage).mock.calls.length).toBeGreaterThan(0)
@@ -82,7 +82,10 @@ describe("storage", () => {
 
       await setExtractionMode("selector")
 
-      expect(mockStorageInstance.set).toHaveBeenCalledWith("extraction_mode", "selector")
+      expect(mockStorageInstance.set).toHaveBeenCalledWith(
+        "extraction_mode",
+        "selector"
+      )
       expect(mockStorageInstance.get).toHaveBeenCalledWith("extraction_mode")
     })
 
@@ -95,7 +98,10 @@ describe("storage", () => {
 
     test("当传入无效模式时应抛出错误", async () => {
       // 传入无效模式
-      await expect(setExtractionMode("invalid" as any)).rejects.toThrow("无效的抓取模式")
+      // @ts-expect-error: Testing invalid mode input
+      await expect(setExtractionMode("invalid")).rejects.toThrow(
+        "无效的抓取模式"
+      )
     })
   })
 
