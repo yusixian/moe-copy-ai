@@ -23,8 +23,16 @@ export interface ScrapeViaTabResponse {
  * 通过标签页导航抓取内容
  * 支持创建新标签页或使用现有标签页
  */
-const handler: PlasmoMessaging.MessageHandler<ScrapeViaTabRequest, ScrapeViaTabResponse> = async (req, res) => {
-  const { url, timeout = 30000, background = true, tabId: existingTabId } = req.body || {}
+const handler: PlasmoMessaging.MessageHandler<
+  ScrapeViaTabRequest,
+  ScrapeViaTabResponse
+> = async (req, res) => {
+  const {
+    url,
+    timeout = 30000,
+    background = true,
+    tabId: existingTabId
+  } = req.body || {}
 
   if (!url) {
     return res.send({ success: false, error: "URL 不能为空" })
@@ -40,7 +48,7 @@ const handler: PlasmoMessaging.MessageHandler<ScrapeViaTabRequest, ScrapeViaTabR
     if (!tabId) {
       const tab = await chrome.tabs.create({
         url,
-        active: !background,
+        active: !background
       })
       tabId = tab.id
       shouldCloseTab = true
@@ -74,12 +82,14 @@ const handler: PlasmoMessaging.MessageHandler<ScrapeViaTabRequest, ScrapeViaTabR
         {
           action: "scrapeContent",
           mode: extractionMode,
-          readabilityConfig,
+          readabilityConfig
         },
         (result) => {
           clearTimeout(timeoutId)
           if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message || "内容脚本通信失败"))
+            reject(
+              new Error(chrome.runtime.lastError.message || "内容脚本通信失败")
+            )
           } else {
             resolve(result)
           }
@@ -99,7 +109,7 @@ const handler: PlasmoMessaging.MessageHandler<ScrapeViaTabRequest, ScrapeViaTabR
     res.send({
       success: true,
       title: response?.title || "",
-      content: response?.cleanedContent || response?.articleContent || "",
+      content: response?.cleanedContent || response?.articleContent || ""
     })
   } catch (error) {
     debugLog(`[ScrapeViaTab] 抓取失败: ${url}`, error)
@@ -111,7 +121,7 @@ const handler: PlasmoMessaging.MessageHandler<ScrapeViaTabRequest, ScrapeViaTabR
 
     res.send({
       success: false,
-      error: error instanceof Error ? error.message : "未知错误",
+      error: error instanceof Error ? error.message : "未知错误"
     })
   }
 }
@@ -126,7 +136,10 @@ function waitForTabLoad(tabId: number, timeout: number): Promise<void> {
       reject(new Error("页面加载超时"))
     }, timeout)
 
-    const listener = (updatedTabId: number, changeInfo: chrome.tabs.TabChangeInfo) => {
+    const listener = (
+      updatedTabId: number,
+      changeInfo: chrome.tabs.TabChangeInfo
+    ) => {
       if (updatedTabId === tabId && changeInfo.status === "complete") {
         clearTimeout(timeoutId)
         chrome.tabs.onUpdated.removeListener(listener)
@@ -138,13 +151,16 @@ function waitForTabLoad(tabId: number, timeout: number): Promise<void> {
     chrome.tabs.onUpdated.addListener(listener)
 
     // 检查标签页是否已经加载完成
-    chrome.tabs.get(tabId).then((tab) => {
-      if (tab.status === "complete") {
-        clearTimeout(timeoutId)
-        chrome.tabs.onUpdated.removeListener(listener)
-        setTimeout(resolve, 500)
-      }
-    }).catch(reject)
+    chrome.tabs
+      .get(tabId)
+      .then((tab) => {
+        if (tab.status === "complete") {
+          clearTimeout(timeoutId)
+          chrome.tabs.onUpdated.removeListener(listener)
+          setTimeout(resolve, 500)
+        }
+      })
+      .catch(reject)
   })
 }
 

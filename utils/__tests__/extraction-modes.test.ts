@@ -72,7 +72,9 @@ describe("Extraction Modes Integration", () => {
       expect(result.metadata["extraction:mode"]).toBeDefined()
       expect(result.articleContent).toBeDefined()
       // In test environment, might fallback to selector mode
-      expect(["readability", "selector"]).toContain(result.metadata["extraction:mode"])
+      expect(["readability", "selector"]).toContain(
+        result.metadata["extraction:mode"]
+      )
     })
 
     test("should include readability config when specified", async () => {
@@ -117,12 +119,12 @@ describe("Extraction Modes Integration", () => {
   describe("Mode Comparison", () => {
     test("should provide consistent basic structure across all modes", async () => {
       const modes: ExtractionMode[] = ["selector", "readability", "hybrid"]
-      
+
       for (const mode of modes) {
         const result = await scrapeWebpageContent({ mode })
-        
+
         expect(result).toHaveProperty("title")
-        expect(result).toHaveProperty("articleContent") 
+        expect(result).toHaveProperty("articleContent")
         expect(result).toHaveProperty("cleanedContent")
         expect(result).toHaveProperty("metadata")
         expect(result).toHaveProperty("images")
@@ -197,7 +199,7 @@ describe("Extraction Modes Integration", () => {
       })
 
       expect(result.articleContent).toContain("Section 1")
-      expect(result.articleContent).toContain("Section 2") 
+      expect(result.articleContent).toContain("Section 2")
       expect(result.articleContent).toContain("List item 1")
       expect(result.articleContent).toContain("important quote")
     })

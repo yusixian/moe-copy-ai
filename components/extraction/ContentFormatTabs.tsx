@@ -60,7 +60,7 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
               key={tab.id}
               onClick={() => setActiveFormat(tab.id)}
               className={cn(
-                "flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+                "flex items-center gap-1 rounded-md px-3 py-1.5 font-medium text-xs transition-colors",
                 activeFormat === tab.id
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
@@ -75,7 +75,7 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
         {activeFormat === "markdown" && (
           <button
             onClick={() => setIsPreviewMode(!isPreviewMode)}
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-gray-500 hover:bg-gray-100">
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-gray-500 text-xs hover:bg-gray-100">
             <Icon
               icon={isPreviewMode ? "mdi:code-tags" : "mdi:eye"}
               width={14}
@@ -94,11 +94,11 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
             isPreviewMode={isPreviewMode}
           />
         ) : activeFormat === "html" ? (
-          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-gray-700">
+          <pre className="whitespace-pre-wrap break-all font-mono text-gray-700 text-xs">
             {currentContent}
           </pre>
         ) : (
-          <pre className="whitespace-pre-wrap text-sm text-gray-700">
+          <pre className="whitespace-pre-wrap text-gray-700 text-sm">
             {currentContent}
           </pre>
         )}
@@ -106,14 +106,14 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
 
       {/* 底部操作栏 */}
       <div className="flex items-center justify-between">
-        <div className="text-xs text-gray-400">
+        <div className="text-gray-400 text-xs">
           {stats.chars.toLocaleString()} 字符 · {stats.words.toLocaleString()}{" "}
           词 · {stats.tokens.toLocaleString()} tokens
         </div>
         <button
           onClick={() => copy(currentContent)}
           className={cn(
-            "flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+            "flex items-center gap-1 rounded-md px-3 py-1.5 font-medium text-xs transition-colors",
             copied
               ? "bg-green-100 text-green-700"
               : "bg-sky-100 text-sky-700 hover:bg-sky-200"

@@ -1,6 +1,6 @@
 import { streamText } from "@xsai/stream-text"
 
-import { AiChatHistory, AiChatHistoryItem } from "~constants/types"
+import type { AiChatHistory, AiChatHistoryItem } from "~constants/types"
 import { generateUUID } from "~utils"
 
 import { debugLog } from "./logger"

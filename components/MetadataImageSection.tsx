@@ -14,7 +14,7 @@ export const MetadataImageSection: React.FC<MetadataImageSectionProps> = ({
 }) => {
   // 检查是否有任何图片元数据
   const hasImages =
-    metadata["og:image"] || metadata["twitter:image"] || metadata["image"]
+    metadata["og:image"] || metadata["twitter:image"] || metadata.image
 
   if (!hasImages) {
     return null
@@ -22,7 +22,7 @@ export const MetadataImageSection: React.FC<MetadataImageSectionProps> = ({
 
   return (
     <div className="mb-4">
-      <h3 className="text-md mb-2 font-medium text-sky-600">元数据图片</h3>
+      <h3 className="mb-2 font-medium text-md text-sky-600">元数据图片</h3>
       <div className="flex flex-wrap gap-3">
         {metadata["og:image"] && (
           <MetadataImage
@@ -40,9 +40,9 @@ export const MetadataImageSection: React.FC<MetadataImageSectionProps> = ({
             onLoadError={onLoadError}
           />
         )}
-        {metadata["image"] && (
+        {metadata.image && (
           <MetadataImage
-            src={metadata["image"]}
+            src={metadata.image}
             alt="元数据图片"
             label="image"
             onLoadError={onLoadError}

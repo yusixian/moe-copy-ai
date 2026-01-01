@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react"
-import React, { useEffect, useState } from "react"
+import type React from "react"
+import { useEffect, useState } from "react"
 
 import type { ExtractionMode } from "../../constants/types"
 import { getExtractionMode, setExtractionMode } from "../../utils/storage"
@@ -102,7 +103,7 @@ export const ExtractionModeSection: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="text-center text-sm text-purple-500">
+          <div className="text-center text-purple-500 text-sm">
             <span className="animate-bounce">加载中...</span>
             <span className="ml-2 animate-pulse">(&gt;ω&lt;)</span>
           </div>
@@ -173,12 +174,12 @@ export const ExtractionModeSection: React.FC = () => {
                     />
                   </div>
                   <span
-                    className={`text-sm/5 font-medium ${extractionMode === option.value ? option.textColor : "text-gray-900"}`}>
+                    className={`font-medium text-sm/5 ${extractionMode === option.value ? option.textColor : "text-gray-900"}`}>
                     {option.label}
                   </span>
                   {extractionMode === option.value && (
                     <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium shadow-sm ${option.bgColor} ${option.textColor} border ${option.borderColor}`}>
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-medium text-xs shadow-sm ${option.bgColor} ${option.textColor} border ${option.borderColor}`}>
                       <Icon
                         icon="line-md:confirm-circle-twotone"
                         className={option.textColor}
@@ -189,7 +190,7 @@ export const ExtractionModeSection: React.FC = () => {
                     </span>
                   )}
                   {option.value === "hybrid" && extractionMode !== "hybrid" && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-600 shadow-sm">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-purple-50 px-2.5 py-1 font-medium text-purple-600 text-xs shadow-sm">
                       <Icon
                         icon="line-md:heart-twotone"
                         width="14"
@@ -225,7 +226,7 @@ export const ExtractionModeSection: React.FC = () => {
                     Readability 模式说明
                   </p>
                 </div>
-                <p className="text-sm leading-relaxed text-emerald-600">
+                <p className="text-emerald-600 text-sm leading-relaxed">
                   使用 Mozilla Firefox
                   阅读模式的底层算法，能更准确地识别文章内容，
                   自动移除广告和无关元素。适合大多数新闻网站、博客和文章页面呢～
@@ -248,7 +249,7 @@ export const ExtractionModeSection: React.FC = () => {
                 <div className="mb-2 flex items-center gap-2">
                   <p className="font-medium text-purple-700">混合模式说明</p>
                 </div>
-                <p className="text-sm leading-relaxed text-purple-600">
+                <p className="text-purple-600 text-sm leading-relaxed">
                   同时使用选择器和 Readability
                   两种方式提取内容，智能评估并选择质量更高的结果。
                   这种方式结合了两种方法的优点，适合各种类型的网站呢～
@@ -271,7 +272,7 @@ export const ExtractionModeSection: React.FC = () => {
                 <div className="mb-2 flex items-center gap-2">
                   <p className="font-medium text-sky-700">选择器模式说明</p>
                 </div>
-                <p className="text-sm leading-relaxed text-sky-600">
+                <p className="text-sky-600 text-sm leading-relaxed">
                   使用预定义的 CSS 选择器提取内容，精确度高。
                   可以在"选择器设置"中添加自定义选择器以适配特定网站呢～
                 </p>

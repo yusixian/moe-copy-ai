@@ -39,20 +39,17 @@ export function useSelectionSet<T, K extends string | number>({
     return new Set()
   })
 
-  const toggle = useCallback(
-    (key: K) => {
-      setSelectedKeys((prev) => {
-        const next = new Set(prev)
-        if (next.has(key)) {
-          next.delete(key)
-        } else {
-          next.add(key)
-        }
-        return next
-      })
-    },
-    []
-  )
+  const toggle = useCallback((key: K) => {
+    setSelectedKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) {
+        next.delete(key)
+      } else {
+        next.add(key)
+      }
+      return next
+    })
+  }, [])
 
   const selectAll = useCallback(() => {
     setSelectedKeys(

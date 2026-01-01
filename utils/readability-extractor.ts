@@ -185,10 +185,10 @@ ${cleanBodyHTML}
     }
 
     debugLog("DOMPurify + Readability 提取成功:", {
-      title: article.title?.substring(0, 50) + "...",
+      title: `${article.title?.substring(0, 50)}...`,
       contentLength: article.content?.length || 0,
       textLength: article.textContent?.length || 0,
-      excerpt: article.excerpt?.substring(0, 100) + "..."
+      excerpt: `${article.excerpt?.substring(0, 100)}...`
     })
 
     // 分析提取的内容结构
@@ -244,44 +244,49 @@ function processTable(tableElement: Element): string {
   let hasHeader = false
 
   // 提取表头
-  const thead = tableElement.querySelector('thead')
+  const thead = tableElement.querySelector("thead")
   if (thead) {
-    const headerRow = thead.querySelector('tr')
+    const headerRow = thead.querySelector("tr")
     if (headerRow) {
-      const headerCells = Array.from(headerRow.querySelectorAll('th, td'))
+      const headerCells = Array.from(headerRow.querySelectorAll("th, td"))
       if (headerCells.length > 0) {
-        rows.push(headerCells.map(cell => getCellText(cell)))
+        rows.push(headerCells.map((cell) => getCellText(cell)))
         hasHeader = true
       }
     }
   }
 
   // 提取表体
-  const tbody = tableElement.querySelector('tbody') || tableElement
-  const bodyRows = Array.from(tbody.querySelectorAll('tr'))
-    .filter(row => !row.closest('thead')) // 排除已处理的表头
+  const tbody = tableElement.querySelector("tbody") || tableElement
+  const bodyRows = Array.from(tbody.querySelectorAll("tr")).filter(
+    (row) => !row.closest("thead")
+  ) // 排除已处理的表头
 
   for (const row of bodyRows) {
-    const cells = Array.from(row.querySelectorAll('th, td'))
+    const cells = Array.from(row.querySelectorAll("th, td"))
     if (cells.length > 0) {
       // 如果没有表头但第一行是 th，标记为表头
-      if (!hasHeader && rows.length === 0 && cells[0].tagName.toLowerCase() === 'th') {
-        rows.push(cells.map(cell => getCellText(cell)))
+      if (
+        !hasHeader &&
+        rows.length === 0 &&
+        cells[0].tagName.toLowerCase() === "th"
+      ) {
+        rows.push(cells.map((cell) => getCellText(cell)))
         hasHeader = true
       } else {
-        rows.push(cells.map(cell => getCellText(cell)))
+        rows.push(cells.map((cell) => getCellText(cell)))
       }
     }
   }
 
-  if (rows.length === 0) return ''
+  if (rows.length === 0) return ""
 
   // 确定列数（取最大列数）
-  const colCount = Math.max(...rows.map(row => row.length))
+  const colCount = Math.max(...rows.map((row) => row.length))
 
   // 补齐每行的列数
-  const normalizedRows = rows.map(row => {
-    while (row.length < colCount) row.push('')
+  const normalizedRows = rows.map((row) => {
+    while (row.length < colCount) row.push("")
     return row
   })
 
@@ -290,18 +295,18 @@ function processTable(tableElement: Element): string {
 
   // 如果没有表头，使用第一行作为表头
   const headerRow = normalizedRows[0]
-  lines.push('| ' + headerRow.join(' | ') + ' |')
+  lines.push(`| ${headerRow.join(" | ")} |`)
 
   // 分隔行
-  lines.push('| ' + headerRow.map(() => '---').join(' | ') + ' |')
+  lines.push(`| ${headerRow.map(() => "---").join(" | ")} |`)
 
   // 数据行
   const dataRows = hasHeader ? normalizedRows.slice(1) : normalizedRows.slice(1)
   for (const row of dataRows) {
-    lines.push('| ' + row.join(' | ') + ' |')
+    lines.push(`| ${row.join(" | ")} |`)
   }
 
-  return '\n\n' + lines.join('\n') + '\n\n'
+  return `\n\n${lines.join("\n")}\n\n`
 }
 
 /**
@@ -311,38 +316,40 @@ function getCellText(cell: Element): string {
   // 递归获取文本，处理嵌套元素
   function extractText(node: Node): string {
     if (node.nodeType === Node.TEXT_NODE) {
-      return node.textContent?.trim() || ''
+      return node.textContent?.trim() || ""
     }
     if (node.nodeType === Node.ELEMENT_NODE) {
       const el = node as Element
       const tag = el.tagName.toLowerCase()
 
       // 跳过不需要的元素
-      if (['script', 'style', 'svg', 'button', 'input'].includes(tag)) {
+      if (["script", "style", "svg", "button", "input"].includes(tag)) {
         // 对于 input，可能需要提取 placeholder 或 value
-        if (tag === 'input') {
-          return el.getAttribute('placeholder') || ''
+        if (tag === "input") {
+          return el.getAttribute("placeholder") || ""
         }
-        return ''
+        return ""
       }
 
       // 递归处理子节点
-      const children = Array.from(el.childNodes).map(extractText).filter(Boolean)
+      const children = Array.from(el.childNodes)
+        .map(extractText)
+        .filter(Boolean)
 
       // 根据标签添加格式
-      const text = children.join(' ')
-      if (tag === 'strong' || tag === 'b') return `**${text}**`
-      if (tag === 'em' || tag === 'i') return `*${text}*`
-      if (tag === 'code') return `\`${text}\``
+      const text = children.join(" ")
+      if (tag === "strong" || tag === "b") return `**${text}**`
+      if (tag === "em" || tag === "i") return `*${text}*`
+      if (tag === "code") return `\`${text}\``
 
       return text
     }
-    return ''
+    return ""
   }
 
   return extractText(cell)
-    .replace(/\s+/g, ' ')
-    .replace(/\|/g, '\\|') // 转义表格分隔符
+    .replace(/\s+/g, " ")
+    .replace(/\|/g, "\\|") // 转义表格分隔符
     .trim()
 }
 
@@ -358,7 +365,7 @@ export function convertHtmlToMarkdown(htmlContent: string): string {
   debugLog("convertHtmlToMarkdown: 开始转换，输入长度:", htmlContent.length)
   debugLog(
     "convertHtmlToMarkdown: 输入内容预览:",
-    htmlContent.substring(0, 200) + "..."
+    `${htmlContent.substring(0, 200)}...`
   )
 
   // 创建临时DOM元素来处理HTML
@@ -397,7 +404,9 @@ export function convertHtmlToMarkdown(htmlContent: string): string {
       const tagName = element.tagName.toLowerCase()
 
       // 跳过一些不需要的元素
-      if (["script", "style", "meta", "link", "noscript", "svg"].includes(tagName)) {
+      if (
+        ["script", "style", "meta", "link", "noscript", "svg"].includes(tagName)
+      ) {
         return ""
       }
 
@@ -449,9 +458,10 @@ export function convertHtmlToMarkdown(htmlContent: string): string {
           return `\n\n##### ${textContent.trim()}\n\n`
         case "h6":
           return `\n\n###### ${textContent.trim()}\n\n`
-        case "p":
+        case "p": {
           const pContent = textContent.trim()
           return pContent ? `\n\n${pContent}\n` : ""
+        }
         case "br":
           return "\n"
         case "strong":
@@ -462,16 +472,17 @@ export function convertHtmlToMarkdown(htmlContent: string): string {
           return `*${textContent.trim()}*`
         case "code":
           return `\`${textContent.trim()}\``
-        case "pre":
+        case "pre": {
           // 检查是否包含代码块
           const codeElement = element.querySelector("code")
           const preContent = codeElement
             ? codeElement.textContent?.trim() || textContent.trim()
             : textContent.trim()
           return `\n\n\`\`\`\n${preContent}\n\`\`\`\n\n`
+        }
         case "blockquote":
           return `\n\n> ${textContent.trim()}\n\n`
-        case "a":
+        case "a": {
           const href = element.getAttribute("href")
           const linkText = textContent.trim()
           if (
@@ -483,12 +494,13 @@ export function convertHtmlToMarkdown(htmlContent: string): string {
             return `[${linkText}](${href})`
           }
           return linkText
+        }
         case "ul":
           return `\n${textContent}\n`
         case "ol":
           // 对于有序列表，需要特殊处理
           return `\n${textContent}\n`
-        case "li":
+        case "li": {
           const liContent = textContent.trim()
           // 检查是否是有序列表的子项
           const parentOl = element.closest("ol")
@@ -498,13 +510,15 @@ export function convertHtmlToMarkdown(htmlContent: string): string {
             return liContent ? `\n${index}. ${liContent}` : ""
           }
           return liContent ? `\n- ${liContent}` : ""
-        case "img":
+        }
+        case "img": {
           const src = element.getAttribute("src")
           const alt = element.getAttribute("alt") || ""
           if (src) {
             return `\n\n![${alt}](${src})\n\n`
           }
           return ""
+        }
         case "hr":
           return "\n\n---\n\n"
         case "dl":
@@ -529,15 +543,23 @@ export function convertHtmlToMarkdown(htmlContent: string): string {
         case "figcaption":
           // 对于容器元素，直接返回子内容，但添加适当的间距
           if (textContent.trim()) {
-            return ["div", "section", "article", "main", "aside", "figure"].includes(tagName)
+            return [
+              "div",
+              "section",
+              "article",
+              "main",
+              "aside",
+              "figure"
+            ].includes(tagName)
               ? `\n${textContent}\n`
               : textContent
           }
           return ""
-        case "button":
+        case "button": {
           // 按钮通常是交互元素，可以保留文本或跳过
           const buttonText = textContent.trim()
           return buttonText ? ` [${buttonText}] ` : ""
+        }
         default:
           return textContent
       }
@@ -573,7 +595,7 @@ export function convertHtmlToMarkdown(htmlContent: string): string {
   debugLog("convertHtmlToMarkdown: 最终结果长度:", cleanedContent.length)
   debugLog(
     "convertHtmlToMarkdown: 最终内容预览:",
-    cleanedContent.substring(0, 200) + "..."
+    `${cleanedContent.substring(0, 200)}...`
   )
 
   return cleanedContent

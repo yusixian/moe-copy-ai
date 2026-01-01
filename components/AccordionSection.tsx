@@ -24,7 +24,7 @@ export function AccordionSection({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-sky-50">
-        <span className="flex items-center gap-2 text-sm font-medium text-sky-700">
+        <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
           <Icon icon={icon} width={16} />
           {title}
         </span>
@@ -41,7 +41,7 @@ export function AccordionSection({
             : "max-h-0 overflow-hidden opacity-0"
         }`}
         style={isOpen && maxHeight ? { maxHeight } : undefined}>
-        <div className="border-t border-sky-100 p-3">{children}</div>
+        <div className="border-sky-100 border-t p-3">{children}</div>
       </div>
     </div>
   )

@@ -59,13 +59,13 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
         {...props}>
         {/* 可折叠面板标题栏 */}
         <div
-          className="group relative flex cursor-pointer items-center justify-between border-b border-sky-200 bg-gradient-to-r from-sky-100 to-indigo-100 p-2 transition-all duration-300"
+          className="group relative flex cursor-pointer items-center justify-between border-sky-200 border-b bg-gradient-to-r from-sky-100 to-indigo-100 p-2 transition-all duration-300"
           onClick={toggleExpand}>
           {/* 背景装饰元素 */}
-          <div className="pointer-events-none absolute left-0 top-0 h-full w-full overflow-hidden opacity-10">
-            <div className="absolute left-1/4 top-1 h-2 w-2 rounded-full bg-pink-400"></div>
-            <div className="absolute bottom-1 right-1/4 h-2 w-2 rounded-full bg-sky-400"></div>
-            <div className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-gradient-to-r from-yellow-200 to-pink-200 opacity-20 blur-xl filter"></div>
+          <div className="pointer-events-none absolute top-0 left-0 h-full w-full overflow-hidden opacity-10">
+            <div className="absolute top-1 left-1/4 h-2 w-2 rounded-full bg-pink-400"></div>
+            <div className="absolute right-1/4 bottom-1 h-2 w-2 rounded-full bg-sky-400"></div>
+            <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-12 w-12 transform rounded-full bg-gradient-to-r from-yellow-200 to-pink-200 opacity-20 blur-xl filter"></div>
           </div>
 
           <div className="relative flex items-center gap-2">
@@ -81,7 +81,7 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
             </div>
 
             {/* 标题 */}
-            <div className="ml-1 text-xs text-sky-500">{title}</div>
+            <div className="ml-1 text-sky-500 text-xs">{title}</div>
           </div>
 
           <div className="relative flex items-center">
@@ -107,7 +107,7 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
 
               {/* 小气泡装饰 */}
               <span
-                className={`absolute -right-1 -top-1 h-2 w-2 rounded-full ${expanded ? "bg-sky-300" : "bg-pink-300"} opacity-70`}></span>
+                className={`-top-1 -right-1 absolute h-2 w-2 rounded-full ${expanded ? "bg-sky-300" : "bg-pink-300"} opacity-70`}></span>
             </div>
           </div>
         </div>

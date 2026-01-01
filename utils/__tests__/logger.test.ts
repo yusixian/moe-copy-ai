@@ -32,7 +32,7 @@ const mockStorage = {
   get: jest.fn().mockResolvedValue("debug"),
   set: jest.fn(),
   watch: jest.fn().mockImplementation((config) => {
-    if (config && config.log_level) {
+    if (config?.log_level) {
       watchCallback = config.log_level
     }
     return jest.fn()
@@ -42,7 +42,7 @@ const mockStorage = {
 // 模拟pino
 jest.mock("pino", () => {
   const mockPino = jest.fn().mockImplementation((options) => {
-    if (options && options.browser && options.browser.transmit) {
+    if (options?.browser?.transmit) {
       transmitSendFunction = options.browser.transmit.send
     }
     mockPinoInstance.level = options.level || "info"
@@ -79,7 +79,7 @@ jest.mock("@plasmohq/storage", () => {
 })
 
 describe("logger", () => {
-  let logger: any
+  let _logger: any
   let debugLog: any
   let isDevelopment: any
 
@@ -101,7 +101,7 @@ describe("logger", () => {
 
     // 导入模块
     const loggerModule = require("../logger")
-    logger = loggerModule.logger
+    _logger = loggerModule.logger
     debugLog = loggerModule.debugLog
     isDevelopment = loggerModule.isDevelopment
   })
@@ -111,7 +111,7 @@ describe("logger", () => {
 
     // 重置process.env
     process.env = { ...originalEnv }
-    
+
     // 确保mockPinoInstance在开发环境下允许debug输出
     mockPinoInstance.levelVal = 20 // debug level
   })
@@ -146,7 +146,7 @@ describe("logger", () => {
     test("在debug级别下应调用logger.debug", () => {
       // 设置debug级别
       mockPinoInstance.levelVal = 20
-      
+
       debugLog("测试消息")
       expect(mockPinoInstance.debug).toHaveBeenCalledWith("测试消息")
     })
@@ -154,7 +154,7 @@ describe("logger", () => {
     test("带有多个参数时应正确调用logger.debug", () => {
       // 设置debug级别
       mockPinoInstance.levelVal = 20
-      
+
       const data = { test: "value" }
       debugLog("测试消息", data)
       expect(mockPinoInstance.debug).toHaveBeenCalledWith("测试消息", data)
@@ -163,7 +163,7 @@ describe("logger", () => {
     test("在silent级别下不应调用logger.debug", () => {
       // 设置silent级别 (Infinity)
       mockPinoInstance.levelVal = Infinity
-      
+
       jest.clearAllMocks()
       debugLog("测试消息")
       expect(mockPinoInstance.debug).not.toHaveBeenCalled()
@@ -291,7 +291,7 @@ describe("logger", () => {
       if (transmitSendFunction) {
         // 准备测试数据
         const testLogEvent = {
-          ts: new Date().getTime(),
+          ts: Date.now(),
           messages: ["测试消息"]
         }
 
@@ -338,7 +338,7 @@ describe("logger", () => {
         // 准备测试数据
         const extraData = { userId: 123, action: "测试" }
         const testLogEvent = {
-          ts: new Date().getTime(),
+          ts: Date.now(),
           messages: ["用户活动", extraData]
         }
 

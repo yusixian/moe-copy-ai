@@ -1,4 +1,3 @@
-import { SKIP_TAGS } from "../../constants/config"
 import { cleanContent, extractFormattedText, formatContent } from "../formatter"
 
 describe("formatter", () => {
@@ -161,7 +160,7 @@ describe("formatter", () => {
         </div>
       `)
       const imagesArray: any[] = []
-      const result = extractFormattedText(element, imagesArray)
+      const _result = extractFormattedText(element, imagesArray)
       expect(imagesArray.length).toBe(0)
     })
 
@@ -172,7 +171,7 @@ describe("formatter", () => {
         </div>
       `)
       const imagesArray: any[] = []
-      const result = extractFormattedText(element, imagesArray)
+      const _result = extractFormattedText(element, imagesArray)
       expect(imagesArray.length).toBe(0)
     })
 

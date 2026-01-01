@@ -1,11 +1,10 @@
+import { Storage } from "@plasmohq/storage"
+import { useStorage } from "@plasmohq/storage/hook"
 import { generateText } from "@xsai/generate-text"
 import type { StreamTextChunkResult, StreamTextResult } from "@xsai/stream-text"
 import { useCallback, useLayoutEffect, useState } from "react"
 import { isMobile } from "react-device-detect"
 import { toast } from "react-toastify"
-
-import { Storage } from "@plasmohq/storage"
-import { useStorage } from "@plasmohq/storage/hook"
 
 import type { ScrapedContent } from "~constants/types"
 import {
@@ -104,7 +103,7 @@ export const useAiSummary = (
   // 当自定义提示词为空时，获取系统提示词
   useLayoutEffect(() => {
     fetchSystemPrompt()
-  }, [])
+  }, [fetchSystemPrompt])
 
   // 保存聊天历史记录
   const saveToHistory = useCallback(
@@ -248,7 +247,7 @@ export const useAiSummary = (
               role: "system"
             },
             {
-              content: processedPrompt + "\n\n内容: " + content,
+              content: `${processedPrompt}\n\n内容: ${content}`,
               role: "user"
             }
           ],

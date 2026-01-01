@@ -1,5 +1,5 @@
 // https://icons8.com/icons/set/cat--style-cool
-import React from "react"
+
 import type { MouseEventHandler } from "react"
 
 interface CatSVGProps {

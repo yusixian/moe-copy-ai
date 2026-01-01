@@ -92,7 +92,7 @@ export const CopyableTextField: React.FC<CopyableTextFieldProps> = ({
               readOnly={readOnly}
               rows={rows}
               placeholder={placeholder}
-              className="w-full resize-none overflow-hidden rounded-l-md border border-r-0 border-sky-200/70 bg-white bg-opacity-70 px-2.5 py-1.5 text-xs text-slate-600 focus:border-sky-300 focus:outline-none focus:ring-1 focus:ring-sky-300"
+              className="w-full resize-none overflow-hidden rounded-l-md border border-sky-200/70 border-r-0 bg-white bg-opacity-70 px-2.5 py-1.5 text-slate-600 text-xs focus:border-sky-300 focus:outline-none focus:ring-1 focus:ring-sky-300"
             />
           ) : (
             <input
@@ -100,7 +100,7 @@ export const CopyableTextField: React.FC<CopyableTextFieldProps> = ({
               value={text}
               readOnly={readOnly}
               placeholder={placeholder}
-              className="w-full truncate rounded-l-md border border-r-0 border-sky-200/70 bg-white bg-opacity-70 px-2.5 py-1.5 text-xs text-slate-600 focus:border-sky-300 focus:outline-none focus:ring-1 focus:ring-sky-300"
+              className="w-full truncate rounded-l-md border border-sky-200/70 border-r-0 bg-white bg-opacity-70 px-2.5 py-1.5 text-slate-600 text-xs focus:border-sky-300 focus:outline-none focus:ring-1 focus:ring-sky-300"
             />
           )}
           <Button
@@ -110,8 +110,8 @@ export const CopyableTextField: React.FC<CopyableTextFieldProps> = ({
             className={cn(
               "border border-sky-200/70 bg-white transition-all duration-200 hover:bg-sky-50",
               isLongText
-                ? "absolute right-0 top-0 border-none opacity-80 hover:opacity-100"
-                : "rounded-l-none rounded-r-md shadow-none",
+                ? "absolute top-0 right-0 border-none opacity-80 hover:opacity-100"
+                : "rounded-r-md rounded-l-none shadow-none",
               {
                 "border-green-200 bg-green-50": copied
               }

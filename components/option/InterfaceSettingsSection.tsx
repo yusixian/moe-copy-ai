@@ -1,4 +1,4 @@
-import React from "react"
+import type React from "react"
 
 import { FLOAT_BUTTON_OPTIONS } from "../../constants/options"
 import OptionSection from "./OptionSection"

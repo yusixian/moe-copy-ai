@@ -82,7 +82,7 @@ function SidePanel() {
       setLinks(elementInfo, extractedLinks)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [elementInfo, extractedLinks])
+  }, [elementInfo, extractedLinks, setLinks])
 
   // 当选择完成时，重置 isSelectingNextPage 状态
   useEffect(() => {
@@ -176,10 +176,10 @@ function SidePanel() {
 
         {/* 标题 */}
         <div>
-          <h1 className="text-lg font-bold text-gray-800">
+          <h1 className="font-bold text-gray-800 text-lg">
             {currentConfig.title}
           </h1>
-          <p className="text-sm text-gray-500">{currentConfig.description}</p>
+          <p className="text-gray-500 text-sm">{currentConfig.description}</p>
         </div>
       </div>
 

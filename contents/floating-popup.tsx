@@ -1,7 +1,8 @@
+import cssText from "data-text:~styles/global.css"
 import {
   autoUpdate,
-  flip,
   FloatingFocusManager,
+  flip,
   offset,
   shift,
   useClick,
@@ -10,11 +11,9 @@ import {
   useInteractions,
   useRole
 } from "@floating-ui/react"
-import cssText from "data-text:~styles/global.css"
+import { useStorage } from "@plasmohq/storage/hook"
 import type { PlasmoCSConfig } from "plasmo"
 import { useEffect, useState } from "react"
-
-import { useStorage } from "@plasmohq/storage/hook"
 
 import FloatingButton from "~components/FloatingButton"
 import PopupContent from "~components/PopupContent"
@@ -47,7 +46,10 @@ const FloatingPopup = () => {
   useEffect(() => {
     // 页面加载时重置临时隐藏状态，确保刷新后悬浮窗恢复显示
     setTempHideButton(false)
-  }, [])
+  }, [
+    // 页面加载时重置临时隐藏状态，确保刷新后悬浮窗恢复显示
+    setTempHideButton
+  ])
 
   // 使用floating-ui来定位弹窗
   const { refs, floatingStyles, context } = useFloating({
@@ -135,7 +137,7 @@ const FloatingPopup = () => {
           <FloatingFocusManager context={context}>
             <div
               ref={refs.setFloating}
-              className="fixed left-1/2 top-1/2 z-[999] max-h-[90vh] max-w-[95vw] -translate-x-1/2 -translate-y-1/2 rounded-xl border-2 border-sky-200 bg-white text-black md:fixed md:h-[90vh] md:max-h-[90vh] md:w-[95vw]"
+              className="-translate-x-1/2 -translate-y-1/2 fixed top-1/2 left-1/2 z-[999] max-h-[90vh] max-w-[95vw] rounded-xl border-2 border-sky-200 bg-white text-black md:fixed md:h-[90vh] md:max-h-[90vh] md:w-[95vw]"
               {...getFloatingProps()}>
               <PopupContent
                 onClose={handleClose}

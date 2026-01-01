@@ -176,9 +176,9 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
             exit={{ scaleY: 0, opacity: 0 }}
             transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
             onClick={stopPropagation}
-            className="fixed -inset-x-0.5 -bottom-1 z-50 flex h-[80vh] origin-bottom flex-col overflow-hidden rounded-xl bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-indigo-100 bg-sky-50 p-4">
-              <h3 className="flex items-center text-lg font-semibold text-sky-600">
+            className="-inset-x-0.5 -bottom-1 fixed z-50 flex h-[80vh] origin-bottom flex-col overflow-hidden rounded-xl bg-white shadow-xl">
+            <div className="flex items-center justify-between border-indigo-100 border-b bg-sky-50 p-4">
+              <h3 className="flex items-center font-semibold text-lg text-sky-600">
                 <Icon
                   icon="mdi:history"
                   className="mr-2"
@@ -192,7 +192,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                   <>
                     <button
                       onClick={handleExport}
-                      className="flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-200">
+                      className="flex items-center rounded-md bg-blue-100 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-200">
                       <Icon
                         icon="line-md:cloud-alt-download"
                         className="mr-1"
@@ -203,7 +203,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                     </button>
                     <button
                       onClick={handleClearAll}
-                      className="flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-200">
+                      className="flex items-center rounded-md bg-red-100 px-2 py-1 font-medium text-red-600 text-xs hover:bg-red-200">
                       <Icon
                         icon="line-md:trash"
                         className="mr-1"
@@ -216,7 +216,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                 )}
                 <button
                   onClick={onClose}
-                  className="flex items-center rounded-md bg-sky-100 px-2 py-1 text-xs font-medium text-sky-600 hover:bg-sky-200">
+                  className="flex items-center rounded-md bg-sky-100 px-2 py-1 font-medium text-sky-600 text-xs hover:bg-sky-200">
                   <Icon icon="line-md:close" width="16" height="16" />
                 </button>
               </div>
@@ -232,7 +232,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                       width="32"
                       height="32"
                     />
-                    <p className="mt-2 text-sm text-sky-600">加载中...</p>
+                    <p className="mt-2 text-sky-600 text-sm">加载中...</p>
                   </div>
                 </div>
               ) : historyItems.length === 0 ? (
@@ -272,7 +272,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                             <p className="font-medium text-sky-600">
                               {new URL(item.url).hostname}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-gray-500 text-xs">
                               {formatDateTime(item.timestamp)}
                             </p>
                           </div>
@@ -312,12 +312,12 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                               collapsed: { opacity: 0, height: 0, marginTop: 0 }
                             }}
                             transition={{ duration: 0.3, ease: "easeInOut" }}
-                            className="overflow-hidden border-t border-dashed border-sky-100 pt-2">
+                            className="overflow-hidden border-sky-100 border-t border-dashed pt-2">
                             <div className="mb-2 rounded-md bg-indigo-50 p-2">
-                              <p className="mb-1 text-xs font-medium text-indigo-600">
+                              <p className="mb-1 font-medium text-indigo-600 text-xs">
                                 原始提示词:
                               </p>
-                              <p className="whitespace-pre-wrap break-words text-xs text-indigo-700">
+                              <p className="whitespace-pre-wrap break-words text-indigo-700 text-xs">
                                 {item.prompt}
                               </p>
                             </div>
@@ -330,7 +330,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                                     onClick={(e) =>
                                       togglePromptExpand(item.id, e)
                                     }>
-                                    <p className="mb-1 text-xs font-medium text-emerald-600">
+                                    <p className="mb-1 font-medium text-emerald-600 text-xs">
                                       完整提示词 (已填充):
                                     </p>
                                     <Icon
@@ -352,7 +352,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                                         exit={{ height: 0, opacity: 0 }}
                                         transition={{ duration: 0.2 }}
                                         className="overflow-hidden">
-                                        <p className="whitespace-pre-wrap break-words text-xs text-emerald-700">
+                                        <p className="whitespace-pre-wrap break-words text-emerald-700 text-xs">
                                           {item.processedPrompt}
                                         </p>
                                       </motion.div>
@@ -362,7 +362,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                               )}
 
                             <div className="mb-2">
-                              <p className="mb-1 text-xs font-medium text-sky-600">
+                              <p className="mb-1 font-medium text-sky-600 text-xs">
                                 内容:
                               </p>
                               <div className="rounded-md bg-gray-50 p-2">
@@ -376,10 +376,10 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
 
                             {item.usage && (
                               <div className="rounded-md bg-green-50 p-2">
-                                <p className="mb-1 text-xs font-medium text-green-600">
+                                <p className="mb-1 font-medium text-green-600 text-xs">
                                   Token 使用:
                                 </p>
-                                <div className="flex flex-wrap gap-2 text-xs text-green-700">
+                                <div className="flex flex-wrap gap-2 text-green-700 text-xs">
                                   <span>
                                     总计: {item.usage.total_tokens || 0}
                                   </span>

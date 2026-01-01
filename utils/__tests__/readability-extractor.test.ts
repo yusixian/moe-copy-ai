@@ -93,7 +93,8 @@ describe("Readability Extractor", () => {
     })
 
     test("should convert pre blocks to code blocks", () => {
-      const html = "<pre><code>function test() {\n  return true;\n}</code></pre>"
+      const html =
+        "<pre><code>function test() {\n  return true;\n}</code></pre>"
       const markdown = convertHtmlToMarkdown(html)
 
       expect(markdown).toContain("```")
@@ -115,7 +116,7 @@ describe("Readability Extractor", () => {
 
       // The basic implementation extracts table content as text
       expect(markdown).toContain("Header 1")
-      expect(markdown).toContain("Header 2") 
+      expect(markdown).toContain("Header 2")
       expect(markdown).toContain("Cell 1")
       expect(markdown).toContain("Cell 2")
     })
@@ -218,12 +219,12 @@ describe("Readability Extractor", () => {
 
       expect(images).toHaveLength(3)
       expect(images[0].index).toBe(0)
-      expect(images[1].index).toBe(1) 
+      expect(images[1].index).toBe(1)
       expect(images[2].index).toBe(2)
     })
 
     test("should handle images with basic syntax", () => {
-      const markdown = '![Alt text](image.jpg)'
+      const markdown = "![Alt text](image.jpg)"
       const images = extractImagesFromMarkdown(markdown)
 
       expect(images).toHaveLength(1)
@@ -319,10 +320,15 @@ describe("Readability Extractor", () => {
         More content here with proper structure
       `
 
-      const evaluation = evaluateContentQuality(simpleContent, structuredContent)
+      const evaluation = evaluateContentQuality(
+        simpleContent,
+        structuredContent
+      )
 
       expect(evaluation.betterContent).toBe(structuredContent)
-      expect(evaluation.scores.readability).toBeGreaterThan(evaluation.scores.selector)
+      expect(evaluation.scores.readability).toBeGreaterThan(
+        evaluation.scores.selector
+      )
     })
 
     test("should handle content with only HTML tags", () => {
@@ -332,7 +338,9 @@ describe("Readability Extractor", () => {
       const evaluation = evaluateContentQuality(tagOnlyContent, textContent)
 
       expect(evaluation.betterContent).toBe(textContent)
-      expect(evaluation.scores.readability).toBeGreaterThan(evaluation.scores.selector)
+      expect(evaluation.scores.readability).toBeGreaterThan(
+        evaluation.scores.selector
+      )
     })
   })
 })

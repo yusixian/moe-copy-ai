@@ -22,7 +22,7 @@ import {
 // 图片加载失败显示组件
 const ImageLoadError = () => (
   <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 p-2 text-center">
-    <span className="mt-2 text-xs text-red-400">
+    <span className="mt-2 text-red-400 text-xs">
       <SadFaceDecoration />
       <br />
       图片加载失败
@@ -72,30 +72,30 @@ const ImageCard = memo(
         <DownloadButton
           fileUrl={img.src}
           fileName={`${img.alt}.jpg`}
-          className="absolute right-2 top-2 z-10"
+          className="absolute top-2 right-2 z-10"
         />
         {isFailed && <ImageLoadError />}
 
         {isHovered && (
           <AnimatedContainer
             animation="pulse"
-            className="absolute right-2.5 top-2.5">
+            className="absolute top-2.5 right-2.5">
             <HeartDecoration />
           </AnimatedContainer>
         )}
       </div>
-      <div className="truncate border-t border-sky-100/50 bg-gradient-to-r from-blue-50/80 to-sky-50/80 p-2 text-center text-xs font-medium text-sky-700">
+      <div className="truncate border-sky-100/50 border-t bg-gradient-to-r from-blue-50/80 to-sky-50/80 p-2 text-center font-medium text-sky-700 text-xs">
         {img.alt || img.title || `图片 #${img.index} ✨`}
       </div>
 
-      <div className="border-t border-sky-100/50 bg-gradient-to-r from-blue-50/60 to-sky-50/60 px-3 py-2 transition-all duration-300">
+      <div className="border-sky-100/50 border-t bg-gradient-to-r from-blue-50/60 to-sky-50/60 px-3 py-2 transition-all duration-300">
         <CopyableTextField text={img.src} isUrl={true} />
         <div className="mt-2 flex justify-end">
           <Button
             onClick={preventBubbling(() => onOpen(img.src))}
             variant="ghost"
             size="sm"
-            className="text-xs text-sky-600 hover:bg-sky-50 hover:text-sky-700"
+            className="text-sky-600 text-xs hover:bg-sky-50 hover:text-sky-700"
             icon={
               <Icon icon="line-md:external-link" className="mr-1 h-3.5 w-3.5" />
             }>
@@ -125,7 +125,7 @@ const ImageGridFooter = ({ count }: ImageGridFooterProps) => (
         icon="line-md:image-twotone"
         className="mr-1.5 h-4 w-4 text-sky-500"
       />
-      <span className="text-sm font-medium text-sky-700">
+      <span className="font-medium text-sky-700 text-sm">
         总共 {count} 张图片
       </span>
       <AnimatedContainer animation="bounce" className="ml-1 inline-block">
@@ -168,7 +168,7 @@ export const ImageGrid: React.FC<ImageGridProps> = ({
   if (!images?.length) return null
 
   const defaultTitle = (
-    <span className="flex items-center text-xs font-medium">
+    <span className="flex items-center font-medium text-xs">
       <Icon
         icon="line-md:image-twotone"
         className="mr-1.5 h-4 w-4 text-sky-500"

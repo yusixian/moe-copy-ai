@@ -1,8 +1,8 @@
 import {
   autoUpdate,
-  flip,
   FloatingFocusManager,
   FloatingPortal,
+  flip,
   offset,
   shift,
   size,

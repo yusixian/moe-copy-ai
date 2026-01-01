@@ -1,8 +1,8 @@
-import { Icon } from '@iconify/react'
-import { memo, useEffect, useMemo, useState } from 'react'
+import { Icon } from "@iconify/react"
+import { memo, useEffect, useMemo, useState } from "react"
 
-import type { BatchProgress } from '~constants/types'
-import { cn } from '~utils'
+import type { BatchProgress } from "~constants/types"
+import { cn } from "~utils"
 
 // 格式化耗时
 const formatElapsedTime = (startTime: number): string => {
@@ -33,10 +33,10 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
   paginationProgress,
   onPause,
   onResume,
-  onCancel,
+  onCancel
 }: ScrapeProgressPanelProps) {
   // 持续更新的耗时显示
-  const [elapsedTime, setElapsedTime] = useState('0s')
+  const [elapsedTime, setElapsedTime] = useState("0s")
 
   // 计算百分比
   const percentage = useMemo(() => {
@@ -47,7 +47,7 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
   // 每秒更新耗时
   useEffect(() => {
     if (!progress) {
-      setElapsedTime('0s')
+      setElapsedTime("0s")
       return
     }
 
@@ -60,14 +60,14 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [progress?.startTime])
+  }, [progress?.startTime, progress])
 
   // 统计成功/失败
   const stats = useMemo(() => {
     if (!progress) return { success: 0, failed: 0 }
     return {
-      success: progress.results.filter((r) => r.status === 'success').length,
-      failed: progress.results.filter((r) => r.status === 'failed').length,
+      success: progress.results.filter((r) => r.status === "success").length,
+      failed: progress.results.filter((r) => r.status === "failed").length
     }
   }, [progress])
 
@@ -78,7 +78,7 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
       {/* 标题 */}
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-gray-800">正在批量抓取...</h3>
-        <span className="text-sm text-gray-500">{elapsedTime}</span>
+        <span className="text-gray-500 text-sm">{elapsedTime}</span>
       </div>
 
       {/* 操作按钮 - 固定在顶部 */}
@@ -86,24 +86,21 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
         {progress.isPaused ? (
           <button
             onClick={onResume}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
-          >
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2.5 font-medium text-sm text-white transition-colors hover:bg-emerald-600">
             <Icon icon="mdi:play" className="h-4 w-4" />
             继续
           </button>
         ) : (
           <button
             onClick={onPause}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-amber-500 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-600"
-          >
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-amber-500 py-2.5 font-medium text-sm text-white transition-colors hover:bg-amber-600">
             <Icon icon="mdi:pause" className="h-4 w-4" />
             暂停
           </button>
         )}
         <button
           onClick={onCancel}
-          className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-        >
+          className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2.5 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
           <Icon icon="mdi:close" className="h-4 w-4" />
           取消
         </button>
@@ -131,21 +128,30 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Icon
-                icon={paginationProgress.isLoadingNextPage ? 'mdi:loading' : 'mdi:book-open-page-variant'}
-                className={cn('h-4 w-4 text-indigo-500', paginationProgress.isLoadingNextPage && 'animate-spin')}
+                icon={
+                  paginationProgress.isLoadingNextPage
+                    ? "mdi:loading"
+                    : "mdi:book-open-page-variant"
+                }
+                className={cn(
+                  "h-4 w-4 text-indigo-500",
+                  paginationProgress.isLoadingNextPage && "animate-spin"
+                )}
               />
-              <span className="text-sm font-medium text-indigo-700">
-                {paginationProgress.isLoadingNextPage ? '正在加载下一页...' : `第 ${paginationProgress.currentPage} 页`}
+              <span className="font-medium text-indigo-700 text-sm">
+                {paginationProgress.isLoadingNextPage
+                  ? "正在加载下一页..."
+                  : `第 ${paginationProgress.currentPage} 页`}
               </span>
             </div>
             {paginationProgress.maxPages > 0 && (
-              <span className="text-xs text-indigo-500">
+              <span className="text-indigo-500 text-xs">
                 最多 {paginationProgress.maxPages} 页
               </span>
             )}
           </div>
           {paginationProgress.currentUrl && (
-            <div className="mt-2 truncate text-xs text-indigo-600">
+            <div className="mt-2 truncate text-indigo-600 text-xs">
               {paginationProgress.currentUrl}
             </div>
           )}
@@ -156,10 +162,15 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
       {progress.current && (
         <div className="rounded-lg bg-sky-50 p-3">
           <div className="mb-1 flex items-center gap-2">
-            <Icon icon="mdi:loading" className="h-4 w-4 animate-spin text-sky-500" />
-            <span className="text-sm font-medium text-sky-700">正在抓取</span>
+            <Icon
+              icon="mdi:loading"
+              className="h-4 w-4 animate-spin text-sky-500"
+            />
+            <span className="font-medium text-sky-700 text-sm">正在抓取</span>
           </div>
-          <div className="truncate text-xs text-sky-600">{progress.current.url}</div>
+          <div className="truncate text-sky-600 text-xs">
+            {progress.current.url}
+          </div>
         </div>
       )}
 
@@ -185,16 +196,24 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
               <div
                 key={result.url}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-1.5 text-xs',
-                  index !== Math.min(progress.results.length, 5) - 1 && 'border-b border-gray-100'
-                )}
-              >
-                {result.status === 'success' ? (
-                  <Icon icon="mdi:check-circle" className="h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />
+                  "flex items-center gap-2 px-3 py-1.5 text-xs",
+                  index !== Math.min(progress.results.length, 5) - 1 &&
+                    "border-gray-100 border-b"
+                )}>
+                {result.status === "success" ? (
+                  <Icon
+                    icon="mdi:check-circle"
+                    className="h-3.5 w-3.5 flex-shrink-0 text-emerald-500"
+                  />
                 ) : (
-                  <Icon icon="mdi:close-circle" className="h-3.5 w-3.5 flex-shrink-0 text-red-500" />
+                  <Icon
+                    icon="mdi:close-circle"
+                    className="h-3.5 w-3.5 flex-shrink-0 text-red-500"
+                  />
                 )}
-                <span className="truncate text-gray-700">{result.title || result.url}</span>
+                <span className="truncate text-gray-700">
+                  {result.title || result.url}
+                </span>
               </div>
             ))}
         </div>

@@ -1,6 +1,5 @@
-import { toast } from "react-toastify"
-
 import { useStorage } from "@plasmohq/storage/hook"
+import { toast } from "react-toastify"
 
 import {
   BATCH_CONCURRENCY_OPTIONS,
@@ -26,7 +25,7 @@ export function CompactSelect({
 }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <label className="text-xs text-gray-600">{label}</label>
+      <label className="text-gray-600 text-xs">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -81,7 +80,7 @@ export function BatchScrapeSettings({
     <div className="space-y-3">
       {/* 策略选择 - 使用按钮组 */}
       <div className="space-y-2">
-        <label className="text-xs text-gray-600">抓取策略</label>
+        <label className="text-gray-600 text-xs">抓取策略</label>
         <div className="grid grid-cols-3 gap-1">
           {BATCH_STRATEGY_OPTIONS.map((s) => (
             <button
@@ -99,7 +98,7 @@ export function BatchScrapeSettings({
           ))}
         </div>
         {!compact && currentStrategyDesc && (
-          <p className="text-xs text-gray-500">{currentStrategyDesc}</p>
+          <p className="text-gray-500 text-xs">{currentStrategyDesc}</p>
         )}
       </div>
 
@@ -162,7 +161,7 @@ export function BatchScrapeSettings({
 
       {/* 分页抓取设置 */}
       <div
-        className={`flex gap-2 border-t border-gray-200 pt-3 ${compact ? "" : "mt-4"}`}>
+        className={`flex gap-2 border-gray-200 border-t pt-3 ${compact ? "" : "mt-4"}`}>
         <div className="flex-1">
           <CompactSelect
             label={compact ? "页数" : "最大页数"}

@@ -1,6 +1,6 @@
 import { FloatingFocusManager, FloatingPortal } from "@floating-ui/react"
 import { Icon } from "@iconify/react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 
 import { useCombobox } from "./FloatingDropdown"
 
@@ -179,7 +179,9 @@ export function Combobox({
                   </div>
                 ))
               ) : (
-                <div className={`${optionClass} text-gray-400`}>{emptyText}</div>
+                <div className={`${optionClass} text-gray-400`}>
+                  {emptyText}
+                </div>
               )}
             </div>
           </FloatingFocusManager>

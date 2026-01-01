@@ -46,7 +46,7 @@ export function extractFormattedText(
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent?.trim() || ""
       if (text) {
-        result += text + " "
+        result += `${text} `
       }
       return
     }
@@ -81,9 +81,9 @@ export function extractFormattedText(
           const caption = figCaption ? figCaption.textContent?.trim() || "" : ""
 
           // 使用caption作为alt文本（如果alt为空且caption存在）
-          const effectiveAlt = alt || caption || "图片#" + imageIndex
+          const effectiveAlt = alt || caption || `图片#${imageIndex}`
 
-          if (src && src.trim() && !src.startsWith("data:image/")) {
+          if (src?.trim() && !src.startsWith("data:image/")) {
             // 将图片信息存储到数组中
             const imageInfo: ImageInfo = {
               src: src,
@@ -125,7 +125,7 @@ export function extractFormattedText(
         // 遍历所有可能的图片属性
         for (const attr of IMAGE_SRC_ATTRIBUTES) {
           const value = imgElement.getAttribute(attr)
-          if (value && value.trim() && !value.startsWith("data:image/")) {
+          if (value?.trim() && !value.startsWith("data:image/")) {
             src = value
             break
           }
@@ -152,7 +152,7 @@ export function extractFormattedText(
           processingSummary.totalExtracted++
 
           // 在文本中插入图片引用标记，使用Markdown格式
-          result += `\n\n![${alt || "图片#" + imageIndex}](${src})\n\n`
+          result += `\n\n![${alt || `图片#${imageIndex}`}](${src})\n\n`
           imageIndex++
         } else {
           processingSummary.imgSkipped++
@@ -171,7 +171,7 @@ export function extractFormattedText(
         tagName === "h6"
       ) {
         // 将标题转换为Markdown格式的标题
-        const level = parseInt(tagName.substring(1))
+        const level = parseInt(tagName.substring(1), 10)
         const headingMd = "#".repeat(level)
         result += `\n\n${headingMd} ${(node as Element).textContent?.trim()}\n\n`
       } else if (tagName === "p") {
@@ -193,14 +193,14 @@ export function extractFormattedText(
         // 如果段落中没有图片，按常规处理
         const text = paragraphElement.textContent?.trim() || ""
         if (text) {
-          result += "\n\n" + text + "\n"
+          result += `\n\n${text}\n`
         }
       } else if (tagName === "blockquote") {
         // 引用处理
-        result += "\n\n> " + (node as Element).textContent?.trim() + "\n\n"
+        result += `\n\n> ${(node as Element).textContent?.trim()}\n\n`
       } else if (tagName === "li") {
         // 列表项处理
-        result += "\n- " + (node as Element).textContent?.trim()
+        result += `\n- ${(node as Element).textContent?.trim()}`
       } else if (tagName === "br") {
         // 换行处理
         result += "\n"
@@ -216,8 +216,7 @@ export function extractFormattedText(
         return // 已经处理完子节点，直接返回
       } else if (tagName === "pre" || tagName === "code") {
         // 代码块处理
-        result +=
-          "\n\n```\n" + (node as Element).textContent?.trim() + "\n```\n\n"
+        result += `\n\n\`\`\`\n${(node as Element).textContent?.trim()}\n\`\`\`\n\n`
       } else if (tagName === "table") {
         // 表格处理 - 以Markdown格式输出表格
         handleTable(node as HTMLTableElement)
@@ -263,7 +262,7 @@ export function extractFormattedText(
         })
 
         // 添加行
-        result += rowText + "\n"
+        result += `${rowText}\n`
 
         // 在第一行后添加分隔符
         if (rowIndex === 0) {
@@ -271,7 +270,7 @@ export function extractFormattedText(
           headerCells.forEach(() => {
             separatorRow += " --- |"
           })
-          result += separatorRow + "\n"
+          result += `${separatorRow}\n`
         }
       })
       result += "\n"
@@ -282,10 +281,10 @@ export function extractFormattedText(
         const cells = row.querySelectorAll("th, td")
         let rowText = ""
         cells.forEach((cell) => {
-          rowText += (cell.textContent?.trim() || "") + " | "
+          rowText += `${cell.textContent?.trim() || ""} | `
         })
         if (rowText) {
-          result += rowText.slice(0, -3) + "\n" // 移除最后一个 " | "
+          result += `${rowText.slice(0, -3)}\n` // 移除最后一个 " | "
         }
       })
       result += "\n\n"
@@ -318,7 +317,7 @@ export function extractFormattedText(
         // 从配置的属性列表中提取src
         for (const attr of IMAGE_SRC_ATTRIBUTES) {
           const value = imgElement.getAttribute(attr)
-          if (value && value.trim() && !value.startsWith("data:image/")) {
+          if (value?.trim() && !value.startsWith("data:image/")) {
             src = value
             break
           }
@@ -347,7 +346,7 @@ export function extractFormattedText(
         debugLog(`从${linkType}中提取图片: ${src}`)
 
         // 在文本中插入图片引用标记，使用Markdown格式
-        result += `\n\n![${alt || "图片#" + imageIndex}](${src})\n\n`
+        result += `\n\n![${alt || `图片#${imageIndex}`}](${src})\n\n`
         imageIndex++
       } else {
         processingSummary.imgSkipped++
@@ -363,7 +362,7 @@ export function extractFormattedText(
       if (href && !href.startsWith("#") && !href.startsWith("javascript:")) {
         result += `[${text}](${href}) `
       } else {
-        result += text + " "
+        result += `${text} `
       }
     }
   }

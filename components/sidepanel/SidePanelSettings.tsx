@@ -1,16 +1,14 @@
 import { Icon } from "@iconify/react"
+import { useStorage } from "@plasmohq/storage/hook"
 import { useLayoutEffect, useState } from "react"
 import { toast } from "react-toastify"
-
-import { useStorage } from "@plasmohq/storage/hook"
 
 import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
 import { useAiSettings } from "~hooks/useAiSettings"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
-
-import { ModelSelectInput } from "../ai/ModelSelectInput"
 import { AccordionSection } from "../AccordionSection"
+import { ModelSelectInput } from "../ai/ModelSelectInput"
 import {
   BatchScrapeSettings,
   CompactSelect
@@ -30,7 +28,7 @@ function ToggleRow({
 }) {
   return (
     <div className="flex items-center justify-between rounded-lg border border-sky-200 bg-white p-3">
-      <span className="flex items-center gap-2 text-sm font-medium text-sky-700">
+      <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
         <Icon icon={icon} width={16} />
         {label}
       </span>
@@ -67,7 +65,7 @@ function ExtractionModeSettings() {
     toast.success("抓取模式已保存")
   }
 
-  if (loading) return <div className="text-xs text-gray-400">加载中...</div>
+  if (loading) return <div className="text-gray-400 text-xs">加载中...</div>
 
   const modes = [
     { value: "selector", label: "选择器", desc: "CSS选择器提取" },
@@ -91,7 +89,7 @@ function ExtractionModeSettings() {
           </button>
         ))}
       </div>
-      <p className="text-xs text-gray-500">
+      <p className="text-gray-500 text-xs">
         {modes.find((m) => m.value === mode)?.desc}
       </p>
     </div>
@@ -118,7 +116,7 @@ function AiSettings() {
   return (
     <div className="space-y-3">
       <div>
-        <label className="mb-1 block text-xs text-gray-600">API Key</label>
+        <label className="mb-1 block text-gray-600 text-xs">API Key</label>
         <input
           type="password"
           value={apiKey}
@@ -129,7 +127,7 @@ function AiSettings() {
       </div>
 
       <div>
-        <label className="mb-1 block text-xs text-gray-600">Base URL</label>
+        <label className="mb-1 block text-gray-600 text-xs">Base URL</label>
         <div className="flex gap-1">
           <input
             type="text"
@@ -141,7 +139,7 @@ function AiSettings() {
           <button
             onClick={() => fetchModels()}
             disabled={isLoadingModels}
-            className="rounded bg-sky-100 px-2 py-1 text-xs text-sky-600 hover:bg-sky-200 disabled:opacity-50">
+            className="rounded bg-sky-100 px-2 py-1 text-sky-600 text-xs hover:bg-sky-200 disabled:opacity-50">
             <Icon
               icon={isLoadingModels ? "mdi:loading" : "mdi:refresh"}
               width={14}
@@ -152,7 +150,7 @@ function AiSettings() {
       </div>
 
       <div>
-        <label className="mb-1 block text-xs text-gray-600">模型</label>
+        <label className="mb-1 block text-gray-600 text-xs">模型</label>
         <ModelSelectInput
           value={model}
           onChange={setModel}
@@ -162,7 +160,7 @@ function AiSettings() {
       </div>
 
       <div>
-        <label className="mb-1 block text-xs text-gray-600">系统提示词</label>
+        <label className="mb-1 block text-gray-600 text-xs">系统提示词</label>
         <textarea
           value={systemPrompt}
           onChange={(e) => setSystemPrompt(e.target.value)}
@@ -173,7 +171,7 @@ function AiSettings() {
 
       <button
         onClick={saveSettings}
-        className="flex w-full items-center justify-center gap-1 rounded bg-sky-500 py-1.5 text-xs font-medium text-white hover:bg-sky-600">
+        className="flex w-full items-center justify-center gap-1 rounded bg-sky-500 py-1.5 font-medium text-white text-xs hover:bg-sky-600">
         <Icon icon="mdi:content-save" width={14} />
         保存
       </button>
@@ -278,11 +276,11 @@ export default function SidePanelSettings() {
       <button
         onClick={openFullSettings}
         className="flex w-full items-center justify-between rounded-lg border border-sky-200 bg-white p-3 text-left transition-colors hover:bg-sky-50">
-        <span className="flex items-center gap-2 text-sm font-medium text-sky-700">
+        <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
           <Icon icon="mdi:code-braces" width={16} />
           选择器设置
         </span>
-        <span className="flex items-center gap-1 text-xs text-gray-400">
+        <span className="flex items-center gap-1 text-gray-400 text-xs">
           打开完整设置
           <Icon icon="mdi:open-in-new" width={14} />
         </span>

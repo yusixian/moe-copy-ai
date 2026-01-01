@@ -1,4 +1,4 @@
-import React from "react"
+import type React from "react"
 
 import { DEBUG_PANEL_OPTIONS } from "../../constants/options"
 import OptionSection from "./OptionSection"

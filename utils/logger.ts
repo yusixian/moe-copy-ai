@@ -1,8 +1,8 @@
 // 导入pino和存储API
-import pino from "pino"
-import type { LevelWithSilentOrString } from "pino"
 
 import { Storage } from "@plasmohq/storage"
+import type { LevelWithSilentOrString } from "pino"
+import pino from "pino"
 
 // 创建存储实例
 const storage = new Storage({ area: "sync" })
@@ -101,7 +101,7 @@ export const logger = pino({
 getLogLevel().then((level: LevelWithSilentOrString) => {
   logger.level = level
   // 只在非silent模式下输出初始化日志
-  if (level !== 'silent') {
+  if (level !== "silent") {
     logger.debug(`日志级别已设置为: ${level}`)
   }
 })
@@ -113,7 +113,7 @@ storage.watch({
     if (newLevel) {
       logger.level = newLevel
       // 只在非silent模式下输出更新日志
-      if (newLevel !== 'silent') {
+      if (newLevel !== "silent") {
         logger.debug(`日志级别已更新为: ${newLevel}`)
       }
     }
@@ -124,7 +124,8 @@ storage.watch({
 export function debugLog(...args: any[]): void {
   // 检查当前日志级别是否允许debug输出
   // pino的level是数字，debug对应20，silent对应Infinity
-  if (logger.levelVal <= 20) { // 20是debug级别的数值
+  if (logger.levelVal <= 20) {
+    // 20是debug级别的数值
     // 如果只有一个参数
     if (args.length === 1) {
       logger.debug(args[0])

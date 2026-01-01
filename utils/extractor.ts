@@ -242,7 +242,7 @@ export async function extractTitle(
     try {
       const elements = document.querySelectorAll(selector)
       let firstContent = ""
-      let allContent: string[] = []
+      const allContent: string[] = []
       if (elements.length > 0) {
         for (const element of elements) {
           let content = ""
@@ -475,7 +475,10 @@ export async function scrapeWebpageContent(
           debugLog("Readability 抓取成功")
         } else {
           debugLog("Readability 抓取失败，回退到选择器模式")
-          const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+          const fallbackResult = await scrapeWithSelectors(
+            customSelectors,
+            scrapedContent
+          )
           // 添加原始模式信息，用于UI显示
           fallbackResult.metadata = {
             ...fallbackResult.metadata,
@@ -486,7 +489,10 @@ export async function scrapeWebpageContent(
         }
       } catch (error) {
         debugLog("Readability 抓取异常，回退到选择器模式:", error)
-        const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+        const fallbackResult = await scrapeWithSelectors(
+          customSelectors,
+          scrapedContent
+        )
         // 添加原始模式信息，用于UI显示
         fallbackResult.metadata = {
           ...fallbackResult.metadata,
@@ -563,13 +569,17 @@ export async function scrapeWebpageContent(
           selectorResult.metadata = {
             ...selectorResult.metadata,
             "original:mode": "hybrid",
-            "fallback:reason": "混合模式中Readability解析失败，自动使用选择器模式结果"
+            "fallback:reason":
+              "混合模式中Readability解析失败，自动使用选择器模式结果"
           }
           return selectorResult
         }
       } catch (error) {
         debugLog("混合模式执行异常，回退到选择器模式:", error)
-        const fallbackResult = await scrapeWithSelectors(customSelectors, scrapedContent)
+        const fallbackResult = await scrapeWithSelectors(
+          customSelectors,
+          scrapedContent
+        )
         // 添加原始模式信息，用于UI显示
         fallbackResult.metadata = {
           ...fallbackResult.metadata,

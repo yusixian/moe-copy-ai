@@ -468,7 +468,7 @@ function ElementSelector() {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage)
     }
-  }, []) // 只在挂载时订阅一次
+  }, [resetState]) // 只在挂载时订阅一次
 
   // 添加/移除事件监听 - 使用 ref 避免循环依赖
   useEffect(() => {
@@ -573,7 +573,7 @@ function ElementSelector() {
       document.body.style.userSelect = ""
       document.body.style.cursor = ""
     }
-  }, [isActive]) // 只依赖 isActive
+  }, [isActive, resetState]) // 只依赖 isActive
 
   if (!isActive) return null
 

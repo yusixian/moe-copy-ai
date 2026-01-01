@@ -306,7 +306,7 @@ describe("extractor", () => {
 
       const metadata = extractMetadata()
       expect(Object.keys(metadata).length).toBe(2)
-      expect(metadata["description"]).toBe("Page description")
+      expect(metadata.description).toBe("Page description")
       expect(metadata["og:image"]).toBe("image.jpg")
 
       // 测试空文档

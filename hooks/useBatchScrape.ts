@@ -1,19 +1,20 @@
-import { useCallback, useRef, useState } from 'react'
-
-import { sendToBackground } from '@plasmohq/messaging'
-import { Storage } from '@plasmohq/storage'
-
+import { sendToBackground } from "@plasmohq/messaging"
+import { Storage } from "@plasmohq/storage"
+import { useCallback, useRef, useState } from "react"
+import type { FilterMode, FilterTarget } from "~constants/link-filter-presets"
 import type {
   BatchProgress,
   BatchScrapeMode,
   BatchScrapeResult,
   ExtractedLink,
   ScrapeStrategyType,
-  SelectedElementInfo,
-} from '~constants/types'
-import type { FilterMode, FilterTarget } from '~constants/link-filter-presets'
-import { BatchScrapeController, type ExtendedBatchScrapeOptions } from '~utils/batch-scraper'
-import { debugLog } from '~utils/logger'
+  SelectedElementInfo
+} from "~constants/types"
+import {
+  BatchScrapeController,
+  type ExtendedBatchScrapeOptions
+} from "~utils/batch-scraper"
+import { debugLog } from "~utils/logger"
 
 // 链接过滤配置
 export interface LinkFilterConfig {
@@ -22,7 +23,7 @@ export interface LinkFilterConfig {
   mode: FilterMode
 }
 
-const storage = new Storage({ area: 'sync' })
+const storage = new Storage({ area: "sync" })
 
 // 分页进度信息
 interface PaginationProgress {
@@ -47,7 +48,13 @@ interface UseBatchScrapeReturn {
   addLink: (url: string, text?: string) => void
   updateLink: (index: number, url: string, text: string) => void
   removeLink: (index: number) => void
-  startScrape: (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string, filterConfig?: LinkFilterConfig, options?: Partial<ExtendedBatchScrapeOptions>) => Promise<void>
+  startScrape: (
+    selectedLinks: ExtractedLink[],
+    nextPageXPath?: string,
+    linkContainerSelector?: string,
+    filterConfig?: LinkFilterConfig,
+    options?: Partial<ExtendedBatchScrapeOptions>
+  ) => Promise<void>
   pauseScrape: () => void
   resumeScrape: () => void
   cancelScrape: () => void
@@ -59,43 +66,52 @@ interface UseBatchScrapeReturn {
  * 管理完整的批量抓取流程
  */
 export function useBatchScrape(): UseBatchScrapeReturn {
-  const [mode, setMode] = useState<BatchScrapeMode>('idle')
-  const [elementInfo, setElementInfo] = useState<SelectedElementInfo | null>(null)
+  const [mode, setMode] = useState<BatchScrapeMode>("idle")
+  const [elementInfo, setElementInfo] = useState<SelectedElementInfo | null>(
+    null
+  )
   const [links, setLinksState] = useState<ExtractedLink[]>([])
   const [progress, setProgress] = useState<BatchProgress | null>(null)
   const [results, setResults] = useState<BatchScrapeResult[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [paginationProgress, setPaginationProgress] = useState<PaginationProgress | null>(null)
+  const [paginationProgress, setPaginationProgress] =
+    useState<PaginationProgress | null>(null)
 
   const controllerRef = useRef<BatchScrapeController | null>(null)
   const isCancelledRef = useRef(false)
 
   // 设置链接（从元素选择器接收）
-  const setLinks = useCallback((info: SelectedElementInfo | null, extractedLinks: ExtractedLink[]) => {
-    setElementInfo(info)
-    setLinksState(extractedLinks)
-    setMode(extractedLinks.length > 0 ? 'previewing' : 'idle')
-    setError(null)
-  }, [])
+  const setLinks = useCallback(
+    (info: SelectedElementInfo | null, extractedLinks: ExtractedLink[]) => {
+      setElementInfo(info)
+      setLinksState(extractedLinks)
+      setMode(extractedLinks.length > 0 ? "previewing" : "idle")
+      setError(null)
+    },
+    []
+  )
 
   // 添加链接
   const addLink = useCallback((url: string, text?: string) => {
     setLinksState((prev) => {
-      const maxIndex = prev.length > 0 ? Math.max(...prev.map((l) => l.index)) : -1
+      const maxIndex =
+        prev.length > 0 ? Math.max(...prev.map((l) => l.index)) : -1
       const newLink: ExtractedLink = {
         url,
         text: text || url,
-        index: maxIndex + 1,
+        index: maxIndex + 1
       }
       return [...prev, newLink]
     })
     // 确保在 previewing 模式
-    setMode('previewing')
+    setMode("previewing")
   }, [])
 
   // 更新链接
   const updateLink = useCallback((index: number, url: string, text: string) => {
-    setLinksState((prev) => prev.map((link) => (link.index === index ? { ...link, url, text } : link)))
+    setLinksState((prev) =>
+      prev.map((link) => (link.index === index ? { ...link, url, text } : link))
+    )
   }, [])
 
   // 删除链接
@@ -104,62 +120,82 @@ export function useBatchScrape(): UseBatchScrapeReturn {
       const newLinks = prev.filter((link) => link.index !== index)
       // 如果删除后没有链接了，回到 idle 模式
       if (newLinks.length === 0) {
-        setMode('idle')
+        setMode("idle")
       }
       return newLinks
     })
   }, [])
 
   // 应用过滤规则到链接
-  const applyFilter = useCallback((links: ExtractedLink[], filterConfig?: LinkFilterConfig): ExtractedLink[] => {
-    if (!filterConfig?.pattern?.trim()) {
-      return links
-    }
+  const applyFilter = useCallback(
+    (
+      links: ExtractedLink[],
+      filterConfig?: LinkFilterConfig
+    ): ExtractedLink[] => {
+      if (!filterConfig?.pattern?.trim()) {
+        return links
+      }
 
-    try {
-      const regex = new RegExp(filterConfig.pattern, 'i')
-      return links.filter((link) => {
-        let matches = false
-        switch (filterConfig.target) {
-          case 'url':
-            matches = regex.test(link.url)
-            break
-          case 'text':
-            matches = regex.test(link.text)
-            break
-          case 'both':
-            matches = regex.test(link.url) || regex.test(link.text)
-            break
-        }
-        return filterConfig.mode === 'include' ? matches : !matches
-      })
-    } catch {
-      return links
-    }
-  }, [])
+      try {
+        const regex = new RegExp(filterConfig.pattern, "i")
+        return links.filter((link) => {
+          let matches = false
+          switch (filterConfig.target) {
+            case "url":
+              matches = regex.test(link.url)
+              break
+            case "text":
+              matches = regex.test(link.text)
+              break
+            case "both":
+              matches = regex.test(link.url) || regex.test(link.text)
+              break
+          }
+          return filterConfig.mode === "include" ? matches : !matches
+        })
+      } catch {
+        return links
+      }
+    },
+    []
+  )
 
   // 开始抓取
   const startScrape = useCallback(
-    async (selectedLinks: ExtractedLink[], nextPageXPath?: string, linkContainerSelector?: string, filterConfig?: LinkFilterConfig, options: Partial<ExtendedBatchScrapeOptions> = {}) => {
+    async (
+      selectedLinks: ExtractedLink[],
+      nextPageXPath?: string,
+      linkContainerSelector?: string,
+      filterConfig?: LinkFilterConfig,
+      options: Partial<ExtendedBatchScrapeOptions> = {}
+    ) => {
       if (selectedLinks.length === 0) {
-        setError('没有可抓取的链接')
+        setError("没有可抓取的链接")
         return
       }
 
-      setMode('scraping')
+      setMode("scraping")
       setError(null)
       setResults([])
       setPaginationProgress(null)
       isCancelledRef.current = false
 
       // 从 storage 读取用户配置
-      const concurrency = (await storage.get<string>('batch_concurrency')) || '2'
-      const delay = (await storage.get<string>('batch_delay')) || '500'
-      const timeout = (await storage.get<string>('batch_timeout')) || '30000'
-      const retryCount = (await storage.get<string>('batch_retry')) || '1'
-      const strategy = (await storage.get<ScrapeStrategyType>('batch_strategy')) || 'fetch'
-      const maxPages = parseInt((await storage.get<string>('pagination_max_pages')) || '10', 10)
-      const delayBetweenPages = parseInt((await storage.get<string>('pagination_delay')) || '2000', 10)
+      const concurrency =
+        (await storage.get<string>("batch_concurrency")) || "2"
+      const delay = (await storage.get<string>("batch_delay")) || "500"
+      const timeout = (await storage.get<string>("batch_timeout")) || "30000"
+      const retryCount = (await storage.get<string>("batch_retry")) || "1"
+      const strategy =
+        (await storage.get<ScrapeStrategyType>("batch_strategy")) || "fetch"
+      const maxPages = parseInt(
+        (await storage.get<string>("pagination_max_pages")) || "10",
+        10
+      )
+      const delayBetweenPages = parseInt(
+        (await storage.get<string>("pagination_delay")) || "2000",
+        10
+      )
 
       const mergedOptions: ExtendedBatchScrapeOptions = {
         concurrency: parseInt(concurrency, 10),
@@ -167,30 +203,38 @@ export function useBatchScrape(): UseBatchScrapeReturn {
         timeout: parseInt(timeout, 10),
         retryCount: parseInt(retryCount, 10),
         strategy,
-        ...options,
+        ...options
       }
 
       // 分页配置：使用传入的 nextPageXPath
       const paginationEnabled = !!nextPageXPath
-      debugLog('[BatchScrape] 分页配置:', { enabled: paginationEnabled, xpath: nextPageXPath })
+      debugLog("[BatchScrape] 分页配置:", {
+        enabled: paginationEnabled,
+        xpath: nextPageXPath
+      })
       const allResults: BatchScrapeResult[] = []
       let currentPage = 1
       let linksToScrape = selectedLinks
 
       try {
         // 获取当前标签页 ID（用于分页）
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+        const [tab] = await chrome.tabs.query({
+          active: true,
+          currentWindow: true
+        })
         const tabId = tab?.id
 
         // 分页循环
         while (true) {
           if (isCancelledRef.current) {
-            debugLog('[BatchScrape] 用户取消')
+            debugLog("[BatchScrape] 用户取消")
             break
           }
 
           // 日志：当前页信息
-          debugLog(`[BatchScrape] 第 ${currentPage} 页开始, 待抓取: ${linksToScrape.length} 个链接`)
+          debugLog(
+            `[BatchScrape] 第 ${currentPage} 页开始, 待抓取: ${linksToScrape.length} 个链接`
+          )
 
           // 更新分页进度
           if (paginationEnabled) {
@@ -200,7 +244,7 @@ export function useBatchScrape(): UseBatchScrapeReturn {
               currentPage,
               maxPages,
               isLoadingNextPage: false,
-              currentUrl: currentTab?.url,
+              currentUrl: currentTab?.url
             })
           }
 
@@ -213,7 +257,7 @@ export function useBatchScrape(): UseBatchScrapeReturn {
             setProgress({
               ...p,
               total: p.total + allResults.length,
-              completed: p.completed + allResults.length,
+              completed: p.completed + allResults.length
             })
           })
 
@@ -236,7 +280,7 @@ export function useBatchScrape(): UseBatchScrapeReturn {
             currentPage,
             maxPages,
             isLoadingNextPage: true,
-            currentUrl: prev?.currentUrl,
+            currentUrl: prev?.currentUrl
           }))
 
           // 等待翻页延迟
@@ -245,22 +289,22 @@ export function useBatchScrape(): UseBatchScrapeReturn {
           if (isCancelledRef.current) break
 
           // 点击下一页
-          debugLog('[BatchScrape] 准备点击下一页')
+          debugLog("[BatchScrape] 准备点击下一页")
           // paginationEnabled 为 true 时 nextPageXPath 必定存在
           const clickResult = await sendToBackground<
             { tabId: number; nextPageXPath: string },
             { success: boolean; hasNextPage: boolean; error?: string }
           >({
-            name: 'clickNextPage',
+            name: "clickNextPage",
             body: {
               tabId,
-              nextPageXPath: nextPageXPath as string,
-            },
+              nextPageXPath: nextPageXPath as string
+            }
           })
 
-          debugLog('[BatchScrape] 点击下一页结果:', clickResult)
+          debugLog("[BatchScrape] 点击下一页结果:", clickResult)
           if (!clickResult.success || !clickResult.hasNextPage) {
-            debugLog('[BatchScrape] 没有下一页或点击失败')
+            debugLog("[BatchScrape] 没有下一页或点击失败")
             break
           }
 
@@ -275,29 +319,40 @@ export function useBatchScrape(): UseBatchScrapeReturn {
             { tabId: number; linkContainerSelector?: string },
             { success: boolean; links?: ExtractedLink[]; error?: string }
           >({
-            name: 'extractLinksFromPage',
+            name: "extractLinksFromPage",
             body: {
               tabId,
-              linkContainerSelector,
-            },
+              linkContainerSelector
+            }
           })
 
           if (!extractResult.success || !extractResult.links?.length) {
-            debugLog(`[BatchScrape] 第 ${currentPage + 1} 页提取失败:`, extractResult.error || '无链接')
+            debugLog(
+              `[BatchScrape] 第 ${currentPage + 1} 页提取失败:`,
+              extractResult.error || "无链接"
+            )
             break
           }
 
           // 应用用户的正则过滤规则
           const filteredByRegex = applyFilter(extractResult.links, filterConfig)
-          debugLog(`[BatchScrape] 第 ${currentPage + 1} 页: 正则过滤后 ${filteredByRegex.length}/${extractResult.links.length} 个`)
+          debugLog(
+            `[BatchScrape] 第 ${currentPage + 1} 页: 正则过滤后 ${filteredByRegex.length}/${extractResult.links.length} 个`
+          )
 
           // 过滤掉已抓取的链接
           const existingUrls = new Set(allResults.map((r) => r.url))
-          const newLinks = filteredByRegex.filter((l) => !existingUrls.has(l.url))
-          debugLog(`[BatchScrape] 第 ${currentPage + 1} 页: 提取 ${extractResult.links.length} 个, 过滤后 ${filteredByRegex.length} 个, 新增 ${newLinks.length} 个`)
+          const newLinks = filteredByRegex.filter(
+            (l) => !existingUrls.has(l.url)
+          )
+          debugLog(
+            `[BatchScrape] 第 ${currentPage + 1} 页: 提取 ${extractResult.links.length} 个, 过滤后 ${filteredByRegex.length} 个, 新增 ${newLinks.length} 个`
+          )
 
           if (newLinks.length === 0) {
-            debugLog(`[BatchScrape] 第 ${currentPage + 1} 页没有新链接，停止分页`)
+            debugLog(
+              `[BatchScrape] 第 ${currentPage + 1} 页没有新链接，停止分页`
+            )
             break
           }
           linksToScrape = newLinks
@@ -305,11 +360,11 @@ export function useBatchScrape(): UseBatchScrapeReturn {
         }
 
         setResults(allResults)
-        setMode('completed')
+        setMode("completed")
         setPaginationProgress(null)
       } catch (err) {
-        setError(err instanceof Error ? err.message : '抓取过程中发生错误')
-        setMode('error')
+        setError(err instanceof Error ? err.message : "抓取过程中发生错误")
+        setMode("error")
         setPaginationProgress(null)
       }
     },
@@ -332,7 +387,7 @@ export function useBatchScrape(): UseBatchScrapeReturn {
   const cancelScrape = useCallback(() => {
     isCancelledRef.current = true
     controllerRef.current?.cancel()
-    setMode('idle')
+    setMode("idle")
     setProgress(null)
     setPaginationProgress(null)
   }, [])
@@ -342,7 +397,7 @@ export function useBatchScrape(): UseBatchScrapeReturn {
     isCancelledRef.current = true
     controllerRef.current?.cancel()
     controllerRef.current = null
-    setMode('idle')
+    setMode("idle")
     setElementInfo(null)
     setLinksState([])
     setProgress(null)
@@ -367,7 +422,7 @@ export function useBatchScrape(): UseBatchScrapeReturn {
     pauseScrape,
     resumeScrape,
     cancelScrape,
-    reset,
+    reset
   }
 }
 

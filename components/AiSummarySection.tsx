@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react"
-import React, { useCallback, useMemo, useState } from "react"
+import type React from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import type { ScrapedContent } from "~constants/types"
 import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
@@ -24,7 +25,7 @@ const ErrorMessage = ({ message }: { message: string }) => (
       width="16"
       height="16"
     />
-    <p className="text-xs font-medium text-red-500">
+    <p className="font-medium text-red-500 text-xs">
       {message} (ノಠ益ಠ)ノ彡┻━┻
     </p>
   </div>
@@ -101,7 +102,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
 
   return (
     <div className="mb-4">
-      <h2 className="mb-2 flex items-center gap-1 text-lg font-semibold text-sky-600">
+      <h2 className="mb-2 flex items-center gap-1 font-semibold text-lg text-sky-600">
         <Icon
           icon="line-md:chat-round-dots-twotone"
           className="inline"
@@ -112,7 +113,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
       </h2>
 
       <div className="rounded-xl border-2 border-indigo-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 shadow-md transition-all hover:shadow-lg">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 xs:flex-col">
+        <div className="mb-2 flex xs:flex-col flex-wrap items-center justify-between gap-2">
           <div className="flex items-center">
             <Icon
               icon="line-md:robot"
@@ -120,14 +121,14 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
               width="20"
               height="20"
             />
-            <p className="text-sm text-indigo-600">
+            <p className="text-indigo-600 text-sm">
               可以用文章内容生成摘要，阅读效率噌噌噌提升！(｡•̀ᴗ-)✧
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={togglePromptInput}
-              className={`flex items-center rounded-md px-3 py-1.5 text-xs font-medium shadow-sm transition-all hover:shadow ${
+              className={`flex items-center rounded-md px-3 py-1.5 font-medium text-xs shadow-sm transition-all hover:shadow ${
                 showCustomPromptInput
                   ? "bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
                   : "bg-blue-100 text-sky-600 hover:bg-blue-200"
@@ -147,7 +148,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
 
             <button
               onClick={toggleHistoryDrawer}
-              className="flex items-center rounded-md bg-purple-100 px-3 py-1.5 text-xs font-medium text-purple-600 shadow-sm transition-all hover:bg-purple-200 hover:shadow">
+              className="flex items-center rounded-md bg-purple-100 px-3 py-1.5 font-medium text-purple-600 text-xs shadow-sm transition-all hover:bg-purple-200 hover:shadow">
               <Icon
                 icon="mdi:history"
                 className="mr-1.5"
@@ -159,7 +160,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
 
             <button
               onClick={handleOpenSettings}
-              className="flex items-center rounded-md bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-600 shadow-sm transition-all hover:bg-amber-200 hover:shadow">
+              className="flex items-center rounded-md bg-amber-100 px-3 py-1.5 font-medium text-amber-600 text-xs shadow-sm transition-all hover:bg-amber-200 hover:shadow">
               <Icon
                 icon="line-md:cog-filled"
                 className="mr-1.5"
@@ -212,7 +213,7 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
             {totalTokens && (
               <div className="mt-3 rounded-lg border border-indigo-100 bg-indigo-50 p-2">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center text-xs text-indigo-700">
+                  <div className="flex items-center text-indigo-700 text-xs">
                     <Icon
                       icon="line-md:document-code"
                       className="mr-1"
@@ -222,13 +223,13 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
                     <span>Token 消耗统计</span>
                   </div>
                   <div className="flex gap-3">
-                    <div className="flex items-center text-xs text-indigo-700">
+                    <div className="flex items-center text-indigo-700 text-xs">
                       totalTokens: <b>{totalTokens}</b>
                     </div>
-                    <div className="flex items-center text-xs text-sky-600">
+                    <div className="flex items-center text-sky-600 text-xs">
                       promptTokens: <b>{promptTokens}</b>
                     </div>
-                    <div className="flex items-center text-xs text-green-600">
+                    <div className="flex items-center text-green-600 text-xs">
                       completionTokens: <b>{completionTokens}</b>
                     </div>
                   </div>

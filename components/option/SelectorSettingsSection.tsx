@@ -1,9 +1,8 @@
 import { Icon } from "@iconify/react"
-import React, { useEffect, useState } from "react"
-import { toast } from "react-toastify"
-
-import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
+import type React from "react"
+import { useEffect, useState } from "react"
+import { toast } from "react-toastify"
 
 import {
   AUTHOR_SELECTORS,
@@ -137,7 +136,7 @@ const SelectorEditor: React.FC<{
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-xl bg-white p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-sky-600">
+          <h3 className="font-semibold text-sky-600 text-xl">
             <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2 inline" />
             编辑{SELECTOR_TYPE_NAMES[type]}
           </h3>
@@ -148,7 +147,7 @@ const SelectorEditor: React.FC<{
           </button>
         </div>
 
-        <p className="mb-4 text-sm text-gray-600">
+        <p className="mb-4 text-gray-600 text-sm">
           {SELECTOR_TYPE_DESCRIPTIONS[type]} (按优先级排序，从上到下)
         </p>
 
@@ -156,7 +155,7 @@ const SelectorEditor: React.FC<{
           <div className="mb-4">
             <button
               onClick={() => setShowRules(!showRules)}
-              className="flex items-center rounded-md border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700">
+              className="flex items-center rounded-md border border-sky-200 bg-sky-50 px-3 py-1.5 font-medium text-sky-600 text-sm transition-colors hover:bg-sky-100 hover:text-sky-700">
               <Icon
                 icon={showRules ? "mdi:chevron-up" : "mdi:chevron-down"}
                 className="mr-1.5"
@@ -170,7 +169,7 @@ const SelectorEditor: React.FC<{
                 className={`origin-top transform transition-all duration-300 ease-in-out ${
                   showRules
                     ? "mt-3 max-h-[500px] scale-100 opacity-100"
-                    : "scale-98 mt-0 max-h-0 overflow-hidden opacity-0"
+                    : "mt-0 max-h-0 scale-98 overflow-hidden opacity-0"
                 }`}>
                 <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
                   <strong className="mb-2 flex items-center text-sky-700">
@@ -196,7 +195,7 @@ const SelectorEditor: React.FC<{
                 className={`origin-top transform transition-all duration-300 ease-in-out ${
                   showRules
                     ? "mt-3 max-h-[500px] scale-100 opacity-100"
-                    : "scale-98 mt-0 max-h-0 overflow-hidden opacity-0"
+                    : "mt-0 max-h-0 scale-98 overflow-hidden opacity-0"
                 }`}>
                 <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
                   <strong className="mb-2 flex items-center text-sky-700">
@@ -320,9 +319,9 @@ const SelectorTypeCard: React.FC<{
       className="cursor-pointer rounded-lg border-2 border-sky-100 bg-white p-4 shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
       <div className="mb-2 flex items-center text-sky-600">
         <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2" width={24} />
-        <h3 className="text-lg font-medium">{SELECTOR_TYPE_NAMES[type]}</h3>
+        <h3 className="font-medium text-lg">{SELECTOR_TYPE_NAMES[type]}</h3>
       </div>
-      <p className="text-sm text-gray-600">
+      <p className="text-gray-600 text-sm">
         {SELECTOR_TYPE_DESCRIPTIONS[type]}
       </p>
     </div>
@@ -362,7 +361,7 @@ const ScrapeRulesExplanation = () => {
           默认选择器列表（按优先级）：
         </p>
         <div className="max-h-32 overflow-y-auto rounded border border-sky-100 bg-white p-2">
-          <code className="font-mono text-xs text-gray-600">
+          <code className="font-mono text-gray-600 text-xs">
             {CONTENT_SELECTORS.join(", ")}
           </code>
         </div>
@@ -389,11 +388,11 @@ export const SelectorSettingsSection: React.FC = () => {
   return (
     <OptionSection title="选择器设置" icon="line-md:document-code">
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-gray-600">
+        <span className="text-gray-600 text-sm">
           自定义CSS选择器用于从网页中提取内容。点击卡片编辑对应类型的选择器。
         </span>
         <button
-          className="flex items-center rounded-md border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700"
+          className="flex items-center rounded-md border border-sky-200 bg-sky-50 px-3 py-1.5 font-medium text-sky-600 text-sm transition-colors hover:bg-sky-100 hover:text-sky-700"
           onClick={() => setShowExplanation(!showExplanation)}>
           <Icon
             icon={showExplanation ? "mdi:eye-off-outline" : "mdi:eye-outline"}
@@ -408,7 +407,7 @@ export const SelectorSettingsSection: React.FC = () => {
         className={`origin-top transform transition-all duration-500 ease-in-out ${
           showExplanation
             ? "mb-6 max-h-[1000px] scale-100 opacity-100"
-            : "scale-98 mb-0 max-h-0 overflow-hidden opacity-0"
+            : "mb-0 max-h-0 scale-98 overflow-hidden opacity-0"
         }`}
         style={{
           transitionDelay: showExplanation ? "0ms" : "100ms"

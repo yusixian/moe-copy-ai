@@ -26,16 +26,16 @@ export const MetadataImage: React.FC<MetadataImageProps> = ({
           alt={alt}
           variant="rounded"
           size="full"
-          onLoadError={() => onLoadError && onLoadError(label)}
+          onLoadError={() => onLoadError?.(label)}
         />
         <DownloadButton
           fileUrl={src}
           fileName={`${label}.jpg`}
           title="点击下载可爱图片～"
-          className="absolute right-2 top-2 z-10"
+          className="absolute top-2 right-2 z-10"
         />
       </div>
-      <div className="border-t border-sky-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-1.5 text-center text-xs text-sky-600">
+      <div className="border-sky-200 border-t bg-gradient-to-r from-blue-50 to-indigo-50 p-1.5 text-center text-sky-600 text-xs">
         {label} ✨
       </div>
     </div>

@@ -21,9 +21,9 @@ export const SummaryResult = ({
   }
 
   return (
-    <div className="mt-4 rounded-xl border-2 border-dashed border-sky-200 bg-white p-4 shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
+    <div className="mt-4 rounded-xl border-2 border-sky-200 border-dashed bg-white p-4 shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="flex items-center text-sm font-medium text-sky-600">
+        <h3 className="flex items-center font-medium text-sky-600 text-sm">
           <Icon
             icon="line-md:lightbulb-twotone"
             className="mr-1 text-amber-400"
@@ -34,7 +34,7 @@ export const SummaryResult = ({
         </h3>
         <button
           onClick={handleCopy}
-          className="flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-medium text-sky-600 shadow-sm transition-all hover:bg-sky-200 hover:shadow">
+          className="flex items-center rounded-full bg-sky-100 px-3 py-1 font-medium text-sky-600 text-xs shadow-sm transition-all hover:bg-sky-200 hover:shadow">
           <Icon
             icon={copied ? "line-md:check-all" : "line-md:clipboard-arrow"}
             className="mr-1.5"

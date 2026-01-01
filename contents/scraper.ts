@@ -83,7 +83,7 @@ function testSelector(selector: string) {
 
         // 如果是大型内容容器，限制内容长度
         if (content.length > 1000) {
-          content = content.substring(0, 1000) + "..."
+          content = `${content.substring(0, 1000)}...`
         }
       }
 

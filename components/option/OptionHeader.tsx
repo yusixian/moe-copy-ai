@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react"
-import React, { useCallback } from "react"
+import type React from "react"
+import { useCallback } from "react"
 
 export const OptionHeader: React.FC = () => {
   const handleOpenGithub = useCallback(() => {
@@ -9,10 +10,10 @@ export const OptionHeader: React.FC = () => {
   return (
     <header className="mb-6 flex items-center justify-between rounded-xl border-2 border-sky-200 bg-white p-4 shadow-md">
       <div>
-        <h1 className="flex items-center text-2xl font-bold text-sky-600">
+        <h1 className="flex items-center font-bold text-2xl text-sky-600">
           Moe Copy AI <span className="ml-2">✨</span> 萌抓
         </h1>
-        <p className="text-sm text-indigo-600">
+        <p className="text-indigo-600 text-sm">
           配置你的小助手，让它更好地为你服务 (。・ω・。)
         </p>
       </div>
