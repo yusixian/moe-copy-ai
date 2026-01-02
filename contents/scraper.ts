@@ -186,7 +186,7 @@ chrome.runtime.onMessage.addListener(
           debugLog("抓取过程中出错:", error)
           sendResponse({
             success: false,
-            error: error.message || "抓取内容时出错"
+            error: error instanceof Error ? error.message : "抓取内容时出错"
           })
         })
 
@@ -195,7 +195,10 @@ chrome.runtime.onMessage.addListener(
     }
 
     // 处理测试选择器请求
-    if (message.action === "testSelector" && message.selector) {
+    if (
+      message.action === "testSelector" &&
+      typeof message.selector === "string"
+    ) {
       debugLog("收到测试选择器请求")
       const result = testSelector(message.selector)
       sendResponse(result)

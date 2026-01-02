@@ -517,8 +517,9 @@ function ElementSelector() {
         // 根据 purpose 提取不同数据
         if (purposeRef.current === "content-extraction") {
           // 内容提取模式：提取完整内容
-          const content = extractContentFromElement(element)
-          setExtractedContent(content)
+          extractContentFromElement(element).then((content) => {
+            setExtractedContent(content)
+          })
         } else if (purposeRef.current === "next-page-button") {
           // 下一页按钮选择模式：使用专用的下一页按钮选择器生成（XPath）
           try {

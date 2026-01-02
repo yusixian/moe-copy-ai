@@ -13,7 +13,7 @@ import type {
   SelectorResultItem,
   SelectorType
 } from "../constants/types"
-import { cleanContent, extractFormattedText } from "./formatter"
+import { cleanContent } from "./formatter"
 import { debugLog } from "./logger"
 import {
   convertHtmlToMarkdown,
@@ -32,6 +32,41 @@ const STORAGE_KEYS = {
 
 // 存储实例
 const storage = new Storage({ area: "sync" })
+
+function getBaseUrl(): string | undefined {
+  if (typeof document !== "undefined" && document.baseURI) {
+    return document.baseURI
+  }
+  if (typeof window !== "undefined") {
+    return window.location.href
+  }
+  return undefined
+}
+
+function mergeExtractedImages(
+  target: ImageInfo[],
+  extracted: ImageInfo[]
+): void {
+  const indexOffset = target.length
+  for (const image of extracted) {
+    target.push({
+      ...image,
+      index: indexOffset + image.index
+    })
+  }
+}
+
+async function convertElementToMarkdown(
+  element: Element,
+  imagesArray: ImageInfo[]
+): Promise<string> {
+  const html = element.outerHTML || element.innerHTML || ""
+  const markdown = await convertHtmlToMarkdown(html, getBaseUrl())
+  if (imagesArray.length >= 0) {
+    mergeExtractedImages(imagesArray, extractImagesFromMarkdown(markdown))
+  }
+  return markdown
+}
 
 // 获取选择器列表，优先使用自定义选择器，如果不存在则使用默认选择器
 async function getSelectors(
@@ -149,7 +184,7 @@ export async function extractArticleContent(
     })
 
     debugLog("使用最长的article元素, 长度:", maxLength)
-    const content = extractFormattedText(longestArticle, imagesArray)
+    const content = await convertElementToMarkdown(longestArticle, imagesArray)
 
     results.push({
       selector: "article (longest)",
@@ -170,7 +205,7 @@ export async function extractArticleContent(
       const contentEl = document.querySelector(selector)
       if (contentEl) {
         debugLog(`找到内容容器: ${selector}`)
-        const content = extractFormattedText(contentEl, imagesArray)
+        const content = await convertElementToMarkdown(contentEl, imagesArray)
 
         contentResults.push({
           selector,
@@ -200,12 +235,14 @@ export async function extractArticleContent(
   if (paragraphs.length > 3) {
     // 如果有至少3个段落，可能是文章的主体
     debugLog(`使用段落集合: ${paragraphs.length} 个段落`)
-    const contentArray = Array.from(paragraphs)
+    const contentElements = Array.from(paragraphs)
       .filter((p) => (p.textContent?.trim().length || 0) > 30) // 筛选出较长的段落
-      .map((p) => p.textContent?.trim() || "")
+      .map((p) => p)
 
-    if (contentArray.length > 0) {
-      const content = contentArray.join("\n\n")
+    if (contentElements.length > 0) {
+      const html = contentElements.map((p) => p.outerHTML).join("\n")
+      const content = await convertHtmlToMarkdown(html, getBaseUrl())
+      mergeExtractedImages(imagesArray, extractImagesFromMarkdown(content))
 
       results.push({
         selector: "p (paragraphs collection)",
@@ -218,7 +255,7 @@ export async function extractArticleContent(
 
   // 最后的fallback：尝试获取body中的主要文本内容
   debugLog("未找到明确的内容区域，尝试提取body内容")
-  const content = extractFormattedText(document.body, imagesArray)
+  const content = await convertElementToMarkdown(document.body, imagesArray)
 
   results.push({
     selector: "body",
@@ -464,8 +501,9 @@ export async function scrapeWebpageContent(
 
         if (readabilityResult.success) {
           // 将 HTML 转换为 Markdown
-          scrapedContent.articleContent = convertHtmlToMarkdown(
-            readabilityResult.content
+          scrapedContent.articleContent = await convertHtmlToMarkdown(
+            readabilityResult.content,
+            getBaseUrl()
           )
           scrapedContent.title = readabilityResult.metadata.title || ""
           scrapedContent.author = readabilityResult.metadata.byline || ""
@@ -527,8 +565,9 @@ export async function scrapeWebpageContent(
         const readabilityResult = await extractWithReadability()
 
         if (readabilityResult.success) {
-          const readabilityContent = convertHtmlToMarkdown(
-            readabilityResult.content
+          const readabilityContent = await convertHtmlToMarkdown(
+            readabilityResult.content,
+            getBaseUrl()
           )
           const evaluation = evaluateContentQuality(
             selectorResult.articleContent,

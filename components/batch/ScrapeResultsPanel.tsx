@@ -177,11 +177,17 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
       <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="xs" onClick={selectAll}>
-            <Icon icon="mdi:checkbox-multiple-marked" className="mr-1 h-3.5 w-3.5" />
+            <Icon
+              icon="mdi:checkbox-multiple-marked"
+              className="mr-1 h-3.5 w-3.5"
+            />
             全选
           </Button>
           <Button variant="ghost" size="xs" onClick={deselectAll}>
-            <Icon icon="mdi:checkbox-multiple-blank-outline" className="mr-1 h-3.5 w-3.5" />
+            <Icon
+              icon="mdi:checkbox-multiple-blank-outline"
+              className="mr-1 h-3.5 w-3.5"
+            />
             取消
           </Button>
         </div>
@@ -265,14 +271,20 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
                     {result.url}
                   </span>
                   <Button
-                    variant={copiedItemIndex === index ? "success" : "secondary"}
+                    variant={
+                      copiedItemIndex === index ? "success" : "secondary"
+                    }
                     size="xs"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleCopyItemJson(result, index)
                     }}>
                     <Icon
-                      icon={copiedItemIndex === index ? "mdi:check" : "mdi:code-json"}
+                      icon={
+                        copiedItemIndex === index
+                          ? "mdi:check"
+                          : "mdi:code-json"
+                      }
                       className="mr-1 h-3.5 w-3.5"
                     />
                     {copiedItemIndex === index ? "已复制" : "JSON"}
@@ -304,7 +316,11 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
                           toggleFullContent(index)
                         }}>
                         <Icon
-                          icon={fullContentItems.has(index) ? "mdi:chevron-up" : "mdi:chevron-down"}
+                          icon={
+                            fullContentItems.has(index)
+                              ? "mdi:chevron-up"
+                              : "mdi:chevron-down"
+                          }
                           className="mr-1 h-4 w-4"
                         />
                         {fullContentItems.has(index) ? "收起" : "展开全部"}
@@ -327,7 +343,10 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
         fullWidth
         onClick={handleCopyAll}
         disabled={selectedStats.count === 0}>
-        <Icon icon={copied ? "mdi:check" : "mdi:content-copy"} className="mr-1 h-4 w-4" />
+        <Icon
+          icon={copied ? "mdi:check" : "mdi:content-copy"}
+          className="mr-1 h-4 w-4"
+        />
         {copied ? "已复制" : `复制选中 (${selectedStats.count})`}
       </Button>
 

@@ -61,9 +61,7 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
           className="group justify-between border-sky-200 border-b bg-sky-50 p-2 hover:bg-sky-100"
           onClick={toggleExpand}>
           <div className="flex items-center gap-2">
-            {icon && (
-              <span className="text-base text-sky-600">{icon}</span>
-            )}
+            {icon && <span className="text-base text-sky-600">{icon}</span>}
             <span className="text-sky-600 text-sm">{title}</span>
           </div>
 
@@ -74,10 +72,7 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
               collapsed: { rotate: 180 }
             }}
             transition={defaultTransition}>
-            <Icon
-              icon="line-md:chevron-up"
-              className="h-4 w-4 text-sky-500"
-            />
+            <Icon icon="line-md:chevron-up" className="h-4 w-4 text-sky-500" />
           </motion.div>
         </Button>
 
