@@ -16,6 +16,7 @@ interface ComboboxProps {
   options: ComboboxOption[]
   placeholder?: string
   compact?: boolean
+  inputId?: string
   /** 是否允许输入过滤 */
   filterable?: boolean
   /** 空状态文案 */
@@ -29,6 +30,7 @@ export function Combobox({
   options,
   placeholder = "",
   compact = false,
+  inputId,
   filterable = true,
   emptyText = "无可用选项",
   className = ""
@@ -118,6 +120,7 @@ export function Combobox({
         <div className="flex">
           <input
             ref={inputRef}
+            id={inputId}
             type="text"
             value={value || ""}
             onChange={handleInputChange}

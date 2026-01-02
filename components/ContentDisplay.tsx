@@ -117,6 +117,7 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
           {/* 全屏内容区域 */}
           <div
             className="markdown-preview markdown-preview-fullscreen flex-1 overflow-auto bg-white px-6 py-4"
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: renderMarkdown sanitizes output
             dangerouslySetInnerHTML={renderMarkdown(content)}
           />
         </div>
@@ -126,6 +127,7 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
     return (
       <div
         className="markdown-preview"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: renderMarkdown sanitizes output
         dangerouslySetInnerHTML={renderMarkdown(content)}
       />
     )

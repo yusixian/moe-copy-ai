@@ -44,7 +44,12 @@
     "react-dom": "18.2.0",
     "react-responsive": "^10.0.0",
     "react-toastify": "^11.0.5",
-    "tailwind-merge": "^3.0.2"
+    "rehype-parse": "^8.0.5",
+    "rehype-remark": "^9.1.2",
+    "remark-gfm": "^3.0.1",
+    "remark-stringify": "^10.0.3",
+    "tailwind-merge": "^3.0.2",
+    "unified": "^10.1.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",

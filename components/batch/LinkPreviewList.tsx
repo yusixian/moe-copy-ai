@@ -230,7 +230,10 @@ const LinkPreviewList = memo(function LinkPreviewList({
               size="xs"
               onClick={handleExportMarkdown}
               disabled={isExporting}>
-              <Icon icon="mdi:file-document-outline" className="mr-1 h-3.5 w-3.5" />
+              <Icon
+                icon="mdi:file-document-outline"
+                className="mr-1 h-3.5 w-3.5"
+              />
               MD
             </Button>
             <Button

@@ -107,7 +107,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
       )}>
       <header className="relative mb-4 flex flex-col gap-3 rounded-xl border border-blue-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <div className="min-w-0 flex-1">
-          <h1 className="flex items-center font-bold text-lg text-blue-600 sm:text-xl">
+          <h1 className="flex items-center font-bold text-blue-600 text-lg sm:text-xl">
             <span className="truncate">Moe Copy AI</span>
             <span className="ml-2 flex-shrink-0">萌抓</span>
           </h1>
@@ -120,11 +120,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         </div>
         <div className="flex flex-shrink-0 items-center justify-end gap-2">
           {onClose && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              title="关闭">
+            <Button variant="ghost" size="icon" onClick={onClose} title="关闭">
               <Icon icon="line-md:close" width="20" height="20" />
             </Button>
           )}
@@ -200,8 +196,16 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-medium text-red-600">出错了</p>
                 <p className="flex-1 text-red-600 text-sm">{error}</p>
-                <Button variant="outline" size="xs" onClick={handleRefreshClick}>
-                  <Icon icon="mdi:refresh" width="14" height="14" className="mr-1" />
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={handleRefreshClick}>
+                  <Icon
+                    icon="mdi:refresh"
+                    width="14"
+                    height="14"
+                    className="mr-1"
+                  />
                   重试
                 </Button>
               </div>
@@ -264,7 +268,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                       ? "line-md:loading-twotone-loop"
                       : "line-md:confirm-circle"
                   }
-                  className={isLoading ? "animate-spin text-blue-400" : "text-green-500"}
+                  className={
+                    isLoading ? "animate-spin text-blue-400" : "text-green-500"
+                  }
                   width="12"
                   height="12"
                 />

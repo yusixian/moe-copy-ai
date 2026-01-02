@@ -6,15 +6,14 @@ import { useCallback, useEffect, useState } from "react"
 import { ToastContainer } from "react-toastify"
 
 import BatchScrapePanel from "~components/batch/BatchScrapePanel"
-import { Button } from "~components/ui/button"
 import ContentExtractionPanel from "~components/extraction/ContentExtractionPanel"
 import SidePanelSettings from "~components/sidepanel/SidePanelSettings"
+import { Button } from "~components/ui/button"
 import Segmented, { type SegmentedOption } from "~components/ui/segmented"
 import type { BatchScrapeMode } from "~constants/types"
 import useBatchScrape from "~hooks/useBatchScrape"
 import useContentExtraction from "~hooks/useContentExtraction"
 import useElementSelector from "~hooks/useElementSelector"
-import { cn } from "~utils"
 
 type SidePanelView = "batch" | "extraction" | "settings"
 

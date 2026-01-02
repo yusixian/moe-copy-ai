@@ -17,7 +17,8 @@ const config = {
   collectCoverage: true,
   collectCoverageFrom: ["utils/**/*.ts", "!**/node_modules/**", "!**/build/**"],
   moduleNameMapper: {
-    "^~(.*)$": "<rootDir>/$1"
+    "^~(.*)$": "<rootDir>/$1",
+    "^../parser/htmlParser$": "<rootDir>/__mocks__/parser/htmlParser.ts"
   }
 }
 

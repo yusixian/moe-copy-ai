@@ -20,7 +20,12 @@ interface AiSummarySectionProps {
 // 错误提示组件
 const ErrorMessage = ({ message }: { message: string }) => (
   <div className="flex items-center gap-1">
-    <Icon icon="line-md:alert" className="text-red-500" width="16" height="16" />
+    <Icon
+      icon="line-md:alert"
+      className="text-red-500"
+      width="16"
+      height="16"
+    />
     <p className="font-medium text-red-500 text-xs">{message}</p>
   </div>
 )
@@ -119,7 +124,11 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
               size="xs"
               onClick={togglePromptInput}>
               <Icon
-                icon={showCustomPromptInput ? "line-md:close-small" : "line-md:edit-twotone"}
+                icon={
+                  showCustomPromptInput
+                    ? "line-md:close-small"
+                    : "line-md:edit-twotone"
+                }
                 className="mr-1"
                 width="14"
                 height="14"
@@ -128,12 +137,22 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
             </Button>
 
             <Button variant="outline" size="xs" onClick={toggleHistoryDrawer}>
-              <Icon icon="mdi:history" className="mr-1" width="14" height="14" />
+              <Icon
+                icon="mdi:history"
+                className="mr-1"
+                width="14"
+                height="14"
+              />
               历史记录
             </Button>
 
             <Button variant="outline" size="xs" onClick={handleOpenSettings}>
-              <Icon icon="line-md:cog-filled" className="mr-1" width="14" height="14" />
+              <Icon
+                icon="line-md:cog-filled"
+                className="mr-1"
+                width="14"
+                height="14"
+              />
               设置
             </Button>
           </div>

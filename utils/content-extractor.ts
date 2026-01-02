@@ -134,14 +134,16 @@ export function getElementInfo(element: Element): SelectedElementInfo {
  * 从 DOM 元素中提取内容
  * 返回三种格式：HTML、Markdown、纯文本
  */
-export function extractContentFromElement(element: Element): ExtractedContent {
+export async function extractContentFromElement(
+  element: Element
+): Promise<ExtractedContent> {
   const html = element.outerHTML
   const text = extractFormattedText(element) // 使用智能文本提取
 
   // 转换 HTML 为 Markdown
   let markdown = ""
   try {
-    markdown = convertHtmlToMarkdown(html)
+    markdown = await convertHtmlToMarkdown(html)
   } catch (error) {
     console.error("Markdown 转换失败:", error)
     // 回退到纯文本
