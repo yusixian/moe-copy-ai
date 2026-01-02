@@ -260,8 +260,10 @@ ${cleanBodyHTML}
  * 使用 unified 生态系统进行转换
  */
 export async function convertHtmlToMarkdown(
-  htmlContent: string
+  htmlContent: string,
+  baseUrl?: string
 ): Promise<string> {
+  console.log(htmlContent, 'input-html')
   if (!htmlContent) {
     debugLog("convertHtmlToMarkdown: 输入内容为空")
     return ""
@@ -274,8 +276,8 @@ export async function convertHtmlToMarkdown(
   )
 
   try {
-    const markdownContent = await parseHtmlToMarkdown(htmlContent)
-
+    const markdownContent = await parseHtmlToMarkdown(htmlContent, baseUrl)
+    console.log(markdownContent, 'output-markdown')
     // 清理多余的空行和空格
     const cleanedContent = markdownContent
       .replace(/\n{3,}/g, "\n\n") // 限制连续换行不超过2个
@@ -289,6 +291,7 @@ export async function convertHtmlToMarkdown(
 
     return cleanedContent
   } catch (error) {
+    console.log(error)
     debugLog("convertHtmlToMarkdown: 转换失败:", error)
     // Fallback: 提取纯文本
     const textOnly = htmlContent

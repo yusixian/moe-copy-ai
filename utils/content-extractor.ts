@@ -143,7 +143,7 @@ export async function extractContentFromElement(
   // 转换 HTML 为 Markdown
   let markdown = ""
   try {
-    markdown = await convertHtmlToMarkdown(html)
+    markdown = await convertHtmlToMarkdown(html, element.baseURI)
   } catch (error) {
     console.error("Markdown 转换失败:", error)
     // 回退到纯文本

@@ -33,6 +33,16 @@ const STORAGE_KEYS = {
 // 存储实例
 const storage = new Storage({ area: "sync" })
 
+function getBaseUrl(): string | undefined {
+  if (typeof document !== "undefined" && document.baseURI) {
+    return document.baseURI
+  }
+  if (typeof window !== "undefined") {
+    return window.location.href
+  }
+  return undefined
+}
+
 function mergeExtractedImages(
   target: ImageInfo[],
   extracted: ImageInfo[]
@@ -51,7 +61,7 @@ async function convertElementToMarkdown(
   imagesArray: ImageInfo[]
 ): Promise<string> {
   const html = element.outerHTML || element.innerHTML || ""
-  const markdown = await convertHtmlToMarkdown(html)
+  const markdown = await convertHtmlToMarkdown(html, getBaseUrl())
   if (imagesArray.length >= 0) {
     mergeExtractedImages(imagesArray, extractImagesFromMarkdown(markdown))
   }
@@ -231,7 +241,7 @@ export async function extractArticleContent(
 
     if (contentElements.length > 0) {
       const html = contentElements.map((p) => p.outerHTML).join("\n")
-      const content = await convertHtmlToMarkdown(html)
+      const content = await convertHtmlToMarkdown(html, getBaseUrl())
       mergeExtractedImages(imagesArray, extractImagesFromMarkdown(content))
 
       results.push({
@@ -492,7 +502,8 @@ export async function scrapeWebpageContent(
         if (readabilityResult.success) {
           // 将 HTML 转换为 Markdown
           scrapedContent.articleContent = await convertHtmlToMarkdown(
-            readabilityResult.content
+            readabilityResult.content,
+            getBaseUrl()
           )
           scrapedContent.title = readabilityResult.metadata.title || ""
           scrapedContent.author = readabilityResult.metadata.byline || ""
@@ -555,7 +566,8 @@ export async function scrapeWebpageContent(
 
         if (readabilityResult.success) {
           const readabilityContent = await convertHtmlToMarkdown(
-            readabilityResult.content
+            readabilityResult.content,
+            getBaseUrl()
           )
           const evaluation = evaluateContentQuality(
             selectorResult.articleContent,

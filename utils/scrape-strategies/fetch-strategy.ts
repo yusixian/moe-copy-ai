@@ -81,7 +81,7 @@ export class FetchStrategy implements ScrapeStrategy {
       }
 
       // 转换为 Markdown
-      const markdown = await convertHtmlToMarkdown(result.content)
+      const markdown = await convertHtmlToMarkdown(result.content, url)
 
       debugLog(`[FetchStrategy] 抓取成功: ${url}`, {
         titleLength: result.metadata.title?.length || 0,
