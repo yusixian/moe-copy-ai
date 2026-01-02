@@ -163,7 +163,7 @@ export async function parseHtmlToMarkdown(html: string): Promise<string> {
       {
         bullet: "-",
         emphasis: "*",
-        strong: "**",
+        strong: "*",
         fence: "`",
         fences: true,
         listItemIndent: "one"
