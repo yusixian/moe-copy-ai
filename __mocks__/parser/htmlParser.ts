@@ -30,7 +30,9 @@ export async function parseHtmlToMarkdown(
       const tagName = element.tagName.toLowerCase()
 
       // Skip unwanted elements
-      if (["script", "style", "meta", "link", "noscript", "svg"].includes(tagName)) {
+      if (
+        ["script", "style", "meta", "link", "noscript", "svg"].includes(tagName)
+      ) {
         return ""
       }
 
@@ -90,9 +92,10 @@ export async function parseHtmlToMarkdown(
             return linkText
           }
           // Resolve relative URLs if baseUrl is provided
-          const finalHref = baseUrl && !href.startsWith("http")
-            ? new URL(href, baseUrl).href
-            : href
+          const finalHref =
+            baseUrl && !href.startsWith("http")
+              ? new URL(href, baseUrl).href
+              : href
           return `[${linkText}](${finalHref})`
         }
         case "ul":
@@ -114,9 +117,10 @@ export async function parseHtmlToMarkdown(
           const alt = element.getAttribute("alt") || ""
           if (src) {
             // Resolve relative URLs if baseUrl is provided
-            const finalSrc = baseUrl && !src.startsWith("http")
-              ? new URL(src, baseUrl).href
-              : src
+            const finalSrc =
+              baseUrl && !src.startsWith("http")
+                ? new URL(src, baseUrl).href
+                : src
             return `![${alt}](${finalSrc})`
           }
           return ""
@@ -134,7 +138,5 @@ export async function parseHtmlToMarkdown(
   const markdown = convertNode(tempDiv)
 
   // Clean up extra whitespace
-  return markdown
-    .replace(/\n{3,}/g, "\n\n")
-    .trim()
+  return markdown.replace(/\n{3,}/g, "\n\n").trim()
 }

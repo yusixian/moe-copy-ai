@@ -225,11 +225,11 @@ describe("extractor", () => {
 
       // 6. 使用body作为最后手段
       jest.clearAllMocks()
-      setupFormatterMock("Body content")
       setDocumentHTML(`<div>Just some content</div>`)
 
       result = await extractArticleContent()
-      expect(result.content).toBe("Body content")
+      // After PR #19 refactor, we use real HTML to Markdown conversion
+      expect(result.content).toContain("Just some content")
       expect(result.results[0].selector).toBe("body")
     })
 

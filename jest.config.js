@@ -15,7 +15,14 @@ const config = {
   setupFiles: ["./jest.setup.js"],
   testPathIgnorePatterns: ["/node_modules/", "/build/"],
   collectCoverage: true,
-  collectCoverageFrom: ["utils/**/*.ts", "!**/node_modules/**", "!**/build/**"],
+  collectCoverageFrom: [
+    "utils/**/*.ts",
+    "parser/**/*.ts",
+    "!**/node_modules/**",
+    "!**/build/**",
+    "!**/__tests__/**",
+    "!**/__mocks__/**"
+  ],
   moduleNameMapper: {
     "^~(.*)$": "<rootDir>/$1",
     "^../parser/htmlParser$": "<rootDir>/__mocks__/parser/htmlParser.ts"
