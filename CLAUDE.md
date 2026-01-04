@@ -2,6 +2,47 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Overview
+
+**moe-copy-ai** is a Chrome extension built with Plasmo framework that provides AI-powered web content extraction. The extension supports mobile browsers (Kiwi Browser) and offers intelligent content scraping, metadata extraction, and AI-powered summarization.
+
+## Core Engineering Principles
+
+### 1. Module-First Principle
+**Every feature must be implemented as a standalone module with clear boundaries.**
+- Logic organized into focused, single-responsibility modules
+- Module structure: `utils/` (core logic), `hooks/` (React hooks), `components/` (UI), `background/messages/` (Chrome messaging), `constants/` (config)
+- Extract shared logic when used 2+ times
+
+### 2. Interface-First Design
+**Modules must expose clear, minimal public APIs.**
+- Use barrel exports (`index.ts`) to define public interfaces when a module has multiple related exports
+- Export TypeScript types alongside implementations
+- Document complex functions with JSDoc
+
+### 3. Functional-First Approach
+**Prefer pure functions over stateful classes; manage side effects explicitly.**
+- Write pure functions (same input → same output)
+- Isolate side effects at boundaries (storage operations, Chrome API calls, AI service calls)
+- Immutable data transformations
+
+### 4. Test-Friendly Architecture
+**Design code to be testable without excessive mocking.**
+- Pure functions are naturally testable
+- Testing priorities: High (utils, data transformations) > Medium (hooks, message handlers) > Low (UI components)
+- Tests located in `utils/__tests__/`
+
+### 5. Simplicity & Anti-Abstraction
+**Resist premature abstraction; extract patterns after 2-3 instances.**
+- Don't create abstractions for single-use cases
+- Inline code until pattern becomes clear
+- Keep abstractions simple and focused
+
+### 6. Dependency Hygiene
+**Manage dependencies carefully; avoid circular imports and bloat.**
+- No circular dependencies between modules
+- Keep dependency chain shallow
+
 ## Development Commands
 
 ### Core Commands
@@ -32,6 +73,29 @@ This is a Chrome extension built with **Plasmo framework** that provides AI-powe
 - **Popup** (`popup.tsx`) - Extension popup interface
 - **Options page** (`options.tsx`) - Settings and configuration
 - **Components** (`components/`) - React UI components
+- **Hooks** (`hooks/`) - Reusable React hooks
+- **Utils** (`utils/`) - Core business logic and utilities
+- **Constants** (`constants/`) - Configuration and type definitions
+
+### Module Organization
+
+**Dependency Flow** (avoid circular dependencies):
+```
+popup.tsx/options.tsx → components/ → hooks/ → utils/ → constants/
+                          ↓
+              background/messages/
+```
+
+**File Naming**:
+- Barrel exports: `index.ts` (when module has multiple related exports)
+- Single export: Match filename (`useIsMobile.ts`)
+- React components: PascalCase (`ContentDisplay.tsx`)
+- Utilities: camelCase (`extractor.ts`, `storage.ts`)
+
+**Module Size Guidelines**:
+- Max 500 lines per file (split if larger)
+- Max 15 public exports per module
+- Max 10 imports per file
 
 ### Core Functionality Modules
 
@@ -39,7 +103,7 @@ This is a Chrome extension built with **Plasmo framework** that provides AI-powe
 
 - **Multi-tier selector system**: Uses prioritized CSS selectors for content extraction
 - **Custom selector support**: Allows user-defined CSS selectors via storage
-- **Smart fallbacks**: Article tags → custom selectors → paragraph collections → body content
+- **Smart fallbacks**: Article tags → custom selectors → default selectors → paragraph collections → body content
 - **Metadata extraction**: Automatically extracts og:tags and meta information
 
 #### AI Integration (`utils/ai-service.ts`)
@@ -102,19 +166,119 @@ Built with Tailwind CSS, optimized for mobile browsers (Kiwi Browser support).
 
 Development builds go to `build/chrome-mv3-dev/` for local testing in Chrome developer mode.
 
-## Code Style
+## Code Style & Quality
 
-- Avoid code duplication - extract common types and components.
-- Keep components focused - use hooks and component composition.
-- Follow React best practices - proper Context usage, state management.
-- Use TypeScript strictly - leverage type safety throughout.
-- Build React features out of small, atomic components. Push data fetching, stores, and providers down to the feature or tab that actually needs them so switching views unmounts unused logic and prevents runaway updates instead of centralizing everything in a mega component.
+### General Guidelines
 
-### React Best Practices
+- **Avoid code duplication**: Extract common types and components
+- **Keep components focused**: Use hooks and component composition
+- **TypeScript strict mode**: Leverage type safety throughout, avoid `any`
+- **Atomic components**: Build features from small, focused components
+- **Localized state**: Push data fetching and state management down to components that need them
 
-#### Extract Custom Hooks for Reusable Logic
+### Error Handling Strategy
 
-When the same `useState` + `useRef` + `useEffect` pattern appears 2+ times, extract it into a custom hook:
+**Layered and context-appropriate:**
+
+1. **Utility Layer** (`utils/`): Return `null` for missing data or throw typed errors for critical failures
+2. **React Components**: Use `ErrorBoundary` for component errors, graceful degradation
+3. **Async Operations**: Explicit try-catch with user feedback
+4. **Chrome API Calls**: Always handle `chrome.runtime.lastError`
+5. **Validation**: At system boundaries only (user input, external APIs, storage reads)
+
+```typescript
+// ✅ Good: Error handling in storage utility
+export async function getSetting<T>(key: string): Promise<T | null> {
+  try {
+    const result = await chrome.storage.sync.get(key);
+    return result[key] ?? null;
+  } catch (error) {
+    console.error(`Failed to get setting: ${key}`, error);
+    return null;
+  }
+}
+
+// ✅ Good: Error handling in component
+function AiSummary() {
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSummarize = async () => {
+    try {
+      const result = await generateSummary(content);
+      setSummary(result);
+    } catch (err) {
+      setError("Failed to generate summary. Please try again.");
+      console.error(err);
+    }
+  };
+}
+```
+
+### State Management Best Practices
+
+#### State Placement
+- **Local first**: Keep state in component unless shared
+- **Lift minimally**: Move state to nearest common ancestor only when needed
+- **Chrome storage**: For persistent settings and cross-context data
+
+#### Derived State
+Prefer computation over synchronization:
+
+```typescript
+// ✅ Good: Computed value
+const filteredLinks = links.filter(link => link.includes(searchTerm));
+
+// ❌ Bad: Synchronized state
+const [filteredLinks, setFilteredLinks] = useState([]);
+useEffect(() => {
+  setFilteredLinks(links.filter(link => link.includes(searchTerm)));
+}, [links, searchTerm]);
+```
+
+#### Immutability
+Always use immutable updates:
+
+```typescript
+// ✅ Good: Immutable update
+setSettings(prev => ({ ...prev, darkMode: true }));
+
+// ❌ Bad: Mutation
+settings.darkMode = true;
+setSettings(settings);
+```
+
+#### Chrome Storage Pattern
+Centralize storage operations in `utils/storage.ts`:
+
+```typescript
+// ✅ Good: Typed storage utilities
+export const storage = {
+  getSettings: async () => {...},
+  updateSettings: async (updates: Partial<Settings>) => {...},
+  getHistory: async () => {...},
+};
+```
+
+### Performance Best Practices
+
+- **Lazy load heavy dependencies**: Dynamic imports for large libraries
+- **Measure before optimizing**: Use Chrome DevTools Performance panel
+- **Memoization**: Only for expensive computations (not premature optimization)
+- **Event listeners**: Always clean up in useEffect return
+
+```typescript
+// ✅ Good: Lazy load heavy library
+const handleExport = async () => {
+  const { exportToPDF } = await import('./heavy-export-lib');
+  await exportToPDF(data);
+};
+```
+
+## React Best Practices
+
+### Extract Custom Hooks for Reusable Logic
+
+When the same `useState` + `useRef` + `useEffect` pattern appears 2+ times, extract it into a custom hook.
 
 **Signs you need a custom hook:**
 
@@ -122,7 +286,7 @@ When the same `useState` + `useRef` + `useEffect` pattern appears 2+ times, extr
 - Logic involves event listeners with cleanup
 - State synchronization with refs (e.g., `isDraggingRef.current = isDragging`)
 
-**Example: `useDrag` hook** (see `src/renderer/src/hooks/use-drag.ts`)
+**Example: `useDrag` hook**
 
 ```typescript
 // ❌ Bad: Duplicated drag logic in each component (30+ lines)
@@ -143,17 +307,17 @@ useEffect(() => {
 
 // ✅ Good: Extract to reusable hook
 const { isDragging, onMouseDown } = useDrag({
-  onDrag: ({ x, y }) => window.api.panel.drag(x, y),
+  onDrag: ({ x, y }) => handleDrag(x, y),
 });
 ```
 
 **Hook naming conventions:**
 
 - `use` prefix (required by React)
-- Descriptive verb: `useDrag`, `useResize`, `useHover`
+- Descriptive verb: `useDrag`, `useResize`, `useHover`, `useAiSettings`
 - Return object with clear properties
 
-#### Avoid useCallback Overuse
+### Avoid useCallback Overuse
 
 Only use `useCallback` when:
 
@@ -165,16 +329,16 @@ Only use `useCallback` when:
 ```typescript
 // ❌ Bad: Unnecessary useCallback
 const handleClose = useCallback(() => {
-  window.api.mainPanel.close();
+  chrome.runtime.sendMessage({ type: 'close' });
 }, []);
 
 // ✅ Good: Regular function
 const handleClose = () => {
-  window.api.mainPanel.close();
+  chrome.runtime.sendMessage({ type: 'close' });
 };
 ```
 
-#### Fix Circular Dependencies in useEffect
+### Fix Circular Dependencies in useEffect
 
 When event handlers need to access latest state without re-subscribing, use refs:
 
@@ -182,119 +346,80 @@ When event handlers need to access latest state without re-subscribing, use refs
 // ❌ Bad: Circular dependency causes re-subscription every state change
 const handleMouseMove = useCallback(
   (e: MouseEvent) => {
-    if (!isDragging) return
+    if (!isDragging) return;
     // ... logic
   },
   [isDragging]
-)
+);
 
 useEffect(() => {
   if (isDragging) {
-    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mousemove", handleMouseMove);
   }
-  return () => window.removeEventListener("mousemove", handleMouseMove)
-}, [isDragging, handleMouseMove]) // Circular dependency!
+  return () => window.removeEventListener("mousemove", handleMouseMove);
+}, [isDragging, handleMouseMove]); // Circular dependency!
 
 // ✅ Good: Use ref and define handler inside effect
-const isDraggingRef = useRef(isDragging)
-isDraggingRef.current = isDragging
+const isDraggingRef = useRef(isDragging);
+isDraggingRef.current = isDragging;
 
 useEffect(() => {
   const handleMouseMove = (e: MouseEvent) => {
-    if (!isDraggingRef.current) return
+    if (!isDraggingRef.current) return;
     // ... logic
-  }
+  };
 
   if (isDragging) {
-    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mousemove", handleMouseMove);
   }
-  return () => window.removeEventListener("mousemove", handleMouseMove)
-}, [isDragging]) // No circular dependency
+  return () => window.removeEventListener("mousemove", handleMouseMove);
+}, [isDragging]); // No circular dependency
 ```
 
-#### IPC Subscriptions Should Subscribe Once
+### Chrome Extension Messaging Pattern
 
-IPC listeners should subscribe once on mount, not re-subscribe on state changes:
+Message listeners should subscribe once on mount, not re-subscribe on state changes:
 
 ```typescript
-// ❌ Bad: Re-subscribes every time isHovering changes
+// ❌ Bad: Re-subscribes every time state changes
 useEffect(() => {
-  const cleanup = window.api.menu.onCheckMousePosition(() => {
-    if (!isHovering) {
-      window.api.menu.hide()
+  const listener = (msg) => {
+    if (msg.type === 'update' && isActive) {
+      handleUpdate(msg.data);
     }
-  })
-  return cleanup
-}, [isHovering]) // Re-subscribes unnecessarily
+  };
+  chrome.runtime.onMessage.addListener(listener);
+  return () => chrome.runtime.onMessage.removeListener(listener);
+}, [isActive]); // Re-subscribes unnecessarily
 
 // ✅ Good: Subscribe once, access state via ref
-const isHoveringRef = useRef(isHovering)
-isHoveringRef.current = isHovering
+const isActiveRef = useRef(isActive);
+isActiveRef.current = isActive;
 
 useEffect(() => {
-  const cleanup = window.api.menu.onCheckMousePosition(() => {
-    if (!isHoveringRef.current) {
-      window.api.menu.hide()
+  const listener = (msg) => {
+    if (msg.type === 'update' && isActiveRef.current) {
+      handleUpdate(msg.data);
     }
-  })
-  return cleanup
-}, []) // Subscribe once
+  };
+  chrome.runtime.onMessage.addListener(listener);
+  return () => chrome.runtime.onMessage.removeListener(listener);
+}, []); // Subscribe once
 ```
 
-#### Avoid useState for Static Values
+### Avoid useState for Static Values
 
 Don't use `useState` for values that never change:
 
 ```typescript
 // ❌ Bad: useState for static value
-const [versions] = useState(window.electron.process.versions);
+const [extensionId] = useState(chrome.runtime.id);
 
 // ✅ Good: Direct constant
-const versions = window.electron.process.versions;
+const extensionId = chrome.runtime.id;
 ```
 
-#### Extract Custom Hooks for Reusable Logic
-
-When the same `useState` + `useRef` + `useEffect` pattern appears 2+ times, extract it into a custom hook:
-
-**Signs you need a custom hook:**
-
-- Same state management pattern repeated across components
-- Logic involves event listeners with cleanup
-- State synchronization with refs (e.g., `isDraggingRef.current = isDragging`)
-
-**Example: `useDrag` hook** (see `src/renderer/src/hooks/use-drag.ts`)
-
-```typescript
-// ❌ Bad: Duplicated drag logic in each component (30+ lines)
-const [isDragging, setIsDragging] = useState(false);
-const isDraggingRef = useRef(isDragging);
-isDraggingRef.current = isDragging;
-const dragStartPos = useRef({ x: 0, y: 0 });
-
-useEffect(() => {
-  const handleMouseMove = (e: MouseEvent) => { /* ... */ };
-  const handleMouseUp = () => { /* ... */ };
-  if (isDragging) {
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-  }
-  return () => { /* cleanup */ };
-}, [isDragging]);
-
-// ✅ Good: Extract to reusable hook
-const { isDragging, onMouseDown } = useDrag({
-  onDrag: ({ x, y }) => window.api.panel.drag(x, y),
-});
-```
-
-**Hook naming conventions:**
-
-- `use` prefix (required by React)
-- Descriptive verb: `useDrag`, `useResize`, `useHover`
-- Return object with clear properties
-
-#### Scroll Event Subscription in React
+### Scroll Event Subscription in React
 
 When subscribing to scroll events in React components, **use `useSyncExternalStore`** instead of `useState` + `useEffect` to avoid excessive re-renders:
 
@@ -348,44 +473,232 @@ function useScrollPosition() {
 ```
 
 Key benefits:
-
 - Only triggers re-render when the tracked value actually changes
-- Properly handles React concurrent mode and SSR
+- Properly handles React concurrent mode
 - Automatic cleanup when no components are subscribed
-- See `src/hooks/useCurrentHeading.ts` for a real-world example
 
-#### Media Query Hooks
+### Media Query Hooks
 
-Use the existing `useMediaQuery` hook from `@hooks/useMediaQuery` instead of creating custom media query detection:
+Use the existing `useIsMobile` hook from `hooks/useIsMobile.ts` instead of creating custom media query detection:
 
 ```typescript
-// ✅ Good: Use existing hooks
-import { useIsMobile, useMediaQuery } from "@hooks/useMediaQuery"
-
-// ❌ Bad: Custom media query detection
-const [isMobile, setIsMobile] = useState(false)
-useEffect(() => {
-  const mql = window.matchMedia("(max-width: 768px)")
-  setIsMobile(mql.matches)
-  // ...
-}, [])
+// ✅ Good: Use existing hook
+import { useIsMobile } from '~hooks/useIsMobile';
 
 function Component() {
-  const isMobile = useIsMobile()
-  const isLargeScreen = useMediaQuery("(min-width: 1024px)")
+  const isMobile = useIsMobile();
+  return <div>{isMobile ? 'Mobile' : 'Desktop'}</div>;
+}
+
+// ❌ Bad: Custom media query detection
+const [isMobile, setIsMobile] = useState(false);
+useEffect(() => {
+  const mql = window.matchMedia("(max-width: 768px)");
+  setIsMobile(mql.matches);
+  // ...
+}, []);
+```
+
+Available hooks in `hooks/`:
+- `useIsMobile()` - Mobile device detection
+- `useAiSettings()` - AI configuration management
+- `useContentExtraction()` - Content extraction logic
+- `useScrapedData()` - Scraped data management
+
+## Development Checklist
+
+### Before Starting
+- [ ] Understand requirement clearly
+- [ ] Check existing code for similar patterns
+- [ ] Verify no circular dependencies would be created
+- [ ] Identify which modules need to be modified
+
+### During Implementation
+- [ ] Follow Module-First Principle
+- [ ] Write pure functions where possible
+- [ ] Use TypeScript strictly (no `any` unless unavoidable)
+- [ ] Extract shared logic after 2nd use
+- [ ] Handle errors appropriately for the layer
+- [ ] Use existing hooks when available
+- [ ] Clean up event listeners in useEffect returns
+
+### Component Development
+- [ ] Keep components under 300 lines
+- [ ] Use composition over prop drilling
+- [ ] Handle loading and error states
+- [ ] Add proper TypeScript types for props
+- [ ] Use existing UI components from `components/ui/`
+
+### Chrome Extension Specifics
+- [ ] Handle `chrome.runtime.lastError` for Chrome API calls
+- [ ] Message listeners subscribe once (not in dependency arrays)
+- [ ] Storage operations are async and error-handled
+- [ ] Content scripts have proper cleanup on unmount
+
+### Before Committing
+- [ ] Run tests: `pnpm test`
+- [ ] Fix linting issues (if applicable)
+- [ ] Verify build succeeds: `pnpm build`
+- [ ] Test in actual Chrome extension (load `build/chrome-mv3-dev/`)
+
+## Common Code Smells
+
+### Component-Level
+- **Oversized components** (> 300 lines) → Split into smaller components
+- **Props drilling** beyond 2-3 levels → Use Context or lift state differently
+- **Overuse of useEffect** → Prefer derived state or event handlers
+- **Missing error boundaries** → Wrap feature sections in ErrorBoundary
+
+### State Management
+- **Duplicate state** → Single source of truth
+- **Stale state in listeners** → Use refs for event handlers
+- **Unnecessary re-renders** → Check dependency arrays, use memo when needed
+
+### Extension-Specific
+- **Missing chrome.runtime.lastError checks** → Always check after Chrome API calls
+- **Memory leaks in content scripts** → Clean up listeners on unmount
+- **Re-subscribing to Chrome messages** → Subscribe once with refs for state access
+- **Blocking storage operations** → Always use async storage APIs
+
+### Code Organization
+- **Circular dependencies** → Extract shared logic to new module
+- **God modules** (too many exports) → Split into focused modules
+- **Business logic in components** → Extract to utils or hooks
+
+## Common Pitfalls
+
+### 1. Circular Dependencies
+Extract shared logic to separate file instead of importing between peer modules.
+
+```typescript
+// ❌ Bad: componentA imports componentB, componentB imports componentA
+// components/A.tsx
+import { helperB } from './B';
+
+// components/B.tsx
+import { helperA } from './A';
+
+// ✅ Good: Extract shared logic
+// utils/shared-helpers.ts
+export function sharedHelper() { /* ... */ }
+
+// components/A.tsx & components/B.tsx
+import { sharedHelper } from '~utils/shared-helpers';
+```
+
+### 2. Chrome API Error Handling
+Always check for errors after Chrome API calls:
+
+```typescript
+// ❌ Bad: No error handling
+chrome.storage.sync.get('settings', (result) => {
+  setSettings(result.settings);
+});
+
+// ✅ Good: Handle errors
+chrome.storage.sync.get('settings', (result) => {
+  if (chrome.runtime.lastError) {
+    console.error('Storage error:', chrome.runtime.lastError);
+    return;
+  }
+  setSettings(result.settings);
+});
+
+// ✅ Better: Use promise wrapper with try-catch
+async function getSettings() {
+  try {
+    const result = await chrome.storage.sync.get('settings');
+    return result.settings;
+  } catch (error) {
+    console.error('Storage error:', error);
+    return null;
+  }
 }
 ```
 
-Available hooks in `src/hooks/useMediaQuery.ts`:
+### 3. Content Script Memory Leaks
+Always clean up listeners when content scripts unmount:
 
-- `useMediaQuery(query)` - Generic media query hook
-- `useIsMobile()` - `(max-width: 768px)`
-- `useIsTablet()` - `(max-width: 992px)`
-- `usePrefersColorSchemeDark()` - Dark mode preference
-- `usePrefersReducedMotion()` - Reduced motion preference
+```typescript
+// ✅ Good: Cleanup in React component
+useEffect(() => {
+  const listener = (msg) => handleMessage(msg);
+  chrome.runtime.onMessage.addListener(listener);
+
+  return () => {
+    chrome.runtime.onMessage.removeListener(listener);
+  };
+}, []);
+```
+
+### 4. Overuse of useEffect
+Prefer derived values or event handlers:
+
+```typescript
+// ❌ Bad: Unnecessary useEffect
+const [fullName, setFullName] = useState('');
+useEffect(() => {
+  setFullName(`${firstName} ${lastName}`);
+}, [firstName, lastName]);
+
+// ✅ Good: Derived value
+const fullName = `${firstName} ${lastName}`;
+```
+
+### 5. Over-abstraction
+Inline until pattern appears 2-3 times:
+
+```typescript
+// ❌ Bad: Premature abstraction for single use
+const getButtonClassName = (variant: string, size: string) => {
+  // complex logic for one button
+};
+
+// ✅ Good: Inline first, extract after 3rd use
+<button className="px-4 py-2 bg-blue-500 text-white rounded">
+  Click me
+</button>
+```
+
+## Testing Strategy
+
+**Test business logic rigorously; test UI pragmatically.**
+
+**High Priority**:
+- Content extraction logic (`utils/extractor.ts`)
+- Data transformations
+- Storage utilities
+- Message handlers
+
+**Medium Priority**:
+- Complex React hooks
+- State management logic
+
+**Low Priority**:
+- UI components (manual testing preferred)
+- Simple presentational components
+
+```typescript
+// Example: Pure function test
+describe("extractContent", () => {
+  it("extracts content from article element", () => {
+    document.body.innerHTML = `
+      <article>
+        <h1>Title</h1>
+        <p>Content paragraph</p>
+      </article>
+    `;
+
+    const result = extractContent(document);
+    expect(result.title).toBe("Title");
+    expect(result.content).toContain("Content paragraph");
+  });
+});
+```
 
 ## IMPORTANT
 
-- Avoid feature flags and backwards compatibility shims - directly modify code since the app is unreleased.
-- When you need to check the official documentation, use Context 7 to get the latest information, or search for it if you can't get it.
-- When making major changes involving architectural alterations, etc., please request an update to CLAUDE.md at the end by yourself
+- **Avoid feature flags and backwards compatibility shims** - directly modify code since the app is unreleased
+- **Documentation lookup**: Use Context7 MCP server for official docs, or WebSearch if Context7 fails
+- **Update CLAUDE.md**: Request updates when making major architectural changes
+- **Chrome Extension Best Practices**: Always handle async operations, clean up listeners, and check for errors
