@@ -118,6 +118,9 @@ importers:
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.0
+      '@testing-library/react-hooks':
+        specifier: ^8.0.1
+        version: 8.0.1(@types/react@18.2.48)(react-dom@18.2.0(react@18.2.0))(react-test-renderer@18.3.1(react@18.2.0))(react@18.2.0)
       '@types/chrome':
         specifier: 0.0.258
         version: 0.0.258
@@ -148,6 +151,9 @@ importers:
       postcss:
         specifier: ^8.5.3
         version: 8.5.3
+      react-test-renderer:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.2.0)
       simple-git-hooks:
         specifier: ^2.13.1
         version: 2.13.1
@@ -2027,6 +2033,22 @@ packages:
   '@testing-library/dom@10.4.0':
     resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}
     engines: {node: '>=18'}
+
+  '@testing-library/react-hooks@8.0.1':
+    resolution: {integrity: sha512-Aqhl2IVmLt8IovEVarNDFuJDVWVvhnr9/GCU6UUnrYXwgDFF9h2L2o2P9KBni1AST5sT6riAyoukFLyjQUgD/g==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      '@types/react': ^16.9.0 || ^17.0.0
+      react: ^16.9.0 || ^17.0.0
+      react-dom: ^16.9.0 || ^17.0.0
+      react-test-renderer: ^16.9.0 || ^17.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react-dom:
+        optional: true
+      react-test-renderer:
+        optional: true
 
   '@tootallnate/once@2.0.0':
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
@@ -4284,6 +4306,12 @@ packages:
     peerDependencies:
       react: ^18.2.0
 
+  react-error-boundary@3.1.4:
+    resolution: {integrity: sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==}
+    engines: {node: '>=10', npm: '>=6'}
+    peerDependencies:
+      react: '>=16.13.1'
+
   react-error-overlay@6.0.9:
     resolution: {integrity: sha512-nQTTcUu+ATDbrSD1BZHr5kgSD4oF8OFjxun8uAaL8RwPBacGBNPf/yAuVVdx17N8XNzRDMrZ9XcKZHCjPW+9ew==}
 
@@ -4309,6 +4337,16 @@ packages:
     engines: {node: '>=14'}
     peerDependencies:
       react: '>=16.8.0'
+
+  react-shallow-renderer@16.15.0:
+    resolution: {integrity: sha512-oScf2FqQ9LFVQgA73vr86xl2NaOIX73rh+YFqcOp68CWj56tSfgtGKrEbyhCj0rSijyG9M1CYprTh39fBi5hzA==}
+    peerDependencies:
+      react: ^16.0.0 || ^17.0.0 || ^18.0.0
+
+  react-test-renderer@18.3.1:
+    resolution: {integrity: sha512-KkAgygexHUkQqtvvx/otwxtuFu5cVjfzTCtjXLH9boS19/Nbtg84zS7wIQn39G8IlrhThBpQsMKkq5ZHZIYFXA==}
+    peerDependencies:
+      react: ^18.3.1
 
   react-toastify@11.0.5:
     resolution: {integrity: sha512-EpqHBGvnSTtHYhCPLxML05NLY2ZX0JURbAdNYa6BUkk+amz4wbKBQvoKQAB0ardvSarUBuY4Q4s1sluAzZwkmA==}
@@ -7147,6 +7185,16 @@ snapshots:
       lz-string: 1.5.0
       pretty-format: 27.5.1
 
+  '@testing-library/react-hooks@8.0.1(@types/react@18.2.48)(react-dom@18.2.0(react@18.2.0))(react-test-renderer@18.3.1(react@18.2.0))(react@18.2.0)':
+    dependencies:
+      '@babel/runtime': 7.28.4
+      react: 18.2.0
+      react-error-boundary: 3.1.4(react@18.2.0)
+    optionalDependencies:
+      '@types/react': 18.2.48
+      react-dom: 18.2.0(react@18.2.0)
+      react-test-renderer: 18.3.1(react@18.2.0)
+
   '@tootallnate/once@2.0.0': {}
 
   '@trysound/sax@0.2.0': {}
@@ -9837,6 +9885,11 @@ snapshots:
       react: 18.2.0
       scheduler: 0.23.2
 
+  react-error-boundary@3.1.4(react@18.2.0):
+    dependencies:
+      '@babel/runtime': 7.28.4
+      react: 18.2.0
+
   react-error-overlay@6.0.9: {}
 
   react-is@16.13.1: {}
@@ -9856,6 +9909,19 @@ snapshots:
       prop-types: 15.8.1
       react: 18.2.0
       shallow-equal: 3.1.0
+
+  react-shallow-renderer@16.15.0(react@18.2.0):
+    dependencies:
+      object-assign: 4.1.1
+      react: 18.2.0
+      react-is: 18.3.1
+
+  react-test-renderer@18.3.1(react@18.2.0):
+    dependencies:
+      react: 18.2.0
+      react-is: 18.3.1
+      react-shallow-renderer: 16.15.0(react@18.2.0)
+      scheduler: 0.23.2
 
   react-toastify@11.0.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:

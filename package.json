@@ -54,6 +54,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
     "@testing-library/dom": "^10.4.0",
+    "@testing-library/react-hooks": "^8.0.1",
     "@types/chrome": "0.0.258",
     "@types/dompurify": "^3.2.0",
     "@types/jest": "^29.5.14",
@@ -64,6 +65,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8.5.3",
+    "react-test-renderer": "^18.2.0",
     "simple-git-hooks": "^2.13.1",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",

@@ -17,6 +17,7 @@ const config = {
   collectCoverage: true,
   collectCoverageFrom: [
     "utils/**/*.ts",
+    "hooks/**/*.ts",
     "parser/**/*.ts",
     "!**/node_modules/**",
     "!**/build/**",
