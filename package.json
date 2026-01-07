@@ -15,7 +15,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "lint:fix:unssafe": "biome check --write --unsafe",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "prepare": "npx simple-git-hooks"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec biome check --staged --write --no-errors-on-unmatched"
