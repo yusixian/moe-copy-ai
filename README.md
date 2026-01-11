@@ -18,7 +18,7 @@ MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩
 
 ## 安装
 
-已上架 [Chrome 应用商店](https://chromewebstore.google.com/detail/moe-copy-ai/dfmlcfckmfgabpgbaobgapdfmjiihnck)
+已上架 [Chrome 应用商店](https://chromewebstore.google.com/detail/moe-copy-ai/dfmlcfckmfgabpgbaobgapdfmjiihnck) | [Firefox 附加组件](https://addons.mozilla.org/zh-CN/firefox/addon/moe-copy-ai/)
 
 - 也可以：从 Github 最新 Release 页面获取插件 zip 包 ( chrome-mv3-prod.zip ) ，然后打开浏览器的插件管理页面，启用**开发者模式**，点击“加载已解压的拓展程序”，选择刚刚下载并解压的插件文件夹，就可以完成安装。
 
