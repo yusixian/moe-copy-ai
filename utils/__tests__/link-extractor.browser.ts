@@ -33,14 +33,22 @@ describe("resolveUrl", () => {
 
 describe("isSameDomain", () => {
   it("returns true for same domain regardless of path or protocol", () => {
-    expect(isSameDomain("https://example.com/page", "https://example.com")).toBe(true)
-    expect(isSameDomain("http://example.com/page", "https://example.com")).toBe(true)
+    expect(
+      isSameDomain("https://example.com/page", "https://example.com")
+    ).toBe(true)
+    expect(isSameDomain("http://example.com/page", "https://example.com")).toBe(
+      true
+    )
     expect(isSameDomain("/page", "https://example.com")).toBe(true)
   })
 
   it("returns false for different domains, subdomains, or invalid URLs", () => {
-    expect(isSameDomain("https://other.com/page", "https://example.com")).toBe(false)
-    expect(isSameDomain("https://sub.example.com/page", "https://example.com")).toBe(false)
+    expect(isSameDomain("https://other.com/page", "https://example.com")).toBe(
+      false
+    )
+    expect(
+      isSameDomain("https://sub.example.com/page", "https://example.com")
+    ).toBe(false)
     expect(isSameDomain("not-a-url", "also-not-a-url")).toBe(false)
   })
 })

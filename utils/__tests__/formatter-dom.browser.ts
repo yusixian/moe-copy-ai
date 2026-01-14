@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "vitest"
 
 import type { ImageInfo } from "~constants/types"
 
-import { extractFormattedText } from "../formatter"
+import { cleanContent, extractFormattedText, formatContent } from "../formatter"
 
 describe("extractFormattedText", () => {
   afterEach(() => {
@@ -35,7 +35,8 @@ describe("extractFormattedText", () => {
 
   it("extracts images with markdown syntax and populates array", () => {
     const div = document.createElement("div")
-    div.innerHTML = '<img src="test.jpg" alt="Test"><img src="img2.jpg" alt="Two">'
+    div.innerHTML =
+      '<img src="test.jpg" alt="Test"><img src="img2.jpg" alt="Two">'
     const images: ImageInfo[] = []
     const result = extractFormattedText(div, images)
     expect(result).toContain("![Test](test.jpg)")
@@ -82,5 +83,59 @@ describe("extractFormattedText", () => {
     expect(result).not.toContain("[JS]")
     expect(result).not.toContain("[Anchor]")
     expect(images).toHaveLength(0)
+  })
+})
+
+describe("formatContent", () => {
+  it("returns empty string for empty input", () => {
+    expect(formatContent("")).toBe("")
+  })
+
+  it("normalizes excessive newlines to double newlines", () => {
+    expect(formatContent("a\n\n\nb")).toBe("a\n\nb")
+    expect(formatContent("a\n\n\n\n\nb")).toBe("a\n\nb")
+  })
+
+  it("converts CRLF to LF", () => {
+    expect(formatContent("a\r\nb")).toBe("a\nb")
+  })
+
+  it("preserves double newlines for paragraph breaks", () => {
+    expect(formatContent("para1\n\npara2")).toBe("para1\n\npara2")
+  })
+})
+
+describe("cleanContent", () => {
+  it("returns empty string for empty input", () => {
+    expect(cleanContent("")).toBe("")
+  })
+
+  it("removes excessive whitespace", () => {
+    expect(cleanContent("hello   world")).toBe("hello world")
+    expect(cleanContent("hello\n\nworld")).toBe("hello world")
+  })
+
+  it("fixes punctuation spacing", () => {
+    expect(cleanContent("hello , world")).toBe("hello, world")
+    expect(cleanContent("hello . world")).toBe("hello. world")
+    expect(cleanContent("hello ! world")).toBe("hello! world")
+  })
+
+  it("preserves code blocks unchanged", () => {
+    const input = "text before ```\ncode here\n``` text after"
+    const result = cleanContent(input)
+    expect(result).toContain("```\ncode here\n```")
+  })
+
+  it("preserves markdown heading format", () => {
+    const input = "# Title\n\n## Subtitle"
+    const result = cleanContent(input)
+    expect(result).toContain("# Title")
+    expect(result).toContain("## Subtitle")
+  })
+
+  it("fixes bracket and quote spacing", () => {
+    expect(cleanContent("( hello )")).toBe("(hello)")
+    expect(cleanContent("[ hello ]")).toBe("[hello]")
   })
 })

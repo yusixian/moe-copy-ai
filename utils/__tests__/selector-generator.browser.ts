@@ -6,19 +6,28 @@ import {
   isDynamicValue
 } from "../selector-generator"
 
+// Helper to get element or throw test error
+function getTestElement<T extends Element>(selector: string): T {
+  const element = document.querySelector<T>(selector)
+  if (!element) {
+    throw new Error(`Test setup error: element "${selector}" not found`)
+  }
+  return element
+}
+
+// Global cleanup after each test
+afterEach(() => {
+  document.body.innerHTML = ""
+})
+
 describe("isDynamicValue", () => {
   it("detects dynamic values (hash, UUID, React IDs, long numbers)", () => {
-    // Hex hash (8+ chars)
-    expect(isDynamicValue("a1b2c3d4")).toBe(true)
-    // Dynamic suffix
-    expect(isDynamicValue("button-a1b2c3d4")).toBe(true)
-    // React/Radix IDs
-    expect(isDynamicValue("r:0")).toBe(true)
-    expect(isDynamicValue("radix-dropdown")).toBe(true)
-    // UUID
-    expect(isDynamicValue("550e8400-e29b-41d4-a716-446655440000")).toBe(true)
-    // Long numeric
-    expect(isDynamicValue("123456")).toBe(true)
+    expect(isDynamicValue("a1b2c3d4")).toBe(true) // Hex hash (8+ chars)
+    expect(isDynamicValue("button-a1b2c3d4")).toBe(true) // Dynamic suffix
+    expect(isDynamicValue("r:0")).toBe(true) // React IDs
+    expect(isDynamicValue("radix-dropdown")).toBe(true) // Radix IDs
+    expect(isDynamicValue("550e8400-e29b-41d4-a716-446655440000")).toBe(true) // UUID
+    expect(isDynamicValue("123456")).toBe(true) // Long numeric
   })
 
   it("rejects static values", () => {
@@ -30,10 +39,6 @@ describe("isDynamicValue", () => {
 })
 
 describe("getStableClasses", () => {
-  afterEach(() => {
-    document.body.innerHTML = ""
-  })
-
   it("filters out dynamic classes and preserves semantic ones", () => {
     const div = document.createElement("div")
     // Mix of: hash, CSS-in-JS, CSS Modules, Tailwind arbitrary, dynamic suffix, stable
@@ -51,53 +56,61 @@ describe("getStableClasses", () => {
 })
 
 describe("generateNextPageButtonSelector", () => {
-  afterEach(() => {
-    document.body.innerHTML = ""
+  it("generates XPath for rel='next' attribute", () => {
+    document.body.innerHTML = '<a rel="next" href="/page2">Next</a>'
+    const result = generateNextPageButtonSelector(
+      getTestElement<HTMLAnchorElement>("a")
+    )
+    expect(result.xpath).toBe("//a[@rel='next']")
+    expect(result.description).toBe('rel="next"')
   })
 
-  it("prioritizes rel='next' and aria-label attributes", () => {
-    document.body.innerHTML = '<a rel="next" href="/page2">Next</a>'
-    expect(generateNextPageButtonSelector(document.querySelector("a")!).xpath).toBe(
-      "//a[@rel='next']"
-    )
-
+  it("generates XPath for aria-label attribute", () => {
     document.body.innerHTML = '<a aria-label="Next page" href="/page2">→</a>'
-    expect(
-      generateNextPageButtonSelector(document.querySelector("a")!).xpath
-    ).toContain("aria-label")
+    const result = generateNextPageButtonSelector(
+      getTestElement<HTMLAnchorElement>("a")
+    )
+    expect(result.xpath).toContain("aria-label")
+    expect(result.description).toBe('aria-label="Next page"')
   })
 
   it("uses text matching for unique short text", () => {
     document.body.innerHTML = "<button>Next</button>"
-    const result = generateNextPageButtonSelector(document.querySelector("button")!)
+    const result = generateNextPageButtonSelector(
+      getTestElement<HTMLButtonElement>("button")
+    )
     expect(result.xpath).toContain("Next")
     expect(result.textContent).toBe("Next")
   })
 
-  it("uses class/data-attr when text is not unique", () => {
+  it("uses class containing 'next' when text is not unique", () => {
     document.body.innerHTML = `
       <a class="btn-next" href="/page2">Next</a>
       <a href="/other">Next</a>
     `
-    expect(
-      generateNextPageButtonSelector(document.querySelector("a.btn-next")!).xpath
-    ).toContain("next")
+    const result = generateNextPageButtonSelector(
+      getTestElement<HTMLAnchorElement>("a.btn-next")
+    )
+    expect(result.xpath).toContain("next")
+  })
 
+  it("uses data attribute when text is not unique", () => {
     document.body.innerHTML = `
       <button data-next-page="2">Go</button>
       <button>Go</button>
     `
-    expect(
-      generateNextPageButtonSelector(
-        document.querySelector("button[data-next-page]")!
-      ).xpath
-    ).toContain("data-next-page")
+    const result = generateNextPageButtonSelector(
+      getTestElement<HTMLButtonElement>("button[data-next-page]")
+    )
+    expect(result.xpath).toContain("data-next-page")
   })
 
   it("falls back to XPath path when no semantic attributes", () => {
     document.body.innerHTML =
       '<div><span><a href="/page2">Very long text that exceeds twenty chars without attributes</a></span></div>'
-    const result = generateNextPageButtonSelector(document.querySelector("a")!)
+    const result = generateNextPageButtonSelector(
+      getTestElement<HTMLAnchorElement>("a")
+    )
     expect(result.xpath).toMatch(/^\/\//)
     expect(result.description).toBe("路径定位")
   })
