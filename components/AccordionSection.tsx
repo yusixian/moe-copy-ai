@@ -9,6 +9,7 @@ interface AccordionSectionProps {
   children: React.ReactNode
   defaultOpen?: boolean
   maxHeight?: string
+  contentBorder?: boolean
 }
 
 export function AccordionSection({
@@ -16,7 +17,8 @@ export function AccordionSection({
   icon,
   children,
   defaultOpen = false,
-  maxHeight
+  maxHeight,
+  contentBorder = true
 }: AccordionSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen)
 
@@ -44,7 +46,10 @@ export function AccordionSection({
             : "max-h-0 overflow-hidden opacity-0"
         }`}
         style={isOpen && maxHeight ? { maxHeight } : undefined}>
-        <div className="border-sky-100 border-t p-3">{children}</div>
+        <div
+          className={`p-3 ${contentBorder ? "border-sky-100 border-t" : ""}`}>
+          {children}
+        </div>
       </div>
     </div>
   )

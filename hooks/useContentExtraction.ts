@@ -7,11 +7,17 @@ import type {
 } from "~constants/types"
 import useElementSelector from "./useElementSelector"
 
+export interface TabInfo {
+  url: string
+  title: string
+}
+
 interface UseContentExtractionReturn {
   mode: ContentExtractionMode
   content: ExtractedContent | null
   elementInfo: SelectedElementInfo | null
   error: string | null
+  tabInfo: TabInfo | null
   startSelection: () => Promise<void>
   cancelSelection: () => void
   reset: () => void
@@ -24,6 +30,7 @@ interface UseContentExtractionReturn {
 export function useContentExtraction(): UseContentExtractionReturn {
   const [mode, setMode] = useState<ContentExtractionMode>("idle")
   const [error, setError] = useState<string | null>(null)
+  const [tabInfo, setTabInfo] = useState<TabInfo | null>(null)
 
   const {
     isSelecting,
@@ -43,6 +50,25 @@ export function useContentExtraction(): UseContentExtractionReturn {
       setMode("extracted")
     }
   }, [isSelecting, extractedContent])
+
+  // 当内容提取成功时，获取当前标签页信息
+  useEffect(() => {
+    if (extractedContent) {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (chrome.runtime.lastError) {
+          console.error("获取标签页信息失败:", chrome.runtime.lastError)
+          return
+        }
+        const tab = tabs[0]
+        if (tab) {
+          setTabInfo({
+            url: tab.url || "",
+            title: tab.title || ""
+          })
+        }
+      })
+    }
+  }, [extractedContent])
 
   // 开始选择
   const startSelection = useCallback(async () => {
@@ -67,6 +93,7 @@ export function useContentExtraction(): UseContentExtractionReturn {
     clearSelection()
     setMode("idle")
     setError(null)
+    setTabInfo(null)
   }, [clearSelection])
 
   return {
@@ -74,6 +101,7 @@ export function useContentExtraction(): UseContentExtractionReturn {
     content: extractedContent,
     elementInfo,
     error,
+    tabInfo,
     startSelection,
     cancelSelection,
     reset

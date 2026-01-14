@@ -1,4 +1,8 @@
-import type { ExtractedContent, SelectedElementInfo } from "~constants/types"
+import type {
+  ExtractedContent,
+  ScrapedContent,
+  SelectedElementInfo
+} from "~constants/types"
 
 import { convertHtmlToMarkdown } from "./readability-extractor"
 
@@ -176,5 +180,31 @@ export function getContentStats(content: ExtractedContent): {
     markdownLength: content.markdown.length,
     textLength: content.text.length,
     wordCount
+  }
+}
+
+/**
+ * 将提取的内容转换为 ScrapedContent 格式
+ * 用于与 useAiSummary hook 兼容
+ */
+export function createScrapedDataFromExtraction(
+  content: ExtractedContent,
+  tabInfo: { url: string; title: string }
+): ScrapedContent {
+  return {
+    title: tabInfo.title,
+    url: tabInfo.url,
+    articleContent: content.markdown,
+    cleanedContent: content.text,
+    author: "",
+    publishDate: "", // 内容提取无法获取发布日期
+    metadata: {
+      "extraction:tagName": content.elementInfo.tagName,
+      "extraction:id": content.elementInfo.id || "",
+      "extraction:class": content.elementInfo.className || "",
+      "extraction:htmlLength": String(content.html.length),
+      "extraction:textLength": String(content.text.length)
+    },
+    images: []
   }
 }

@@ -70,6 +70,7 @@ function SidePanel() {
     content: extractedContent,
     elementInfo: extractionElementInfo,
     error: extractionError,
+    tabInfo: extractionTabInfo,
     startSelection: startContentSelection,
     cancelSelection: cancelContentSelection,
     reset: resetContentExtraction
@@ -210,6 +211,7 @@ function SidePanel() {
             content={extractedContent}
             elementInfo={extractionElementInfo}
             error={extractionError}
+            tabInfo={extractionTabInfo}
             onStartSelection={startContentSelection}
             onCancel={cancelContentSelection}
             onReset={resetContentExtraction}

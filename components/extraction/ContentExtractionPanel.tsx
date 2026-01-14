@@ -8,12 +8,14 @@ import type {
 } from "~constants/types"
 
 import ContentFormatTabs from "./ContentFormatTabs"
+import ExtractionAiSummary from "./ExtractionAiSummary"
 
 interface ContentExtractionPanelProps {
   mode: ContentExtractionMode
   content: ExtractedContent | null
   elementInfo: SelectedElementInfo | null
   error: string | null
+  tabInfo: { url: string; title: string } | null
   onStartSelection: () => void
   onCancel: () => void
   onReset: () => void
@@ -24,6 +26,7 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
   content,
   elementInfo,
   error,
+  tabInfo,
   onStartSelection,
   onCancel,
   onReset
@@ -119,6 +122,11 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
 
             {/* 内容格式切换和显示 */}
             <ContentFormatTabs content={content} defaultFormat="markdown" />
+
+            {/* AI 总结 */}
+            {tabInfo && (
+              <ExtractionAiSummary content={content} tabInfo={tabInfo} />
+            )}
 
             {/* 底部操作按钮 */}
             <button
