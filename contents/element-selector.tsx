@@ -1,6 +1,6 @@
 import cssText from "data-text:~styles/element-selector.css"
 import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import type {
   ElementSelectorPurpose,
@@ -279,6 +279,7 @@ function InfoPanel({
 
       <div style={{ display: "flex", gap: "8px" }}>
         <button
+          type="button"
           onClick={onCancel}
           style={{
             flex: 1,
@@ -294,6 +295,7 @@ function InfoPanel({
           取消
         </button>
         <button
+          type="button"
           onClick={onConfirm}
           disabled={
             !isContentMode && !isNextPageButtonMode && links.length === 0
@@ -358,7 +360,7 @@ function ElementSelector() {
   nextPageButtonInfoRef.current = nextPageButtonInfo
 
   // 重置所有状态
-  const resetState = () => {
+  const resetState = useCallback(() => {
     setIsActive(false)
     setSelectedElement(null)
     setSelectedRect(null)
@@ -370,7 +372,7 @@ function ElementSelector() {
     setExtractedContent(null)
     setNextPageButtonInfo(null)
     hoveredElementRef.current = null
-  }
+  }, [])
 
   // 切换同域名过滤
   const handleToggleSameDomain = () => {
@@ -468,7 +470,7 @@ function ElementSelector() {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage)
     }
-  }, []) // 只在挂载时订阅一次
+  }, [resetState]) // 只在挂载时订阅一次
 
   // 添加/移除事件监听 - 使用 ref 避免循环依赖
   useEffect(() => {
@@ -515,8 +517,9 @@ function ElementSelector() {
         // 根据 purpose 提取不同数据
         if (purposeRef.current === "content-extraction") {
           // 内容提取模式：提取完整内容
-          const content = extractContentFromElement(element)
-          setExtractedContent(content)
+          extractContentFromElement(element).then((content) => {
+            setExtractedContent(content)
+          })
         } else if (purposeRef.current === "next-page-button") {
           // 下一页按钮选择模式：使用专用的下一页按钮选择器生成（XPath）
           try {
@@ -573,7 +576,7 @@ function ElementSelector() {
       document.body.style.userSelect = ""
       document.body.style.cursor = ""
     }
-  }, [isActive]) // 只依赖 isActive
+  }, [isActive, resetState]) // 只依赖 isActive
 
   if (!isActive) return null
 

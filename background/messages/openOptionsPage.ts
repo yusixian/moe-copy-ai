@@ -2,7 +2,7 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 
 // 处理打开选项页面的消息
-const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
+const handler: PlasmoMessaging.MessageHandler = async (_req, res) => {
   try {
     // 直接在background脚本中调用openOptionsPage
     chrome.runtime.openOptionsPage()

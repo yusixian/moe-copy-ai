@@ -1,11 +1,10 @@
+import { Storage } from "@plasmohq/storage"
+import { useStorage } from "@plasmohq/storage/hook"
 import { generateText } from "@xsai/generate-text"
 import type { StreamTextChunkResult, StreamTextResult } from "@xsai/stream-text"
 import { useCallback, useLayoutEffect, useState } from "react"
 import { isMobile } from "react-device-detect"
 import { toast } from "react-toastify"
-
-import { Storage } from "@plasmohq/storage"
-import { useStorage } from "@plasmohq/storage/hook"
 
 import type { ScrapedContent } from "~constants/types"
 import {
@@ -48,6 +47,8 @@ export interface UseAiSummaryResult {
     prompt_tokens?: number
     completion_tokens?: number
   } | null
+  /** 当前使用的模型 ID */
+  modelId: string | null
 }
 
 /**
@@ -72,16 +73,18 @@ export const useAiSummary = (
   const [apiKey] = useStorage<string>("ai_api_key", "")
   const [error, setError] = useState<string | null>(null)
   const [systemPrompt, setSystemPrompt] = useState("")
+  const [modelId, setModelId] = useState<string | null>(null)
 
   const fetchSystemPrompt = useCallback(async () => {
-    if (!customPrompt) {
-      try {
-        const config = await getAiConfig()
+    try {
+      const config = await getAiConfig()
+      setModelId(config.model || null)
+      if (!customPrompt) {
         setSystemPrompt(config.systemPrompt)
         setCustomPrompt(config.systemPrompt)
-      } catch (error) {
-        console.error("获取系统提示词失败:", error)
       }
+    } catch (error) {
+      console.error("获取系统提示词失败:", error)
     }
   }, [customPrompt])
 
@@ -100,7 +103,7 @@ export const useAiSummary = (
   // 当自定义提示词为空时，获取系统提示词
   useLayoutEffect(() => {
     fetchSystemPrompt()
-  }, [])
+  }, [fetchSystemPrompt])
 
   // 保存聊天历史记录
   const saveToHistory = useCallback(
@@ -205,6 +208,14 @@ export const useAiSummary = (
       return
     }
 
+    // 预先获取配置并验证模型
+    const config = await getAiConfig()
+    if (!config.model) {
+      setError("请先在设置中选择 AI 模型")
+      toast.error("请先在设置中选择 AI 模型")
+      return
+    }
+
     let fullText = ""
     let currentUsage = null
     let savedToHistory = false
@@ -226,9 +237,6 @@ export const useAiSummary = (
         // TODO: 移动端流式输出好像有问题，等后续 debug，先打补丁
         debugLog("检测到移动设备，使用直接生成方式")
 
-        // 获取AI配置信息
-        const config = await getAiConfig()
-
         // 调用generateText直接生成文本
         const { text, usage } = await generateText({
           apiKey: apiKey,
@@ -239,11 +247,11 @@ export const useAiSummary = (
               role: "system"
             },
             {
-              content: processedPrompt + "\n\n内容: " + content,
+              content: `${processedPrompt}\n\n内容: ${content}`,
               role: "user"
             }
           ],
-          model: config.model || "gpt-3.5-turbo"
+          model: config.model
         })
 
         // 设置生成的文本
@@ -452,6 +460,7 @@ export const useAiSummary = (
     systemPrompt,
     generateSummaryText,
     saveAsDefaultPrompt,
-    usage
+    usage,
+    modelId
   }
 }

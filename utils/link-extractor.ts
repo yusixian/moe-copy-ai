@@ -1,7 +1,11 @@
-import type { ExtractedLink, LinkFilterOptions, SelectedElementInfo } from '~constants/types'
+import type {
+  ExtractedLink,
+  LinkFilterOptions,
+  SelectedElementInfo
+} from "~constants/types"
 
-import { debugLog } from './logger'
-import { generateUniqueSelector } from './selector-generator'
+import { debugLog } from "./logger"
+import { generateUniqueSelector } from "./selector-generator"
 
 /**
  * 从 DOM 元素中提取所有链接
@@ -11,26 +15,26 @@ export function extractLinksFromElement(element: Element): ExtractedLink[] {
   let index = 0
 
   // 检查元素本身是否是 <a> 标签
-  if (element.tagName.toLowerCase() === 'a' && element.hasAttribute('href')) {
-    const href = element.getAttribute('href')
+  if (element.tagName.toLowerCase() === "a" && element.hasAttribute("href")) {
+    const href = element.getAttribute("href")
     if (href) {
       links.push({
         url: href,
         text: element.textContent?.trim() || href,
-        index: index++,
+        index: index++
       })
     }
   }
 
   // 搜索子孙元素中的链接
-  const anchors = element.querySelectorAll('a[href]')
+  const anchors = element.querySelectorAll("a[href]")
   anchors.forEach((anchor) => {
-    const href = anchor.getAttribute('href')
+    const href = anchor.getAttribute("href")
     if (href) {
       links.push({
         url: href,
         text: anchor.textContent?.trim() || href,
-        index: index++,
+        index: index++
       })
     }
   })
@@ -42,28 +46,29 @@ export function extractLinksFromElement(element: Element): ExtractedLink[] {
  * 获取选中元素的信息
  */
 export function getElementInfo(element: Element): SelectedElementInfo {
-  const isAnchor = element.tagName.toLowerCase() === 'a' && element.hasAttribute('href')
-  const descendantAnchors = element.querySelectorAll('a[href]')
+  const isAnchor =
+    element.tagName.toLowerCase() === "a" && element.hasAttribute("href")
+  const descendantAnchors = element.querySelectorAll("a[href]")
   const linkCount = descendantAnchors.length + (isAnchor ? 1 : 0)
 
   // 生成选择器（使用 selector-generator 中的函数）
-  let selector = ''
+  let selector = ""
   try {
     selector = generateUniqueSelector(element, { allowMultiple: true })
   } catch (err) {
-    debugLog('[LinkExtractor] 生成选择器失败:', err)
+    debugLog("[LinkExtractor] 生成选择器失败:", err)
     selector = element.tagName.toLowerCase()
   }
 
-  debugLog('[LinkExtractor] 链接容器选择器:', selector)
+  debugLog("[LinkExtractor] 链接容器选择器:", selector)
 
   return {
     tagName: element.tagName.toLowerCase(),
-    className: element.className || '',
-    id: element.id || '',
+    className: element.className || "",
+    id: element.id || "",
     linkCount,
     outerHTML: element.outerHTML.substring(0, 500), // 限制长度
-    selector,
+    selector
   }
 }
 
@@ -96,22 +101,22 @@ export function isSameDomain(url: string, baseUrl: string): boolean {
  */
 export function isValidScrapableUrl(url: string): boolean {
   // 排除 JavaScript 链接
-  if (url.startsWith('javascript:')) {
+  if (url.startsWith("javascript:")) {
     return false
   }
 
   // 排除纯锚点链接
-  if (url.startsWith('#')) {
+  if (url.startsWith("#")) {
     return false
   }
 
   // 排除 mailto 和 tel 链接
-  if (url.startsWith('mailto:') || url.startsWith('tel:')) {
+  if (url.startsWith("mailto:") || url.startsWith("tel:")) {
     return false
   }
 
   // 排除 data: URL
-  if (url.startsWith('data:')) {
+  if (url.startsWith("data:")) {
     return false
   }
 
@@ -160,7 +165,7 @@ export function filterLinks(
     }
 
     // 排除 JavaScript 链接
-    if (options.excludeJavaScript && link.url.startsWith('javascript:')) {
+    if (options.excludeJavaScript && link.url.startsWith("javascript:")) {
       return false
     }
 
@@ -180,7 +185,10 @@ export function filterLinks(
 /**
  * 去重链接（基于 URL）
  */
-export function deduplicateLinks(links: ExtractedLink[], baseUrl: string): ExtractedLink[] {
+export function deduplicateLinks(
+  links: ExtractedLink[],
+  baseUrl: string
+): ExtractedLink[] {
   const seen = new Set<string>()
   const result: ExtractedLink[] = []
 
@@ -190,7 +198,7 @@ export function deduplicateLinks(links: ExtractedLink[], baseUrl: string): Extra
     let normalizedUrl: string
     try {
       const urlObj = new URL(absoluteUrl)
-      urlObj.hash = ''
+      urlObj.hash = ""
       normalizedUrl = urlObj.href
     } catch {
       normalizedUrl = absoluteUrl
@@ -200,7 +208,7 @@ export function deduplicateLinks(links: ExtractedLink[], baseUrl: string): Extra
       seen.add(normalizedUrl)
       result.push({
         ...link,
-        url: absoluteUrl, // 使用绝对 URL
+        url: absoluteUrl // 使用绝对 URL
       })
     }
   }
@@ -217,7 +225,7 @@ export function extractAndProcessLinks(
   filterOptions: LinkFilterOptions = {
     sameDomainOnly: true,
     excludeAnchors: true,
-    excludeJavaScript: true,
+    excludeJavaScript: true
   }
 ): ExtractedLink[] {
   // 1. 提取所有链接
@@ -232,7 +240,7 @@ export function extractAndProcessLinks(
   // 4. 重新编号
   return uniqueLinks.map((link, index) => ({
     ...link,
-    index,
+    index
   }))
 }
 
@@ -242,5 +250,5 @@ export function extractAndProcessLinks(
 export const DEFAULT_FILTER_OPTIONS: LinkFilterOptions = {
   sameDomainOnly: false,
   excludeAnchors: true,
-  excludeJavaScript: true,
+  excludeJavaScript: true
 }

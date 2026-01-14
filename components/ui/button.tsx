@@ -4,26 +4,27 @@ import { forwardRef } from "react"
 import { cn } from "~/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-full text-xs font-medium transition-all duration-200 shadow-md hover:shadow-lg border relative group",
+  "inline-flex items-center justify-center rounded-lg font-medium transition-colors duration-200 border disabled:opacity-50 disabled:cursor-not-allowed",
   {
     variants: {
       variant: {
-        default:
-          "bg-gradient-to-br from-indigo-400 to-sky-400 text-white border-indigo-200 hover:from-indigo-500 hover:to-sky-500",
+        default: "bg-blue-600 text-white border-blue-600 hover:bg-blue-700",
         secondary:
-          "bg-gradient-to-br from-blue-400 to-teal-400 text-white border-teal-200 hover:from-blue-500 hover:to-teal-500",
-        outline: "bg-white border-sky-200 text-sky-600 hover:bg-sky-50",
+          "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200",
+        outline:
+          "bg-transparent border-blue-300 text-blue-600 hover:bg-blue-50",
         ghost:
-          "bg-transparent border-transparent text-sky-600 hover:bg-sky-50 shadow-none hover:shadow-none",
+          "bg-transparent border-transparent text-blue-600 hover:bg-blue-50",
         success:
-          "bg-gradient-to-br from-green-400 to-emerald-400 text-white border-emerald-200",
-        copy: "bg-gradient-to-br from-sky-300 to-blue-200 text-blue-800 hover:from-sky-400 hover:to-blue-300 border-sky-200"
+          "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700",
+        danger: "bg-red-600 text-white border-red-600 hover:bg-red-700"
       },
       size: {
-        sm: "px-3 py-1.5",
-        md: "px-4 py-2",
-        lg: "px-5 py-2.5",
-        icon: "p-1.5"
+        xs: "px-2 py-1 text-xs",
+        sm: "px-3 py-1.5 text-sm",
+        md: "px-4 py-2 text-sm",
+        lg: "px-5 py-2.5 text-base",
+        icon: "p-2"
       },
       fullWidth: {
         true: "w-full"
@@ -49,15 +50,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(buttonVariants({ variant, size, fullWidth, className }))}
         ref={ref}
         {...props}>
-        {icon && (
-          <span className="mr-1.5 transition-transform duration-200 group-hover:scale-110">
-            {icon}
-          </span>
-        )}
-        <span className="relative">
-          {children}
-          <span className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 transform rounded-full bg-white/40 transition-transform duration-200 group-hover:scale-x-100"></span>
-        </span>
+        {icon && <span className="mr-1.5">{icon}</span>}
+        {children}
       </button>
     )
   }

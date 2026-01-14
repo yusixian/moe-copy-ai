@@ -62,9 +62,21 @@ export const BATCH_RETRY_OPTIONS = [
 
 // 批量抓取 - 抓取策略
 export const BATCH_STRATEGY_OPTIONS = [
-  { value: "fetch", label: "Fetch API", desc: "直接获取 HTML，速度快但无法处理 JS 渲染" },
-  { value: "background-tabs", label: "后台标签页", desc: "在后台打开标签页抓取，支持 JS 渲染和登录态" },
-  { value: "current-tab", label: "当前标签页", desc: "在当前标签页依次访问，用户可见过程，完成后返回原页面" }
+  {
+    value: "fetch",
+    label: "Fetch API",
+    desc: "直接获取 HTML，速度快但无法处理 JS 渲染"
+  },
+  {
+    value: "background-tabs",
+    label: "后台标签页",
+    desc: "在后台打开标签页抓取，支持 JS 渲染和登录态"
+  },
+  {
+    value: "current-tab",
+    label: "当前标签页",
+    desc: "在当前标签页依次访问，用户可见过程，完成后返回原页面"
+  }
 ]
 
 // 分页抓取 - 最大页数

@@ -2,22 +2,31 @@ import "./styles/global.css"
 import "react-toastify/dist/ReactToastify.css"
 
 import { Icon } from "@iconify/react"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { ToastContainer } from "react-toastify"
 
 import BatchScrapePanel from "~components/batch/BatchScrapePanel"
 import ContentExtractionPanel from "~components/extraction/ContentExtractionPanel"
 import SidePanelSettings from "~components/sidepanel/SidePanelSettings"
+import {
+  SingleScrapePanel,
+  type SingleScrapePanelHandle
+} from "~components/singlescrape"
+import { Button } from "~components/ui/button"
 import Segmented, { type SegmentedOption } from "~components/ui/segmented"
 import type { BatchScrapeMode } from "~constants/types"
 import useBatchScrape from "~hooks/useBatchScrape"
 import useContentExtraction from "~hooks/useContentExtraction"
 import useElementSelector from "~hooks/useElementSelector"
-import { cn } from "~utils"
 
-type SidePanelView = "batch" | "extraction" | "settings"
+type SidePanelView = "batch" | "extraction" | "singlescrape" | "settings"
 
-const tabOptions: SegmentedOption<"batch" | "extraction">[] = [
+const tabOptions: SegmentedOption<"batch" | "extraction" | "singlescrape">[] = [
+  {
+    value: "singlescrape",
+    label: "单页抓取",
+    icon: <Icon icon="mdi:file-document-outline" width={14} />
+  },
   {
     value: "batch",
     label: "批量抓取",
@@ -31,7 +40,9 @@ const tabOptions: SegmentedOption<"batch" | "extraction">[] = [
 ]
 
 function SidePanel() {
-  const [currentView, setCurrentView] = useState<SidePanelView>("batch")
+  const [currentView, setCurrentView] = useState<SidePanelView>("singlescrape")
+  const [isSingleScrapeLoading, setIsSingleScrapeLoading] = useState(false)
+  const singleScrapePanelRef = useRef<SingleScrapePanelHandle>(null)
 
   const [isSelectingNextPage, setIsSelectingNextPage] = useState(false)
 
@@ -70,6 +81,7 @@ function SidePanel() {
     content: extractedContent,
     elementInfo: extractionElementInfo,
     error: extractionError,
+    tabInfo: extractionTabInfo,
     startSelection: startContentSelection,
     cancelSelection: cancelContentSelection,
     reset: resetContentExtraction
@@ -82,7 +94,7 @@ function SidePanel() {
       setLinks(elementInfo, extractedLinks)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [elementInfo, extractedLinks])
+  }, [elementInfo, extractedLinks, setLinks])
 
   // 当选择完成时，重置 isSelectingNextPage 状态
   useEffect(() => {
@@ -132,6 +144,10 @@ function SidePanel() {
 
   // 视图标题和描述
   const viewConfig = {
+    singlescrape: {
+      title: "单页抓取",
+      description: "抓取当前页面内容，转换为 AI 易读的格式"
+    },
     batch: {
       title: "批量抓取",
       description: "选择页面区域，批量抓取链接中的所有文档"
@@ -161,29 +177,53 @@ function SidePanel() {
             onChange={(value) => setCurrentView(value)}
             className="flex-1"
           />
-          <button
+          <Button
+            variant={currentView === "settings" ? "secondary" : "ghost"}
+            size="icon"
             onClick={() => setCurrentView("settings")}
-            className={cn(
-              "rounded-lg p-2 transition-colors",
-              currentView === "settings"
-                ? "bg-white text-gray-700 shadow-sm"
-                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-            )}
             title="设置">
             <Icon icon="mdi:cog" width={18} />
-          </button>
+          </Button>
         </div>
 
         {/* 标题 */}
-        <div>
-          <h1 className="text-lg font-bold text-gray-800">
-            {currentConfig.title}
-          </h1>
-          <p className="text-sm text-gray-500">{currentConfig.description}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-bold text-gray-800 text-lg">
+              {currentConfig.title}
+            </h1>
+            <p className="text-gray-500 text-sm">{currentConfig.description}</p>
+          </div>
+          {currentView === "singlescrape" && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => singleScrapePanelRef.current?.refresh()}
+              disabled={isSingleScrapeLoading}
+              title="刷新内容">
+              <Icon
+                icon={
+                  isSingleScrapeLoading
+                    ? "line-md:loading-alt-loop"
+                    : "line-md:refresh-twotone"
+                }
+                className={isSingleScrapeLoading ? "mr-1 animate-spin" : "mr-1"}
+                width="16"
+                height="16"
+              />
+              {isSingleScrapeLoading ? "抓取中..." : "刷新"}
+            </Button>
+          )}
         </div>
       </div>
 
-      <div className="min-h-0 flex-1">
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {currentView === "singlescrape" && (
+          <SingleScrapePanel
+            ref={singleScrapePanelRef}
+            onLoadingChange={setIsSingleScrapeLoading}
+          />
+        )}
         {currentView === "batch" && (
           <BatchScrapePanel
             mode={currentMode}
@@ -214,12 +254,51 @@ function SidePanel() {
             content={extractedContent}
             elementInfo={extractionElementInfo}
             error={extractionError}
+            tabInfo={extractionTabInfo}
             onStartSelection={startContentSelection}
             onCancel={cancelContentSelection}
             onReset={resetContentExtraction}
           />
         )}
         {currentView === "settings" && <SidePanelSettings />}
+      </div>
+
+      {/* 底部链接 */}
+      <div className="flex flex-shrink-0 items-center justify-between gap-4 border-gray-100 border-t px-1 pt-2">
+        <span className="text-gray-400 text-xs">Moe Copy AI</span>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6 p-0"
+            onClick={() =>
+              window.open("https://github.com/yusixian/moe-copy-ai", "_blank")
+            }
+            title="GitHub">
+            <Icon icon="mdi:github" className="size-full" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6 p-0"
+            onClick={() => window.open("https://moe.cosine.ren/docs", "_blank")}
+            title="文档">
+            <Icon icon="mdi:book-open-outline" className="size-full" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6 p-0"
+            onClick={() =>
+              window.open("https://discord.gg/XzvrvNMcSe", "_blank")
+            }
+            title="Discord">
+            <Icon icon="mdi:discord" className="size-full" />
+          </Button>
+        </div>
+        <span className="text-gray-400 text-xs">
+          v{chrome.runtime.getManifest().version}
+        </span>
       </div>
 
       <ToastContainer

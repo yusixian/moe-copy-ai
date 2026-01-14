@@ -3,11 +3,11 @@ import type {
   BatchScrapeOptions,
   BatchScrapeResult,
   ExtractedLink,
-  ScrapeStrategyType,
-} from '~constants/types'
+  ScrapeStrategyType
+} from "~constants/types"
 
-import { debugLog } from './logger'
-import { createScrapeStrategy, type ScrapeStrategy } from './scrape-strategies'
+import { debugLog } from "./logger"
+import { createScrapeStrategy, type ScrapeStrategy } from "./scrape-strategies"
 
 /**
  * 扩展的批量抓取选项
@@ -25,7 +25,7 @@ export const DEFAULT_BATCH_OPTIONS: ExtendedBatchScrapeOptions = {
   timeout: 30000,
   retryCount: 1,
   delayBetweenRequests: 500,
-  strategy: 'fetch',
+  strategy: "fetch"
 }
 
 /**
@@ -82,17 +82,24 @@ export class BatchScrapeController {
    * 带重试逻辑的抓取
    */
   private async scrapeWithRetry(url: string): Promise<BatchScrapeResult> {
-    let lastResult: BatchScrapeResult | null = null
+    // 初始抓取
+    let lastResult = await this.strategy.scrape(url, {
+      timeout: this.options.timeout,
+      retryCount: this.options.retryCount
+    })
 
-    for (let attempt = 0; attempt <= this.options.retryCount; attempt++) {
-      if (attempt > 0) {
-        debugLog(`[BatchScrape] 第 ${attempt} 次重试: ${url}`)
-        await delay(this.options.delayBetweenRequests)
-      }
+    if (lastResult.success) {
+      return lastResult
+    }
+
+    // 重试逻辑
+    for (let attempt = 1; attempt <= this.options.retryCount; attempt++) {
+      debugLog(`[BatchScrape] 第 ${attempt} 次重试: ${url}`)
+      await delay(this.options.delayBetweenRequests)
 
       lastResult = await this.strategy.scrape(url, {
         timeout: this.options.timeout,
-        retryCount: this.options.retryCount,
+        retryCount: this.options.retryCount
       })
 
       if (lastResult.success) {
@@ -100,7 +107,7 @@ export class BatchScrapeController {
       }
     }
 
-    return lastResult!
+    return lastResult
   }
 
   /**
@@ -124,20 +131,22 @@ export class BatchScrapeController {
       current: null,
       results: [],
       startTime,
-      isPaused: false,
+      isPaused: false
     }
 
     onProgress({ ...progress })
 
     try {
       // 根据策略是否支持并发决定处理方式
-      const concurrency = this.strategy.supportsConcurrency ? this.options.concurrency : 1
+      const concurrency = this.strategy.supportsConcurrency
+        ? this.options.concurrency
+        : 1
 
       // 按并发数分批处理
       for (let i = 0; i < links.length; i += concurrency) {
         // 检查是否取消
         if (this.isCancelled) {
-          debugLog('[BatchScrape] 已取消')
+          debugLog("[BatchScrape] 已取消")
           break
         }
 
@@ -153,7 +162,7 @@ export class BatchScrapeController {
           // 更新当前进度
           progress.current = {
             url: link.url,
-            status: 'fetching',
+            status: "fetching"
           }
           onProgress({ ...progress })
 
@@ -163,9 +172,9 @@ export class BatchScrapeController {
           // 更新结果
           progress.results.push({
             url: result.url,
-            status: result.success ? 'success' : 'failed',
+            status: result.success ? "success" : "failed",
             title: result.title,
-            error: result.error,
+            error: result.error
           })
           progress.completed = progress.results.length
 
@@ -189,11 +198,11 @@ export class BatchScrapeController {
       await this.strategy.cleanup?.()
     }
 
-    debugLog('[BatchScrape] 完成', {
+    debugLog("[BatchScrape] 完成", {
       total: results.length,
       success: results.filter((r) => r.success).length,
       failed: results.filter((r) => !r.success).length,
-      strategy: this.options.strategy,
+      strategy: this.options.strategy
     })
 
     return results
@@ -207,7 +216,10 @@ export async function batchScrape(
   links: ExtractedLink[],
   options: Partial<ExtendedBatchScrapeOptions> = {},
   onProgress: (progress: BatchProgress) => void
-): Promise<{ results: BatchScrapeResult[]; controller: BatchScrapeController }> {
+): Promise<{
+  results: BatchScrapeResult[]
+  controller: BatchScrapeController
+}> {
   const controller = new BatchScrapeController(options)
   const results = await controller.execute(links, onProgress)
   return { results, controller }

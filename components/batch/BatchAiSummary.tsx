@@ -75,7 +75,8 @@ const BatchAiSummary = memo(function BatchAiSummary({
     systemPrompt,
     generateSummaryText,
     saveAsDefaultPrompt,
-    usage
+    usage,
+    modelId
   } = useAiSummary(aggregatedContent, onSummaryGenerated, scrapedData)
 
   // 预估 token 数量 - 基于模板替换后的完整提示词
@@ -129,27 +130,37 @@ const BatchAiSummary = memo(function BatchAiSummary({
           />
 
           {/* 生成按钮 */}
-          <button
-            type="button"
-            onClick={generateSummaryText}
-            disabled={isLoading || successCount === 0}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 py-2 text-xs font-medium text-white shadow-sm transition-all hover:from-sky-600 hover:to-indigo-600 disabled:cursor-not-allowed disabled:opacity-50">
-            {isLoading ? (
-              <>
-                <Icon icon="mdi:loading" width={14} className="animate-spin" />
-                生成中...
-              </>
-            ) : (
-              <>
-                <Icon icon="line-md:lightbulb-twotone" width={14} />
-                生成摘要
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <span
+              className={`flex items-center gap-1 text-xs ${modelId ? "text-gray-500" : "text-amber-500"}`}>
+              {modelId || "未选择模型"}
+            </span>
+            <button
+              type="button"
+              onClick={generateSummaryText}
+              disabled={isLoading || successCount === 0}
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 py-2 font-medium text-white text-xs shadow-sm transition-all hover:from-sky-600 hover:to-indigo-600 disabled:cursor-not-allowed disabled:opacity-50">
+              {isLoading ? (
+                <>
+                  <Icon
+                    icon="mdi:loading"
+                    width={14}
+                    className="animate-spin"
+                  />
+                  生成中...
+                </>
+              ) : (
+                <>
+                  <Icon icon="line-md:lightbulb-twotone" width={14} />
+                  生成摘要
+                </>
+              )}
+            </button>
+          </div>
 
           {/* 错误提示 */}
           {error && (
-            <div className="flex items-center gap-1 rounded bg-red-50 px-2 py-1.5 text-xs text-red-600">
+            <div className="flex items-center gap-1 rounded bg-red-50 px-2 py-1.5 text-red-600 text-xs">
               <Icon icon="mdi:alert-circle" width={14} />
               {error}
             </div>
@@ -159,7 +170,7 @@ const BatchAiSummary = memo(function BatchAiSummary({
           {displayText && (
             <div className="rounded-lg border border-sky-100 bg-sky-50/30 p-2">
               <div className="mb-1.5 flex items-center justify-between">
-                <span className="flex items-center gap-1 text-xs font-medium text-sky-700">
+                <span className="flex items-center gap-1 font-medium text-sky-700 text-xs">
                   <Icon
                     icon="line-md:lightbulb-twotone"
                     width={14}
@@ -170,7 +181,7 @@ const BatchAiSummary = memo(function BatchAiSummary({
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="flex items-center gap-1 rounded bg-sky-100 px-2 py-0.5 text-xs text-sky-600 hover:bg-sky-200">
+                  className="flex items-center gap-1 rounded bg-sky-100 px-2 py-0.5 text-sky-600 text-xs hover:bg-sky-200">
                   <Icon
                     icon={copied ? "mdi:check" : "mdi:content-copy"}
                     width={12}
@@ -190,7 +201,7 @@ const BatchAiSummary = memo(function BatchAiSummary({
 
           {/* Token 统计 */}
           {usage?.total_tokens && (
-            <div className="flex items-center gap-3 text-xs text-gray-500">
+            <div className="flex items-center gap-3 text-gray-500 text-xs">
               <span className="flex items-center gap-1">
                 <Icon icon="mdi:counter" width={12} />
                 Tokens: <b className="text-gray-700">{usage.total_tokens}</b>

@@ -23,8 +23,16 @@ export interface ScrapeViaTabResponse {
  * 通过标签页导航抓取内容
  * 支持创建新标签页或使用现有标签页
  */
-const handler: PlasmoMessaging.MessageHandler<ScrapeViaTabRequest, ScrapeViaTabResponse> = async (req, res) => {
-  const { url, timeout = 30000, background = true, tabId: existingTabId } = req.body || {}
+const handler: PlasmoMessaging.MessageHandler<
+  ScrapeViaTabRequest,
+  ScrapeViaTabResponse
+> = async (req, res) => {
+  const {
+    url,
+    timeout = 30000,
+    background = true,
+    tabId: existingTabId
+  } = req.body || {}
 
   if (!url) {
     return res.send({ success: false, error: "URL 不能为空" })
@@ -40,7 +48,7 @@ const handler: PlasmoMessaging.MessageHandler<ScrapeViaTabRequest, ScrapeViaTabR
     if (!tabId) {
       const tab = await chrome.tabs.create({
         url,
-        active: !background,
+        active: !background
       })
       tabId = tab.id
       shouldCloseTab = true
@@ -64,28 +72,44 @@ const handler: PlasmoMessaging.MessageHandler<ScrapeViaTabRequest, ScrapeViaTabR
     const readabilityConfig = getReadabilityConfig()
 
     // 向内容脚本发送抓取请求
-    const response = await new Promise<any>((resolve, reject) => {
-      const timeoutId = setTimeout(() => {
-        reject(new Error("内容抓取超时"))
-      }, timeout)
+    interface ScrapeContentResponse {
+      title?: string
+      cleanedContent?: string
+      articleContent?: string
+    }
+    const response = await new Promise<ScrapeContentResponse>(
+      (resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          reject(new Error("内容抓取超时"))
+        }, timeout)
 
-      chrome.tabs.sendMessage(
-        tabId!,
-        {
-          action: "scrapeContent",
-          mode: extractionMode,
-          readabilityConfig,
-        },
-        (result) => {
-          clearTimeout(timeoutId)
-          if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message || "内容脚本通信失败"))
-          } else {
-            resolve(result)
-          }
+        if (tabId === undefined) {
+          reject(new Error("标签页 ID 无效"))
+          return
         }
-      )
-    })
+
+        chrome.tabs.sendMessage(
+          tabId,
+          {
+            action: "scrapeContent",
+            mode: extractionMode,
+            readabilityConfig
+          },
+          (result) => {
+            clearTimeout(timeoutId)
+            if (chrome.runtime.lastError) {
+              reject(
+                new Error(
+                  chrome.runtime.lastError.message || "内容脚本通信失败"
+                )
+              )
+            } else {
+              resolve(result)
+            }
+          }
+        )
+      }
+    )
 
     debugLog(`[ScrapeViaTab] 抓取成功: ${url}`)
 
@@ -99,7 +123,7 @@ const handler: PlasmoMessaging.MessageHandler<ScrapeViaTabRequest, ScrapeViaTabR
     res.send({
       success: true,
       title: response?.title || "",
-      content: response?.cleanedContent || response?.articleContent || "",
+      content: response?.cleanedContent || response?.articleContent || ""
     })
   } catch (error) {
     debugLog(`[ScrapeViaTab] 抓取失败: ${url}`, error)
@@ -111,7 +135,7 @@ const handler: PlasmoMessaging.MessageHandler<ScrapeViaTabRequest, ScrapeViaTabR
 
     res.send({
       success: false,
-      error: error instanceof Error ? error.message : "未知错误",
+      error: error instanceof Error ? error.message : "未知错误"
     })
   }
 }
@@ -126,7 +150,10 @@ function waitForTabLoad(tabId: number, timeout: number): Promise<void> {
       reject(new Error("页面加载超时"))
     }, timeout)
 
-    const listener = (updatedTabId: number, changeInfo: chrome.tabs.TabChangeInfo) => {
+    const listener = (
+      updatedTabId: number,
+      changeInfo: chrome.tabs.TabChangeInfo
+    ) => {
       if (updatedTabId === tabId && changeInfo.status === "complete") {
         clearTimeout(timeoutId)
         chrome.tabs.onUpdated.removeListener(listener)
@@ -138,13 +165,16 @@ function waitForTabLoad(tabId: number, timeout: number): Promise<void> {
     chrome.tabs.onUpdated.addListener(listener)
 
     // 检查标签页是否已经加载完成
-    chrome.tabs.get(tabId).then((tab) => {
-      if (tab.status === "complete") {
-        clearTimeout(timeoutId)
-        chrome.tabs.onUpdated.removeListener(listener)
-        setTimeout(resolve, 500)
-      }
-    }).catch(reject)
+    chrome.tabs
+      .get(tabId)
+      .then((tab) => {
+        if (tab.status === "complete") {
+          clearTimeout(timeoutId)
+          chrome.tabs.onUpdated.removeListener(listener)
+          setTimeout(resolve, 500)
+        }
+      })
+      .catch(reject)
   })
 }
 

@@ -1,7 +1,7 @@
-import React, { useCallback } from "react"
-import { toast } from "react-toastify"
-
 import { useStorage } from "@plasmohq/storage/hook"
+import type React from "react"
+import { useCallback } from "react"
+import { toast } from "react-toastify"
 
 interface Option {
   value: string
@@ -51,7 +51,7 @@ export const OptionSelect: React.FC<OptionSelectProps> = ({
           </option>
         ))}
       </select>
-      <p className="mt-2 text-sm text-sky-500">{description}</p>
+      <p className="mt-2 text-sky-500 text-sm">{description}</p>
     </div>
   )
 }

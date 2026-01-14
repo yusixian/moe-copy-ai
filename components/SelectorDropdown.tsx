@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react"
-import React, { memo, useCallback, useEffect, useRef, useState } from "react"
+import type React from "react"
+import { memo, useCallback, useEffect, useRef, useState } from "react"
 // Note: useCallback is still used in useSelectorState hook for stable callback references
 
 import type { SelectorResultItem, SelectorType } from "~constants/types"
@@ -100,6 +101,7 @@ const SelectorItem = memo<SelectorItemProps>(
             : "hover:bg-blue-50"
         }`}>
         <button
+          type="button"
           className="flex w-full items-center justify-between gap-2 p-3 text-left text-xs"
           onClick={handleSelect}>
           <div className="flex items-center">
@@ -125,18 +127,19 @@ const SelectorItem = memo<SelectorItemProps>(
           <div className="flex items-center">
             {hasContent ? (
               <span
-                className={`inline-block max-w-[5rem] truncate whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${hasMultipleContents ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"}`}>
+                className={`inline-block max-w-[5rem] truncate whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-xs ${hasMultipleContents ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"}`}>
                 {hasMultipleContents
                   ? `${allPreviewContents?.length}个结果`
                   : "有结果"}
               </span>
             ) : (
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+              <span className="rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-500 text-xs">
                 无结果
               </span>
             )}
             {hasContent && (
               <button
+                type="button"
                 className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
                   showPreview
                     ? "bg-sky-100 text-sky-600 hover:bg-sky-200"
@@ -158,24 +161,25 @@ const SelectorItem = memo<SelectorItemProps>(
         {hasContent && showPreview && (
           <div
             ref={previewRef}
-            className="border-t border-sky-100 bg-blue-50 p-2">
-            <div className="mb-2 text-xs font-medium text-sky-600">
+            className="border-sky-100 border-t bg-blue-50 p-2">
+            <div className="mb-2 font-medium text-sky-600 text-xs">
               {hasMultipleContents ? "多个内容预览:" : "内容预览:"}
             </div>
             {hasMultipleContents ? (
               <div className="space-y-3">
                 {allPreviewContents?.map((content, idx) => (
                   <div
-                    key={idx}
+                    key={`preview-${idx}-${content.slice(0, 20)}`}
                     className="overflow-hidden rounded-lg border border-sky-100 bg-white shadow-sm transition-all hover:shadow-md">
-                    <div className="flex items-center justify-between border-b border-sky-50 bg-gradient-to-r from-sky-50 to-blue-50 px-2 py-2">
-                      <span className="flex items-center text-xs font-medium text-sky-600">
+                    <div className="flex items-center justify-between border-sky-50 border-b bg-gradient-to-r from-sky-50 to-blue-50 px-2 py-2">
+                      <span className="flex items-center font-medium text-sky-600 text-xs">
                         <Icon icon="mdi:numeric" className="mr-1" width={14} />
                         结果 {idx + 1}
                       </span>
                       {onSelectContent && (
                         <button
-                          className="flex min-h-[32px] items-center rounded-full border border-sky-200 bg-white px-3 py-1 text-xs font-medium text-sky-600 shadow-sm transition-all hover:bg-sky-100 hover:shadow"
+                          type="button"
+                          className="flex min-h-[32px] items-center rounded-full border border-sky-200 bg-white px-3 py-1 font-medium text-sky-600 text-xs shadow-sm transition-all hover:bg-sky-100 hover:shadow"
                           onClick={() => handleContentSelect(idx)}
                           title="将此结果设为当前选择器的内容">
                           <Icon
@@ -188,18 +192,19 @@ const SelectorItem = memo<SelectorItemProps>(
                         </button>
                       )}
                     </div>
-                    <div className="max-h-32 overflow-auto p-2 text-xs text-gray-700 md:max-h-40">
+                    <div className="max-h-32 overflow-auto p-2 text-gray-700 text-xs md:max-h-40">
                       {content}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div
-                className="max-h-32 cursor-pointer overflow-auto rounded-lg border border-sky-100 bg-white p-2 text-gray-700 shadow-sm md:max-h-40"
+              <button
+                type="button"
+                className="max-h-32 w-full cursor-pointer overflow-auto rounded-lg border border-sky-100 bg-white p-2 text-left text-gray-700 shadow-sm md:max-h-40"
                 onClick={() => handleContentSelect(0)}>
                 {previewContent}
-              </div>
+              </button>
             )}
           </div>
         )}
@@ -215,9 +220,9 @@ const SelectorHeader = memo<{
   type: SelectorType
   count: number
 }>(({ type, count }) => (
-  <div className="flex items-center gap-1 text-xs font-medium text-sky-600">
+  <div className="flex items-center gap-1 font-medium text-sky-600 text-xs">
     <span>{SELECTOR_TYPE_NAMES[type]}</span>
-    <span className="whitespace-nowrap rounded-full bg-sky-100 px-1 py-0.5 text-xs font-medium text-sky-600">
+    <span className="whitespace-nowrap rounded-full bg-sky-100 px-1 py-0.5 font-medium text-sky-600 text-xs">
       {count}个
     </span>
   </div>
@@ -232,8 +237,9 @@ const DropdownToggle = memo<{
   selectedText: string
 }>(({ isOpen, toggleOpen, selectedText }) => (
   <button
+    type="button"
     onClick={toggleOpen}
-    className="flex min-h-[36px] items-center rounded-lg border border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50 px-3 py-1.5 text-xs font-medium text-sky-600 shadow-sm transition-all hover:shadow">
+    className="flex min-h-[36px] items-center rounded-lg border border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50 px-3 py-1.5 font-medium text-sky-600 text-xs shadow-sm transition-all hover:shadow">
     <span className="mr-2 max-w-[12.5rem] truncate font-mono md:max-w-[9.375rem]">
       {selectedText}
     </span>
@@ -383,8 +389,8 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
 
       {/* 下拉菜单 */}
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-auto rounded-lg border border-sky-200 bg-white shadow-lg">
-          <div className="border-b border-sky-100 bg-gradient-to-r from-sky-50 to-indigo-50 p-2.5 text-xs text-sky-600">
+        <div className="absolute top-full right-0 z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-auto rounded-lg border border-sky-200 bg-white shadow-lg">
+          <div className="border-sky-100 border-b bg-gradient-to-r from-sky-50 to-indigo-50 p-2.5 text-sky-600 text-xs">
             <div className="flex items-center">
               <Icon
                 icon="mdi:information-outline"
@@ -402,7 +408,7 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
 
               return (
                 <SelectorItem
-                  key={index}
+                  key={selector}
                   selector={selector}
                   index={index}
                   isSelected={index === selectedIndex}

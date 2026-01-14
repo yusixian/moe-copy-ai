@@ -11,7 +11,10 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
     }
   } catch (error) {
     console.error("打开侧边栏失败:", error)
-    res.send({ success: false, error: error instanceof Error ? error.message : "未知错误" })
+    res.send({
+      success: false,
+      error: error instanceof Error ? error.message : "未知错误"
+    })
   }
 }
 

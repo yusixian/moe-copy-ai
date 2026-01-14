@@ -9,13 +9,6 @@ export interface ModelInfo {
   owned_by?: string
 }
 
-interface AiSettingsState {
-  apiKey: string
-  baseURL: string
-  systemPrompt: string
-  model: string | null
-}
-
 const DEFAULT_BASE_URL = "https://api.openai.com/v1/"
 const DEFAULT_SYSTEM_PROMPT =
   "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}"

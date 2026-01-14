@@ -1,6 +1,6 @@
 import { FloatingFocusManager, FloatingPortal } from "@floating-ui/react"
 import { Icon } from "@iconify/react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 
 import { useCombobox } from "./FloatingDropdown"
 
@@ -16,6 +16,7 @@ interface ComboboxProps {
   options: ComboboxOption[]
   placeholder?: string
   compact?: boolean
+  inputId?: string
   /** 是否允许输入过滤 */
   filterable?: boolean
   /** 空状态文案 */
@@ -29,6 +30,7 @@ export function Combobox({
   options,
   placeholder = "",
   compact = false,
+  inputId,
   filterable = true,
   emptyText = "无可用选项",
   className = ""
@@ -118,6 +120,7 @@ export function Combobox({
         <div className="flex">
           <input
             ref={inputRef}
+            id={inputId}
             type="text"
             value={value || ""}
             onChange={handleInputChange}
@@ -159,6 +162,7 @@ export function Combobox({
                       listRef.current[index] = node
                     }}
                     role="option"
+                    tabIndex={0}
                     aria-selected={index === activeIndex}
                     {...getItemProps({
                       onClick: () => handleSelect(opt.id)
@@ -179,7 +183,9 @@ export function Combobox({
                   </div>
                 ))
               ) : (
-                <div className={`${optionClass} text-gray-400`}>{emptyText}</div>
+                <div className={`${optionClass} text-gray-400`}>
+                  {emptyText}
+                </div>
               )}
             </div>
           </FloatingFocusManager>

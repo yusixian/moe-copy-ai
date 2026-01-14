@@ -1,6 +1,6 @@
 import { streamText } from "@xsai/stream-text"
 
-import { AiChatHistory, AiChatHistoryItem } from "~constants/types"
+import type { AiChatHistory, AiChatHistoryItem } from "~constants/types"
 import { generateUUID } from "~utils"
 
 import { debugLog } from "./logger"
@@ -16,7 +16,7 @@ export async function getAiConfig() {
     const systemPrompt =
       (await syncStorage.get<string>("ai_system_prompt")) ||
       "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}"
-    const model = (await syncStorage.get<string>("ai_model")) || "gpt-3.5-turbo"
+    const model = (await syncStorage.get<string>("ai_model")) || ""
 
     return {
       apiKey,
@@ -146,7 +146,7 @@ export async function addAiChatHistoryItem(
     // 检查storage对象
     debugLog("storage对象信息:", {
       type: typeof localStorage,
-      area: (localStorage as any).area,
+      area: (localStorage as unknown as { area?: string }).area,
       isReady: isStorageReady,
       methods: Object.keys(localStorage)
     })

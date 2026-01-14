@@ -1,6 +1,5 @@
-import { toast } from "react-toastify"
-
 import { useStorage } from "@plasmohq/storage/hook"
+import { toast } from "react-toastify"
 
 import {
   BATCH_CONCURRENCY_OPTIONS,
@@ -24,10 +23,14 @@ export function CompactSelect({
   onChange: (value: string) => void
   options: { value: string; label: string }[]
 }) {
+  const selectId = `select-${label.replace(/\s+/g, "-").toLowerCase()}`
   return (
     <div className="flex items-center justify-between gap-2">
-      <label className="text-xs text-gray-600">{label}</label>
+      <label htmlFor={selectId} className="text-gray-600 text-xs">
+        {label}
+      </label>
       <select
+        id={selectId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="rounded border border-sky-200 bg-sky-50 px-2 py-1 text-xs focus:border-sky-400 focus:outline-none">
@@ -80,11 +83,12 @@ export function BatchScrapeSettings({
   return (
     <div className="space-y-3">
       {/* 策略选择 - 使用按钮组 */}
-      <div className="space-y-2">
-        <label className="text-xs text-gray-600">抓取策略</label>
+      <fieldset className="space-y-2">
+        <legend className="text-gray-600 text-xs">抓取策略</legend>
         <div className="grid grid-cols-3 gap-1">
           {BATCH_STRATEGY_OPTIONS.map((s) => (
             <button
+              type="button"
               key={s.value}
               onClick={() =>
                 handleChange(setStrategy, s.value, "抓取策略已保存")
@@ -99,9 +103,9 @@ export function BatchScrapeSettings({
           ))}
         </div>
         {!compact && currentStrategyDesc && (
-          <p className="text-xs text-gray-500">{currentStrategyDesc}</p>
+          <p className="text-gray-500 text-xs">{currentStrategyDesc}</p>
         )}
-      </div>
+      </fieldset>
 
       {/* 紧凑模式使用2列网格 */}
       {compact ? (
@@ -162,7 +166,7 @@ export function BatchScrapeSettings({
 
       {/* 分页抓取设置 */}
       <div
-        className={`flex gap-2 border-t border-gray-200 pt-3 ${compact ? "" : "mt-4"}`}>
+        className={`flex gap-2 border-gray-200 border-t pt-3 ${compact ? "" : "mt-4"}`}>
         <div className="flex-1">
           <CompactSelect
             label={compact ? "页数" : "最大页数"}

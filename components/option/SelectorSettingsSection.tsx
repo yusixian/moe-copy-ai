@@ -1,10 +1,10 @@
 import { Icon } from "@iconify/react"
-import React, { useEffect, useState } from "react"
+import { useStorage } from "@plasmohq/storage/hook"
+import type React from "react"
+import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 
-import { Storage } from "@plasmohq/storage"
-import { useStorage } from "@plasmohq/storage/hook"
-
+import { Button } from "~/components/ui/button"
 import {
   AUTHOR_SELECTORS,
   CONTENT_SELECTORS,
@@ -123,7 +123,7 @@ const SelectorEditor: React.FC<{
   // 保存选择器
   const handleSave = () => {
     setSelectors(editingSelectors)
-    toast.success("选择器已保存！(๑•̀ㅂ•́)و✧")
+    toast.success("选择器已保存")
     onClose()
   }
 
@@ -137,40 +137,39 @@ const SelectorEditor: React.FC<{
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-xl bg-white p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-sky-600">
+          <h3 className="font-semibold text-sky-600 text-xl">
             <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2 inline" />
             编辑{SELECTOR_TYPE_NAMES[type]}
           </h3>
-          <button
-            onClick={onClose}
-            className="rounded-full p-1 text-gray-500 hover:bg-gray-100">
+          <Button variant="ghost" size="icon" onClick={onClose}>
             <Icon icon="mdi:close" width={24} />
-          </button>
+          </Button>
         </div>
 
-        <p className="mb-4 text-sm text-gray-600">
+        <p className="mb-4 text-gray-600 text-sm">
           {SELECTOR_TYPE_DESCRIPTIONS[type]} (按优先级排序，从上到下)
         </p>
 
         {(type === "title" || type === "content") && (
           <div className="mb-4">
-            <button
-              onClick={() => setShowRules(!showRules)}
-              className="flex items-center rounded-md border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowRules(!showRules)}>
               <Icon
                 icon={showRules ? "mdi:chevron-up" : "mdi:chevron-down"}
                 className="mr-1.5"
                 width={16}
               />
               {showRules ? "收起规则说明" : "展开规则说明"}
-            </button>
+            </Button>
 
             {type === "title" && (
               <div
                 className={`origin-top transform transition-all duration-300 ease-in-out ${
                   showRules
                     ? "mt-3 max-h-[500px] scale-100 opacity-100"
-                    : "scale-98 mt-0 max-h-0 overflow-hidden opacity-0"
+                    : "mt-0 max-h-0 scale-98 overflow-hidden opacity-0"
                 }`}>
                 <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
                   <strong className="mb-2 flex items-center text-sky-700">
@@ -196,7 +195,7 @@ const SelectorEditor: React.FC<{
                 className={`origin-top transform transition-all duration-300 ease-in-out ${
                   showRules
                     ? "mt-3 max-h-[500px] scale-100 opacity-100"
-                    : "scale-98 mt-0 max-h-0 overflow-hidden opacity-0"
+                    : "mt-0 max-h-0 scale-98 overflow-hidden opacity-0"
                 }`}>
                 <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
                   <strong className="mb-2 flex items-center text-sky-700">
@@ -239,43 +238,51 @@ const SelectorEditor: React.FC<{
             placeholder="输入新的CSS选择器..."
             className="flex-1 rounded-l-lg border border-sky-200 bg-blue-50 p-2 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
           />
-          <button
-            onClick={handleAddSelector}
-            className="rounded-r-lg bg-sky-500 px-4 py-2 text-white hover:bg-sky-600">
+          <Button onClick={handleAddSelector} className="rounded-l-none">
             添加
-          </button>
+          </Button>
         </div>
 
         {/* 选择器列表 */}
         <div className="mb-4 max-h-[40vh] overflow-auto rounded-lg border border-sky-100">
           {editingSelectors.length > 0 ? (
             <ul className="divide-y divide-sky-100">
-              {editingSelectors.map((selector, index) => (
-                <li
-                  key={index}
-                  className="flex items-center justify-between bg-white p-3 hover:bg-blue-50">
-                  <span className="flex-1 font-mono text-sm">{selector}</span>
-                  <div className="flex space-x-1">
-                    <button
-                      onClick={() => handleMoveUp(index)}
-                      disabled={index === 0}
-                      className="rounded p-1 text-sky-600 hover:bg-sky-100 disabled:text-gray-300">
-                      <Icon icon="mdi:arrow-up" width={20} />
-                    </button>
-                    <button
-                      onClick={() => handleMoveDown(index)}
-                      disabled={index === editingSelectors.length - 1}
-                      className="rounded p-1 text-sky-600 hover:bg-sky-100 disabled:text-gray-300">
-                      <Icon icon="mdi:arrow-down" width={20} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSelector(index)}
-                      className="rounded p-1 text-red-500 hover:bg-red-50">
-                      <Icon icon="mdi:delete-outline" width={20} />
-                    </button>
-                  </div>
-                </li>
-              ))}
+              {editingSelectors.map((selector, index) => {
+                // Selectors may be duplicated, so index is needed for uniqueness
+                const itemKey = `selector-${index}-${selector.slice(0, 10)}`
+                return (
+                  <li
+                    key={itemKey}
+                    className="flex items-center justify-between bg-white p-3 hover:bg-blue-50">
+                    <span className="flex-1 font-mono text-sm">{selector}</span>
+                    <div className="flex space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleMoveUp(index)}
+                        disabled={index === 0}
+                        className="h-7 w-7">
+                        <Icon icon="mdi:arrow-up" width={20} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleMoveDown(index)}
+                        disabled={index === editingSelectors.length - 1}
+                        className="h-7 w-7">
+                        <Icon icon="mdi:arrow-down" width={20} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteSelector(index)}
+                        className="h-7 w-7 text-red-500 hover:text-red-600">
+                        <Icon icon="mdi:delete-outline" width={20} />
+                      </Button>
+                    </div>
+                  </li>
+                )
+              })}
             </ul>
           ) : (
             <div className="flex h-24 items-center justify-center text-gray-500">
@@ -286,22 +293,14 @@ const SelectorEditor: React.FC<{
 
         {/* 按钮组 */}
         <div className="flex justify-between">
-          <button
-            onClick={handleResetToDefault}
-            className="rounded-lg border border-sky-300 bg-white px-4 py-2 text-sky-600 hover:bg-sky-50">
+          <Button variant="outline" onClick={handleResetToDefault}>
             恢复默认值
-          </button>
+          </Button>
           <div className="space-x-2">
-            <button
-              onClick={onClose}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50">
+            <Button variant="secondary" onClick={onClose}>
               取消
-            </button>
-            <button
-              onClick={handleSave}
-              className="rounded-lg bg-sky-500 px-4 py-2 text-white hover:bg-sky-600">
-              保存
-            </button>
+            </Button>
+            <Button onClick={handleSave}>保存</Button>
           </div>
         </div>
       </div>
@@ -315,17 +314,18 @@ const SelectorTypeCard: React.FC<{
   onClick: () => void
 }> = ({ type, onClick }) => {
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
-      className="cursor-pointer rounded-lg border-2 border-sky-100 bg-white p-4 shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
+      className="w-full cursor-pointer rounded-lg border-2 border-sky-100 bg-white p-4 text-left shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
       <div className="mb-2 flex items-center text-sky-600">
         <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2" width={24} />
-        <h3 className="text-lg font-medium">{SELECTOR_TYPE_NAMES[type]}</h3>
+        <h3 className="font-medium text-lg">{SELECTOR_TYPE_NAMES[type]}</h3>
       </div>
-      <p className="text-sm text-gray-600">
+      <p className="text-gray-600 text-sm">
         {SELECTOR_TYPE_DESCRIPTIONS[type]}
       </p>
-    </div>
+    </button>
   )
 }
 
@@ -362,7 +362,7 @@ const ScrapeRulesExplanation = () => {
           默认选择器列表（按优先级）：
         </p>
         <div className="max-h-32 overflow-y-auto rounded border border-sky-100 bg-white p-2">
-          <code className="font-mono text-xs text-gray-600">
+          <code className="font-mono text-gray-600 text-xs">
             {CONTENT_SELECTORS.join(", ")}
           </code>
         </div>
@@ -389,11 +389,12 @@ export const SelectorSettingsSection: React.FC = () => {
   return (
     <OptionSection title="选择器设置" icon="line-md:document-code">
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-gray-600">
+        <span className="text-gray-600 text-sm">
           自定义CSS选择器用于从网页中提取内容。点击卡片编辑对应类型的选择器。
         </span>
-        <button
-          className="flex items-center rounded-md border border-sky-200 bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700"
+        <Button
+          variant="outline"
+          size="xs"
           onClick={() => setShowExplanation(!showExplanation)}>
           <Icon
             icon={showExplanation ? "mdi:eye-off-outline" : "mdi:eye-outline"}
@@ -401,14 +402,14 @@ export const SelectorSettingsSection: React.FC = () => {
             width={18}
           />
           {showExplanation ? "隐藏抓取规则" : "查看抓取规则"}
-        </button>
+        </Button>
       </div>
 
       <div
         className={`origin-top transform transition-all duration-500 ease-in-out ${
           showExplanation
             ? "mb-6 max-h-[1000px] scale-100 opacity-100"
-            : "scale-98 mb-0 max-h-0 overflow-hidden opacity-0"
+            : "mb-0 max-h-0 scale-98 overflow-hidden opacity-0"
         }`}
         style={{
           transitionDelay: showExplanation ? "0ms" : "100ms"

@@ -1,12 +1,15 @@
 import { Icon } from "@iconify/react"
 import { useState } from "react"
 
+import { Button } from "~/components/ui/button"
+
 interface AccordionSectionProps {
   title: string
   icon: string
   children: React.ReactNode
   defaultOpen?: boolean
   maxHeight?: string
+  contentBorder?: boolean
 }
 
 export function AccordionSection({
@@ -14,17 +17,19 @@ export function AccordionSection({
   icon,
   children,
   defaultOpen = false,
-  maxHeight
+  maxHeight,
+  contentBorder = true
 }: AccordionSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen)
 
   return (
     <div className="overflow-hidden rounded-lg border border-sky-200 bg-white">
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        fullWidth
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-sky-50">
-        <span className="flex items-center gap-2 text-sm font-medium text-sky-700">
+        className="justify-between p-3 hover:bg-sky-50">
+        <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
           <Icon icon={icon} width={16} />
           {title}
         </span>
@@ -33,7 +38,7 @@ export function AccordionSection({
           width={18}
           className={`text-sky-500 transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
-      </button>
+      </Button>
       <div
         className={`transition-all duration-200 ${
           isOpen
@@ -41,7 +46,10 @@ export function AccordionSection({
             : "max-h-0 overflow-hidden opacity-0"
         }`}
         style={isOpen && maxHeight ? { maxHeight } : undefined}>
-        <div className="border-t border-sky-100 p-3">{children}</div>
+        <div
+          className={`p-3 ${contentBorder ? "border-sky-100 border-t" : ""}`}>
+          {children}
+        </div>
       </div>
     </div>
   )

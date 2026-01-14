@@ -37,6 +37,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
   }, [fileUrl, fileName])
   return (
     <button
+      type="button"
       onClick={handleDownload}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}

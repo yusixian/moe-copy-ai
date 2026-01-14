@@ -41,11 +41,11 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
       <table className="min-w-full divide-y divide-sky-200">
         <thead className="bg-gradient-to-r from-blue-100 to-indigo-100">
           <tr>
-            <th className="w-1/5 px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-sky-600">
-              属性 🏷️
+            <th className="w-1/5 px-3 py-2 text-left font-medium text-sky-600 text-xs uppercase tracking-wider">
+              属性
             </th>
-            <th className="w-4/5 px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-sky-600">
-              值 ✨
+            <th className="w-4/5 px-3 py-2 text-left font-medium text-sky-600 text-xs uppercase tracking-wider">
+              值
             </th>
           </tr>
         </thead>
@@ -54,10 +54,10 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
             <tr
               key={key}
               className={index % 2 === 0 ? "bg-blue-50" : "bg-white"}>
-              <td className="w-1/5 px-3 py-2 text-xs font-medium text-indigo-600">
+              <td className="w-1/5 px-3 py-2 font-medium text-indigo-600 text-xs">
                 {key}
               </td>
-              <td className="w-4/5 whitespace-pre-wrap break-all px-3 py-2 text-xs text-gray-700">
+              <td className="w-4/5 whitespace-pre-wrap break-all px-3 py-2 text-gray-700 text-xs">
                 <CopyableTextField
                   text={value}
                   readOnly={true}
@@ -77,7 +77,7 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
                           variant="rounded"
                           size="full"
                           containerClassName="size-full"
-                          onLoadError={() => onLoadError && onLoadError(key)}
+                          onLoadError={() => onLoadError?.(key)}
                         />
                       </div>
                     </div>
@@ -87,8 +87,8 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
           ))}
         </tbody>
       </table>
-      <div className="border-t border-blue-100 bg-blue-50 p-1 text-center text-xs text-sky-400">
-        ✨ 元数据可以帮助 AI 更好地理解页面内容 ✨
+      <div className="border-blue-100 border-t bg-blue-50 p-1 text-center text-sky-400 text-xs">
+        元数据可以帮助 AI 更好地理解页面内容
       </div>
     </div>
   )

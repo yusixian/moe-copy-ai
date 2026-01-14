@@ -14,8 +14,18 @@ import { getExtractionMode, getReadabilityConfig } from "../utils/storage"
 // 创建存储实例
 const storage = new Storage({ area: "sync" })
 
+// 抓取数据类型
+interface CachedScrapeData {
+  articleContent?: string
+  cleanedContent?: string
+  title?: string
+  metadata: Record<string, string>
+  success?: boolean
+  error?: string
+}
+
 // 缓存抓取结果，避免重复抓取
-let cachedScrapedData: any = null
+let cachedScrapedData: CachedScrapeData | null = null
 let cacheUrl: string = ""
 
 // 在页面加载完成后，检查用户配置决定是否自动抓取
@@ -83,7 +93,7 @@ function testSelector(selector: string) {
 
         // 如果是大型内容容器，限制内容长度
         if (content.length > 1000) {
-          content = content.substring(0, 1000) + "..."
+          content = `${content.substring(0, 1000)}...`
         }
       }
 
@@ -176,7 +186,7 @@ chrome.runtime.onMessage.addListener(
           debugLog("抓取过程中出错:", error)
           sendResponse({
             success: false,
-            error: error.message || "抓取内容时出错"
+            error: error instanceof Error ? error.message : "抓取内容时出错"
           })
         })
 
@@ -185,7 +195,10 @@ chrome.runtime.onMessage.addListener(
     }
 
     // 处理测试选择器请求
-    if (message.action === "testSelector" && message.selector) {
+    if (
+      message.action === "testSelector" &&
+      typeof message.selector === "string"
+    ) {
       debugLog("收到测试选择器请求")
       const result = testSelector(message.selector)
       sendResponse(result)

@@ -10,7 +10,12 @@ export function isDynamicValue(value: string): boolean {
   if (/^r[:-]?\d+$/.test(value)) return true
   if (/^radix-/i.test(value)) return true
   // UUID 格式
-  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)) return true
+  if (
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      value
+    )
+  )
+    return true
   // 纯数字 ID (可能是动态生成的)
   if (/^\d{6,}$/.test(value)) return true
 
@@ -73,7 +78,13 @@ export interface SelectorResult {
   /** 选择器的稳定性评分 (0-100)，越高越稳定 */
   stability: number
   /** 选择器类型描述 */
-  type: 'id' | 'class' | 'attribute' | 'semantic' | 'parent-limited' | 'nth-path'
+  type:
+    | "id"
+    | "class"
+    | "attribute"
+    | "semantic"
+    | "parent-limited"
+    | "nth-path"
 }
 
 /**
@@ -103,7 +114,7 @@ export function generateSelectorWithInfo(
     const selector = `#${CSS.escape(element.id)}`
     const matchCount = countMatches(selector)
     if (matchCount === 1 || allowMultiple) {
-      return { selector, matchCount, stability: 95, type: 'id' }
+      return { selector, matchCount, stability: 95, type: "id" }
     }
   }
 
@@ -117,13 +128,13 @@ export function generateSelectorWithInfo(
     // 尝试不同数量的类名组合
     for (let count = stableClasses.length; count >= 1; count--) {
       const classes = stableClasses.slice(0, count)
-      const selector = `${tag}.${classes.map((c) => CSS.escape(c)).join('.')}`
+      const selector = `${tag}.${classes.map((c) => CSS.escape(c)).join(".")}`
       const matchCount = countMatches(selector)
       if (matchCount === 1) {
-        return { selector, matchCount, stability: 80, type: 'class' }
+        return { selector, matchCount, stability: 80, type: "class" }
       }
       if (allowMultiple && matchCount > 0) {
-        return { selector, matchCount, stability: 70, type: 'class' }
+        return { selector, matchCount, stability: 70, type: "class" }
       }
     }
   }
@@ -148,7 +159,7 @@ export function generateSelectorWithInfo(
     selector: nthPath,
     matchCount: 1,
     stability: 30,
-    type: 'nth-path',
+    type: "nth-path"
   }
 }
 
@@ -162,34 +173,34 @@ function trySemanticSelector(
 ): SelectorResult | null {
   // 优先级从高到低的语义属性
   const semanticAttrs = [
-    'data-testid',
-    'data-test-id',
-    'data-cy',
-    'data-id',
-    'aria-label',
-    'name',
-    'title',
+    "data-testid",
+    "data-test-id",
+    "data-cy",
+    "data-id",
+    "aria-label",
+    "name",
+    "title"
   ]
 
   for (const attrName of semanticAttrs) {
     const value = element.getAttribute(attrName)
-    if (value && !isDynamicValue(value) && !value.includes('\n')) {
+    if (value && !isDynamicValue(value) && !value.includes("\n")) {
       const escapedValue = CSS.escape(value)
       const selector = `${tag}[${attrName}="${escapedValue}"]`
       const matchCount = countMatches(selector)
       if (matchCount === 1 || allowMultiple) {
-        return { selector, matchCount, stability: 85, type: 'semantic' }
+        return { selector, matchCount, stability: 85, type: "semantic" }
       }
     }
   }
 
   // 尝试 role 属性
-  const role = element.getAttribute('role')
+  const role = element.getAttribute("role")
   if (role) {
     const selector = `${tag}[role="${CSS.escape(role)}"]`
     const matchCount = countMatches(selector)
     if (matchCount === 1) {
-      return { selector, matchCount, stability: 75, type: 'semantic' }
+      return { selector, matchCount, stability: 75, type: "semantic" }
     }
   }
 
@@ -206,25 +217,26 @@ function tryAttributeSelector(
 ): SelectorResult | null {
   // 可用于选择的属性（排除常见的动态属性）
   const skipAttrs = new Set([
-    'id',
-    'class',
-    'style',
-    'src',
-    'href',
-    'onclick',
-    'onload',
-    'onerror',
+    "id",
+    "class",
+    "style",
+    "src",
+    "href",
+    "onclick",
+    "onload",
+    "onerror"
   ])
 
   for (const attr of Array.from(element.attributes)) {
     if (skipAttrs.has(attr.name)) continue
-    if (!attr.value || attr.value.includes(' ') || attr.value.length > 50) continue
+    if (!attr.value || attr.value.includes(" ") || attr.value.length > 50)
+      continue
     if (isDynamicValue(attr.value)) continue
 
     const selector = `${tag}[${attr.name}="${CSS.escape(attr.value)}"]`
     const matchCount = countMatches(selector)
     if (matchCount === 1 || allowMultiple) {
-      return { selector, matchCount, stability: 65, type: 'attribute' }
+      return { selector, matchCount, stability: 65, type: "attribute" }
     }
   }
 
@@ -253,7 +265,12 @@ function tryParentLimitedSelector(
       const directChild = `${parentSelector} > ${tag}`
       let matchCount = countMatches(directChild)
       if (matchCount === 1 || allowMultiple) {
-        return { selector: directChild, matchCount, stability: 60, type: 'parent-limited' }
+        return {
+          selector: directChild,
+          matchCount,
+          stability: 60,
+          type: "parent-limited"
+        }
       }
 
       // 尝试 父选择器 > 子标签.类名
@@ -261,7 +278,12 @@ function tryParentLimitedSelector(
         const withClass = `${parentSelector} > ${tag}.${CSS.escape(stableClasses[0])}`
         matchCount = countMatches(withClass)
         if (matchCount === 1 || allowMultiple) {
-          return { selector: withClass, matchCount, stability: 65, type: 'parent-limited' }
+          return {
+            selector: withClass,
+            matchCount,
+            stability: 65,
+            type: "parent-limited"
+          }
         }
       }
 
@@ -269,7 +291,12 @@ function tryParentLimitedSelector(
       const descendant = `${parentSelector} ${tag}`
       matchCount = countMatches(descendant)
       if (matchCount === 1 || allowMultiple) {
-        return { selector: descendant, matchCount, stability: 55, type: 'parent-limited' }
+        return {
+          selector: descendant,
+          matchCount,
+          stability: 55,
+          type: "parent-limited"
+        }
       }
     }
 
@@ -293,11 +320,14 @@ function buildElementSelector(element: Element): string | null {
   // 使用稳定类名
   const stableClasses = getStableClasses(element)
   if (stableClasses.length > 0) {
-    return `${tag}.${stableClasses.slice(0, 2).map((c) => CSS.escape(c)).join('.')}`
+    return `${tag}.${stableClasses
+      .slice(0, 2)
+      .map((c) => CSS.escape(c))
+      .join(".")}`
   }
 
   // 使用语义属性
-  const semanticAttrs = ['data-testid', 'role', 'aria-label']
+  const semanticAttrs = ["data-testid", "role", "aria-label"]
   for (const attrName of semanticAttrs) {
     const value = element.getAttribute(attrName)
     if (value && !isDynamicValue(value)) {
@@ -316,7 +346,11 @@ function generateNthChildPath(element: Element): string {
   let current: Element | null = element
   let foundAnchor = false
 
-  while (current && current !== document.body && current !== document.documentElement) {
+  while (
+    current &&
+    current !== document.body &&
+    current !== document.documentElement
+  ) {
     const tag = current.tagName.toLowerCase()
     const parent = current.parentElement
 
@@ -331,7 +365,7 @@ function generateNthChildPath(element: Element): string {
 
     // 计算当前元素在同类兄弟中的索引
     const siblings = Array.from(parent.children).filter(
-      (child) => child.tagName === current!.tagName
+      (child) => child.tagName === current?.tagName
     )
     const index = siblings.indexOf(current) + 1
 
@@ -349,13 +383,16 @@ function generateNthChildPath(element: Element): string {
     }
   }
 
-  return path.join(' > ')
+  return path.join(" > ")
 }
 
 /**
  * 验证选择器是否能匹配到目标元素
  */
-export function validateSelector(selector: string, targetElement: Element): boolean {
+export function validateSelector(
+  selector: string,
+  targetElement: Element
+): boolean {
   try {
     const matches = document.querySelectorAll(selector)
     return Array.from(matches).includes(targetElement)
@@ -377,13 +414,13 @@ export function getSelectorMatchInfo(selector: string): {
     return {
       isValid: true,
       matchCount: elements.length,
-      elements,
+      elements
     }
   } catch {
     return {
       isValid: false,
       matchCount: 0,
-      elements: [],
+      elements: []
     }
   }
 }
@@ -411,7 +448,9 @@ function escapeXPathString(str: string): string {
     return `"${str}"`
   }
   // 包含两种引号，使用 concat
-  return `concat('${str.replace(/'/g, "',\"'\",'")}')`.replace(/'',/g, '').replace(/,''$/g, '')
+  return `concat('${str.replace(/'/g, "',\"'\",'")}')`
+    .replace(/'',/g, "")
+    .replace(/,''$/g, "")
 }
 
 /**
@@ -419,7 +458,13 @@ function escapeXPathString(str: string): string {
  */
 function countXPathMatches(xpath: string): number {
   try {
-    const result = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null)
+    const result = document.evaluate(
+      xpath,
+      document,
+      null,
+      XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+      null
+    )
     return result.snapshotLength
   } catch {
     return 0
@@ -430,19 +475,21 @@ function countXPathMatches(xpath: string): number {
  * 获取元素的简洁文本内容（去除多余空白）
  */
 function getElementText(element: Element): string {
-  return (element.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 50)
+  return (element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 50)
 }
 
 /**
  * 专门为下一页按钮生成稳定的 XPath 选择器
  * 使用多种策略确保选择器的稳定性和唯一性，包含文本内容匹配
  */
-export function generateNextPageButtonSelector(element: Element): NextPageSelectorResult {
+export function generateNextPageButtonSelector(
+  element: Element
+): NextPageSelectorResult {
   const tag = element.tagName.toLowerCase()
   const textContent = getElementText(element)
 
   // 策略 1: rel="next" (最标准的分页标识)
-  if (element.getAttribute('rel') === 'next') {
+  if (element.getAttribute("rel") === "next") {
     const xpath = `//${tag}[@rel='next']`
     if (countXPathMatches(xpath) === 1) {
       return { xpath, description: 'rel="next"', textContent }
@@ -450,7 +497,7 @@ export function generateNextPageButtonSelector(element: Element): NextPageSelect
   }
 
   // 策略 2: aria-label 匹配
-  const ariaLabel = element.getAttribute('aria-label')
+  const ariaLabel = element.getAttribute("aria-label")
   if (ariaLabel && !isDynamicValue(ariaLabel)) {
     const xpath = `//${tag}[@aria-label=${escapeXPathString(ariaLabel)}]`
     if (countXPathMatches(xpath) === 1) {
@@ -467,7 +514,7 @@ export function generateNextPageButtonSelector(element: Element): NextPageSelect
   }
 
   // 策略 4: title 属性匹配
-  const title = element.getAttribute('title')
+  const title = element.getAttribute("title")
   if (title && !isDynamicValue(title)) {
     const xpath = `//${tag}[@title=${escapeXPathString(title)}]`
     if (countXPathMatches(xpath) === 1) {
@@ -477,7 +524,9 @@ export function generateNextPageButtonSelector(element: Element): NextPageSelect
 
   // 策略 5: class 包含 next 相关词 + 文本
   const classList = Array.from(element.classList)
-  const nextClass = classList.find((c) => /next|forward/i.test(c) && !isDynamicValue(c))
+  const nextClass = classList.find(
+    (c) => /next|forward/i.test(c) && !isDynamicValue(c)
+  )
   if (nextClass && textContent) {
     const xpath = `//${tag}[contains(@class, '${nextClass}') and normalize-space()=${escapeXPathString(textContent)}]`
     if (countXPathMatches(xpath) === 1) {
@@ -493,11 +542,15 @@ export function generateNextPageButtonSelector(element: Element): NextPageSelect
 
   // 策略 6: data 属性
   for (const attr of Array.from(element.attributes)) {
-    if (attr.name.startsWith('data-') && /next|page/i.test(attr.name)) {
+    if (attr.name.startsWith("data-") && /next|page/i.test(attr.name)) {
       if (attr.value && !isDynamicValue(attr.value)) {
         const xpath = `//${tag}[@${attr.name}=${escapeXPathString(attr.value)}]`
         if (countXPathMatches(xpath) === 1) {
-          return { xpath, description: `${attr.name}="${attr.value}"`, textContent }
+          return {
+            xpath,
+            description: `${attr.name}="${attr.value}"`,
+            textContent
+          }
         }
       }
     }
@@ -506,16 +559,23 @@ export function generateNextPageButtonSelector(element: Element): NextPageSelect
   // 策略 7: 稳定类名 + 文本内容组合
   const stableClasses = getStableClasses(element)
   if (stableClasses.length > 0 && textContent) {
-    const classCondition = stableClasses.slice(0, 2).map(c => `contains(@class, '${c}')`).join(' and ')
+    const classCondition = stableClasses
+      .slice(0, 2)
+      .map((c) => `contains(@class, '${c}')`)
+      .join(" and ")
     const xpath = `//${tag}[${classCondition} and normalize-space()=${escapeXPathString(textContent)}]`
     if (countXPathMatches(xpath) === 1) {
-      return { xpath, description: `class + text="${textContent}"`, textContent }
+      return {
+        xpath,
+        description: `class + text="${textContent}"`,
+        textContent
+      }
     }
   }
 
   // 策略 8: 生成 XPath 路径
   const xpathPath = generateXPathFromElement(element)
-  return { xpath: xpathPath, description: '路径定位', textContent }
+  return { xpath: xpathPath, description: "路径定位", textContent }
 }
 
 /**
@@ -525,7 +585,11 @@ function generateXPathFromElement(element: Element): string {
   const parts: string[] = []
   let current: Element | null = element
 
-  while (current && current !== document.body && current !== document.documentElement) {
+  while (
+    current &&
+    current !== document.body &&
+    current !== document.documentElement
+  ) {
     const tag = current.tagName.toLowerCase()
     const parent = current.parentElement
 
@@ -539,7 +603,7 @@ function generateXPathFromElement(element: Element): string {
 
     // 计算同名兄弟中的索引
     const siblings = Array.from(parent.children).filter(
-      (child) => child.tagName === current!.tagName
+      (child) => child.tagName === current?.tagName
     )
     const index = siblings.indexOf(current) + 1
 
@@ -554,10 +618,10 @@ function generateXPathFromElement(element: Element): string {
     if (parts.length >= 5) break
   }
 
-  if (parts[0]?.startsWith('//')) {
-    return parts.join('/')
+  if (parts[0]?.startsWith("//")) {
+    return parts.join("/")
   }
-  return '//' + parts.join('/')
+  return `//${parts.join("/")}`
 }
 
 /**
@@ -565,7 +629,13 @@ function generateXPathFromElement(element: Element): string {
  */
 export function findElementByXPath(xpath: string): Element | null {
   try {
-    const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+    const result = document.evaluate(
+      xpath,
+      document,
+      null,
+      XPathResult.FIRST_ORDERED_NODE_TYPE,
+      null
+    )
     return result.singleNodeValue as Element | null
   } catch {
     return null
@@ -575,6 +645,8 @@ export function findElementByXPath(xpath: string): Element | null {
 /**
  * 根据选择器结果查找元素
  */
-export function findElementBySelector(selectorResult: NextPageSelectorResult): Element | null {
+export function findElementBySelector(
+  selectorResult: NextPageSelectorResult
+): Element | null {
   return findElementByXPath(selectorResult.xpath)
 }

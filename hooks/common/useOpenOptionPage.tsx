@@ -1,6 +1,5 @@
-import { useCallback } from "react"
-
 import { sendToBackground } from "@plasmohq/messaging"
+import { useCallback } from "react"
 
 // 打开选项页面
 export const useOpenOptionPage = () => {

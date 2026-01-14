@@ -2,7 +2,26 @@ import { Readability } from "@mozilla/readability"
 import DOMPurify from "dompurify"
 
 import type { ImageInfo, ReadabilityResult } from "../constants/types"
+import { parseHtmlToMarkdown } from "../parser/htmlParser"
 import { debugLog } from "./logger"
+
+/**
+ * Readability.parse() 的实际返回类型
+ * 注意：@mozilla/readability 的类型定义中 content 是 T (泛型)，
+ * 但实际返回的是 HTML 字符串
+ */
+interface ReadabilityParseResult {
+  title: string
+  content: string
+  textContent: string
+  length: number
+  excerpt: string
+  byline: string
+  dir: string
+  siteName: string
+  lang: string
+  publishedTime: string
+}
 
 /**
  * 使用 DOMPurify + Readability.js 提取网页内容
@@ -154,11 +173,11 @@ ${cleanBodyHTML}
     debugLog("Readability 配置:", readabilityOptions)
 
     // 执行内容提取
-    let article: any
+    let article: ReadabilityParseResult | null
     try {
       debugLog("开始执行 Readability 解析")
       const reader = new Readability(documentForReadability, readabilityOptions)
-      article = reader.parse()
+      article = reader.parse() as ReadabilityParseResult | null
 
       debugLog("Readability 解析完成:", {
         success: !!article,
@@ -185,10 +204,10 @@ ${cleanBodyHTML}
     }
 
     debugLog("DOMPurify + Readability 提取成功:", {
-      title: article.title?.substring(0, 50) + "...",
+      title: `${article.title?.substring(0, 50)}...`,
       contentLength: article.content?.length || 0,
       textLength: article.textContent?.length || 0,
-      excerpt: article.excerpt?.substring(0, 100) + "..."
+      excerpt: `${article.excerpt?.substring(0, 100)}...`
     })
 
     // 分析提取的内容结构
@@ -237,119 +256,13 @@ ${cleanBodyHTML}
 }
 
 /**
- * 处理表格元素，转换为 Markdown 表格格式
- */
-function processTable(tableElement: Element): string {
-  const rows: string[][] = []
-  let hasHeader = false
-
-  // 提取表头
-  const thead = tableElement.querySelector('thead')
-  if (thead) {
-    const headerRow = thead.querySelector('tr')
-    if (headerRow) {
-      const headerCells = Array.from(headerRow.querySelectorAll('th, td'))
-      if (headerCells.length > 0) {
-        rows.push(headerCells.map(cell => getCellText(cell)))
-        hasHeader = true
-      }
-    }
-  }
-
-  // 提取表体
-  const tbody = tableElement.querySelector('tbody') || tableElement
-  const bodyRows = Array.from(tbody.querySelectorAll('tr'))
-    .filter(row => !row.closest('thead')) // 排除已处理的表头
-
-  for (const row of bodyRows) {
-    const cells = Array.from(row.querySelectorAll('th, td'))
-    if (cells.length > 0) {
-      // 如果没有表头但第一行是 th，标记为表头
-      if (!hasHeader && rows.length === 0 && cells[0].tagName.toLowerCase() === 'th') {
-        rows.push(cells.map(cell => getCellText(cell)))
-        hasHeader = true
-      } else {
-        rows.push(cells.map(cell => getCellText(cell)))
-      }
-    }
-  }
-
-  if (rows.length === 0) return ''
-
-  // 确定列数（取最大列数）
-  const colCount = Math.max(...rows.map(row => row.length))
-
-  // 补齐每行的列数
-  const normalizedRows = rows.map(row => {
-    while (row.length < colCount) row.push('')
-    return row
-  })
-
-  // 生成 Markdown 表格
-  const lines: string[] = []
-
-  // 如果没有表头，使用第一行作为表头
-  const headerRow = normalizedRows[0]
-  lines.push('| ' + headerRow.join(' | ') + ' |')
-
-  // 分隔行
-  lines.push('| ' + headerRow.map(() => '---').join(' | ') + ' |')
-
-  // 数据行
-  const dataRows = hasHeader ? normalizedRows.slice(1) : normalizedRows.slice(1)
-  for (const row of dataRows) {
-    lines.push('| ' + row.join(' | ') + ' |')
-  }
-
-  return '\n\n' + lines.join('\n') + '\n\n'
-}
-
-/**
- * 获取表格单元格的文本内容（清理格式）
- */
-function getCellText(cell: Element): string {
-  // 递归获取文本，处理嵌套元素
-  function extractText(node: Node): string {
-    if (node.nodeType === Node.TEXT_NODE) {
-      return node.textContent?.trim() || ''
-    }
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const el = node as Element
-      const tag = el.tagName.toLowerCase()
-
-      // 跳过不需要的元素
-      if (['script', 'style', 'svg', 'button', 'input'].includes(tag)) {
-        // 对于 input，可能需要提取 placeholder 或 value
-        if (tag === 'input') {
-          return el.getAttribute('placeholder') || ''
-        }
-        return ''
-      }
-
-      // 递归处理子节点
-      const children = Array.from(el.childNodes).map(extractText).filter(Boolean)
-
-      // 根据标签添加格式
-      const text = children.join(' ')
-      if (tag === 'strong' || tag === 'b') return `**${text}**`
-      if (tag === 'em' || tag === 'i') return `*${text}*`
-      if (tag === 'code') return `\`${text}\``
-
-      return text
-    }
-    return ''
-  }
-
-  return extractText(cell)
-    .replace(/\s+/g, ' ')
-    .replace(/\|/g, '\\|') // 转义表格分隔符
-    .trim()
-}
-
-/**
  * HTML内容转换为Markdown格式
+ * 使用 unified 生态系统进行转换
  */
-export function convertHtmlToMarkdown(htmlContent: string): string {
+export async function convertHtmlToMarkdown(
+  htmlContent: string,
+  baseUrl?: string
+): Promise<string> {
   if (!htmlContent) {
     debugLog("convertHtmlToMarkdown: 输入内容为空")
     return ""
@@ -358,21 +271,26 @@ export function convertHtmlToMarkdown(htmlContent: string): string {
   debugLog("convertHtmlToMarkdown: 开始转换，输入长度:", htmlContent.length)
   debugLog(
     "convertHtmlToMarkdown: 输入内容预览:",
-    htmlContent.substring(0, 200) + "..."
+    `${htmlContent.substring(0, 200)}...`
   )
 
-  // 创建临时DOM元素来处理HTML
-  const tempDiv = document.createElement("div")
-
   try {
-    tempDiv.innerHTML = htmlContent
+    const markdownContent = await parseHtmlToMarkdown(htmlContent, baseUrl)
+    // 清理多余的空行和空格
+    const cleanedContent = markdownContent
+      .replace(/\n{3,}/g, "\n\n") // 限制连续换行不超过2个
+      .trim()
+
+    debugLog("convertHtmlToMarkdown: 最终结果长度:", cleanedContent.length)
     debugLog(
-      "convertHtmlToMarkdown: HTML解析成功，子节点数量:",
-      tempDiv.childNodes.length
+      "convertHtmlToMarkdown: 最终内容预览:",
+      `${cleanedContent.substring(0, 200)}...`
     )
+
+    return cleanedContent
   } catch (error) {
-    debugLog("convertHtmlToMarkdown: HTML解析失败:", error)
-    // 如果HTML解析失败，尝试提取纯文本
+    debugLog("convertHtmlToMarkdown: 转换失败:", error)
+    // Fallback: 提取纯文本
     const textOnly = htmlContent
       .replace(/<[^>]*>/g, " ")
       .replace(/\s+/g, " ")
@@ -383,200 +301,6 @@ export function convertHtmlToMarkdown(htmlContent: string): string {
     )
     return textOnly
   }
-
-  // 递归处理节点，转换为Markdown
-  function processNode(node: Node): string {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent || ""
-      // 保留一些空格，但清理多余的换行
-      return text.replace(/\s+/g, " ")
-    }
-
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const element = node as Element
-      const tagName = element.tagName.toLowerCase()
-
-      // 跳过一些不需要的元素
-      if (["script", "style", "meta", "link", "noscript", "svg"].includes(tagName)) {
-        return ""
-      }
-
-      // 跳过扩展相关元素
-      if (
-        element.id?.includes("plasmo") ||
-        element.className?.includes("plasmo")
-      ) {
-        return ""
-      }
-
-      // 特殊处理表格
-      if (tagName === "table") {
-        return processTable(element)
-      }
-
-      // 跳过表格内部元素（由 processTable 统一处理）
-      if (["thead", "tbody", "tfoot", "tr", "th", "td"].includes(tagName)) {
-        // 如果不在 table 内，则正常处理子内容
-        if (!element.closest("table")) {
-          const textContent = Array.from(element.childNodes)
-            .map(processNode)
-            .join("")
-          return textContent
-        }
-        return ""
-      }
-
-      const textContent = Array.from(element.childNodes)
-        .map(processNode)
-        .join("")
-
-      // 对于img、br、hr等自闭合标签，即使没有textContent也要处理
-      const selfClosingTags = ["img", "br", "hr", "input"]
-      if (!textContent.trim() && !selfClosingTags.includes(tagName)) {
-        return ""
-      }
-
-      switch (tagName) {
-        case "h1":
-          return `\n\n# ${textContent.trim()}\n\n`
-        case "h2":
-          return `\n\n## ${textContent.trim()}\n\n`
-        case "h3":
-          return `\n\n### ${textContent.trim()}\n\n`
-        case "h4":
-          return `\n\n#### ${textContent.trim()}\n\n`
-        case "h5":
-          return `\n\n##### ${textContent.trim()}\n\n`
-        case "h6":
-          return `\n\n###### ${textContent.trim()}\n\n`
-        case "p":
-          const pContent = textContent.trim()
-          return pContent ? `\n\n${pContent}\n` : ""
-        case "br":
-          return "\n"
-        case "strong":
-        case "b":
-          return `**${textContent.trim()}**`
-        case "em":
-        case "i":
-          return `*${textContent.trim()}*`
-        case "code":
-          return `\`${textContent.trim()}\``
-        case "pre":
-          // 检查是否包含代码块
-          const codeElement = element.querySelector("code")
-          const preContent = codeElement
-            ? codeElement.textContent?.trim() || textContent.trim()
-            : textContent.trim()
-          return `\n\n\`\`\`\n${preContent}\n\`\`\`\n\n`
-        case "blockquote":
-          return `\n\n> ${textContent.trim()}\n\n`
-        case "a":
-          const href = element.getAttribute("href")
-          const linkText = textContent.trim()
-          if (
-            href &&
-            !href.startsWith("#") &&
-            !href.startsWith("javascript:") &&
-            linkText
-          ) {
-            return `[${linkText}](${href})`
-          }
-          return linkText
-        case "ul":
-          return `\n${textContent}\n`
-        case "ol":
-          // 对于有序列表，需要特殊处理
-          return `\n${textContent}\n`
-        case "li":
-          const liContent = textContent.trim()
-          // 检查是否是有序列表的子项
-          const parentOl = element.closest("ol")
-          if (parentOl) {
-            const siblings = Array.from(parentOl.children)
-            const index = siblings.indexOf(element) + 1
-            return liContent ? `\n${index}. ${liContent}` : ""
-          }
-          return liContent ? `\n- ${liContent}` : ""
-        case "img":
-          const src = element.getAttribute("src")
-          const alt = element.getAttribute("alt") || ""
-          if (src) {
-            return `\n\n![${alt}](${src})\n\n`
-          }
-          return ""
-        case "hr":
-          return "\n\n---\n\n"
-        case "dl":
-          // 定义列表
-          return `\n${textContent}\n`
-        case "dt":
-          // 定义术语
-          return `\n\n**${textContent.trim()}**\n`
-        case "dd":
-          // 定义描述
-          return `\n: ${textContent.trim()}\n`
-        case "div":
-        case "span":
-        case "section":
-        case "article":
-        case "main":
-        case "header":
-        case "footer":
-        case "aside":
-        case "nav":
-        case "figure":
-        case "figcaption":
-          // 对于容器元素，直接返回子内容，但添加适当的间距
-          if (textContent.trim()) {
-            return ["div", "section", "article", "main", "aside", "figure"].includes(tagName)
-              ? `\n${textContent}\n`
-              : textContent
-          }
-          return ""
-        case "button":
-          // 按钮通常是交互元素，可以保留文本或跳过
-          const buttonText = textContent.trim()
-          return buttonText ? ` [${buttonText}] ` : ""
-        default:
-          return textContent
-      }
-    }
-
-    return ""
-  }
-
-  let markdownContent: string
-  try {
-    markdownContent = processNode(tempDiv)
-    debugLog(
-      "convertHtmlToMarkdown: 节点处理完成，Markdown长度:",
-      markdownContent.length
-    )
-  } catch (error) {
-    debugLog("convertHtmlToMarkdown: 节点处理失败:", error)
-    // Fallback: 直接使用文本内容
-    markdownContent = tempDiv.textContent || tempDiv.innerText || ""
-    debugLog(
-      "convertHtmlToMarkdown: 使用textContent fallback，长度:",
-      markdownContent.length
-    )
-  }
-
-  // 清理多余的空行和空格
-  const cleanedContent = markdownContent
-    .replace(/\n\s+\n/g, "\n\n") // 清理换行间的空格
-    .replace(/\n{3,}/g, "\n\n") // 限制连续换行不超过2个
-    .replace(/^\s+/gm, "") // 移除行首空格（但保留列表缩进）
-    .trim()
-
-  debugLog("convertHtmlToMarkdown: 最终结果长度:", cleanedContent.length)
-  debugLog(
-    "convertHtmlToMarkdown: 最终内容预览:",
-    cleanedContent.substring(0, 200) + "..."
-  )
-
-  return cleanedContent
 }
 
 /**
@@ -664,10 +388,10 @@ export function extractImagesFromMarkdown(
 ): ImageInfo[] {
   const images: ImageInfo[] = []
   const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g
-  let match: RegExpExecArray | null
+  let match: RegExpExecArray | null = imageRegex.exec(markdownContent)
   let index = 0
 
-  while ((match = imageRegex.exec(markdownContent)) !== null) {
+  while (match !== null) {
     images.push({
       src: match[2],
       alt: match[1] || `图片#${index}`,
@@ -675,6 +399,7 @@ export function extractImagesFromMarkdown(
       index: index
     })
     index++
+    match = imageRegex.exec(markdownContent)
   }
 
   return images

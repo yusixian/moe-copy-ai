@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from "react"
-
 import { sendToBackground } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
+import { useCallback, useLayoutEffect, useState } from "react"
 
 import type {
   ScrapedContent,
@@ -78,6 +77,17 @@ export const useScrapedData = () => {
     setDebugInfo((prev) => prev + (prev ? "\n" : "") + info)
   }, [])
 
+  // 选择器类型名称映射 (moved before usage)
+  const getSelectorTypeName = useCallback((type: SelectorType): string => {
+    const nameMap: Record<SelectorType, string> = {
+      content: "内容",
+      author: "作者",
+      date: "日期",
+      title: "标题"
+    }
+    return nameMap[type]
+  }, [])
+
   const initLoadSelectors = useCallback(async () => {
     try {
       const selectorCounts = Object.entries(DEFAULT_SELECTORS_MAP)
@@ -119,13 +129,13 @@ export const useScrapedData = () => {
         setSelectorsMap(updatedSelectorsMap)
       } catch (storageError) {
         addDebugInfo(
-          "获取自定义选择器失败，使用默认选择器: " + storageError.message
+          `获取自定义选择器失败，使用默认选择器: ${storageError.message}`
         )
       }
     } catch (error) {
-      addDebugInfo("选择器初始化失败: " + error.message)
+      addDebugInfo(`选择器初始化失败: ${error.message}`)
     }
-  }, [addDebugInfo])
+  }, [addDebugInfo, getSelectorTypeName])
 
   // 加载选择器
   useLayoutEffect(() => {
@@ -141,10 +151,13 @@ export const useScrapedData = () => {
         addDebugInfo("开始请求抓取内容...")
 
         if (overrideSelectors) {
-          addDebugInfo("使用自定义选择器: " + JSON.stringify(overrideSelectors))
+          addDebugInfo(`使用自定义选择器: ${JSON.stringify(overrideSelectors)}`)
         }
 
-        const response = await sendToBackground<any, ScrapeResponse>({
+        const response = await sendToBackground<
+          { selectors?: Partial<Record<SelectorType, string>> },
+          ScrapeResponse
+        >({
           name: "getScrapedContent",
           body: {
             selectors: overrideSelectors
@@ -152,11 +165,11 @@ export const useScrapedData = () => {
         })
 
         addDebugInfo(
-          "收到响应: " + JSON.stringify(response).substring(0, 100) + "..."
+          `收到响应: ${JSON.stringify(response).substring(0, 100)}...`
         )
 
         if (response?.success && response?.data) {
-          addDebugInfo("抓取成功, 标题: " + response.data.title)
+          addDebugInfo(`抓取成功, 标题: ${response.data.title}`)
 
           // 保存选择器结果
           if (response.data.selectorResults) {
@@ -180,30 +193,19 @@ export const useScrapedData = () => {
           setScrapedData(processedData)
         } else {
           const errorMsg = response?.error || "获取内容失败"
-          addDebugInfo("抓取失败: " + errorMsg)
+          addDebugInfo(`抓取失败: ${errorMsg}`)
           setError(errorMsg)
         }
       } catch (err) {
         console.error("抓取内容时出错:", err)
-        addDebugInfo("抓取异常: " + JSON.stringify(err))
-        setError("抓取内容时出错: " + (err.message || "未知错误"))
+        addDebugInfo(`抓取异常: ${JSON.stringify(err)}`)
+        setError(`抓取内容时出错: ${err.message || "未知错误"}`)
       } finally {
         setIsLoading(false)
       }
     },
     [addDebugInfo]
   )
-
-  // 选择器类型名称映射
-  const getSelectorTypeName = (type: SelectorType): string => {
-    const nameMap: Record<SelectorType, string> = {
-      content: "内容",
-      author: "作者",
-      date: "日期",
-      title: "标题"
-    }
-    return nameMap[type]
-  }
 
   // 检查选择器有效性
   const isValidSelector = useCallback(
@@ -285,11 +287,7 @@ export const useScrapedData = () => {
         const updatedData = { ...scrapedData }
 
         // 检查选择器结果是否存在且有实际内容
-        if (
-          existingResult &&
-          existingResult.content &&
-          existingResult.content.trim() !== ""
-        ) {
+        if (existingResult?.content && existingResult.content.trim() !== "") {
           // 如果已有结果，直接更新数据而不重新抓取
           addDebugInfo(
             `使用现有的 ${type} 选择器结果: ${existingResult.content.substring(0, 30)}...`

@@ -1,6 +1,12 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from "react"
 
-import type { ElementSelectorPurpose, ExtractedContent, ExtractedLink, NextPageButtonInfo, SelectedElementInfo } from '~constants/types'
+import type {
+  ElementSelectorPurpose,
+  ExtractedContent,
+  ExtractedLink,
+  NextPageButtonInfo,
+  SelectedElementInfo
+} from "~constants/types"
 
 interface UseElementSelectorReturn {
   isSelecting: boolean
@@ -20,41 +26,57 @@ interface UseElementSelectorReturn {
  */
 export function useElementSelector(): UseElementSelectorReturn {
   const [isSelecting, setIsSelecting] = useState(false)
-  const [elementInfo, setElementInfo] = useState<SelectedElementInfo | null>(null)
+  const [elementInfo, setElementInfo] = useState<SelectedElementInfo | null>(
+    null
+  )
   const [extractedLinks, setExtractedLinks] = useState<ExtractedLink[]>([])
-  const [extractedContent, setExtractedContent] = useState<ExtractedContent | null>(null)
-  const [nextPageButton, setNextPageButton] = useState<NextPageButtonInfo | null>(null)
+  const [extractedContent, setExtractedContent] =
+    useState<ExtractedContent | null>(null)
+  const [nextPageButton, setNextPageButton] =
+    useState<NextPageButtonInfo | null>(null)
 
   // 激活选择器
-  const activateSelector = useCallback(async (purpose: ElementSelectorPurpose = 'link-extraction') => {
-    try {
-      // 获取当前活动标签页
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
-      if (!tab?.id) {
-        console.error('无法获取当前标签页')
-        return
-      }
+  const activateSelector = useCallback(
+    async (purpose: ElementSelectorPurpose = "link-extraction") => {
+      try {
+        // 获取当前活动标签页
+        const [tab] = await chrome.tabs.query({
+          active: true,
+          currentWindow: true
+        })
+        if (!tab?.id) {
+          console.error("无法获取当前标签页")
+          return
+        }
 
-      // 向内容脚本发送激活消息（包含 purpose）
-      await chrome.tabs.sendMessage(tab.id, { action: 'activateSelector', purpose })
-      setIsSelecting(true)
-      setElementInfo(null)
-      setExtractedLinks([])
-      setExtractedContent(null)
-    } catch (error) {
-      console.error('激活选择器失败:', error)
-    }
-  }, [])
+        // 向内容脚本发送激活消息（包含 purpose）
+        await chrome.tabs.sendMessage(tab.id, {
+          action: "activateSelector",
+          purpose
+        })
+        setIsSelecting(true)
+        setElementInfo(null)
+        setExtractedLinks([])
+        setExtractedContent(null)
+      } catch (error) {
+        console.error("激活选择器失败:", error)
+      }
+    },
+    []
+  )
 
   // 停用选择器
   const deactivateSelector = useCallback(async () => {
     try {
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      })
       if (tab?.id) {
-        await chrome.tabs.sendMessage(tab.id, { action: 'deactivateSelector' })
+        await chrome.tabs.sendMessage(tab.id, { action: "deactivateSelector" })
       }
     } catch (error) {
-      console.error('停用选择器失败:', error)
+      console.error("停用选择器失败:", error)
     }
 
     setIsSelecting(false)
@@ -84,10 +106,10 @@ export function useElementSelector(): UseElementSelectorReturn {
       purpose?: ElementSelectorPurpose
       nextPageButton?: NextPageButtonInfo
     }) => {
-      if (message.action === 'elementSelected') {
+      if (message.action === "elementSelected") {
         setIsSelecting(false)
         // 只有非下一页按钮选择时才更新 elementInfo，避免覆盖链接容器信息
-        if (message.purpose !== 'next-page-button') {
+        if (message.purpose !== "next-page-button") {
           if (message.elementInfo) {
             setElementInfo(message.elementInfo)
           }
@@ -101,7 +123,7 @@ export function useElementSelector(): UseElementSelectorReturn {
         if (message.nextPageButton) {
           setNextPageButton(message.nextPageButton)
         }
-      } else if (message.action === 'selectionCancelled') {
+      } else if (message.action === "selectionCancelled") {
         setIsSelecting(false)
         setElementInfo(null)
         setExtractedLinks([])
@@ -125,7 +147,7 @@ export function useElementSelector(): UseElementSelectorReturn {
     activateSelector,
     deactivateSelector,
     clearSelection,
-    clearNextPageButton,
+    clearNextPageButton
   }
 }
 

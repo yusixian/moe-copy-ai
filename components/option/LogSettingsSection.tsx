@@ -1,4 +1,4 @@
-import React from "react"
+import type React from "react"
 
 import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "../../constants/options"
 import OptionSection from "./OptionSection"
@@ -26,10 +26,10 @@ export const LogSettingsSection: React.FC = () => {
       />
 
       <div className="mt-6 rounded-lg border border-sky-200 bg-blue-50 p-4">
-        <h3 className="mb-2 flex items-center text-lg font-medium text-sky-600">
+        <h3 className="mb-2 flex items-center font-medium text-lg text-sky-600">
           <span className="mr-2">📝</span>日志级别说明
         </h3>
-        <ul className="space-y-2 text-sm text-sky-600">
+        <ul className="space-y-2 text-sky-600 text-sm">
           <li className="flex items-center">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-sky-400"></span>
             <span className="font-semibold">调试 (Debug):</span>{" "}

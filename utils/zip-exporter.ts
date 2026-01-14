@@ -1,16 +1,19 @@
-import JSZip from 'jszip'
+import JSZip from "jszip"
 
-import type { BatchScrapeResult, ZipExportOptions } from '~constants/types'
+import type { BatchScrapeResult, ZipExportOptions } from "~constants/types"
 
-import { aggregateToSingleMarkdown, formatSingleDocument } from './content-aggregator'
+import {
+  aggregateToSingleMarkdown,
+  formatSingleDocument
+} from "./content-aggregator"
 
 /**
  * 默认 ZIP 导出选项
  */
 export const DEFAULT_ZIP_OPTIONS: ZipExportOptions = {
   includeIndex: true,
-  filenameFormat: 'title',
-  maxFilenameLength: 50,
+  filenameFormat: "title",
+  maxFilenameLength: 50
 }
 
 /**
@@ -19,22 +22,23 @@ export const DEFAULT_ZIP_OPTIONS: ZipExportOptions = {
 function sanitizeFilename(name: string, maxLength: number): string {
   // 移除或替换非法字符
   let sanitized = name
-    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '') // Windows 非法字符
-    .replace(/[\s.]+/g, '-') // 空格和点号替换为连字符
-    .replace(/-+/g, '-') // 多个连字符合并
-    .replace(/^-+|-+$/g, '') // 移除开头和结尾的连字符
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: intentional control char range for Windows filename sanitization
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, "") // Windows 非法字符
+    .replace(/[\s.]+/g, "-") // 空格和点号替换为连字符
+    .replace(/-+/g, "-") // 多个连字符合并
+    .replace(/^-+|-+$/g, "") // 移除开头和结尾的连字符
     .trim()
 
   // 如果为空，使用默认名称
   if (!sanitized) {
-    sanitized = 'untitled'
+    sanitized = "untitled"
   }
 
   // 截断到最大长度
   if (sanitized.length > maxLength) {
     sanitized = sanitized.substring(0, maxLength)
     // 确保不在单词中间截断
-    const lastDash = sanitized.lastIndexOf('-')
+    const lastDash = sanitized.lastIndexOf("-")
     if (lastDash > maxLength * 0.6) {
       sanitized = sanitized.substring(0, lastDash)
     }
@@ -49,10 +53,10 @@ function sanitizeFilename(name: string, maxLength: number): string {
 function filenameFromUrl(url: string, maxLength: number): string {
   try {
     const urlObj = new URL(url)
-    const pathParts = urlObj.pathname.split('/').filter(Boolean)
+    const pathParts = urlObj.pathname.split("/").filter(Boolean)
     if (pathParts.length > 0) {
       const lastPart = decodeURIComponent(pathParts[pathParts.length - 1])
-      return sanitizeFilename(lastPart.replace(/\.\w+$/, ''), maxLength)
+      return sanitizeFilename(lastPart.replace(/\.\w+$/, ""), maxLength)
     }
     return sanitizeFilename(urlObj.hostname, maxLength)
   } catch {
@@ -66,22 +70,24 @@ function filenameFromUrl(url: string, maxLength: number): string {
 function generateFilename(
   result: BatchScrapeResult,
   index: number,
-  format: ZipExportOptions['filenameFormat'],
+  format: ZipExportOptions["filenameFormat"],
   maxLength: number,
   existingNames: Set<string>
 ): string {
   let baseName: string
 
   switch (format) {
-    case 'title':
-      baseName = sanitizeFilename(result.title || `document-${index + 1}`, maxLength)
+    case "title":
+      baseName = sanitizeFilename(
+        result.title || `document-${index + 1}`,
+        maxLength
+      )
       break
-    case 'url':
+    case "url":
       baseName = filenameFromUrl(result.url, maxLength)
       break
-    case 'index':
     default:
-      baseName = `${String(index + 1).padStart(3, '0')}-document`
+      baseName = `${String(index + 1).padStart(3, "0")}-document`
       break
   }
 
@@ -114,11 +120,11 @@ export async function exportAsZip(
   // 添加索引文件
   if (mergedOptions.includeIndex) {
     const { content } = aggregateToSingleMarkdown(results)
-    zip.file('index.md', content)
+    zip.file("index.md", content)
   }
 
   // 创建 docs 文件夹存放单独的文档
-  const docsFolder = zip.folder('docs')
+  const docsFolder = zip.folder("docs")
 
   if (docsFolder) {
     // 添加每个文档
@@ -137,11 +143,11 @@ export async function exportAsZip(
 
   // 生成 ZIP
   const blob = await zip.generateAsync({
-    type: 'blob',
-    compression: 'DEFLATE',
+    type: "blob",
+    compression: "DEFLATE",
     compressionOptions: {
-      level: 6,
-    },
+      level: 6
+    }
   })
 
   return blob
@@ -151,6 +157,6 @@ export async function exportAsZip(
  * 生成 ZIP 文件名
  */
 export function generateZipFilename(): string {
-  const date = new Date().toISOString().split('T')[0]
+  const date = new Date().toISOString().split("T")[0]
   return `batch-scrape-${date}.zip`
 }

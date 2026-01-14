@@ -1,5 +1,5 @@
 // https://icons8.com/icons/set/cat--style-cool
-import React from "react"
+
 import type { MouseEventHandler } from "react"
 
 interface CatSVGProps {
@@ -17,7 +17,18 @@ export default function CatSVG({ className, onClick }: CatSVGProps) {
       height="1em"
       viewBox="0 0 64 64"
       className={className}
-      onClick={onClick}>
+      onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (e) =>
+              e.key === "Enter" &&
+              onClick(e as unknown as React.MouseEvent<SVGSVGElement>)
+          : undefined
+      }
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={onClick ? "Cat icon" : undefined}
+      aria-hidden={onClick ? undefined : true}>
       <radialGradient
         id="FmGFr4qy5fVnlZU2lCKFDa_RouHxOFPEP1c_gr1"
         cx="-116.365"

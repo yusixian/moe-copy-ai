@@ -66,7 +66,7 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
       {!showOnlySummary && (
         <>
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-slate-700">分词结果</h3>
+            <h3 className="font-medium text-slate-700 text-sm">分词结果</h3>
             <Button
               variant="outline"
               size="sm"
@@ -79,8 +79,8 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
             <div className="flex flex-wrap gap-1">
               {tokenTextPairs.map((pair, index) => (
                 <div
-                  key={index}
-                  className="group relative rounded px-1 py-0.5 text-sm text-slate-700 transition-all hover:shadow-md"
+                  key={`${pair.token}-${index}`}
+                  className="group relative rounded px-1 py-0.5 text-slate-700 text-sm transition-all hover:shadow-md"
                   style={{ backgroundColor: getTokenColor(pair.token) }}>
                   {showTokenIds ? pair.token : pair.text}
                 </div>
@@ -90,7 +90,7 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
         </>
       )}
 
-      <div className="mt-2 text-xs text-slate-500">
+      <div className="mt-2 text-slate-500 text-xs">
         共 {content.length} 个字符，预计消耗 {tokens.length} 个 token，(使用
         <a
           href="https://github.com/niieani/gpt-tokenizer"
