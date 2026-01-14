@@ -6,8 +6,11 @@
   "author": "cos <i@cosine.ren>",
   "scripts": {
     "dev": "plasmo dev",
+    "dev:firefox": "plasmo dev --target=firefox-mv3",
     "build": "plasmo build",
-    "package": "plasmo package",
+    "build:firefox": "plasmo build --target=firefox-mv3 && node scripts/post-build-firefox.js",
+    "package": "pnpm build && plasmo package",
+    "package:firefox": "pnpm build:firefox && plasmo package --target=firefox-mv3",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "lint:fix:unssafe": "biome check --write --unsafe",
