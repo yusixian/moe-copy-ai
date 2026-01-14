@@ -4,8 +4,8 @@
 
 import type {
   BatchScrapeResult,
-  ScrapedContent,
-  ExtractedLink
+  ExtractedLink,
+  ScrapedContent
 } from "~constants/types"
 
 // ========== DOM Helpers ==========

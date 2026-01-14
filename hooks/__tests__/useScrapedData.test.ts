@@ -1,8 +1,8 @@
-import { renderHook, act } from "@testing-library/react-hooks"
 import { sendToBackground } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
-import { useScrapedData } from "~hooks/useScrapedData"
+import { act, renderHook } from "@testing-library/react-hooks"
 import type { ScrapedContent, ScrapeResponse } from "~constants/types"
+import { useScrapedData } from "~hooks/useScrapedData"
 
 // Mock dependencies
 jest.mock("@plasmohq/messaging")
@@ -64,9 +64,7 @@ describe("useScrapedData", () => {
 
   describe("initialization", () => {
     test("should initialize with loading state", () => {
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result } = renderHook(() => useScrapedData())
 
@@ -76,9 +74,7 @@ describe("useScrapedData", () => {
     })
 
     test("should load default selectors on mount", async () => {
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result, waitForNextUpdate } = renderHook(() => useScrapedData())
 
@@ -92,9 +88,7 @@ describe("useScrapedData", () => {
 
     test("should handle storage errors gracefully", async () => {
       mockStorage.get.mockRejectedValue(new Error("Storage error"))
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result, waitForNextUpdate } = renderHook(() => useScrapedData())
 
@@ -179,9 +173,7 @@ describe("useScrapedData", () => {
     })
 
     test("should handle refresh (manual fetch)", async () => {
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result, waitForNextUpdate } = renderHook(() => useScrapedData())
 
@@ -203,18 +195,14 @@ describe("useScrapedData", () => {
     })
 
     test("should send custom selectors to background", async () => {
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result, waitForNextUpdate } = renderHook(() => useScrapedData())
 
       await waitForNextUpdate()
 
       mockSendToBackground.mockClear()
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       await act(async () => {
         await result.current.handleRefresh({ content: ".custom-selector" })
@@ -271,9 +259,7 @@ describe("useScrapedData", () => {
     })
 
     test("should change selected selector index", async () => {
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result, waitForNextUpdate } = renderHook(() => useScrapedData())
 
@@ -287,9 +273,7 @@ describe("useScrapedData", () => {
     })
 
     test("should validate selector before using", async () => {
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result, waitForNextUpdate } = renderHook(() => useScrapedData())
 
@@ -305,18 +289,14 @@ describe("useScrapedData", () => {
       })
 
       // Should set invalid selector message
-      expect(result.current.scrapedData?.articleContent).toBe(
-        "无效的选择器"
-      )
+      expect(result.current.scrapedData?.articleContent).toBe("无效的选择器")
     })
 
     // Removed: Over-mocked test that only verified mock setup, not real caching behavior
 
     test("should handle empty selector results", async () => {
       const selectorResults = {
-        content: [
-          { selector: ".empty", content: "", allContent: [] }
-        ],
+        content: [{ selector: ".empty", content: "", allContent: [] }],
         author: [],
         date: [],
         title: []
@@ -335,9 +315,7 @@ describe("useScrapedData", () => {
       await waitForNextUpdate()
 
       mockSendToBackground.mockClear()
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       // Set content selectors to include our empty selector
       mockStorage.get.mockImplementation((key: string) => {
@@ -362,7 +340,6 @@ describe("useScrapedData", () => {
       // Should attempt to re-fetch
       expect(mockSendToBackground).toHaveBeenCalled()
     })
-
   })
 
   describe("handleSelectContent", () => {
@@ -409,9 +386,7 @@ describe("useScrapedData", () => {
 
   describe("getSelectorsForType", () => {
     test("should return selectors for given type", async () => {
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result, waitForNextUpdate } = renderHook(() => useScrapedData())
 
@@ -423,26 +398,20 @@ describe("useScrapedData", () => {
     })
 
     test("should return empty array for invalid type", async () => {
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result, waitForNextUpdate } = renderHook(() => useScrapedData())
 
       await waitForNextUpdate()
 
-      const selectors = result.current.getSelectorsForType(
-        "invalid" as any
-      )
+      const selectors = result.current.getSelectorsForType("invalid" as any)
       expect(selectors).toEqual([])
     })
   })
 
   describe("debugInfo", () => {
     test("should accumulate debug messages", async () => {
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result, waitForNextUpdate } = renderHook(() => useScrapedData())
 
@@ -455,9 +424,7 @@ describe("useScrapedData", () => {
 
   describe("selectedSelectorIndices", () => {
     test("should initialize with all indices at 0", async () => {
-      mockSendToBackground.mockResolvedValue(
-        createMockScrapeResponse() as any
-      )
+      mockSendToBackground.mockResolvedValue(createMockScrapeResponse() as any)
 
       const { result, waitForNextUpdate } = renderHook(() => useScrapedData())
 

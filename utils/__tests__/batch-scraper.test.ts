@@ -1,14 +1,14 @@
+import type {
+  BatchProgress,
+  BatchScrapeResult,
+  ExtractedLink
+} from "~constants/types"
 import {
   BatchScrapeController,
   batchScrape,
   DEFAULT_BATCH_OPTIONS,
   type ExtendedBatchScrapeOptions
 } from "~utils/batch-scraper"
-import type {
-  BatchProgress,
-  BatchScrapeResult,
-  ExtractedLink
-} from "~constants/types"
 
 // Mock dependencies
 jest.mock("~utils/logger", () => ({

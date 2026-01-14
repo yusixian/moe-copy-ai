@@ -1,11 +1,11 @@
 import {
-  isDynamicValue,
-  getStableClasses,
   countMatches,
+  generateSelectorWithInfo,
   generateUniqueSelector,
-  generateSelectorWithInfo
+  getStableClasses,
+  isDynamicValue
 } from "~utils/selector-generator"
-import { setDocumentHTML, createMockElement } from "./helpers"
+import { createMockElement, setDocumentHTML } from "./helpers"
 
 describe("selector-generator", () => {
   beforeEach(() => {
@@ -37,9 +37,7 @@ describe("selector-generator", () => {
     })
 
     test("should detect UUIDs", () => {
-      expect(
-        isDynamicValue("550e8400-e29b-41d4-a716-446655440000")
-      ).toBe(true)
+      expect(isDynamicValue("550e8400-e29b-41d4-a716-446655440000")).toBe(true)
     })
 
     test("should detect long numeric IDs", () => {

@@ -1,6 +1,6 @@
+import type { BatchScrapeResult } from "~constants/types"
 import { exportAsZip, generateZipFilename } from "~utils/zip-exporter"
 import { createMockBatchScrapeResult } from "./helpers"
-import type { BatchScrapeResult } from "~constants/types"
 
 // Mock content-aggregator
 jest.mock("~utils/content-aggregator", () => ({
@@ -268,10 +268,7 @@ describe("zip-exporter", () => {
       // No documents should be added to docs folder
       expect(mockDocsFolder.file).not.toHaveBeenCalled()
       // But index should still be created (with failed section)
-      expect(mockZip.file).toHaveBeenCalledWith(
-        "index.md",
-        expect.any(String)
-      )
+      expect(mockZip.file).toHaveBeenCalledWith("index.md", expect.any(String))
     })
 
     test("should pass correct content to formatSingleDocument", async () => {
@@ -373,10 +370,7 @@ describe("zip-exporter", () => {
       })
 
       // Should still create index (default behavior)
-      expect(mockZip.file).toHaveBeenCalledWith(
-        "index.md",
-        expect.any(String)
-      )
+      expect(mockZip.file).toHaveBeenCalledWith("index.md", expect.any(String))
     })
   })
 

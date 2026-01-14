@@ -1,9 +1,9 @@
+import type { BatchScrapeResult } from "~constants/types"
 import {
   aggregateToSingleMarkdown,
   formatSingleDocument
 } from "~utils/content-aggregator"
 import { createMockBatchScrapeResult } from "./helpers"
-import type { BatchScrapeResult } from "~constants/types"
 
 describe("content-aggregator", () => {
   describe("aggregateToSingleMarkdown", () => {
@@ -112,8 +112,12 @@ describe("content-aggregator", () => {
 
       // Should have failed section
       expect(aggregated.content).toContain("## 抓取失败的页面")
-      expect(aggregated.content).toContain("- https://example.com/fail1: Error 1")
-      expect(aggregated.content).toContain("- https://example.com/fail2: Error 2")
+      expect(aggregated.content).toContain(
+        "- https://example.com/fail1: Error 1"
+      )
+      expect(aggregated.content).toContain(
+        "- https://example.com/fail2: Error 2"
+      )
     })
 
     test("should handle empty results array", () => {
@@ -298,6 +302,5 @@ describe("content-aggregator", () => {
 
       expect(formatted).toContain(markdownContent)
     })
-
   })
 })

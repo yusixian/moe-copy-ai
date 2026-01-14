@@ -3,13 +3,15 @@ import {
   getContentStats,
   getElementInfo
 } from "~utils/content-extractor"
-import { setDocumentHTML, createMockElement } from "./helpers"
+import { createMockElement, setDocumentHTML } from "./helpers"
 
 // Mock readability-extractor
 jest.mock("~utils/readability-extractor", () => ({
   convertHtmlToMarkdown: jest
     .fn()
-    .mockImplementation((html: string) => Promise.resolve(`# Markdown\n\n${html}`))
+    .mockImplementation((html: string) =>
+      Promise.resolve(`# Markdown\n\n${html}`)
+    )
 }))
 
 describe("content-extractor", () => {
@@ -206,7 +208,9 @@ describe("content-extractor", () => {
     test("should fallback to text when markdown conversion fails", async () => {
       // Mock markdown conversion to throw error
       const { convertHtmlToMarkdown } = require("~utils/readability-extractor")
-      convertHtmlToMarkdown.mockRejectedValueOnce(new Error("Conversion failed"))
+      convertHtmlToMarkdown.mockRejectedValueOnce(
+        new Error("Conversion failed")
+      )
 
       const element = createMockElement("div", {
         textContent: "Fallback text"

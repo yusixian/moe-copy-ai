@@ -44,7 +44,7 @@ if (!global.CSS) {
 if (!global.CSS.escape) {
   global.CSS.escape = (value) => {
     // Simple polyfill for CSS.escape
-    return value.replace(/[!"#$%&'()*+,.\/:;<=>?@\[\\\]^`{|}~]/g, "\\$&")
+    return value.replace(/[!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, "\\$&")
   }
 }
 

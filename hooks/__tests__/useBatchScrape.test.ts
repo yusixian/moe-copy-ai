@@ -1,8 +1,8 @@
-import { renderHook, act } from "@testing-library/react-hooks"
 import { sendToBackground } from "@plasmohq/messaging"
 import { Storage } from "@plasmohq/storage"
-import { useBatchScrape } from "~hooks/useBatchScrape"
+import { act, renderHook } from "@testing-library/react-hooks"
 import type { ExtractedLink, SelectedElementInfo } from "~constants/types"
+import { useBatchScrape } from "~hooks/useBatchScrape"
 
 // Mock dependencies
 jest.mock("@plasmohq/messaging")
@@ -156,7 +156,11 @@ describe("useBatchScrape", () => {
     test("should update link at specified index", () => {
       const { result } = renderHook(() => useBatchScrape())
 
-      const mockLinks = [createMockLink(0), createMockLink(1), createMockLink(2)]
+      const mockLinks = [
+        createMockLink(0),
+        createMockLink(1),
+        createMockLink(2)
+      ]
 
       act(() => {
         result.current.setLinks(null, mockLinks)
@@ -172,7 +176,6 @@ describe("useBatchScrape", () => {
         index: 1
       })
     })
-
   })
 
   describe("removeLink", () => {

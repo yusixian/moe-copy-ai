@@ -2,7 +2,7 @@
  * React hooks test helpers
  */
 
-import { renderHook, act as hooksAct } from "@testing-library/react-hooks"
+import { act as hooksAct, renderHook } from "@testing-library/react-hooks"
 
 // Re-export for convenience
 export { renderHook }

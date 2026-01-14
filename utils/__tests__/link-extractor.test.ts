@@ -1,15 +1,15 @@
+import type { LinkFilterOptions } from "~constants/types"
 import {
+  deduplicateLinks,
+  extractAndProcessLinks,
   extractLinksFromElement,
+  filterLinks,
   getElementInfo,
-  resolveUrl,
   isSameDomain,
   isValidScrapableUrl,
-  filterLinks,
-  deduplicateLinks,
-  extractAndProcessLinks
+  resolveUrl
 } from "~utils/link-extractor"
-import { setDocumentHTML, createMockElement } from "./helpers"
-import type { LinkFilterOptions } from "~constants/types"
+import { createMockElement, setDocumentHTML } from "./helpers"
 
 // Mock dependencies
 jest.mock("~utils/selector-generator", () => ({
