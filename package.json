@@ -12,7 +12,10 @@
     "lint:fix": "biome check --write .",
     "lint:fix:unssafe": "biome check --write --unsafe",
     "format": "biome format --write .",
-    "prepare": "npx simple-git-hooks"
+    "prepare": "npx simple-git-hooks",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec biome check --staged --write --no-errors-on-unmatched"
@@ -55,12 +58,17 @@
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/browser-playwright": "^4.0.17",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.3",
     "simple-git-hooks": "^2.13.1",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "vite-tsconfig-paths": "^6.0.4",
+    "vitest": "^4.0.17",
+    "vitest-browser-react": "^2.0.2"
   },
   "manifest": {
     "host_permissions": [
