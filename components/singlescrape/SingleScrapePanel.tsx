@@ -64,14 +64,6 @@ function SingleScrapePanel() {
     console.error(`${label} 加载失败`)
   }, [])
 
-  // 打开选项页面
-  const handleOpenOptions = useOpenOptionPage()
-
-  // 打开GitHub仓库
-  const handleOpenGithub = useCallback(() => {
-    window.open("https://github.com/yusixian/moe-copy-ai", "_blank")
-  }, [])
-
   return (
     <div className="flex h-full flex-col gap-3 overflow-auto">
       {/* 悬浮窗开关区域 */}
@@ -347,9 +339,9 @@ function SingleScrapePanel() {
             <AccordionSection
               title="文章内容"
               icon="line-md:file-document-twotone"
-              defaultOpen={true}
+              defaultOpen={false}
               maxHeight="500px">
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 {/* 标题行 */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
@@ -490,30 +482,10 @@ function SingleScrapePanel() {
           )}
 
           {/* AI 摘要 */}
-          <AccordionSection
-            title="AI 助手"
-            icon="line-md:chat-round-dots-twotone"
-            defaultOpen={true}
-            maxHeight="400px">
-            <AiSummarySection
-              content={scrapedData.articleContent}
-              scrapedData={scrapedData}
-            />
-          </AccordionSection>
-
-          {/* 页面图片 */}
-          {scrapedData.images && scrapedData.images.length > 0 && (
-            <AccordionSection
-              title={`页面图片 (${scrapedData.images.length}张)`}
-              icon="line-md:image"
-              defaultOpen={false}
-              maxHeight="400px">
-              <ImageGrid
-                images={scrapedData.images}
-                onLoadError={handleImageLoadError}
-              />
-            </AccordionSection>
-          )}
+          <AiSummarySection
+            content={scrapedData.articleContent}
+            scrapedData={scrapedData}
+          />
 
           {/* 元数据 */}
           {Object.keys(scrapedData.metadata).length > 0 && (
@@ -543,6 +515,20 @@ function SingleScrapePanel() {
               </div>
             </AccordionSection>
           )}
+
+          {/* 页面图片 */}
+          {scrapedData.images && scrapedData.images.length > 0 && (
+            <AccordionSection
+              title={`页面图片 (${scrapedData.images.length}张)`}
+              icon="line-md:image"
+              defaultOpen={false}
+              maxHeight="400px">
+              <ImageGrid
+                images={scrapedData.images}
+                onLoadError={handleImageLoadError}
+              />
+            </AccordionSection>
+          )}
         </div>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-sky-200 bg-white p-8 text-center text-gray-500">
@@ -564,27 +550,6 @@ function SingleScrapePanel() {
           </Button>
         </div>
       )}
-
-      {/* 底部操作区 */}
-      <div className="flex flex-shrink-0 items-center justify-between border-sky-200 border-t pt-3">
-        <span className="text-gray-400 text-xs">Moe Copy AI - 萌抓</span>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleOpenGithub}
-            title="访问 GitHub">
-            <Icon icon="mdi:github" width="18" height="18" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleOpenOptions}
-            title="打开设置">
-            <Icon icon="line-md:cog-filled-loop" width="18" height="18" />
-          </Button>
-        </div>
-      </div>
     </div>
   )
 }

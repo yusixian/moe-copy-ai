@@ -82,7 +82,7 @@ const CompactPromptInput = ({
         disabled={disabled}
         placeholder="输入提示词..."
         className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none disabled:opacity-50"
-        rows={2}
+        rows={4}
       />
 
       {/* 占位符列表 */}

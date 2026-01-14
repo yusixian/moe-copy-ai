@@ -190,7 +190,7 @@ function SidePanel() {
         </div>
       </div>
 
-      <div className="min-h-0 flex-1">
+      <div className="min-h-0 flex-1 overflow-y-auto">
         {currentView === "singlescrape" && <SingleScrapePanel />}
         {currentView === "batch" && (
           <BatchScrapePanel
@@ -229,6 +229,44 @@ function SidePanel() {
           />
         )}
         {currentView === "settings" && <SidePanelSettings />}
+      </div>
+
+      {/* 底部链接 */}
+      <div className="flex flex-shrink-0 items-center justify-between gap-4 border-gray-100 border-t px-1 pt-2">
+        <span className="text-gray-400 text-xs">Moe Copy AI</span>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6 p-0"
+            onClick={() =>
+              window.open("https://github.com/yusixian/moe-copy-ai", "_blank")
+            }
+            title="GitHub">
+            <Icon icon="mdi:github" className="size-full" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6 p-0"
+            onClick={() => window.open("https://moe.cosine.ren/docs", "_blank")}
+            title="文档">
+            <Icon icon="mdi:book-open-outline" className="size-full" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6 p-0"
+            onClick={() =>
+              window.open("https://discord.gg/XzvrvNMcSe", "_blank")
+            }
+            title="Discord">
+            <Icon icon="mdi:discord" className="size-full" />
+          </Button>
+        </div>
+        <span className="text-gray-400 text-xs">
+          v{chrome.runtime.getManifest().version}
+        </span>
       </div>
 
       <ToastContainer
