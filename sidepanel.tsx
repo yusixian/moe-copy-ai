@@ -2,13 +2,16 @@ import "./styles/global.css"
 import "react-toastify/dist/ReactToastify.css"
 
 import { Icon } from "@iconify/react"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { ToastContainer } from "react-toastify"
 
 import BatchScrapePanel from "~components/batch/BatchScrapePanel"
 import ContentExtractionPanel from "~components/extraction/ContentExtractionPanel"
 import SidePanelSettings from "~components/sidepanel/SidePanelSettings"
-import { SingleScrapePanel } from "~components/singlescrape"
+import {
+  SingleScrapePanel,
+  type SingleScrapePanelHandle
+} from "~components/singlescrape"
 import { Button } from "~components/ui/button"
 import Segmented, { type SegmentedOption } from "~components/ui/segmented"
 import type { BatchScrapeMode } from "~constants/types"
@@ -38,6 +41,8 @@ const tabOptions: SegmentedOption<"batch" | "extraction" | "singlescrape">[] = [
 
 function SidePanel() {
   const [currentView, setCurrentView] = useState<SidePanelView>("singlescrape")
+  const [isSingleScrapeLoading, setIsSingleScrapeLoading] = useState(false)
+  const singleScrapePanelRef = useRef<SingleScrapePanelHandle>(null)
 
   const [isSelectingNextPage, setIsSelectingNextPage] = useState(false)
 
@@ -182,16 +187,43 @@ function SidePanel() {
         </div>
 
         {/* 标题 */}
-        <div>
-          <h1 className="font-bold text-gray-800 text-lg">
-            {currentConfig.title}
-          </h1>
-          <p className="text-gray-500 text-sm">{currentConfig.description}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-bold text-gray-800 text-lg">
+              {currentConfig.title}
+            </h1>
+            <p className="text-gray-500 text-sm">{currentConfig.description}</p>
+          </div>
+          {currentView === "singlescrape" && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => singleScrapePanelRef.current?.refresh()}
+              disabled={isSingleScrapeLoading}
+              title="刷新内容">
+              <Icon
+                icon={
+                  isSingleScrapeLoading
+                    ? "line-md:loading-alt-loop"
+                    : "line-md:refresh-twotone"
+                }
+                className={isSingleScrapeLoading ? "mr-1 animate-spin" : "mr-1"}
+                width="16"
+                height="16"
+              />
+              {isSingleScrapeLoading ? "抓取中..." : "刷新"}
+            </Button>
+          )}
         </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {currentView === "singlescrape" && <SingleScrapePanel />}
+        {currentView === "singlescrape" && (
+          <SingleScrapePanel
+            ref={singleScrapePanelRef}
+            onLoadingChange={setIsSingleScrapeLoading}
+          />
+        )}
         {currentView === "batch" && (
           <BatchScrapePanel
             mode={currentMode}

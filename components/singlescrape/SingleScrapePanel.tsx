@@ -1,7 +1,13 @@
 import { Icon } from "@iconify/react"
 import { useStorage } from "@plasmohq/storage/hook"
 import { useClipboard } from "foxact/use-clipboard"
-import { memo, useCallback } from "react"
+import {
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useImperativeHandle
+} from "react"
 
 import { AccordionSection } from "~/components/AccordionSection"
 import AiSummarySection from "~/components/AiSummarySection"
@@ -13,10 +19,20 @@ import MetadataTable from "~/components/MetadataTable"
 import SelectorDropdown from "~/components/SelectorDropdown"
 import { Button } from "~/components/ui/button"
 import { Collapsible } from "~/components/ui/collapsible"
-import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import useScrapedData from "~hooks/useScrapedData"
 
-function SingleScrapePanel() {
+export interface SingleScrapePanelHandle {
+  refresh: () => void
+}
+
+interface SingleScrapePanelProps {
+  onLoadingChange?: (isLoading: boolean) => void
+}
+
+const SingleScrapePanel = forwardRef<
+  SingleScrapePanelHandle,
+  SingleScrapePanelProps
+>(function SingleScrapePanel({ onLoadingChange }, ref) {
   const {
     isLoading,
     error,
@@ -34,6 +50,20 @@ function SingleScrapePanel() {
   } = useScrapedData()
 
   const { copy: copyDebugInfo } = useClipboard()
+
+  // 暴露 refresh 方法给父组件
+  useImperativeHandle(
+    ref,
+    () => ({
+      refresh: handleRefresh
+    }),
+    [handleRefresh]
+  )
+
+  // 通知父组件 loading 状态变化
+  useEffect(() => {
+    onLoadingChange?.(isLoading)
+  }, [isLoading, onLoadingChange])
 
   // 从存储中获取是否显示调试面板的设置
   const [showDebugPanel] = useStorage<string>("show_debug_panel", "true")
@@ -552,7 +582,7 @@ function SingleScrapePanel() {
       )}
     </div>
   )
-}
+})
 
 SingleScrapePanel.displayName = "SingleScrapePanel"
 export default memo(SingleScrapePanel)

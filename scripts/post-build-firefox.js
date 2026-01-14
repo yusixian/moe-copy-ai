@@ -4,8 +4,8 @@
  * Adds browser_specific_settings to manifest.json
  */
 
-const fs = require("fs")
-const path = require("path")
+const fs = require("node:fs")
+const path = require("node:path")
 
 const FIREFOX_BUILD_DIR = path.join(
   __dirname,
