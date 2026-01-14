@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify"
 import BatchScrapePanel from "~components/batch/BatchScrapePanel"
 import ContentExtractionPanel from "~components/extraction/ContentExtractionPanel"
 import SidePanelSettings from "~components/sidepanel/SidePanelSettings"
+import { SingleScrapePanel } from "~components/singlescrape"
 import { Button } from "~components/ui/button"
 import Segmented, { type SegmentedOption } from "~components/ui/segmented"
 import type { BatchScrapeMode } from "~constants/types"
@@ -15,9 +16,14 @@ import useBatchScrape from "~hooks/useBatchScrape"
 import useContentExtraction from "~hooks/useContentExtraction"
 import useElementSelector from "~hooks/useElementSelector"
 
-type SidePanelView = "batch" | "extraction" | "settings"
+type SidePanelView = "batch" | "extraction" | "singlescrape" | "settings"
 
-const tabOptions: SegmentedOption<"batch" | "extraction">[] = [
+const tabOptions: SegmentedOption<"batch" | "extraction" | "singlescrape">[] = [
+  {
+    value: "singlescrape",
+    label: "单页抓取",
+    icon: <Icon icon="mdi:file-document-outline" width={14} />
+  },
   {
     value: "batch",
     label: "批量抓取",
@@ -31,7 +37,7 @@ const tabOptions: SegmentedOption<"batch" | "extraction">[] = [
 ]
 
 function SidePanel() {
-  const [currentView, setCurrentView] = useState<SidePanelView>("batch")
+  const [currentView, setCurrentView] = useState<SidePanelView>("singlescrape")
 
   const [isSelectingNextPage, setIsSelectingNextPage] = useState(false)
 
@@ -133,6 +139,10 @@ function SidePanel() {
 
   // 视图标题和描述
   const viewConfig = {
+    singlescrape: {
+      title: "单页抓取",
+      description: "抓取当前页面内容，转换为 AI 易读的格式"
+    },
     batch: {
       title: "批量抓取",
       description: "选择页面区域，批量抓取链接中的所有文档"
@@ -181,6 +191,7 @@ function SidePanel() {
       </div>
 
       <div className="min-h-0 flex-1">
+        {currentView === "singlescrape" && <SingleScrapePanel />}
         {currentView === "batch" && (
           <BatchScrapePanel
             mode={currentMode}
