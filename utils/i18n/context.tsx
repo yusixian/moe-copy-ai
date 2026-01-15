@@ -66,17 +66,19 @@ export function I18nProvider({ children, initialLocale }: I18nProviderProps) {
 
   // 监听 storage 变化，实现跨 context 同步
   useEffect(() => {
-    const unsubscribe = syncStorage.watch({
-      [LOCALE_STORAGE_KEY]: (change) => {
-        const newLocale = change.newValue as Locale | undefined
-        if (newLocale && (newLocale === "zh_CN" || newLocale === "en_US")) {
-          setLocaleState(newLocale)
-        }
+    const handleLocaleChange = (change: { newValue?: unknown }) => {
+      const newLocale = change.newValue as Locale | undefined
+      if (newLocale && (newLocale === "zh_CN" || newLocale === "en_US")) {
+        setLocaleState(newLocale)
       }
-    })
+    }
+    const watchMap = { [LOCALE_STORAGE_KEY]: handleLocaleChange }
+    const isWatching = syncStorage.watch(watchMap)
 
     return () => {
-      unsubscribe()
+      if (isWatching) {
+        syncStorage.unwatch(watchMap)
+      }
     }
   }, [])
 

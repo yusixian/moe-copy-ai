@@ -54,7 +54,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
         toast.success(t("ai.history.item.delete"))
       } catch (error) {
         console.error("删除历史记录失败:", error)
-        toast.error(t("ai.history.item.delete"))
+        toast.error(t("ai.history.item.deleteFailed"))
       }
     },
     [t]
@@ -69,7 +69,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
         toast.success(t("ai.history.clearAll"))
       } catch (error) {
         console.error("清空历史记录失败:", error)
-        toast.error(t("ai.history.clearAll"))
+        toast.error(t("ai.history.clearAllFailed"))
       }
     }
   }, [t])
@@ -92,7 +92,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
       toast.success(t("ai.history.item.export"))
     } catch (error) {
       console.error("导出历史记录失败:", error)
-      toast.error(t("ai.history.item.export"))
+      toast.error(t("ai.history.item.exportFailed"))
     }
   }, [historyItems, t])
 

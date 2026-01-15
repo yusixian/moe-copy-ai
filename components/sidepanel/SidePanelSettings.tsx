@@ -14,6 +14,7 @@ import {
   SUPPORTED_LOCALES,
   useI18n
 } from "~utils/i18n"
+import { translateOptions } from "~utils/options-helper"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
 import { AccordionSection } from "../AccordionSection"
 import { ModelSelectInput } from "../ai/ModelSelectInput"
@@ -148,7 +149,7 @@ function AiSettings() {
         <label
           htmlFor="sp-api-key"
           className="mb-1 block text-gray-600 text-xs">
-          API Key
+          {t("sidepanel.settings.ai.apiKey")}
         </label>
         <input
           id="sp-api-key"
@@ -156,7 +157,7 @@ function AiSettings() {
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
           className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
-          placeholder="sk-..."
+          placeholder={t("sidepanel.settings.ai.apiKeyPlaceholder")}
         />
       </div>
 
@@ -164,7 +165,7 @@ function AiSettings() {
         <label
           htmlFor="sp-base-url"
           className="mb-1 block text-gray-600 text-xs">
-          Base URL
+          {t("sidepanel.settings.ai.baseUrl")}
         </label>
         <div className="flex gap-1">
           <input
@@ -173,7 +174,7 @@ function AiSettings() {
             value={baseURL}
             onChange={(e) => setBaseURL(e.target.value)}
             className="flex-1 rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
-            placeholder="https://api.openai.com/v1/"
+            placeholder={t("sidepanel.settings.ai.baseUrlPlaceholder")}
           />
           <Button
             variant="secondary"
@@ -248,16 +249,16 @@ function LogSettings() {
         label={t("sidepanel.settings.log.level")}
         value={logLevel}
         onChange={handleLogLevelChange}
-        options={LOG_LEVELS.map((l) => ({
-          value: l.value as string,
-          label: l.label
-        }))}
+        options={translateOptions(
+          LOG_LEVELS as Array<{ value: string; labelKey: string }>,
+          t
+        )}
       />
       <CompactSelect
         label={t("sidepanel.settings.log.timing")}
         value={scrapeTiming}
         onChange={handleScrapeTimingChange}
-        options={SCRAPE_TIMING_OPTIONS}
+        options={translateOptions(SCRAPE_TIMING_OPTIONS, t)}
       />
     </div>
   )

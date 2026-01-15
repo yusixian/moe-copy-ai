@@ -161,11 +161,11 @@ const LinkFilterBar = memo(function LinkFilterBar({
                         : t("batch.filter.mode.include")}
                     </span>
                     <span className="font-medium text-gray-700 text-sm">
-                      {preset.name}
+                      {t(preset.nameKey)}
                     </span>
                   </div>
                   <span className="text-gray-400 text-xs">
-                    {preset.description}
+                    {t(preset.descKey)}
                   </span>
                 </button>
               ))}

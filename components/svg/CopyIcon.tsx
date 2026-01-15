@@ -6,6 +6,7 @@ import type { HTMLAttributes } from "react"
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react"
 
 import { cn } from "~/utils"
+import { useI18n } from "~/utils/i18n"
 
 export interface CopyIconHandle {
   startAnimation: () => void
@@ -25,6 +26,7 @@ const defaultTransition: Transition = {
 
 const CopyIcon = forwardRef<CopyIconHandle, CopyIconProps>(
   ({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
+    const { t } = useI18n()
     const controls = useAnimation()
     const isControlledRef = useRef(false)
 
@@ -61,7 +63,7 @@ const CopyIcon = forwardRef<CopyIconHandle, CopyIconProps>(
     return (
       <span
         role="img"
-        aria-label="Copy"
+        aria-label={t("aria.copy")}
         className={cn(
           `flex cursor-pointer select-none items-center justify-center rounded-md transition-colors duration-200`,
           className

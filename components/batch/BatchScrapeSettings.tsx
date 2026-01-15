@@ -11,6 +11,7 @@ import {
   PAGINATION_MAX_PAGES_OPTIONS
 } from "~constants/options"
 import { useI18n } from "~utils/i18n"
+import { translateOptions } from "~utils/options-helper"
 
 // 紧凑选择框组件
 export function CompactSelect({
@@ -128,7 +129,7 @@ export function BatchScrapeSettings({
                 t("batch.settings.concurrency.saved")
               )
             }
-            options={BATCH_CONCURRENCY_OPTIONS}
+            options={translateOptions(BATCH_CONCURRENCY_OPTIONS, t)}
           />
           <CompactSelect
             label={t("batch.settings.delay")}
@@ -136,7 +137,7 @@ export function BatchScrapeSettings({
             onChange={(v) =>
               handleChange(setDelay, v, t("batch.settings.delay.saved"))
             }
-            options={BATCH_DELAY_OPTIONS}
+            options={translateOptions(BATCH_DELAY_OPTIONS, t)}
           />
           <CompactSelect
             label={t("batch.settings.timeout")}
@@ -148,7 +149,7 @@ export function BatchScrapeSettings({
                 t("batch.settings.timeout.saved")
               )
             }
-            options={BATCH_TIMEOUT_OPTIONS}
+            options={translateOptions(BATCH_TIMEOUT_OPTIONS, t)}
           />
           <CompactSelect
             label={t("batch.settings.retry")}
@@ -156,7 +157,7 @@ export function BatchScrapeSettings({
             onChange={(v) =>
               handleChange(setRetryCount, v, t("batch.settings.retry.saved"))
             }
-            options={BATCH_RETRY_OPTIONS}
+            options={translateOptions(BATCH_RETRY_OPTIONS, t)}
           />
         </div>
       ) : (
@@ -171,7 +172,7 @@ export function BatchScrapeSettings({
                 t("batch.settings.concurrency.saved")
               )
             }
-            options={BATCH_CONCURRENCY_OPTIONS}
+            options={translateOptions(BATCH_CONCURRENCY_OPTIONS, t)}
           />
           <CompactSelect
             label={t("batch.settings.delay.full")}
@@ -179,7 +180,7 @@ export function BatchScrapeSettings({
             onChange={(v) =>
               handleChange(setDelay, v, t("batch.settings.delay.saved"))
             }
-            options={BATCH_DELAY_OPTIONS}
+            options={translateOptions(BATCH_DELAY_OPTIONS, t)}
           />
           <CompactSelect
             label={t("batch.settings.timeout.full")}
@@ -191,7 +192,7 @@ export function BatchScrapeSettings({
                 t("batch.settings.timeout.saved")
               )
             }
-            options={BATCH_TIMEOUT_OPTIONS}
+            options={translateOptions(BATCH_TIMEOUT_OPTIONS, t)}
           />
           <CompactSelect
             label={t("batch.settings.retry.full")}
@@ -199,7 +200,7 @@ export function BatchScrapeSettings({
             onChange={(v) =>
               handleChange(setRetryCount, v, t("batch.settings.retry.saved"))
             }
-            options={BATCH_RETRY_OPTIONS}
+            options={translateOptions(BATCH_RETRY_OPTIONS, t)}
           />
         </>
       )}
@@ -218,7 +219,7 @@ export function BatchScrapeSettings({
             onChange={(v) =>
               handleChange(setMaxPages, v, t("batch.settings.maxPages.saved"))
             }
-            options={PAGINATION_MAX_PAGES_OPTIONS}
+            options={translateOptions(PAGINATION_MAX_PAGES_OPTIONS, t)}
           />
         </div>
         <div className="flex-1">
@@ -232,7 +233,7 @@ export function BatchScrapeSettings({
             onChange={(v) =>
               handleChange(setPageDelay, v, t("batch.settings.pageDelay.saved"))
             }
-            options={PAGINATION_DELAY_OPTIONS}
+            options={translateOptions(PAGINATION_DELAY_OPTIONS, t)}
           />
         </div>
       </div>
