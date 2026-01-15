@@ -7,6 +7,13 @@ import { Button } from "~/components/ui/button"
 import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
 import { useAiSettings } from "~hooks/useAiSettings"
+import {
+  getTranslations,
+  LOCALE_NAMES,
+  SUPPORTED_LOCALES,
+  useI18n,
+  type Locale
+} from "~utils/i18n"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
 import { AccordionSection } from "../AccordionSection"
 import { ModelSelectInput } from "../ai/ModelSelectInput"
@@ -236,6 +243,37 @@ function LogSettings() {
   )
 }
 
+// 语言设置
+function LanguageSettings() {
+  const { t, locale, setLocale } = useI18n()
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLocale = e.target.value as Locale
+    setLocale(newLocale)
+    const msg = getTranslations(newLocale)["common.success"] ?? "Success"
+    toast.success(msg)
+  }
+
+  return (
+    <div className="flex items-center justify-between rounded-lg border border-sky-200 bg-white p-3">
+      <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
+        <Icon icon="mdi:globe" width={16} />
+        {t("option.interface.language")}
+      </span>
+      <select
+        value={locale}
+        onChange={handleChange}
+        className="rounded border border-sky-200 bg-sky-50 px-2 py-1 text-sm focus:border-sky-400 focus:outline-none">
+        {SUPPORTED_LOCALES.map((loc) => (
+          <option key={loc} value={loc}>
+            {LOCALE_NAMES[loc]}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
 // 主设置组件
 export default function SidePanelSettings() {
   const [showFloatButton, setShowFloatButton] = useStorage(
@@ -278,6 +316,8 @@ export default function SidePanelSettings() {
       <AccordionSection title="批量抓取" icon="mdi:file-document-multiple">
         <BatchScrapeSettings />
       </AccordionSection>
+
+      <LanguageSettings />
 
       <ToggleRow
         icon="mdi:palette-outline"

@@ -1,19 +1,25 @@
 import type React from "react"
 
 import { FLOAT_BUTTON_OPTIONS } from "../../constants/options"
+import { useI18n } from "~utils/i18n"
+
+import LanguageSelect from "./LanguageSelect"
 import OptionSection from "./OptionSection"
 import OptionSelect from "./OptionSelect"
 
 export const InterfaceSettingsSection: React.FC = () => {
+  const { t } = useI18n()
+
   return (
-    <OptionSection title="界面设置" icon="line-md:cog-filled-loop">
+    <OptionSection title={t("option.interface.title")} icon="line-md:cog">
+      <LanguageSelect />
       <OptionSelect
         id="floatButton"
-        label="网页内悬浮窗"
+        label={t("option.interface.floatButton")}
         options={FLOAT_BUTTON_OPTIONS}
         storageKey="show_float_button"
         defaultValue="true"
-        description="控制是否在网页中显示悬浮球。关闭后将不会在浏览的网页中显示悬浮窗，您仍可以通过浏览器扩展图标使用功能"
+        description={t("option.interface.floatButton.desc")}
       />
     </OptionSection>
   )

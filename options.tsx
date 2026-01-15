@@ -10,22 +10,25 @@ import InterfaceSettingsSection from "./components/option/InterfaceSettingsSecti
 import LogSettingsSection from "./components/option/LogSettingsSection"
 import OptionHeader from "./components/option/OptionHeader"
 import SelectorSettingsSection from "./components/option/SelectorSettingsSection"
+import { I18nProvider } from "~utils/i18n"
 
 function OptionsPage() {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-8">
-      <div className="mx-auto max-w-2xl">
-        <OptionHeader />
-        <ExtractionModeSection />
-        <LogSettingsSection />
-        <InterfaceSettingsSection />
-        <SelectorSettingsSection />
-        <AiSettingsSection />
-        <DevSettingsSection />
-        <Footer />
+    <I18nProvider>
+      <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-8">
+        <div className="mx-auto max-w-2xl">
+          <OptionHeader />
+          <ExtractionModeSection />
+          <LogSettingsSection />
+          <InterfaceSettingsSection />
+          <SelectorSettingsSection />
+          <AiSettingsSection />
+          <DevSettingsSection />
+          <Footer />
+        </div>
+        <ToastContainer />
       </div>
-      <ToastContainer />
-    </div>
+    </I18nProvider>
   )
 }
 

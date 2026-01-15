@@ -6,7 +6,7 @@ import OptionSelect from "./OptionSelect"
 
 export const LogSettingsSection: React.FC = () => {
   return (
-    <OptionSection title="日志设置" icon="line-md:cog-filled-loop">
+    <OptionSection title="日志设置" icon="line-md:cog">
       <OptionSelect
         id="logLevel"
         label="日志级别"

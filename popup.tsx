@@ -1,12 +1,15 @@
 import "./styles/global.css"
 
 import PopupContent from "~/components/PopupContent"
+import { I18nProvider } from "~utils/i18n"
 
 function IndexPopup() {
   return (
-    <div className="w-[35rem]">
-      <PopupContent />
-    </div>
+    <I18nProvider>
+      <div className="w-[35rem]">
+        <PopupContent />
+      </div>
+    </I18nProvider>
   )
 }
 

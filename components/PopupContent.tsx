@@ -149,7 +149,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             size="icon"
             onClick={handleOpenOptions}
             title="打开设置">
-            <Icon icon="line-md:cog-filled-loop" width="20" height="20" />
+            <Icon icon="line-md:cog" width="20" height="20" />
           </Button>
         </div>
       </header>
