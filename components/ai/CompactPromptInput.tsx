@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react"
 import { useMemo, useState } from "react"
 
 import type { ScrapedContent } from "~constants/types"
+import { useI18n } from "~utils/i18n"
 import { hasAnyPlaceholder, processTemplate } from "~utils/template"
 
 import TokenizationDisplay from "../TokenizationDisplay"
@@ -30,6 +31,7 @@ const CompactPromptInput = ({
   onSaveAsDefault,
   disabled = false
 }: CompactPromptInputProps) => {
+  const { t } = useI18n()
   const [showPlaceholders, setShowPlaceholders] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
 
@@ -61,7 +63,7 @@ const CompactPromptInput = ({
         <label
           htmlFor="compact-prompt-input"
           className="font-medium text-gray-600 text-xs">
-          提示词
+          {t("ai.panel.prompt.label")}
         </label>
         {supportedPlaceholders && supportedPlaceholders.length > 0 && (
           <button
@@ -69,7 +71,9 @@ const CompactPromptInput = ({
             onClick={() => setShowPlaceholders(!showPlaceholders)}
             className="flex items-center gap-1 text-sky-600 text-xs hover:text-sky-700">
             <Icon icon="mdi:code-braces" width={14} />
-            {showPlaceholders ? "隐藏占位符" : "占位符"}
+            {showPlaceholders
+              ? t("ai.panel.placeholders.hide")
+              : t("ai.panel.placeholders.title")}
           </button>
         )}
       </div>
@@ -80,7 +84,7 @@ const CompactPromptInput = ({
         value={customPrompt}
         onChange={(e) => setCustomPrompt(e.target.value)}
         disabled={disabled}
-        placeholder="输入提示词..."
+        placeholder={t("ai.prompt.placeholder")}
         className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none disabled:opacity-50"
         rows={4}
       />
@@ -90,7 +94,9 @@ const CompactPromptInput = ({
         supportedPlaceholders &&
         supportedPlaceholders.length > 0 && (
           <div className="rounded border border-sky-100 bg-sky-50/50 p-2">
-            <p className="mb-1.5 text-gray-500 text-xs">点击插入：</p>
+            <p className="mb-1.5 text-gray-500 text-xs">
+              {t("scrape.prompt.placeholderHelp")}
+            </p>
             <div className="flex flex-wrap gap-1">
               {supportedPlaceholders.map((info) => (
                 <button
@@ -116,7 +122,7 @@ const CompactPromptInput = ({
             disabled={disabled}
             className="flex items-center gap-1 rounded bg-purple-100 px-2 py-1 text-purple-600 text-xs hover:bg-purple-200 disabled:opacity-50">
             <Icon icon="mdi:content-save" width={12} />
-            保存默认
+            {t("scrape.prompt.saveDefault")}
           </button>
         )}
         {customPrompt !== systemPrompt && systemPrompt && (
@@ -126,7 +132,7 @@ const CompactPromptInput = ({
             disabled={disabled}
             className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-gray-600 text-xs hover:bg-gray-200 disabled:opacity-50">
             <Icon icon="mdi:restore" width={12} />
-            还原
+            {t("scrape.prompt.resetDefault")}
           </button>
         )}
         {hasPlaceholders && scrapedData && (
@@ -136,7 +142,9 @@ const CompactPromptInput = ({
             disabled={disabled}
             className="flex items-center gap-1 rounded bg-emerald-100 px-2 py-1 text-emerald-600 text-xs hover:bg-emerald-200 disabled:opacity-50">
             <Icon icon={showPreview ? "mdi:eye-off" : "mdi:eye"} width={12} />
-            {showPreview ? "隐藏" : "预览"}
+            {showPreview
+              ? t("scrape.prompt.hidePreview")
+              : t("scrape.prompt.showPreview")}
           </button>
         )}
       </div>
@@ -146,7 +154,7 @@ const CompactPromptInput = ({
         <div className="rounded border border-emerald-100 bg-emerald-50/50 p-2">
           <p className="mb-1 flex items-center gap-1 text-emerald-700 text-xs">
             <Icon icon="mdi:file-document-outline" width={12} />
-            替换后预览：
+            {t("scrape.prompt.previewTitle")}
           </p>
           <div className="max-h-24 overflow-y-auto rounded bg-white p-1.5 text-gray-600 text-xs">
             {getPreviewContent()}

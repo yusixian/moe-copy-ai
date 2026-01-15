@@ -4,6 +4,7 @@ import MarkdownIt from "markdown-it"
 import { memo, useEffect, useMemo, useState } from "react"
 
 import { sanitizeHtmlForDisplay } from "~/utils/sanitize-html"
+import { useI18n } from "~utils/i18n"
 
 interface SummaryResultDisplayProps {
   content: string
@@ -19,6 +20,7 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
   isStreaming = false,
   className
 }: SummaryResultDisplayProps) {
+  const { t } = useI18n()
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isViewSource, setIsViewSource] = useState(false)
   const { copy, copied } = useClipboard({ timeout: 2000 })
@@ -70,14 +72,20 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
               icon="line-md:lightbulb-twotone"
               className="h-4 w-4 text-amber-500"
             />
-            {isViewSource ? "源码" : "预览"}
+            {isViewSource
+              ? t("content.preview.source")
+              : t("content.preview.markdown")}
           </span>
           <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={() => setIsViewSource(!isViewSource)}
               className="rounded p-1.5 text-gray-500 hover:bg-gray-100"
-              title={isViewSource ? "预览" : "查看源码"}>
+              title={
+                isViewSource
+                  ? t("content.preview.markdown")
+                  : t("content.preview.source")
+              }>
               <Icon
                 icon={isViewSource ? "mdi:eye" : "mdi:code-tags"}
                 className="h-5 w-5"
@@ -87,7 +95,9 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
               type="button"
               onClick={handleCopy}
               className="rounded p-1.5 text-gray-500 hover:bg-gray-100"
-              title={copied ? "已复制" : "复制"}>
+              title={
+                copied ? t("extraction.copy.copied") : t("extraction.copy.copy")
+              }>
               <Icon
                 icon={copied ? "mdi:check" : "mdi:content-copy"}
                 className={`h-5 w-5 ${copied ? "text-green-500" : ""}`}
@@ -97,7 +107,7 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
               type="button"
               onClick={() => setIsFullscreen(false)}
               className="rounded p-1.5 text-gray-500 hover:bg-gray-100"
-              title="关闭 (ESC)">
+              title={t("content.fullscreen.help")}>
               <Icon icon="mdi:close" className="h-5 w-5" />
             </button>
           </div>
@@ -131,7 +141,7 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
             width={14}
             className="text-amber-400"
           />
-          摘要结果
+          {t("ai.panel.title")}
           {isStreaming && (
             <Icon icon="mdi:loading" width={12} className="ml-1 animate-spin" />
           )}
@@ -141,7 +151,11 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
             type="button"
             onClick={() => setIsViewSource(!isViewSource)}
             className="flex items-center gap-1 rounded px-1.5 py-0.5 text-gray-500 text-xs hover:bg-gray-100"
-            title={isViewSource ? "预览" : "查看源码"}>
+            title={
+              isViewSource
+                ? t("content.preview.markdown")
+                : t("content.preview.source")
+            }>
             <Icon
               icon={isViewSource ? "mdi:eye" : "mdi:code-tags"}
               width={14}
@@ -151,7 +165,7 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
             type="button"
             onClick={() => setIsFullscreen(true)}
             className="flex items-center gap-1 rounded px-1.5 py-0.5 text-gray-500 text-xs hover:bg-gray-100"
-            title="全屏">
+            title={t("content.fullscreen.enter")}>
             <Icon icon="mdi:fullscreen" width={14} />
           </button>
           <button
@@ -159,7 +173,7 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
             onClick={handleCopy}
             className="flex items-center gap-1 rounded bg-sky-100 px-2 py-0.5 text-sky-600 text-xs hover:bg-sky-200">
             <Icon icon={copied ? "mdi:check" : "mdi:content-copy"} width={12} />
-            {copied ? "已复制" : "复制"}
+            {copied ? t("extraction.copy.copied") : t("extraction.copy.copy")}
           </button>
         </div>
       </div>

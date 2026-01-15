@@ -3,6 +3,7 @@ import { useClipboard } from "foxact/use-clipboard"
 
 import { Button } from "~/components/ui/button"
 import ContentDisplay from "~components/ContentDisplay"
+import { useI18n } from "~utils/i18n"
 
 // 摘要结果组件
 export const SummaryResult = ({
@@ -12,6 +13,7 @@ export const SummaryResult = ({
   summary: string
   streamingText?: string
 }) => {
+  const { t } = useI18n()
   // 显示流式文本或完整摘要
   const displayText = summary || streamingText || ""
   const { copy, copied } = useClipboard({ timeout: 2000 })
@@ -31,7 +33,7 @@ export const SummaryResult = ({
             width="18"
             height="18"
           />
-          摘要结果
+          {t("ai.panel.title")}
         </h3>
         <Button variant="secondary" size="xs" onClick={handleCopy}>
           <Icon
@@ -40,7 +42,7 @@ export const SummaryResult = ({
             width="14"
             height="14"
           />
-          {copied ? "已复制" : "复制摘要"}
+          {copied ? t("extraction.copy.copied") : t("extraction.copy.copy")}
         </Button>
       </div>
       <ContentDisplay content={displayText} isMarkdown isPreviewMode />

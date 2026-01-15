@@ -9,6 +9,7 @@ import {
   deleteAiChatHistoryItem,
   getAiChatHistory
 } from "~utils/ai-service"
+import { useI18n } from "~utils/i18n"
 
 import SummaryResultDisplay from "./SummaryResultDisplay"
 
@@ -21,6 +22,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
   isOpen,
   onClose
 }) => {
+  const { t } = useI18n()
   const [historyItems, setHistoryItems] = useState<AiChatHistoryItem[]>([])
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null)
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set())
@@ -43,31 +45,34 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
   }, [isOpen])
 
   // 删除历史记录项
-  const handleDelete = useCallback(async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    try {
-      await deleteAiChatHistoryItem(id)
-      setHistoryItems((prev) => prev.filter((item) => item.id !== id))
-      toast.success("已删除记录")
-    } catch (error) {
-      console.error("删除历史记录失败:", error)
-      toast.error("删除失败")
-    }
-  }, [])
+  const handleDelete = useCallback(
+    async (id: string, e: React.MouseEvent) => {
+      e.stopPropagation()
+      try {
+        await deleteAiChatHistoryItem(id)
+        setHistoryItems((prev) => prev.filter((item) => item.id !== id))
+        toast.success(t("ai.history.item.delete"))
+      } catch (error) {
+        console.error("删除历史记录失败:", error)
+        toast.error(t("ai.history.item.delete"))
+      }
+    },
+    [t]
+  )
 
   // 清空所有历史记录
   const handleClearAll = useCallback(async () => {
-    if (confirm("确定要清空所有历史记录吗？此操作不可恢复!")) {
+    if (confirm(t("ai.history.clearAll.confirm"))) {
       try {
         await clearAiChatHistory()
         setHistoryItems([])
-        toast.success("已清空所有历史记录")
+        toast.success(t("ai.history.clearAll"))
       } catch (error) {
         console.error("清空历史记录失败:", error)
-        toast.error("清空失败")
+        toast.error(t("ai.history.clearAll"))
       }
     }
-  }, [])
+  }, [t])
 
   // 导出历史记录为JSON
   const handleExport = useCallback(() => {
@@ -84,12 +89,12 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
 
-      toast.success("导出成功")
+      toast.success(t("ai.history.item.export"))
     } catch (error) {
       console.error("导出历史记录失败:", error)
-      toast.error("导出失败")
+      toast.error(t("ai.history.item.export"))
     }
-  }, [historyItems])
+  }, [historyItems, t])
 
   // 切换展开/折叠状态
   const toggleExpand = useCallback((id: string) => {
@@ -167,7 +172,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                   width="24"
                   height="24"
                 />
-                聊天历史记录
+                {t("ai.history.title")}
               </h3>
               <div className="flex gap-2">
                 {historyItems.length > 0 && (
@@ -182,7 +187,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                         width="16"
                         height="16"
                       />
-                      导出
+                      {t("ai.history.item.export")}
                     </button>
                     <button
                       type="button"
@@ -194,7 +199,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                         width="16"
                         height="16"
                       />
-                      清空
+                      {t("ai.history.clearAll")}
                     </button>
                   </>
                 )}
@@ -217,7 +222,9 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                       width="32"
                       height="32"
                     />
-                    <p className="mt-2 text-sky-600 text-sm">加载中...</p>
+                    <p className="mt-2 text-sky-600 text-sm">
+                      {t("image.loading")}
+                    </p>
                   </div>
                 </div>
               ) : historyItems.length === 0 ? (
@@ -229,9 +236,9 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                     height="32"
                   />
                   <p className="text-center text-sm">
-                    还没有聊天记录
+                    {t("ai.history.empty")}
                     <br />
-                    与AI聊天后会自动保存
+                    {t("ai.history.empty.desc")}
                   </p>
                 </div>
               ) : (
@@ -267,7 +274,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                           type="button"
                           onClick={(e) => handleDelete(item.id, e)}
                           className="rounded-full p-1 text-red-500 hover:bg-red-100"
-                          title="删除记录">
+                          title={t("ai.history.item.delete")}>
                           <Icon icon="line-md:trash" width="16" height="16" />
                         </button>
                       </div>
@@ -290,7 +297,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                             className="overflow-hidden border-sky-100 border-t border-dashed pt-2">
                             <div className="mb-2 rounded-md bg-indigo-50 p-2">
                               <p className="mb-1 font-medium text-indigo-600 text-xs">
-                                原始提示词:
+                                {t("ai.history.detail.prompt")}:
                               </p>
                               <p className="whitespace-pre-wrap break-words text-indigo-700 text-xs">
                                 {item.prompt}
@@ -307,7 +314,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                                       togglePromptExpand(item.id, e)
                                     }>
                                     <p className="mb-1 font-medium text-emerald-600 text-xs">
-                                      完整提示词 (已填充):
+                                      {t("ai.history.detail.copyPrompt")}:
                                     </p>
                                     <Icon
                                       icon={
@@ -341,7 +348,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                             {/* biome-ignore lint/a11y/noStaticElementInteractions: stopPropagation only */}
                             <div className="mb-2" onClick={stopPropagation}>
                               <p className="mb-1 font-medium text-sky-600 text-xs">
-                                内容:
+                                {t("ai.history.detail.response")}:
                               </p>
                               <SummaryResultDisplay content={item.content} />
                             </div>
@@ -349,17 +356,20 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                             {item.usage && (
                               <div className="rounded-md bg-green-50 p-2">
                                 <p className="mb-1 font-medium text-green-600 text-xs">
-                                  Token 使用:
+                                  {t("ai.history.detail.metadata.tokens")}:
                                 </p>
                                 <div className="flex flex-wrap gap-2 text-green-700 text-xs">
                                   <span>
-                                    总计: {item.usage.total_tokens || 0}
+                                    {t("batch.stats.total")}:{" "}
+                                    {item.usage.total_tokens || 0}
                                   </span>
                                   <span>
-                                    提示词: {item.usage.prompt_tokens || 0}
+                                    {t("ai.history.detail.prompt")}:{" "}
+                                    {item.usage.prompt_tokens || 0}
                                   </span>
                                   <span>
-                                    完成: {item.usage.completion_tokens || 0}
+                                    {t("batch.stats.completed")}:{" "}
+                                    {item.usage.completion_tokens || 0}
                                   </span>
                                 </div>
                               </div>
