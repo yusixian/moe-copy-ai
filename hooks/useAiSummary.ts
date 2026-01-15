@@ -91,16 +91,19 @@ export const useAiSummary = (
   }, [customPrompt])
 
   // 保存系统默认提示词
-  const saveAsDefaultPrompt = useCallback(async (prompt: string) => {
-    try {
-      await storage.set("ai_system_prompt", prompt)
-      setSystemPrompt(prompt)
-      toast.success("成功保存为系统默认提示词 (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
-    } catch (error) {
-      toast.error("保存默认提示词失败 (╥﹏╥)")
-      console.error("保存默认提示词出错:", error)
-    }
-  }, [])
+  const saveAsDefaultPrompt = useCallback(
+    async (prompt: string) => {
+      try {
+        await storage.set("ai_system_prompt", prompt)
+        setSystemPrompt(prompt)
+        toast.success(t("toast.ai.defaultPromptSaved"))
+      } catch (error) {
+        toast.error(t("toast.ai.defaultPromptSaveFailed"))
+        console.error("保存默认提示词出错:", error)
+      }
+    },
+    [t]
+  )
 
   // 当自定义提示词为空时，获取系统提示词
   useLayoutEffect(() => {

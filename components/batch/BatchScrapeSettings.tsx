@@ -27,15 +27,15 @@ export function CompactSelect({
 }) {
   const selectId = `select-${label.replace(/\s+/g, "-").toLowerCase()}`
   return (
-    <div className="flex items-center justify-between gap-2">
-      <label htmlFor={selectId} className="text-gray-600 text-xs">
+    <div className="flex items-center justify-between gap-1.5">
+      <label htmlFor={selectId} className="flex-shrink-0 text-gray-600 text-xs">
         {label}
       </label>
       <select
         id={selectId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded border border-sky-200 bg-sky-50 px-2 py-1 text-xs focus:border-sky-400 focus:outline-none">
+        className="min-w-0 rounded border border-sky-200 bg-sky-50 px-2 py-1 text-xs focus:border-sky-400 focus:outline-none">
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
@@ -118,7 +118,7 @@ export function BatchScrapeSettings({
 
       {/* 紧凑模式使用2列网格 */}
       {compact ? (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-wrap gap-3">
           <CompactSelect
             label={t("batch.settings.concurrency")}
             value={concurrency}

@@ -5,10 +5,9 @@ import { toast } from "react-toastify"
 
 import { useI18n } from "~utils/i18n"
 
-interface Option {
-  value: string
-  label: string
-}
+type Option =
+  | { value: string; label: string }
+  | { value: string; labelKey: string }
 
 interface OptionSelectProps {
   id: string
@@ -30,6 +29,11 @@ export const OptionSelect: React.FC<OptionSelectProps> = ({
   const { t } = useI18n()
   const [value, setValue] = useStorage<string>(storageKey, defaultValue)
 
+  const getOptionLabel = useCallback(
+    (option: Option) => ("label" in option ? option.label : t(option.labelKey)),
+    [t]
+  )
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       setValue(e.target.value)
@@ -50,7 +54,7 @@ export const OptionSelect: React.FC<OptionSelectProps> = ({
         className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 focus:border-sky-400 focus:ring-2 focus:ring-sky-200">
         {options.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {getOptionLabel(option)}
           </option>
         ))}
       </select>
