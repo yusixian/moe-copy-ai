@@ -187,6 +187,21 @@
   "singlescrape.empty.hint": "Click the button below to re-scrape",
   "singlescrape.empty.action": "Refresh Content",
 
+  "scrape.prompt.saveDefault": "Save as Default",
+  "scrape.prompt.resetDefault": "Reset to Default",
+  "scrape.prompt.hidePreview": "Hide Preview",
+  "scrape.prompt.showPreview": "Show Preview",
+  "scrape.prompt.placeholderHelp": "Click to insert placeholder",
+  "scrape.prompt.previewTitle": "Preview Result",
+
+  "scrape.placeholders.content": "Article content",
+  "scrape.placeholders.title": "Article title",
+  "scrape.placeholders.url": "Article URL",
+  "scrape.placeholders.author": "Author",
+  "scrape.placeholders.publishDate": "Publish date",
+  "scrape.placeholders.cleanedContent": "Cleaned content",
+  "scrape.placeholders.meta": "Metadata field",
+
   "batch.idle.title": "Batch Scrape Documents",
   "batch.idle.subtitle": "Select a region on the page containing links to batch scrape all documents",
   "batch.idle.selectElement": "Select Element Region",

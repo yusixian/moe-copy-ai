@@ -187,6 +187,21 @@
   "singlescrape.empty.hint": "点击下方按钮重新抓取",
   "singlescrape.empty.action": "刷新内容",
 
+  "scrape.prompt.saveDefault": "设为默认",
+  "scrape.prompt.resetDefault": "恢复默认",
+  "scrape.prompt.hidePreview": "隐藏预览",
+  "scrape.prompt.showPreview": "显示预览",
+  "scrape.prompt.placeholderHelp": "点击插入占位符",
+  "scrape.prompt.previewTitle": "预览结果",
+
+  "scrape.placeholders.content": "文章内容",
+  "scrape.placeholders.title": "文章标题",
+  "scrape.placeholders.url": "文章URL",
+  "scrape.placeholders.author": "作者",
+  "scrape.placeholders.publishDate": "发布日期",
+  "scrape.placeholders.cleanedContent": "清理后的内容",
+  "scrape.placeholders.meta": "元数据中的字段",
+
   "batch.idle.title": "批量抓取文档",
   "batch.idle.subtitle": "选择页面上包含链接的区域，批量抓取所有文档",
   "batch.idle.selectElement": "选择元素区域",

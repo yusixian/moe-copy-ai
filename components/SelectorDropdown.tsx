@@ -45,6 +45,7 @@ const SelectorItem = memo<SelectorItemProps>(
     onSelectContent,
     closeDropdown
   }) => {
+    const { t } = useI18n()
     // 判断是否有多个内容
     const hasMultipleContents =
       allPreviewContents && allPreviewContents.length > 1
@@ -122,12 +123,14 @@ const SelectorItem = memo<SelectorItemProps>(
               <span
                 className={`inline-block max-w-[5rem] truncate whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-xs ${hasMultipleContents ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"}`}>
                 {hasMultipleContents
-                  ? `${allPreviewContents?.length}个结果`
-                  : "有结果"}
+                  ? t("selector.count", {
+                      count: allPreviewContents?.length
+                    })
+                  : t("batch.results")}
               </span>
             ) : (
               <span className="rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-500 text-xs">
-                无结果
+                {t("common.noData")}
               </span>
             )}
             {hasContent && (
@@ -139,7 +142,11 @@ const SelectorItem = memo<SelectorItemProps>(
                     : "text-sky-500 hover:bg-sky-50"
                 }`}
                 onClick={handleTogglePreview}
-                title={showPreview ? "隐藏预览" : "显示预览"}>
+                title={
+                  showPreview
+                    ? `${t("common.hide")}${t("extraction.preview")}`
+                    : `${t("common.show")}${t("extraction.preview")}`
+                }>
                 <Icon
                   icon={showPreview ? "mdi:eye-off-outline" : "mdi:eye-outline"}
                   width={18}
@@ -156,7 +163,9 @@ const SelectorItem = memo<SelectorItemProps>(
             ref={previewRef}
             className="border-sky-100 border-t bg-blue-50 p-2">
             <div className="mb-2 font-medium text-sky-600 text-xs">
-              {hasMultipleContents ? "多个内容预览:" : "内容预览:"}
+              {t(
+                hasMultipleContents ? "metadata.preview" : "extraction.preview"
+              )}
             </div>
             {hasMultipleContents ? (
               <div className="space-y-3">
@@ -167,21 +176,21 @@ const SelectorItem = memo<SelectorItemProps>(
                     <div className="flex items-center justify-between border-sky-50 border-b bg-gradient-to-r from-sky-50 to-blue-50 px-2 py-2">
                       <span className="flex items-center font-medium text-sky-600 text-xs">
                         <Icon icon="mdi:numeric" className="mr-1" width={14} />
-                        结果 {idx + 1}
+                        {t("batch.results")} {idx + 1}
                       </span>
                       {onSelectContent && (
                         <button
                           type="button"
                           className="flex min-h-[32px] items-center rounded-full border border-sky-200 bg-white px-3 py-1 font-medium text-sky-600 text-xs shadow-sm transition-all hover:bg-sky-100 hover:shadow"
                           onClick={() => handleContentSelect(idx)}
-                          title="将此结果设为当前选择器的内容">
+                          title={t("batch.results.selected")}>
                           <Icon
                             icon="mdi:check-circle-outline"
                             className="mr-1.5"
                             width={14}
                             height={14}
                           />
-                          设为当前结果
+                          {t("batch.results.selected")}
                         </button>
                       )}
                     </div>
@@ -382,7 +391,7 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
       <DropdownToggle
         isOpen={isOpen}
         toggleOpen={toggleDropdown}
-        selectedText={selectors[selectedIndex] || "默认"}
+        selectedText={selectors[selectedIndex] || t("common.none")}
       />
 
       {/* 下拉菜单 */}

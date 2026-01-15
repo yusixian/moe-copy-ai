@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react"
 import { memo, useCallback, useState } from "react"
 
 import { cn } from "~utils"
+import { useI18n } from "~utils/i18n"
 
 interface DownloadButtonProps {
   fileUrl: string
@@ -16,12 +17,13 @@ interface DownloadButtonProps {
 export const DownloadButton: React.FC<DownloadButtonProps> = ({
   fileUrl,
   fileName,
-  title = "点击下载可爱图片～",
+  title,
   iconName,
   className,
   iconClassName,
   iconSize = 24
 }) => {
+  const { t } = useI18n()
   // 是否悬停在下载按钮上
   const [isHovering, setIsHovering] = useState(false)
 
@@ -45,7 +47,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
         "flex size-9 items-center justify-center rounded-full border-2 border-white/80 bg-gradient-to-br from-pink-400 to-purple-400 text-white shadow-md transition-all hover:scale-110 hover:from-pink-500 hover:to-purple-500 hover:shadow-pink-300/60",
         className
       )}
-      title={title}>
+      title={title || t("image.download")}>
       <Icon
         icon={iconName ?? "line-md:downloading-loop"}
         className={`${isHovering ? "animate-bounce" : ""} ${iconClassName}`}
