@@ -119,6 +119,7 @@ A brand new side panel interface for more efficient workflows.
 - [x] Batch scraping multiple links
 - [x] Content extraction (multiple output formats)
 - [x] ZIP export
+- [x] Internationalization of i18n
 - [ ] Improve engineering & CI (initially let AI grow wild)
 - [ ] Simple documentation site
 - [ ] Add image AI OCR feature
