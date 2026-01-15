@@ -1,5 +1,4 @@
 import { Icon } from "@iconify/react"
-import { useClipboard } from "foxact/use-clipboard"
 import { countTokens } from "gpt-tokenizer"
 import { memo, useCallback, useMemo, useState } from "react"
 
@@ -8,9 +7,9 @@ import { useAiSummary } from "~hooks/useAiSummary"
 import { processTemplate } from "~utils/template"
 
 import { AccordionSection } from "../AccordionSection"
-import ContentDisplay from "../ContentDisplay"
 import AiHistoryDrawer from "./AiHistoryDrawer"
 import CompactPromptInput from "./CompactPromptInput"
+import SummaryResultDisplay from "./SummaryResultDisplay"
 
 interface PlaceholderInfo {
   placeholder: string
@@ -51,7 +50,6 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
   title = "AI 总结",
   onSummaryGenerated
 }: AiSummaryPanelProps) {
-  const { copy, copied } = useClipboard({ timeout: 2000 })
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false)
 
   const {
@@ -82,11 +80,6 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
   )
 
   const displayText = summary || streamingText || ""
-
-  const handleCopy = useCallback(() => {
-    if (!displayText) return
-    copy(displayText)
-  }, [copy, displayText])
 
   const toggleHistoryDrawer = useCallback(
     () => setIsHistoryDrawerOpen((prev) => !prev),
@@ -172,37 +165,13 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
             </div>
           )}
 
-          {/* 摘要结果 - 简化样式，去除嵌套边框 */}
+          {/* 摘要结果 */}
           {displayText && (
-            <div className="pt-2">
-              <div className="mb-1.5 flex items-center justify-between">
-                <span className="flex items-center gap-1 font-medium text-sky-700 text-xs">
-                  <Icon
-                    icon="line-md:lightbulb-twotone"
-                    width={14}
-                    className="text-amber-400"
-                  />
-                  摘要结果
-                </span>
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="flex items-center gap-1 rounded bg-sky-100 px-2 py-0.5 text-sky-600 text-xs hover:bg-sky-200">
-                  <Icon
-                    icon={copied ? "mdi:check" : "mdi:content-copy"}
-                    width={12}
-                  />
-                  {copied ? "已复制" : "复制"}
-                </button>
-              </div>
-              <div className="max-h-48 overflow-y-auto text-gray-700 text-sm">
-                <ContentDisplay
-                  content={displayText}
-                  isMarkdown
-                  isPreviewMode
-                />
-              </div>
-            </div>
+            <SummaryResultDisplay
+              content={displayText}
+              isStreaming={isLoading && !summary}
+              className="pt-2"
+            />
           )}
 
           {/* Token 统计 */}

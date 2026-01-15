@@ -73,7 +73,7 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
   if (isMarkdown && isPreviewMode) {
     if (isFullscreen) {
       return (
-        <div className="fixed inset-0 z-[9999] flex h-full w-full flex-col bg-white">
+        <div className="fixed inset-0 z-50 flex h-full w-full flex-col bg-white">
           {/* 全屏模式顶部栏 */}
           <div className="flex items-center justify-between border-gray-200 border-b bg-white px-4 py-3 shadow-sm">
             <div className="flex items-center gap-3">

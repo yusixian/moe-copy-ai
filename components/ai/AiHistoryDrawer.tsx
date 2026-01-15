@@ -1,5 +1,4 @@
 import { Icon } from "@iconify/react"
-import { useClipboard } from "foxact/use-clipboard"
 import { AnimatePresence, motion } from "motion/react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "react-toastify"
@@ -11,7 +10,7 @@ import {
   getAiChatHistory
 } from "~utils/ai-service"
 
-import ContentDisplay from "../ContentDisplay"
+import SummaryResultDisplay from "./SummaryResultDisplay"
 
 interface AiHistoryDrawerProps {
   isOpen: boolean
@@ -27,14 +26,6 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(false)
   const drawerRef = useRef<HTMLDivElement>(null)
-  const { copy, copied } = useClipboard({ timeout: 2000 })
-
-  // 复制成功时显示 toast
-  useEffect(() => {
-    if (copied) {
-      toast.success("已复制到剪贴板")
-    }
-  }, [copied])
 
   // 加载历史记录
   const loadHistory = useCallback(async () => {
@@ -99,15 +90,6 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
       toast.error("导出失败")
     }
   }, [historyItems])
-
-  // 复制内容
-  const handleCopy = useCallback(
-    (text: string, e: React.MouseEvent) => {
-      e.stopPropagation()
-      copy(text)
-    },
-    [copy]
-  )
 
   // 切换展开/折叠状态
   const toggleExpand = useCallback((id: string) => {
@@ -281,26 +263,13 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={(e) => handleCopy(item.content, e)}
-                            className="rounded-full p-1 text-sky-500 hover:bg-sky-100"
-                            title="复制内容">
-                            <Icon
-                              icon="line-md:clipboard-arrow"
-                              width="16"
-                              height="16"
-                            />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => handleDelete(item.id, e)}
-                            className="rounded-full p-1 text-red-500 hover:bg-red-100"
-                            title="删除记录">
-                            <Icon icon="line-md:trash" width="16" height="16" />
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => handleDelete(item.id, e)}
+                          className="rounded-full p-1 text-red-500 hover:bg-red-100"
+                          title="删除记录">
+                          <Icon icon="line-md:trash" width="16" height="16" />
+                        </button>
                       </div>
                       <AnimatePresence initial={false}>
                         {expandedItemId === item.id && (
@@ -368,17 +337,13 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                                 </div>
                               )}
 
-                            <div className="mb-2">
+                            {/* biome-ignore lint/a11y/useKeyWithClickEvents: stopPropagation only */}
+                            {/* biome-ignore lint/a11y/noStaticElementInteractions: stopPropagation only */}
+                            <div className="mb-2" onClick={stopPropagation}>
                               <p className="mb-1 font-medium text-sky-600 text-xs">
                                 内容:
                               </p>
-                              <div className="rounded-md bg-gray-50 p-2">
-                                <ContentDisplay
-                                  content={item.content}
-                                  isMarkdown
-                                  isPreviewMode
-                                />
-                              </div>
+                              <SummaryResultDisplay content={item.content} />
                             </div>
 
                             {item.usage && (

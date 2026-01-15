@@ -1,5 +1,4 @@
 import { Icon } from "@iconify/react"
-import { useClipboard } from "foxact/use-clipboard"
 import { countTokens } from "gpt-tokenizer"
 import { memo, useMemo } from "react"
 
@@ -10,7 +9,7 @@ import { processTemplate } from "~utils/template"
 
 import { AccordionSection } from "../AccordionSection"
 import CompactPromptInput from "../ai/CompactPromptInput"
-import ContentDisplay from "../ContentDisplay"
+import SummaryResultDisplay from "../ai/SummaryResultDisplay"
 
 interface BatchAiSummaryProps {
   results: BatchScrapeResult[]
@@ -55,8 +54,6 @@ const BatchAiSummary = memo(function BatchAiSummary({
   results,
   onSummaryGenerated
 }: BatchAiSummaryProps) {
-  const { copy, copied } = useClipboard({ timeout: 2000 })
-
   // 转换数据格式
   const scrapedData = useMemo(() => createBatchScrapedData(results), [results])
   const aggregatedContent = useMemo(() => {
@@ -93,11 +90,6 @@ const BatchAiSummary = memo(function BatchAiSummary({
   )
 
   const displayText = summary || streamingText || ""
-
-  const handleCopy = () => {
-    if (!displayText) return
-    copy(displayText)
-  }
 
   const successCount = results.filter((r) => r.success).length
 
@@ -168,35 +160,10 @@ const BatchAiSummary = memo(function BatchAiSummary({
 
           {/* 摘要结果 */}
           {displayText && (
-            <div className="rounded-lg border border-sky-100 bg-sky-50/30 p-2">
-              <div className="mb-1.5 flex items-center justify-between">
-                <span className="flex items-center gap-1 font-medium text-sky-700 text-xs">
-                  <Icon
-                    icon="line-md:lightbulb-twotone"
-                    width={14}
-                    className="text-amber-400"
-                  />
-                  摘要结果
-                </span>
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="flex items-center gap-1 rounded bg-sky-100 px-2 py-0.5 text-sky-600 text-xs hover:bg-sky-200">
-                  <Icon
-                    icon={copied ? "mdi:check" : "mdi:content-copy"}
-                    width={12}
-                  />
-                  {copied ? "已复制" : "复制"}
-                </button>
-              </div>
-              <div className="max-h-48 overflow-y-auto rounded bg-white p-2">
-                <ContentDisplay
-                  content={displayText}
-                  isMarkdown
-                  isPreviewMode
-                />
-              </div>
-            </div>
+            <SummaryResultDisplay
+              content={displayText}
+              isStreaming={isLoading && !summary}
+            />
           )}
 
           {/* Token 统计 */}
