@@ -717,5 +717,7 @@
 
   "ai.model.select": "选择模型",
   "ai.model.custom": "自定义模型",
-  "ai.model.placeholder": "输入模型名称"
+  "ai.model.placeholder": "输入模型名称",
+  "ai.model.empty": "暂无可用模型，请先获取模型列表",
+  "ai.model.noMatch": "无匹配模型"
 }

@@ -42,9 +42,7 @@ export function ModelSelectInput({
       compact={compact}
       inputId={id}
       emptyText={
-        options.length === 0
-          ? t("ai.model.placeholder")
-          : t("option.ai.noMatch")
+        options.length === 0 ? t("ai.model.empty") : t("ai.model.noMatch")
       }
     />
   )

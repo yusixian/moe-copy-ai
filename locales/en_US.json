@@ -717,5 +717,7 @@
 
   "ai.model.select": "Select Model",
   "ai.model.custom": "Custom Model",
-  "ai.model.placeholder": "Enter model name"
+  "ai.model.placeholder": "Enter model name",
+  "ai.model.empty": "No available models. Please fetch the model list first.",
+  "ai.model.noMatch": "No matching model"
 }

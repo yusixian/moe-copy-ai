@@ -195,12 +195,12 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
               </span>
               <span className="text-gray-300">|</span>
               <span>
-                {t("batch.stats.prompt")}:{" "}
+                {t("ai.tokens.input")}:{" "}
                 <b className="text-sky-600">{usage.prompt_tokens}</b>
               </span>
               <span className="text-gray-300">|</span>
               <span>
-                {t("batch.stats.completion")}:
+                {t("ai.tokens.output")}:
                 <b className="text-emerald-600">{usage.completion_tokens}</b>
               </span>
             </div>

@@ -360,7 +360,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                                 </p>
                                 <div className="flex flex-wrap gap-2 text-green-700 text-xs">
                                   <span>
-                                    {t("batch.stats.total")}:{" "}
+                                    {t("ai.tokens.total")}:{" "}
                                     {item.usage.total_tokens || 0}
                                   </span>
                                   <span>
@@ -368,7 +368,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                                     {item.usage.prompt_tokens || 0}
                                   </span>
                                   <span>
-                                    {t("batch.stats.completed")}:{" "}
+                                    {t("ai.tokens.output")}:{" "}
                                     {item.usage.completion_tokens || 0}
                                   </span>
                                 </div>

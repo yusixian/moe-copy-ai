@@ -17,6 +17,7 @@ import { useEffect, useState } from "react"
 import FloatingButton from "~components/FloatingButton"
 import PopupContent from "~components/PopupContent"
 import { useFloatButtonStorage } from "~hooks/useFloatButtonStorage"
+import { I18nProvider } from "~utils/i18n"
 
 // 注入全局样式
 export const getStyle = () => {
@@ -148,4 +149,12 @@ const FloatingPopup = () => {
   )
 }
 
-export default FloatingPopup
+function FloatingPopupWithI18n() {
+  return (
+    <I18nProvider>
+      <FloatingPopup />
+    </I18nProvider>
+  )
+}
+
+export default FloatingPopupWithI18n
