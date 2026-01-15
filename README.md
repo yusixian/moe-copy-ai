@@ -14,7 +14,7 @@ MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩
 
 本插件还处于早期开发阶段～欢迎 Star 关注一下。
 
-这个项目也算是跟 AI 结合的一个尝试，所以对代码质量没有很高要求，优先满足需求。并且因为是插件，想尽可能减少包体积（安利 [xsAI](https://github.com/moeru-ai/xsai) 真的超级轻量）和注入网页对原网页的破坏，样式上不做大要求，纯工具性质 side project～
+这个项目也算是跟 AI 结合的一个尝试，所以对代码质量没有很高要求，优先满足需求。并且因为是插件，想尽可能减少包体积（安利 [xsAI](https://github.com/moeru-ai/xsai) 真的超级轻量）和注入网页对原网页的破坏，样式上不做大要求，纯工具性质 side project ～
 
 ## 安装
 
@@ -41,9 +41,9 @@ MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩
   - **混合模式**: 同时使用两种方式，自动选择最佳结果（推荐）
 - **双版本输出**:
   - 原始格式版: 保留 Markdown 格式和原始换行，适合需要保留格式的场景
-  - 紧凑版: 清理多余空格和换行，使文本更加精简，优化AI模型输入
+  - 紧凑版: 清理多余空格和换行，使文本更加精简，优化 AI 模型输入
 - **智能清理**: 自动去除干扰元素、多余空白和无意义内容
-- **字数与Token统计**: 显示内容实际字数和估算的 AI 模型 token 数量，分词展示（使用 [gpt-tokenizer](https://github.com/niieani/gpt-tokenizer)）
+- **字数与 Token 统计**: 显示内容实际字数和估算的 AI 模型 token 数量，分词展示（使用 [gpt-tokenizer](https://github.com/niieani/gpt-tokenizer)）
 - **移动端适配**: 响应式设计，支持移动设备使用
 - **智能图片提取**: 从文章中提取出所有图片及其元信息
 - **页面元数据**: 自动提取 og:title、og:description 等元标签信息，以表格形式展示
@@ -101,7 +101,7 @@ MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩
 
 ## 📋 开发计划
 
-- [x] 实现基础UI框架与插件架构
+- [x] 实现基础 UI 框架与插件架构
 - [x] 开发核心网页内容提取功能
 - [x] 添加基本文本格式化与预览功能
 - [x] 网页元数据抓取
@@ -139,7 +139,7 @@ pnpm dev
 npm run dev
 ```
 
-打开浏览器并加载相应的开发构建。例如，对于Chrome浏览器(manifest v3)，使用: `build/chrome-mv3-dev`。
+打开浏览器并加载相应的开发构建。例如，对于 Chrome 浏览器(manifest v3)，使用: `build/chrome-mv3-dev`。
 
 ### 构建生产版本
 
@@ -153,7 +153,7 @@ npm run build
 
 ## 🤝 贡献
 
-欢迎各种形式的贡献，包括新功能、Bug修复和文档改进！
+欢迎各种形式的贡献，包括新功能、Bug 修复和文档改进！
 
 1. Fork 项目
 2. 从 dev 分支创建特性分支 (`git checkout -b feat/amazing-feature`)
@@ -163,7 +163,11 @@ npm run build
 
 ## 致谢
 
-- Logo 及样式灵感来源 [xsai](https://github.com/moeru-ai/xsai) （对 萌A 拙劣的模仿～）
+- Logo 及样式灵感来源 [xsai](https://github.com/moeru-ai/xsai) （对 萌 A 拙劣的模仿～）
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=yusixian/moe-copy-ai&type=date&legend=top-left)](https://www.star-history.com/#yusixian/moe-copy-ai&type=date&legend=top-left)
 
 ## License
 
