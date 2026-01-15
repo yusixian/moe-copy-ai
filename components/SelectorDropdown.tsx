@@ -4,14 +4,7 @@ import { memo, useCallback, useEffect, useRef, useState } from "react"
 // Note: useCallback is still used in useSelectorState hook for stable callback references
 
 import type { SelectorResultItem, SelectorType } from "~constants/types"
-
-// 选择器类型映射到显示名称
-const SELECTOR_TYPE_NAMES: Record<SelectorType, string> = {
-  content: "内容选择器",
-  author: "作者选择器",
-  date: "日期选择器",
-  title: "标题选择器"
-}
+import { useI18n } from "~utils/i18n"
 
 interface SelectorDropdownProps {
   type: SelectorType
@@ -219,14 +212,17 @@ SelectorItem.displayName = "SelectorItem"
 const SelectorHeader = memo<{
   type: SelectorType
   count: number
-}>(({ type, count }) => (
-  <div className="flex items-center gap-1 font-medium text-sky-600 text-xs">
-    <span>{SELECTOR_TYPE_NAMES[type]}</span>
-    <span className="whitespace-nowrap rounded-full bg-sky-100 px-1 py-0.5 font-medium text-sky-600 text-xs">
-      {count}个
-    </span>
-  </div>
-))
+}>(({ type, count }) => {
+  const { t } = useI18n()
+  return (
+    <div className="flex items-center gap-1 font-medium text-sky-600 text-xs">
+      <span>{t(`selector.type.${type}`)}</span>
+      <span className="whitespace-nowrap rounded-full bg-sky-100 px-1 py-0.5 font-medium text-sky-600 text-xs">
+        {t("selector.count", { count })}
+      </span>
+    </div>
+  )
+})
 
 SelectorHeader.displayName = "SelectorHeader"
 
@@ -361,6 +357,8 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
   onChange,
   onSelectContent
 }) => {
+  const { t } = useI18n()
+
   // 使用自定义钩子管理状态
   const {
     isOpen,
@@ -398,7 +396,7 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
                 width={14}
                 height={14}
               />
-              <span>选择不同的{SELECTOR_TYPE_NAMES[type]}查看抓取结果</span>
+              <span>{t("selector.info")}</span>
             </div>
           </div>
           <ul className="max-h-[calc(60vh-3rem)] divide-y divide-sky-50 overflow-auto">

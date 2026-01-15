@@ -122,7 +122,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         </div>
         <div className="flex flex-shrink-0 items-center justify-end gap-2">
           {onClose && (
-            <Button variant="ghost" size="icon" onClick={onClose} title={t("common.close")}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              title={t("common.close")}>
               <Icon icon="line-md:close" width="20" height="20" />
             </Button>
           )}
@@ -179,7 +183,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   ? t("popup.floatButton.closeTip")
                   : t("popup.floatButton.openTip")
               }>
-              {showFloatButton === "true" ? t("popup.floatButton.permanentClose") : t("popup.floatButton.enable")}
+              {showFloatButton === "true"
+                ? t("popup.floatButton.permanentClose")
+                : t("popup.floatButton.enable")}
             </Button>
           </div>
         </div>
@@ -196,7 +202,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             />
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-medium text-red-600">{t("popup.error.title")}</p>
+                <p className="font-medium text-red-600">
+                  {t("popup.error.title")}
+                </p>
                 <p className="flex-1 text-red-600 text-sm">{error}</p>
                 <Button
                   variant="outline"
@@ -276,7 +284,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   width="12"
                   height="12"
                 />
-                <span>{isLoading ? t("popup.debug.rendering") : t("popup.debug.renderComplete")}</span>
+                <span>
+                  {isLoading
+                    ? t("popup.debug.rendering")
+                    : t("popup.debug.renderComplete")}
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="rounded border border-blue-200 bg-blue-100/70 px-1.5 py-0.5">
@@ -289,9 +301,13 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   title={t("popup.debug.moreInfo")}
                   onClick={() => {
                     const details = {
-                      [t("popup.debug.pageStatus")]: isLoading ? t("popup.debug.pageLoading") : t("popup.debug.pageLoaded"),
+                      [t("popup.debug.pageStatus")]: isLoading
+                        ? t("popup.debug.pageLoading")
+                        : t("popup.debug.pageLoaded"),
                       [t("popup.debug.dataSize")]: scrapedData
-                        ? t("popup.debug.dataSizeValue", { size: JSON.stringify(scrapedData).length })
+                        ? t("popup.debug.dataSizeValue", {
+                            size: JSON.stringify(scrapedData).length
+                          })
                         : t("popup.debug.noData"),
                       [t("popup.debug.browserInfo")]: navigator.userAgent,
                       [t("popup.debug.timestamp")]: new Date().toISOString()
@@ -498,7 +514,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                           height="12"
                           className="flex-shrink-0"
                         />
-                        <span className="whitespace-nowrap">{t("popup.mode.hybrid")}</span>
+                        <span className="whitespace-nowrap">
+                          {t("popup.mode.hybrid")}
+                        </span>
                       </span>
                     )}
                     {(!scrapedData.metadata["extraction:mode"] ||
@@ -512,7 +530,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                             height="12"
                             className="flex-shrink-0"
                           />
-                          <span className="whitespace-nowrap">{t("popup.mode.selector")}</span>
+                          <span className="whitespace-nowrap">
+                            {t("popup.mode.selector")}
+                          </span>
                         </span>
                         {/* 如果用户配置的是混合模式，但实际使用的是选择器模式，显示回退提示 */}
                         {scrapedData.metadata["original:mode"] === "hybrid" && (
@@ -523,7 +543,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                               height="12"
                               className="flex-shrink-0"
                             />
-                            <span className="whitespace-nowrap">{t("popup.mode.smartFallback")}</span>
+                            <span className="whitespace-nowrap">
+                              {t("popup.mode.smartFallback")}
+                            </span>
                           </span>
                         )}
                       </>
@@ -542,7 +564,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                       height="14"
                       className="text-blue-500"
                     />
-                    <span className="font-medium">{t("popup.mode.hybridEvaluation")}</span>
+                    <span className="font-medium">
+                      {t("popup.mode.hybridEvaluation")}
+                    </span>
                   </div>
                   <p className="mt-1 pl-5">
                     {scrapedData.metadata["evaluation:reason"]}
@@ -560,7 +584,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                       height="14"
                       className="text-orange-500"
                     />
-                    <span className="font-medium">{t("popup.mode.fallbackExplanation")}</span>
+                    <span className="font-medium">
+                      {t("popup.mode.fallbackExplanation")}
+                    </span>
                   </div>
                   <div className="mt-1 pl-5">
                     <p className="text-orange-600">

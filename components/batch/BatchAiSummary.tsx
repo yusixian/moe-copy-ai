@@ -5,6 +5,7 @@ import { memo, useMemo } from "react"
 import type { BatchScrapeResult, ScrapedContent } from "~constants/types"
 import { useAiSummary } from "~hooks/useAiSummary"
 import { aggregateToSingleMarkdown } from "~utils/content-aggregator"
+import { useI18n } from "~utils/i18n"
 import { processTemplate } from "~utils/template"
 
 import { AccordionSection } from "../AccordionSection"
@@ -17,12 +18,15 @@ interface BatchAiSummaryProps {
 }
 
 // 将批量抓取结果转换为 ScrapedContent 格式
-function createBatchScrapedData(results: BatchScrapeResult[]): ScrapedContent {
+function createBatchScrapedData(
+  results: BatchScrapeResult[],
+  t: (key: string, params?: Record<string, string | number>) => string
+): ScrapedContent {
   const { content, toc, metadata } = aggregateToSingleMarkdown(results)
   const firstSuccess = results.find((r) => r.success)
 
   return {
-    title: `批量抓取 (${metadata.successCount} 页)`,
+    title: t("batch.ai.title", { count: metadata.successCount }),
     url: firstSuccess?.url || "batch-scrape",
     articleContent: content,
     cleanedContent: content,
@@ -39,23 +43,43 @@ function createBatchScrapedData(results: BatchScrapeResult[]): ScrapedContent {
   }
 }
 
-// 批量抓取专用占位符
-const batchPlaceholders = [
-  { placeholder: "{{content}}", description: "完整内容" },
-  { placeholder: "{{cleanedContent}}", description: "清理后内容" },
-  { placeholder: "{{title}}", description: "标题" },
-  { placeholder: "{{url}}", description: "首个URL" },
-  { placeholder: "{{meta.batch:totalPages}}", description: "总页数" },
-  { placeholder: "{{meta.batch:successCount}}", description: "成功数" },
-  { placeholder: "{{meta.batch:toc}}", description: "目录" }
+// 批量抓取专用占位符 - 将在组件内部使用 t 函数生成
+const getBatchPlaceholders = (t: (key: string) => string) => [
+  {
+    placeholder: "{{content}}",
+    description: t("batch.ai.placeholder.content")
+  },
+  {
+    placeholder: "{{cleanedContent}}",
+    description: t("batch.ai.placeholder.cleaned")
+  },
+  { placeholder: "{{title}}", description: t("batch.ai.placeholder.title") },
+  { placeholder: "{{url}}", description: t("batch.ai.placeholder.url") },
+  {
+    placeholder: "{{meta.batch:totalPages}}",
+    description: t("batch.ai.placeholder.totalPages")
+  },
+  {
+    placeholder: "{{meta.batch:successCount}}",
+    description: t("batch.ai.placeholder.successCount")
+  },
+  {
+    placeholder: "{{meta.batch:toc}}",
+    description: t("batch.ai.placeholder.toc")
+  }
 ]
 
 const BatchAiSummary = memo(function BatchAiSummary({
   results,
   onSummaryGenerated
 }: BatchAiSummaryProps) {
+  const { t } = useI18n()
+
   // 转换数据格式
-  const scrapedData = useMemo(() => createBatchScrapedData(results), [results])
+  const scrapedData = useMemo(
+    () => createBatchScrapedData(results, t),
+    [results, t]
+  )
   const aggregatedContent = useMemo(() => {
     const { content } = aggregateToSingleMarkdown(results)
     return content
@@ -99,14 +123,15 @@ const BatchAiSummary = memo(function BatchAiSummary({
       <div className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 px-3 py-2 text-xs">
         <Icon icon="mdi:counter" width={16} className="text-amber-500" />
         <span className="text-gray-600">
-          共 <b className="text-amber-600">{processedPrompt.length}</b>{" "}
-          个字符，预计消耗 <b className="text-orange-600">{tokenCount}</b> 个
-          token
+          {t("batch.ai.tokenEstimate", {
+            chars: processedPrompt.length,
+            tokens: tokenCount
+          })}
         </span>
       </div>
 
       <AccordionSection
-        title="AI 总结"
+        title={t("batch.ai.sectionTitle")}
         icon="line-md:chat-round-dots-twotone"
         defaultOpen>
         <div className="space-y-3">
@@ -115,7 +140,7 @@ const BatchAiSummary = memo(function BatchAiSummary({
             customPrompt={customPrompt}
             setCustomPrompt={setCustomPrompt}
             systemPrompt={systemPrompt}
-            supportedPlaceholders={batchPlaceholders}
+            supportedPlaceholders={getBatchPlaceholders(t)}
             scrapedData={scrapedData}
             onSaveAsDefault={saveAsDefaultPrompt}
             disabled={isLoading}
@@ -125,7 +150,7 @@ const BatchAiSummary = memo(function BatchAiSummary({
           <div className="flex items-center gap-2">
             <span
               className={`flex items-center gap-1 text-xs ${modelId ? "text-gray-500" : "text-amber-500"}`}>
-              {modelId || "未选择模型"}
+              {modelId || t("batch.ai.noModel")}
             </span>
             <button
               type="button"
@@ -139,12 +164,12 @@ const BatchAiSummary = memo(function BatchAiSummary({
                     width={14}
                     className="animate-spin"
                   />
-                  生成中...
+                  {t("batch.ai.generating")}
                 </>
               ) : (
                 <>
                   <Icon icon="line-md:lightbulb-twotone" width={14} />
-                  生成摘要
+                  {t("batch.ai.generate")}
                 </>
               )}
             </button>
@@ -171,15 +196,17 @@ const BatchAiSummary = memo(function BatchAiSummary({
             <div className="flex items-center gap-3 text-gray-500 text-xs">
               <span className="flex items-center gap-1">
                 <Icon icon="mdi:counter" width={12} />
-                Tokens: <b className="text-gray-700">{usage.total_tokens}</b>
+                {t("batch.ai.tokens")}{" "}
+                <b className="text-gray-700">{usage.total_tokens}</b>
               </span>
               <span className="text-gray-300">|</span>
               <span>
-                输入: <b className="text-sky-600">{usage.prompt_tokens}</b>
+                {t("batch.ai.input")}{" "}
+                <b className="text-sky-600">{usage.prompt_tokens}</b>
               </span>
               <span className="text-gray-300">|</span>
               <span>
-                输出:
+                {t("batch.ai.output")}
                 <b className="text-emerald-600">{usage.completion_tokens}</b>
               </span>
             </div>

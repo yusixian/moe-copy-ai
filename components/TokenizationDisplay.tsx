@@ -69,12 +69,16 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
       {!showOnlySummary && (
         <>
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="font-medium text-slate-700 text-sm">{t("content.tokenization.title")}</h3>
+            <h3 className="font-medium text-slate-700 text-sm">
+              {t("content.tokenization.title")}
+            </h3>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowTokenIds(!showTokenIds)}>
-              {showTokenIds ? t("content.tokenization.hideIds") : t("content.tokenization.showIds")}
+              {showTokenIds
+                ? t("content.tokenization.hideIds")
+                : t("content.tokenization.showIds")}
             </Button>
           </div>
 
@@ -94,7 +98,10 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
       )}
 
       <div className="mt-2 text-slate-500 text-xs">
-        {t("content.tokenization.stats", { chars: content.length, tokens: tokens.length })}
+        {t("content.tokenization.stats", {
+          chars: content.length,
+          tokens: tokens.length
+        })}
         {"("}
         <a
           href="https://github.com/niieani/gpt-tokenizer"

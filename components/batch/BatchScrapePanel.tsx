@@ -10,6 +10,7 @@ import type {
   SelectedElementInfo
 } from "~constants/types"
 import type { LinkFilterConfig } from "~hooks/useBatchScrape"
+import { useI18n } from "~utils/i18n"
 
 import { AccordionSection } from "../AccordionSection"
 import { BatchScrapeSettings } from "./BatchScrapeSettings"
@@ -73,6 +74,8 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
   onSelectNextPage,
   onClearNextPage
 }: BatchScrapePanelProps) {
+  const { t } = useI18n()
+
   // 根据模式渲染不同内容
   const renderContent = () => {
     switch (mode) {
@@ -89,10 +92,10 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
               </div>
               <div className="text-center">
                 <h3 className="mb-1 font-semibold text-base text-gray-800">
-                  批量抓取文档
+                  {t("batch.idle.title")}
                 </h3>
                 <p className="text-gray-500 text-sm">
-                  选择页面上包含链接的区域，批量抓取所有文档
+                  {t("batch.idle.subtitle")}
                 </p>
               </div>
               <button
@@ -100,13 +103,13 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
                 onClick={onSelectElement}
                 className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 px-6 py-2.5 font-medium text-sm text-white shadow-md transition-all hover:from-sky-600 hover:to-indigo-600 hover:shadow-lg">
                 <Icon icon="mdi:cursor-default-click" className="h-5 w-5" />
-                选择元素区域
+                {t("batch.idle.selectElement")}
               </button>
             </div>
 
             {/* 快捷设置区域 */}
             <AccordionSection
-              title="抓取设置"
+              title={t("batch.idle.settings")}
               icon="mdi:cog-outline"
               defaultOpen>
               <BatchScrapeSettings compact showToast={false} />
@@ -125,10 +128,10 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
             </div>
             <div className="text-center">
               <h3 className="mb-1 font-semibold text-base text-gray-800">
-                正在选择元素...
+                {t("batch.selecting.title")}
               </h3>
               <p className="text-gray-500 text-sm">
-                请在页面上点击包含链接的区域
+                {t("batch.selecting.hint")}
               </p>
             </div>
             <button
@@ -136,7 +139,7 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
               onClick={onCancel}
               className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
               <Icon icon="mdi:close" className="h-4 w-4" />
-              取消
+              {t("batch.selecting.cancel")}
             </button>
           </div>
         )
@@ -144,7 +147,9 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
       case "previewing":
         return (
           <div className="flex flex-col gap-4">
-            <AccordionSection title="抓取设置" icon="mdi:cog-outline">
+            <AccordionSection
+              title={t("batch.previewing.settings")}
+              icon="mdi:cog-outline">
               <BatchScrapeSettings compact showToast={false} />
             </AccordionSection>
             <LinkPreviewList
@@ -186,16 +191,18 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
             </div>
             <div className="text-center">
               <h3 className="mb-1 font-semibold text-base text-gray-800">
-                抓取失败
+                {t("batch.error.title")}
               </h3>
-              <p className="text-red-500 text-sm">{error || "未知错误"}</p>
+              <p className="text-red-500 text-sm">
+                {error || t("batch.error.unknown")}
+              </p>
             </div>
             <button
               type="button"
               onClick={onReset}
               className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-200">
               <Icon icon="mdi:refresh" className="h-4 w-4" />
-              重新开始
+              {t("batch.error.retry")}
             </button>
           </div>
         )

@@ -30,9 +30,7 @@ function AiSettingsSection() {
   return (
     <OptionSection title={t("option.ai.title")} icon="line-md:ai">
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-blue-500 text-sm">
-          {t("option.ai.desc")}
-        </span>
+        <span className="text-blue-500 text-sm">{t("option.ai.desc")}</span>
         <Button
           variant="outline"
           size="xs"
@@ -115,7 +113,9 @@ function AiSettingsSection() {
               {t("option.ai.baseUrl.fetchModels")}
             </Button>
           </div>
-          <p className="mt-2 text-sky-500 text-sm">{t("option.ai.baseUrl.helper")}</p>
+          <p className="mt-2 text-sky-500 text-sm">
+            {t("option.ai.baseUrl.helper")}
+          </p>
         </div>
 
         <div className="mb-4">
@@ -135,7 +135,9 @@ function AiSettingsSection() {
             onChange={setModel}
             options={modelList}
           />
-          <p className="mt-2 text-sky-500 text-sm">{t("option.ai.model.helper")}</p>
+          <p className="mt-2 text-sky-500 text-sm">
+            {t("option.ai.model.helper")}
+          </p>
         </div>
 
         <div className="mb-4">

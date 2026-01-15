@@ -31,30 +31,45 @@ export const LogSettingsSection: React.FC = () => {
 
       <div className="mt-6 rounded-lg border border-sky-200 bg-blue-50 p-4">
         <h3 className="mb-2 flex items-center font-medium text-lg text-sky-600">
-          <span className="mr-2">📝</span>{t("option.log.levelExplanation.title")}
+          <span className="mr-2">📝</span>
+          {t("option.log.levelExplanation.title")}
         </h3>
         <ul className="space-y-2 text-sky-600 text-sm">
           <li className="flex items-center">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-sky-400"></span>
-            <span className="font-semibold">{t("option.log.levelExplanation.debug")}</span>{" "}
+            <span className="font-semibold">
+              {t("option.log.levelExplanation.debug")}
+            </span>{" "}
             <span className="ml-2">
               {t("option.log.levelExplanation.debugDesc")}
             </span>
           </li>
           <li className="flex items-center">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-blue-500"></span>
-            <span className="font-semibold">{t("option.log.levelExplanation.info")}</span>{" "}
-            <span className="ml-2">{t("option.log.levelExplanation.infoDesc")}</span>
+            <span className="font-semibold">
+              {t("option.log.levelExplanation.info")}
+            </span>{" "}
+            <span className="ml-2">
+              {t("option.log.levelExplanation.infoDesc")}
+            </span>
           </li>
           <li className="flex items-center">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-orange-400"></span>
-            <span className="font-semibold">{t("option.log.levelExplanation.error")}</span>{" "}
-            <span className="ml-2">{t("option.log.levelExplanation.errorDesc")}</span>
+            <span className="font-semibold">
+              {t("option.log.levelExplanation.error")}
+            </span>{" "}
+            <span className="ml-2">
+              {t("option.log.levelExplanation.errorDesc")}
+            </span>
           </li>
           <li className="flex items-center">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-gray-400"></span>
-            <span className="font-semibold">{t("option.log.levelExplanation.silent")}</span>{" "}
-            <span className="ml-2">{t("option.log.levelExplanation.silentDesc")}</span>
+            <span className="font-semibold">
+              {t("option.log.levelExplanation.silent")}
+            </span>{" "}
+            <span className="ml-2">
+              {t("option.log.levelExplanation.silentDesc")}
+            </span>
           </li>
         </ul>
       </div>

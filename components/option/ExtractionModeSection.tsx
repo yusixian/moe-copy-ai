@@ -84,7 +84,9 @@ export const ExtractionModeSection: React.FC = () => {
 
   if (loading) {
     return (
-      <OptionSection title={t("option.extraction.mode")} icon="line-md:cog-loop">
+      <OptionSection
+        title={t("option.extraction.mode")}
+        icon="line-md:cog-loop">
         <div className="space-y-3">
           <div className="animate-pulse rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 p-4">
             <div className="flex items-center space-x-3">
@@ -123,9 +125,7 @@ export const ExtractionModeSection: React.FC = () => {
                     type="radio"
                     value={modeKey}
                     checked={extractionMode === modeKey}
-                    onChange={() =>
-                      !saving && handleModeChange(modeKey)
-                    }
+                    onChange={() => !saving && handleModeChange(modeKey)}
                     disabled={saving}
                     className="sr-only"
                     id={`mode-${modeKey}`}

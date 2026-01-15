@@ -20,6 +20,7 @@ import SelectorDropdown from "~/components/SelectorDropdown"
 import { Button } from "~/components/ui/button"
 import { Collapsible } from "~/components/ui/collapsible"
 import useScrapedData from "~hooks/useScrapedData"
+import { useI18n } from "~utils/i18n"
 
 export interface SingleScrapePanelHandle {
   refresh: () => void
@@ -33,6 +34,7 @@ const SingleScrapePanel = forwardRef<
   SingleScrapePanelHandle,
   SingleScrapePanelProps
 >(function SingleScrapePanel({ onLoadingChange }, ref) {
+  const { t } = useI18n()
   const {
     isLoading,
     error,
@@ -98,15 +100,21 @@ const SingleScrapePanel = forwardRef<
     <div className="flex h-full flex-col gap-3 overflow-auto">
       {/* 悬浮窗开关区域 */}
       <div className="flex flex-shrink-0 items-center justify-between rounded-lg border border-sky-200 bg-white p-3">
-        <span className="font-medium text-gray-700 text-sm">悬浮窗开关</span>
+        <span className="font-medium text-gray-700 text-sm">
+          {t("singlescrape.floatToggle.label")}
+        </span>
         <Button
           variant={showFloatButton === "true" ? "danger" : "default"}
           size="sm"
           onClick={handleFloatButtonToggle}
           title={
-            showFloatButton === "true" ? "关闭网页悬浮窗" : "开启网页悬浮窗"
+            showFloatButton === "true"
+              ? t("singlescrape.floatToggle.closeTip")
+              : t("singlescrape.floatToggle.openTip")
           }>
-          {showFloatButton === "true" ? "关闭悬浮窗" : "开启悬浮窗"}
+          {showFloatButton === "true"
+            ? t("singlescrape.floatToggle.close")
+            : t("singlescrape.floatToggle.open")}
         </Button>
       </div>
 
@@ -122,7 +130,9 @@ const SingleScrapePanel = forwardRef<
             />
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-medium text-red-600">出错了</p>
+                <p className="font-medium text-red-600">
+                  {t("singlescrape.error.title")}
+                </p>
                 <p className="flex-1 text-red-600 text-sm">{error}</p>
                 <Button
                   variant="outline"
@@ -134,13 +144,13 @@ const SingleScrapePanel = forwardRef<
                     height="14"
                     className="mr-1"
                   />
-                  重试
+                  {t("singlescrape.error.retry")}
                 </Button>
               </div>
               <div className="mt-2 rounded border border-red-200 bg-red-100/50 p-2 text-xs">
-                <p>可能原因：网络问题、页面结构变化或内容未加载完成</p>
+                <p>{t("singlescrape.error.causes")}</p>
                 <p className="mt-1 text-red-500">
-                  建议：刷新页面后重试，或等待页面完全加载
+                  {t("singlescrape.error.suggestion")}
                 </p>
               </div>
             </div>
@@ -153,9 +163,9 @@ const SingleScrapePanel = forwardRef<
         <Collapsible
           title={
             <span className="flex items-center gap-1.5">
-              调试信息
+              {t("singlescrape.debug.title")}
               <span className="rounded border border-blue-200 bg-blue-100 px-1.5 py-0.5 text-[10px] text-blue-600">
-                开发模式
+                {t("singlescrape.debug.devMode")}
               </span>
             </span>
           }
@@ -175,10 +185,10 @@ const SingleScrapePanel = forwardRef<
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6"
-                title="复制调试信息"
+                title={t("singlescrape.debug.copy")}
                 onClick={() => {
                   copyDebugInfo(debugInfo)
-                  alert("调试信息已复制到剪贴板")
+                  alert(t("singlescrape.debug.copied"))
                 }}>
                 <Icon icon="line-md:clipboard-check" width="14" height="14" />
               </Button>
@@ -202,7 +212,11 @@ const SingleScrapePanel = forwardRef<
                   width="12"
                   height="12"
                 />
-                <span>{isLoading ? "渲染中..." : "渲染完成"}</span>
+                <span>
+                  {isLoading
+                    ? t("singlescrape.debug.rendering")
+                    : t("singlescrape.debug.complete")}
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="rounded border border-blue-200 bg-blue-100/70 px-1.5 py-0.5">
@@ -212,15 +226,21 @@ const SingleScrapePanel = forwardRef<
                   variant="ghost"
                   size="icon"
                   className="h-5 w-5"
-                  title="查看更多调试信息"
+                  title={t("singlescrape.debug.moreInfo")}
                   onClick={() => {
                     const details = {
-                      页面状态: isLoading ? "加载中" : "已加载",
-                      数据大小: scrapedData
-                        ? `${JSON.stringify(scrapedData).length} 字节`
-                        : "无数据",
-                      浏览器信息: navigator.userAgent,
-                      时间戳: new Date().toISOString()
+                      [t("singlescrape.debug.pageStatus")]: isLoading
+                        ? t("singlescrape.debug.pageLoading")
+                        : t("singlescrape.debug.pageLoaded"),
+                      [t("singlescrape.debug.dataSize")]: scrapedData
+                        ? t("singlescrape.debug.dataSizeValue", {
+                            size: JSON.stringify(scrapedData).length
+                          })
+                        : t("singlescrape.debug.noData"),
+                      [t("singlescrape.debug.browserInfo")]:
+                        navigator.userAgent,
+                      [t("singlescrape.debug.timestamp")]:
+                        new Date().toISOString()
                     }
                     alert(JSON.stringify(details, null, 2))
                   }}>
@@ -236,13 +256,13 @@ const SingleScrapePanel = forwardRef<
       {isLoading ? (
         <div className="flex flex-1 flex-col items-center justify-center p-8">
           <div className="h-12 w-12 animate-spin rounded-full border-blue-500 border-t-4 border-b-4" />
-          <p className="mt-3 text-blue-500">加载中...</p>
+          <p className="mt-3 text-blue-500">{t("singlescrape.loading")}</p>
         </div>
       ) : scrapedData ? (
         <div className="flex flex-col gap-3">
           {/* 基础信息区 */}
           <AccordionSection
-            title="基础信息"
+            title={t("singlescrape.section.basicInfo")}
             icon="line-md:document-list"
             defaultOpen={true}>
             <div className="flex flex-col gap-3">
@@ -255,7 +275,9 @@ const SingleScrapePanel = forwardRef<
                     height="16"
                     className="text-sky-600"
                   />
-                  <span className="font-medium text-sky-600 text-sm">标题</span>
+                  <span className="font-medium text-sky-600 text-sm">
+                    {t("singlescrape.field.title")}
+                  </span>
                   {titleSelectors.length > 0 && (
                     <SelectorDropdown
                       type="title"
@@ -286,7 +308,7 @@ const SingleScrapePanel = forwardRef<
                       className="text-sky-600"
                     />
                     <span className="font-medium text-sky-600 text-sm">
-                      作者
+                      {t("singlescrape.field.author")}
                     </span>
                     {authorSelectors.length > 0 && (
                       <SelectorDropdown
@@ -321,7 +343,7 @@ const SingleScrapePanel = forwardRef<
                       className="text-sky-600"
                     />
                     <span className="font-medium text-sky-600 text-sm">
-                      发布日期
+                      {t("singlescrape.field.date")}
                     </span>
                     {dateSelectors.length > 0 && (
                       <SelectorDropdown
@@ -367,7 +389,7 @@ const SingleScrapePanel = forwardRef<
           {/* 文章内容 */}
           {scrapedData.articleContent && (
             <AccordionSection
-              title="文章内容"
+              title={t("singlescrape.section.content")}
               icon="line-md:file-document-twotone"
               defaultOpen={false}
               maxHeight="500px">
@@ -395,7 +417,7 @@ const SingleScrapePanel = forwardRef<
                     size="sm"
                     onClick={handleRefreshClick}
                     disabled={isLoading}
-                    title="刷新内容">
+                    title={t("singlescrape.action.refresh")}>
                     <Icon
                       icon={
                         isLoading
@@ -406,7 +428,9 @@ const SingleScrapePanel = forwardRef<
                       width="14"
                       height="14"
                     />
-                    {isLoading ? "抓取中..." : "刷新"}
+                    {isLoading
+                      ? t("singlescrape.action.refreshing")
+                      : t("singlescrape.action.refreshButton")}
                   </Button>
                 </div>
 
@@ -421,7 +445,7 @@ const SingleScrapePanel = forwardRef<
                           width="12"
                           height="12"
                         />
-                        Readability 模式
+                        {t("singlescrape.mode.readability")}
                       </span>
                     )}
                     {scrapedData.metadata["extraction:mode"] === "hybrid" && (
@@ -431,7 +455,7 @@ const SingleScrapePanel = forwardRef<
                           width="12"
                           height="12"
                         />
-                        混合模式
+                        {t("singlescrape.mode.hybrid")}
                       </span>
                     )}
                     {(!scrapedData.metadata["extraction:mode"] ||
@@ -444,7 +468,7 @@ const SingleScrapePanel = forwardRef<
                             width="12"
                             height="12"
                           />
-                          选择器模式
+                          {t("singlescrape.mode.selector")}
                         </span>
                         {scrapedData.metadata["original:mode"] === "hybrid" && (
                           <span className="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-100 px-2 py-0.5 font-medium text-orange-700 text-xs">
@@ -453,7 +477,7 @@ const SingleScrapePanel = forwardRef<
                               width="12"
                               height="12"
                             />
-                            智能回退
+                            {t("singlescrape.mode.smartFallback")}
                           </span>
                         )}
                       </>
@@ -471,7 +495,9 @@ const SingleScrapePanel = forwardRef<
                         height="14"
                         className="text-blue-500"
                       />
-                      <span className="font-medium">混合模式评估报告</span>
+                      <span className="font-medium">
+                        {t("singlescrape.mode.evaluation")}
+                      </span>
                     </div>
                     <p className="mt-1 pl-5">
                       {scrapedData.metadata["evaluation:reason"]}
@@ -489,14 +515,16 @@ const SingleScrapePanel = forwardRef<
                         height="14"
                         className="text-orange-500"
                       />
-                      <span className="font-medium">智能回退说明</span>
+                      <span className="font-medium">
+                        {t("singlescrape.mode.fallback")}
+                      </span>
                     </div>
                     <div className="mt-1 pl-5">
                       <p className="text-orange-600">
                         {scrapedData.metadata["fallback:reason"]}
                       </p>
                       <p className="mt-1 text-orange-500 text-xs">
-                        这是正常的智能回退机制，确保您总能获得内容
+                        {t("singlescrape.mode.fallbackInfo")}
                       </p>
                     </div>
                   </div>
@@ -520,7 +548,7 @@ const SingleScrapePanel = forwardRef<
           {/* 元数据 */}
           {Object.keys(scrapedData.metadata).length > 0 && (
             <AccordionSection
-              title="元数据"
+              title={t("singlescrape.section.metadata")}
               icon="line-md:emoji-grin-twotone"
               defaultOpen={false}
               maxHeight="400px">
@@ -549,7 +577,9 @@ const SingleScrapePanel = forwardRef<
           {/* 页面图片 */}
           {scrapedData.images && scrapedData.images.length > 0 && (
             <AccordionSection
-              title={`页面图片 (${scrapedData.images.length}张)`}
+              title={t("singlescrape.section.imagesCount", {
+                count: scrapedData.images.length
+              })}
               icon="line-md:image"
               defaultOpen={false}
               maxHeight="400px">
@@ -568,15 +598,15 @@ const SingleScrapePanel = forwardRef<
             height="48"
             className="mb-3 text-sky-300"
           />
-          <p>没有找到内容</p>
-          <p className="mt-1 text-sm">点击下方按钮重新抓取</p>
+          <p>{t("singlescrape.empty.title")}</p>
+          <p className="mt-1 text-sm">{t("singlescrape.empty.hint")}</p>
           <Button
             variant="default"
             size="sm"
             onClick={handleRefreshClick}
             className="mt-4">
             <Icon icon="line-md:refresh-twotone" className="mr-1" width="16" />
-            刷新内容
+            {t("singlescrape.empty.action")}
           </Button>
         </div>
       )}

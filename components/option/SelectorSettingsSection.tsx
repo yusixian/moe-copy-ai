@@ -125,7 +125,9 @@ const SelectorEditor: React.FC<{
         <div className="mb-4 flex items-center justify-between">
           <h3 className="font-semibold text-sky-600 text-xl">
             <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2 inline" />
-            {t("option.selector.edit", { type: t(`option.selector.type.${type}`) })}
+            {t("option.selector.edit", {
+              type: t(`option.selector.type.${type}`)
+            })}
           </h3>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <Icon icon="mdi:close" width={24} />
@@ -133,7 +135,8 @@ const SelectorEditor: React.FC<{
         </div>
 
         <p className="mb-4 text-gray-600 text-sm">
-          {t(`option.selector.type.${type}.desc`)} ({t("option.selector.priority")})
+          {t(`option.selector.type.${type}.desc`)} (
+          {t("option.selector.priority")})
         </p>
 
         {(type === "title" || type === "content") && (
@@ -147,7 +150,9 @@ const SelectorEditor: React.FC<{
                 className="mr-1.5"
                 width={16}
               />
-              {showRules ? t("option.selector.collapseRules") : t("option.selector.expandRules")}
+              {showRules
+                ? t("option.selector.collapseRules")
+                : t("option.selector.expandRules")}
             </Button>
 
             {type === "title" && (
@@ -295,7 +300,9 @@ const SelectorTypeCard: React.FC<{
       className="w-full cursor-pointer rounded-lg border-2 border-sky-100 bg-white p-4 text-left shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
       <div className="mb-2 flex items-center text-sky-600">
         <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2" width={24} />
-        <h3 className="font-medium text-lg">{t(`option.selector.type.${type}`)}</h3>
+        <h3 className="font-medium text-lg">
+          {t(`option.selector.type.${type}`)}
+        </h3>
       </div>
       <p className="text-gray-600 text-sm">
         {t(`option.selector.type.${type}.desc`)}
@@ -313,9 +320,7 @@ const ScrapeRulesExplanation = () => {
         <Icon icon="mdi:information-outline" className="mr-2" width={20} />
         {t("option.selector.rulesExplanationTitle")}
       </h4>
-      <p className="mb-3 text-gray-600">
-        {t("option.selector.rulesIntro")}
-      </p>
+      <p className="mb-3 text-gray-600">{t("option.selector.rulesIntro")}</p>
       <ol className="mb-4 ml-5 list-decimal space-y-2 text-gray-600">
         <li>{t("option.selector.contentRule1")}</li>
         <li>{t("option.selector.contentRule2")}</li>
@@ -354,7 +359,9 @@ export const SelectorSettingsSection: React.FC = () => {
   }
 
   return (
-    <OptionSection title={t("option.selector.title")} icon="line-md:document-code">
+    <OptionSection
+      title={t("option.selector.title")}
+      icon="line-md:document-code">
       <div className="mb-4 flex items-center justify-between">
         <span className="text-gray-600 text-sm">
           {t("option.selector.desc")}
@@ -368,7 +375,9 @@ export const SelectorSettingsSection: React.FC = () => {
             className="mr-1.5"
             width={18}
           />
-          {showExplanation ? t("option.selector.hideRules") : t("option.selector.showRules")}
+          {showExplanation
+            ? t("option.selector.hideRules")
+            : t("option.selector.showRules")}
         </Button>
       </div>
 

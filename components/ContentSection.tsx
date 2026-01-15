@@ -181,7 +181,9 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
           size="sm"
           onClick={toggleContentVersion}
           disabled={isEditing}>
-          {showCleanedContent ? t("content.format.original") : t("content.format.compact")}
+          {showCleanedContent
+            ? t("content.format.original")
+            : t("content.format.compact")}
         </Button>
 
         {isMarkdown && (
@@ -190,7 +192,9 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
             size="sm"
             onClick={togglePreview}
             disabled={isEditing}>
-            {isPreviewMode ? t("content.preview.source") : t("content.preview.markdown")}
+            {isPreviewMode
+              ? t("content.preview.source")
+              : t("content.preview.markdown")}
           </Button>
         )}
 
@@ -205,7 +209,9 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
               icon="line-md:arrows-diagonal-rotated"
               className="mr-2 inline-block size-4 flex-shrink-0"
             />
-            {isFullscreen ? t("content.fullscreen.exit") : t("content.fullscreen.enter")}
+            {isFullscreen
+              ? t("content.fullscreen.exit")
+              : t("content.fullscreen.enter")}
           </Button>
         )}
 
@@ -220,7 +226,9 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
           variant={showTokenization ? "outline" : "default"}
           size="sm"
           onClick={() => setShowTokenization(!showTokenization)}>
-          {showTokenization ? t("content.tokenization.hide") : t("content.tokenization.show")}
+          {showTokenization
+            ? t("content.tokenization.hide")
+            : t("content.tokenization.show")}
         </Button>
 
         <Button
