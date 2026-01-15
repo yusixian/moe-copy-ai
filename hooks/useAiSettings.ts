@@ -1,7 +1,7 @@
 import { listModels } from "@xsai/model"
 import { useCallback, useLayoutEffect, useRef, useState } from "react"
 import { toast } from "react-toastify"
-
+import { useI18n } from "~utils/i18n"
 import { syncStorage } from "~utils/storage"
 
 export interface ModelInfo {
@@ -10,10 +10,11 @@ export interface ModelInfo {
 }
 
 const DEFAULT_BASE_URL = "https://api.openai.com/v1/"
-const DEFAULT_SYSTEM_PROMPT =
-  "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}"
 
 export function useAiSettings() {
+  const { t } = useI18n()
+  const DEFAULT_SYSTEM_PROMPT = t("ai.defaultSystemPrompt")
+
   const [apiKey, setApiKey] = useState("")
   const [baseURL, setBaseURL] = useState(DEFAULT_BASE_URL)
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT)
@@ -37,12 +38,12 @@ export function useAiSettings() {
       const currentModel = overrides?.model ?? stateRef.current.model
 
       if (!currentApiKey) {
-        if (showToast) toast.warning("请先填写API密钥")
+        if (showToast) toast.warning(t("toast.ai.apiKeyRequired"))
         return
       }
 
       if (!currentBaseURL) {
-        if (showToast) toast.warning("请先填写API基础URL")
+        if (showToast) toast.warning(t("toast.ai.baseUrlRequired"))
         return
       }
 
@@ -60,15 +61,15 @@ export function useAiSettings() {
           setModel(models[0].id)
         }
 
-        if (showToast) toast.success("模型列表加载成功")
+        if (showToast) toast.success(t("toast.ai.modelsLoadedSuccess"))
       } catch (error) {
         console.error("获取模型列表失败:", error)
-        if (showToast) toast.error("获取模型列表失败，请检查API设置")
+        if (showToast) toast.error(t("toast.ai.modelsLoadedFailed"))
       } finally {
         setIsLoadingModels(false)
       }
     },
-    []
+    [t]
   )
 
   // 加载设置

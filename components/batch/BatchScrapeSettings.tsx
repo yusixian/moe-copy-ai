@@ -67,9 +67,9 @@ export function BatchScrapeSettings({
   const [maxPages, setMaxPages] = useStorage("pagination_max_pages", "5")
   const [pageDelay, setPageDelay] = useStorage("pagination_delay", "2000")
 
-  const currentStrategyDesc = BATCH_STRATEGY_OPTIONS.find(
+  const currentStrategyDescKey = BATCH_STRATEGY_OPTIONS.find(
     (s) => s.value === strategy
-  )?.desc
+  )?.descKey
 
   const handleChange = (
     setter: (v: string) => void,
@@ -106,12 +106,12 @@ export function BatchScrapeSettings({
                   ? "bg-sky-500 text-white shadow-sm"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}>
-              {s.label}
+              {t(s.labelKey)}
             </button>
           ))}
         </div>
-        {!compact && currentStrategyDesc && (
-          <p className="text-gray-500 text-xs">{currentStrategyDesc}</p>
+        {!compact && currentStrategyDescKey && (
+          <p className="text-gray-500 text-xs">{t(currentStrategyDescKey)}</p>
         )}
       </fieldset>
 

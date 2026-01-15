@@ -12,6 +12,7 @@ import {
   generateSummary,
   getAiConfig
 } from "~utils/ai-service"
+import { useI18n } from "~utils/i18n"
 import { debugLog } from "~utils/logger"
 import { processTemplate } from "~utils/template"
 
@@ -64,6 +65,7 @@ export const useAiSummary = (
   onSummaryGenerated?: (summary: string) => void,
   scrapedData?: ScrapedContent
 ): UseAiSummaryResult => {
+  const { t } = useI18n()
   const [isLoading, setIsLoading] = useState(false)
   const [customPrompt, setCustomPrompt] = useState("")
   const [result, setResult] = useState<StreamTextResult | null>(null)
@@ -197,22 +199,22 @@ export const useAiSummary = (
   // 处理摘要生成
   const generateSummaryText = useCallback(async () => {
     if (!content.trim()) {
-      setError("内容为空，无法生成摘要")
-      toast.warning("内容为空，无法生成摘要")
+      setError(t("error.emptyContentForSummary"))
+      toast.warning(t("error.emptyContentForSummary"))
       return
     }
 
     if (!apiKey) {
-      setError("请先在扩展设置中配置AI提供商信息")
-      toast.error("请先在扩展设置中配置AI提供商信息")
+      setError(t("error.aiConfigMissing"))
+      toast.error(t("error.aiConfigMissing"))
       return
     }
 
     // 预先获取配置并验证模型
     const config = await getAiConfig()
     if (!config.model) {
-      setError("请先在设置中选择 AI 模型")
-      toast.error("请先在设置中选择 AI 模型")
+      setError(t("error.aiModelNotSelected"))
+      toast.error(t("error.aiModelNotSelected"))
       return
     }
 
@@ -446,7 +448,8 @@ export const useAiSummary = (
     onSummaryGenerated,
     scrapedData,
     usage,
-    saveToHistory
+    saveToHistory,
+    t
   ])
 
   return {
