@@ -11,12 +11,12 @@ import {
   useInteractions,
   useRole
 } from "@floating-ui/react"
-import { useStorage } from "@plasmohq/storage/hook"
 import type { PlasmoCSConfig } from "plasmo"
 import { useEffect, useState } from "react"
 
 import FloatingButton from "~components/FloatingButton"
 import PopupContent from "~components/PopupContent"
+import { useFloatButtonStorage } from "~hooks/useFloatButtonStorage"
 
 // 注入全局样式
 export const getStyle = () => {
@@ -34,22 +34,9 @@ export const config: PlasmoCSConfig = {
 // 主组件
 const FloatingPopup = () => {
   const [isOpen, setIsOpen] = useState(false)
-  // 从存储中获取悬浮窗显示设置，默认为显示
-  const [showFloatButton] = useStorage<string>("show_float_button", "true")
-  // 添加临时隐藏状态，使用Plasmo的状态管理
-  const [tempHideButton, setTempHideButton] = useStorage<boolean>(
-    "temp_hide_button",
-    false
-  )
 
-  // 在页面刷新后重置临时隐藏状态
-  useEffect(() => {
-    // 页面加载时重置临时隐藏状态，确保刷新后悬浮窗恢复显示
-    setTempHideButton(false)
-  }, [
-    // 页面加载时重置临时隐藏状态，确保刷新后悬浮窗恢复显示
-    setTempHideButton
-  ])
+  // 使用 useSyncExternalStore 订阅外部存储状态
+  const storageState = useFloatButtonStorage()
 
   // 使用floating-ui来定位弹窗
   const { refs, context } = useFloating({
@@ -113,6 +100,14 @@ const FloatingPopup = () => {
   // 处理关闭弹窗
   const handleClose = () => {
     setIsOpen(false)
+  }
+
+  // 解构存储状态
+  const { showFloatButton, tempHideButton, isReady } = storageState
+
+  // 存储未加载完成时不渲染，防止闪烁
+  if (!isReady) {
+    return null
   }
 
   // 如果设置为不显示悬浮窗或临时隐藏，则直接返回null
