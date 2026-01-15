@@ -2,6 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { forwardRef, useState } from "react"
 
 import { cn } from "~/utils"
+import { useI18n } from "~utils/i18n"
 
 const imageContainerVariants = cva(
   "relative flex items-center justify-center bg-white",
@@ -46,6 +47,7 @@ const Image = forwardRef<HTMLImageElement, ImageProps>(
     },
     ref
   ) => {
+    const { t } = useI18n()
     const [isLoading, setIsLoading] = useState(true)
     const [hasError, setHasError] = useState(false)
 
@@ -61,7 +63,9 @@ const Image = forwardRef<HTMLImageElement, ImageProps>(
         {isLoading && !hasError && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex size-full animate-pulse items-center justify-center bg-gradient-to-r from-pink-50 to-purple-50">
-              <div className="animate-bounce text-pink-400">加载中...</div>
+              <div className="animate-bounce text-pink-400">
+                {t("image.loading")}
+              </div>
             </div>
           </div>
         )}
@@ -70,7 +74,7 @@ const Image = forwardRef<HTMLImageElement, ImageProps>(
           <img
             ref={ref}
             src={src}
-            alt={alt || "可爱图片"}
+            alt={alt || t("image.defaultAlt")}
             title={title || alt || ""}
             className={cn("max-h-full max-w-full object-contain", className)}
             onLoad={() => setIsLoading(false)}
@@ -84,7 +88,7 @@ const Image = forwardRef<HTMLImageElement, ImageProps>(
         ) : (
           <div className="flex flex-col items-center justify-center p-2 text-red-500 text-sm">
             <span className="mb-1">(˃̣̣̥⌓˂̣̣̥) </span>
-            <span>图片加载失败</span>
+            <span>{t("image.loadError")}</span>
           </div>
         )}
       </div>
