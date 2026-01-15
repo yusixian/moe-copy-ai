@@ -3,6 +3,8 @@ import type React from "react"
 import { useCallback } from "react"
 import { toast } from "react-toastify"
 
+import { useI18n } from "~utils/i18n"
+
 interface Option {
   value: string
   label: string
@@ -25,14 +27,15 @@ export const OptionSelect: React.FC<OptionSelectProps> = ({
   defaultValue,
   description
 }) => {
+  const { t } = useI18n()
   const [value, setValue] = useStorage<string>(storageKey, defaultValue)
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       setValue(e.target.value)
-      toast.success("设置已保存！")
+      toast.success(t("option.saved"))
     },
-    [setValue]
+    [setValue, t]
   )
 
   return (

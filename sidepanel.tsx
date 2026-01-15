@@ -216,7 +216,9 @@ function SidePanel() {
                 width="16"
                 height="16"
               />
-              {isSingleScrapeLoading ? t("sidepanel.fetching") : t("common.refresh")}
+              {isSingleScrapeLoading
+                ? t("sidepanel.fetching")
+                : t("common.refresh")}
             </Button>
           )}
         </div>

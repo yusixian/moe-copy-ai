@@ -10,9 +10,9 @@ import { useAiSettings } from "~hooks/useAiSettings"
 import {
   getTranslations,
   LOCALE_NAMES,
+  type Locale,
   SUPPORTED_LOCALES,
-  useI18n,
-  type Locale
+  useI18n
 } from "~utils/i18n"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
 import { AccordionSection } from "../AccordionSection"

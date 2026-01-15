@@ -5,9 +5,9 @@ import { toast } from "react-toastify"
 import {
   getTranslations,
   LOCALE_NAMES,
+  type Locale,
   SUPPORTED_LOCALES,
-  useI18n,
-  type Locale
+  useI18n
 } from "~utils/i18n"
 
 /**

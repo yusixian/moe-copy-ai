@@ -1,7 +1,6 @@
 import type React from "react"
-
-import { FLOAT_BUTTON_OPTIONS } from "../../constants/options"
 import { useI18n } from "~utils/i18n"
+import { FLOAT_BUTTON_OPTIONS } from "../../constants/options"
 
 import LanguageSelect from "./LanguageSelect"
 import OptionSection from "./OptionSection"

@@ -3,6 +3,8 @@ import { useClipboard } from "foxact/use-clipboard"
 import { countTokens } from "gpt-tokenizer"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
+import { useI18n } from "~utils/i18n"
+
 import ContentDisplay from "./ContentDisplay"
 import TokenizationDisplay from "./TokenizationDisplay"
 import { Button } from "./ui/button"
@@ -23,6 +25,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
   isMarkdown,
   onContentChange
 }) => {
+  const { t } = useI18n()
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [showCleanedContent, setShowCleanedContent] = useState(false)
   // 复制功能
@@ -152,10 +155,10 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
         {currentContent?.length ? (
           <div className="flex w-auto items-center gap-1.5 rounded-full bg-gradient-to-r from-sky-50 to-indigo-50 px-3 py-1 font-medium text-sky-600 text-xs shadow-sm ring-1 ring-sky-100 transition-opacity hover:opacity-80">
             <span className="flex items-center">
-              {currentContent.length} 字符
+              {t("content.characters", { count: currentContent.length })}
             </span>
             <span className="mx-0.5 text-sky-300">•</span>
-            <span>约 {tokenCount} token</span>
+            <span>{t("content.tokens", { count: tokenCount })}</span>
           </div>
         ) : null}
       </h2>
@@ -178,7 +181,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
           size="sm"
           onClick={toggleContentVersion}
           disabled={isEditing}>
-          {showCleanedContent ? "显示原始格式" : "显示紧凑版"}
+          {showCleanedContent ? t("content.format.original") : t("content.format.compact")}
         </Button>
 
         {isMarkdown && (
@@ -187,7 +190,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
             size="sm"
             onClick={togglePreview}
             disabled={isEditing}>
-            {isPreviewMode ? "查看原文" : "预览 Markdown"}
+            {isPreviewMode ? t("content.preview.source") : t("content.preview.markdown")}
           </Button>
         )}
 
@@ -202,7 +205,7 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
               icon="line-md:arrows-diagonal-rotated"
               className="mr-2 inline-block size-4 flex-shrink-0"
             />
-            {isFullscreen ? "退出全屏" : "全屏预览"}
+            {isFullscreen ? t("content.fullscreen.exit") : t("content.fullscreen.enter")}
           </Button>
         )}
 
@@ -210,21 +213,21 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
           variant={isEditing ? "outline" : "secondary"}
           size="sm"
           onClick={toggleEditMode}>
-          {isEditing ? "完成编辑" : "编辑内容"}
+          {isEditing ? t("content.edit.done") : t("content.edit.start")}
         </Button>
 
         <Button
           variant={showTokenization ? "outline" : "default"}
           size="sm"
           onClick={() => setShowTokenization(!showTokenization)}>
-          {showTokenization ? "隐藏分词" : "显示分词"}
+          {showTokenization ? t("content.tokenization.hide") : t("content.tokenization.show")}
         </Button>
 
         <Button
           variant={copySuccess ? "success" : "default"}
           size="sm"
           onClick={handleCopy}>
-          {copySuccess ? "已复制" : "复制"}
+          {copySuccess ? t("common.copied") : t("common.copy")}
         </Button>
       </div>
       <TokenizationDisplay

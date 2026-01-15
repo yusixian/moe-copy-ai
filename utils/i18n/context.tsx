@@ -17,8 +17,8 @@ import { syncStorage } from "~utils/storage"
 import { getTranslations } from "./translations"
 import {
   DEFAULT_LOCALE,
-  LOCALE_STORAGE_KEY,
   type I18nContextValue,
+  LOCALE_STORAGE_KEY,
   type Locale
 } from "./types"
 
@@ -48,7 +48,10 @@ export function I18nProvider({ children, initialLocale }: I18nProviderProps) {
     const loadLocale = async () => {
       try {
         const savedLocale = await syncStorage.get<Locale>(LOCALE_STORAGE_KEY)
-        if (savedLocale && (savedLocale === "zh_CN" || savedLocale === "en_US")) {
+        if (
+          savedLocale &&
+          (savedLocale === "zh_CN" || savedLocale === "en_US")
+        ) {
           setLocaleState(savedLocale)
         }
       } catch (error) {
@@ -106,7 +109,10 @@ export function I18nProvider({ children, initialLocale }: I18nProviderProps) {
       // 支持参数插值 {param}
       if (params) {
         for (const [paramKey, value] of Object.entries(params)) {
-          message = message.replace(new RegExp(`\\{${paramKey}\\}`, "g"), String(value))
+          message = message.replace(
+            new RegExp(`\\{${paramKey}\\}`, "g"),
+            String(value)
+          )
         }
       }
 

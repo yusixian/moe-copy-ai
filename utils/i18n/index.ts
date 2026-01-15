@@ -5,17 +5,15 @@
 
 // Context 和 Hooks
 export { I18nProvider, useI18n, useTranslation } from "./context"
-
+// 翻译资源（高级用例）
+export { getTranslations, translations } from "./translations"
 // 类型
 export {
   DEFAULT_LOCALE,
+  type I18nContextValue,
   LOCALE_NAMES,
   LOCALE_STORAGE_KEY,
-  SUPPORTED_LOCALES,
-  type I18nContextValue,
   type Locale,
+  SUPPORTED_LOCALES,
   type TranslationMessages
 } from "./types"
-
-// 翻译资源（高级用例）
-export { getTranslations, translations } from "./translations"

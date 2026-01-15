@@ -2,6 +2,7 @@ import { ToastContainer } from "react-toastify"
 
 import "./styles/global.css"
 
+import { I18nProvider } from "~utils/i18n"
 import AiSettingsSection from "./components/option/AiSettingsSection"
 import DevSettingsSection from "./components/option/DevSettingsSection"
 import ExtractionModeSection from "./components/option/ExtractionModeSection"
@@ -10,7 +11,6 @@ import InterfaceSettingsSection from "./components/option/InterfaceSettingsSecti
 import LogSettingsSection from "./components/option/LogSettingsSection"
 import OptionHeader from "./components/option/OptionHeader"
 import SelectorSettingsSection from "./components/option/SelectorSettingsSection"
-import { I18nProvider } from "~utils/i18n"
 
 function OptionsPage() {
   return (
