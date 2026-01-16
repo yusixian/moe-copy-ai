@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 
 import { Button } from "~/components/ui/button"
+import { useI18n } from "~utils/i18n"
 import {
   AUTHOR_SELECTORS,
   CONTENT_SELECTORS,
@@ -24,28 +25,12 @@ const STORAGE_KEYS = {
 // 选择器类型
 type SelectorType = "content" | "author" | "date" | "title"
 
-// 选择器类型映射到显示名称
-const SELECTOR_TYPE_NAMES = {
-  content: "内容选择器",
-  author: "作者选择器",
-  date: "日期选择器",
-  title: "标题选择器"
-}
-
 // 选择器类型映射到图标
 const SELECTOR_TYPE_ICONS = {
   content: "mdi:text-box-outline",
   author: "mdi:account-outline",
   date: "mdi:calendar-outline",
   title: "mdi:format-title"
-}
-
-// 选择器类型映射到描述
-const SELECTOR_TYPE_DESCRIPTIONS = {
-  content: "用于提取页面主要内容的CSS选择器",
-  author: "用于提取作者信息的CSS选择器",
-  date: "用于提取发布日期的CSS选择器",
-  title: "用于提取文章标题的CSS选择器，系统会严格按照选择器列表顺序尝试匹配"
 }
 
 // 选择器类型映射到默认选择器
@@ -61,6 +46,7 @@ const SelectorEditor: React.FC<{
   type: SelectorType
   onClose: () => void
 }> = ({ type, onClose }) => {
+  const { t } = useI18n()
   // 从存储中获取自定义选择器，如果不存在则使用默认选择器
   const [selectors, setSelectors] = useStorage<string[]>(
     STORAGE_KEYS[type.toUpperCase()],
@@ -80,12 +66,12 @@ const SelectorEditor: React.FC<{
   // 添加新选择器
   const handleAddSelector = () => {
     if (!newSelector.trim()) {
-      toast.error("选择器不能为空！")
+      toast.error(t("option.selector.emptyError"))
       return
     }
 
     if (editingSelectors.includes(newSelector)) {
-      toast.error("该选择器已存在！")
+      toast.error(t("option.selector.duplicateError"))
       return
     }
 
@@ -123,14 +109,14 @@ const SelectorEditor: React.FC<{
   // 保存选择器
   const handleSave = () => {
     setSelectors(editingSelectors)
-    toast.success("选择器已保存")
+    toast.success(t("option.selector.saved"))
     onClose()
   }
 
   // 恢复默认选择器
   const handleResetToDefault = () => {
     setEditingSelectors([...DEFAULT_SELECTORS[type]])
-    toast.info("已恢复默认选择器，点击保存后生效")
+    toast.info(t("option.selector.resetInfo"))
   }
 
   return (
@@ -139,7 +125,9 @@ const SelectorEditor: React.FC<{
         <div className="mb-4 flex items-center justify-between">
           <h3 className="font-semibold text-sky-600 text-xl">
             <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2 inline" />
-            编辑{SELECTOR_TYPE_NAMES[type]}
+            {t("option.selector.edit", {
+              type: t(`option.selector.type.${type}`)
+            })}
           </h3>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <Icon icon="mdi:close" width={24} />
@@ -147,7 +135,8 @@ const SelectorEditor: React.FC<{
         </div>
 
         <p className="mb-4 text-gray-600 text-sm">
-          {SELECTOR_TYPE_DESCRIPTIONS[type]} (按优先级排序，从上到下)
+          {t(`option.selector.type.${type}.desc`)} (
+          {t("option.selector.priority")})
         </p>
 
         {(type === "title" || type === "content") && (
@@ -161,7 +150,9 @@ const SelectorEditor: React.FC<{
                 className="mr-1.5"
                 width={16}
               />
-              {showRules ? "收起规则说明" : "展开规则说明"}
+              {showRules
+                ? t("option.selector.collapseRules")
+                : t("option.selector.expandRules")}
             </Button>
 
             {type === "title" && (
@@ -178,13 +169,11 @@ const SelectorEditor: React.FC<{
                       className="mr-1"
                       width={16}
                     />
-                    标题抓取规则说明：
+                    {t("option.selector.titleRulesTitle")}
                   </strong>
                   <ol className="ml-5 list-decimal space-y-1 text-gray-600">
-                    <li>系统会严格按照选择器列表的顺序从上到下依次尝试匹配</li>
-                    <li>
-                      建议将最常用、最可靠的选择器放在列表前面，以提高抓取效率和准确性
-                    </li>
+                    <li>{t("option.selector.titleRule1")}</li>
+                    <li>{t("option.selector.titleRule2")}</li>
                   </ol>
                 </div>
               </div>
@@ -204,24 +193,14 @@ const SelectorEditor: React.FC<{
                       className="mr-1"
                       width={16}
                     />
-                    内容抓取规则说明：
+                    {t("option.selector.contentRulesTitle")}
                   </strong>
                   <ol className="ml-5 list-decimal space-y-1 text-gray-600">
-                    <li>
-                      如果页面中存在
-                      <code className="mx-1 rounded border border-sky-100 bg-white px-1 font-mono text-sky-700">
-                        article
-                      </code>
-                      标签且未指定自定义选择器，将优先使用内容最长的article元素
-                    </li>
-                    <li>如果指定了自定义选择器，将优先使用自定义选择器</li>
-                    <li>
-                      如果没有找到article标签或自定义选择器未匹配，将按顺序尝试选择器列表
-                    </li>
-                    <li>
-                      如果仍未找到内容，将尝试查找页面中的段落集合（至少3个段落且长度大于30个字符）
-                    </li>
-                    <li>最后的备选方案是提取整个body内容</li>
+                    <li>{t("option.selector.contentRule1")}</li>
+                    <li>{t("option.selector.contentRule2")}</li>
+                    <li>{t("option.selector.contentRule3")}</li>
+                    <li>{t("option.selector.contentRule4")}</li>
+                    <li>{t("option.selector.contentRule5")}</li>
                   </ol>
                 </div>
               </div>
@@ -235,11 +214,11 @@ const SelectorEditor: React.FC<{
             type="text"
             value={newSelector}
             onChange={(e) => setNewSelector(e.target.value)}
-            placeholder="输入新的CSS选择器..."
+            placeholder={t("option.selector.inputPlaceholder")}
             className="flex-1 rounded-l-lg border border-sky-200 bg-blue-50 p-2 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
           />
           <Button onClick={handleAddSelector} className="rounded-l-none">
-            添加
+            {t("option.selector.add")}
           </Button>
         </div>
 
@@ -286,7 +265,7 @@ const SelectorEditor: React.FC<{
             </ul>
           ) : (
             <div className="flex h-24 items-center justify-center text-gray-500">
-              没有选择器，请添加或恢复默认值
+              {t("option.selector.emptyList")}
             </div>
           )}
         </div>
@@ -294,13 +273,13 @@ const SelectorEditor: React.FC<{
         {/* 按钮组 */}
         <div className="flex justify-between">
           <Button variant="outline" onClick={handleResetToDefault}>
-            恢复默认值
+            {t("option.selector.resetDefault")}
           </Button>
           <div className="space-x-2">
             <Button variant="secondary" onClick={onClose}>
-              取消
+              {t("common.cancel")}
             </Button>
-            <Button onClick={handleSave}>保存</Button>
+            <Button onClick={handleSave}>{t("common.save")}</Button>
           </div>
         </div>
       </div>
@@ -313,6 +292,7 @@ const SelectorTypeCard: React.FC<{
   type: SelectorType
   onClick: () => void
 }> = ({ type, onClick }) => {
+  const { t } = useI18n()
   return (
     <button
       type="button"
@@ -320,10 +300,12 @@ const SelectorTypeCard: React.FC<{
       className="w-full cursor-pointer rounded-lg border-2 border-sky-100 bg-white p-4 text-left shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
       <div className="mb-2 flex items-center text-sky-600">
         <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2" width={24} />
-        <h3 className="font-medium text-lg">{SELECTOR_TYPE_NAMES[type]}</h3>
+        <h3 className="font-medium text-lg">
+          {t(`option.selector.type.${type}`)}
+        </h3>
       </div>
       <p className="text-gray-600 text-sm">
-        {SELECTOR_TYPE_DESCRIPTIONS[type]}
+        {t(`option.selector.type.${type}.desc`)}
       </p>
     </button>
   )
@@ -331,35 +313,24 @@ const SelectorTypeCard: React.FC<{
 
 // 抓取规则说明组件
 const ScrapeRulesExplanation = () => {
+  const { t } = useI18n()
   return (
     <div className="rounded-lg border-2 border-sky-100 bg-white p-5 text-sm shadow-sm">
       <h4 className="mb-3 flex items-center font-semibold text-sky-600">
         <Icon icon="mdi:information-outline" className="mr-2" width={20} />
-        内容抓取规则说明
+        {t("option.selector.rulesExplanationTitle")}
       </h4>
-      <p className="mb-3 text-gray-600">
-        文章内容抓取采用以下策略（按优先级排序）：
-      </p>
+      <p className="mb-3 text-gray-600">{t("option.selector.rulesIntro")}</p>
       <ol className="mb-4 ml-5 list-decimal space-y-2 text-gray-600">
-        <li>
-          如果页面中存在
-          <code className="mx-1 rounded border border-sky-100 bg-sky-50 px-1 font-mono text-sky-700">
-            article
-          </code>
-          标签且未指定自定义选择器，将使用内容最长的article元素
-        </li>
-        <li>如果指定了自定义选择器，将优先使用自定义选择器</li>
-        <li>
-          如果没有找到article标签或自定义选择器未匹配，将按顺序尝试默认选择器列表
-        </li>
-        <li>
-          如果仍未找到内容，将尝试查找页面中的段落集合（至少3个段落且长度大于30个字符）
-        </li>
-        <li>最后的备选方案是提取整个body内容</li>
+        <li>{t("option.selector.contentRule1")}</li>
+        <li>{t("option.selector.contentRule2")}</li>
+        <li>{t("option.selector.contentRule3")}</li>
+        <li>{t("option.selector.contentRule4")}</li>
+        <li>{t("option.selector.contentRule5")}</li>
       </ol>
       <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
         <p className="mb-2 font-medium text-sky-700">
-          默认选择器列表（按优先级）：
+          {t("option.selector.defaultListTitle")}
         </p>
         <div className="max-h-32 overflow-y-auto rounded border border-sky-100 bg-white p-2">
           <code className="font-mono text-gray-600 text-xs">
@@ -373,6 +344,7 @@ const ScrapeRulesExplanation = () => {
 
 // 主组件
 export const SelectorSettingsSection: React.FC = () => {
+  const { t } = useI18n()
   const [editingType, setEditingType] = useState<SelectorType | null>(null)
   const [showExplanation, setShowExplanation] = useState(false)
 
@@ -387,10 +359,12 @@ export const SelectorSettingsSection: React.FC = () => {
   }
 
   return (
-    <OptionSection title="选择器设置" icon="line-md:document-code">
+    <OptionSection
+      title={t("option.selector.title")}
+      icon="line-md:document-code">
       <div className="mb-4 flex items-center justify-between">
         <span className="text-gray-600 text-sm">
-          自定义CSS选择器用于从网页中提取内容。点击卡片编辑对应类型的选择器。
+          {t("option.selector.desc")}
         </span>
         <Button
           variant="outline"
@@ -401,7 +375,9 @@ export const SelectorSettingsSection: React.FC = () => {
             className="mr-1.5"
             width={18}
           />
-          {showExplanation ? "隐藏抓取规则" : "查看抓取规则"}
+          {showExplanation
+            ? t("option.selector.hideRules")
+            : t("option.selector.showRules")}
         </Button>
       </div>
 

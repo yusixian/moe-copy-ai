@@ -10,6 +10,8 @@ import {
   PAGINATION_DELAY_OPTIONS,
   PAGINATION_MAX_PAGES_OPTIONS
 } from "~constants/options"
+import { useI18n } from "~utils/i18n"
+import { translateOptions } from "~utils/options-helper"
 
 // 紧凑选择框组件
 export function CompactSelect({
@@ -25,15 +27,15 @@ export function CompactSelect({
 }) {
   const selectId = `select-${label.replace(/\s+/g, "-").toLowerCase()}`
   return (
-    <div className="flex items-center justify-between gap-2">
-      <label htmlFor={selectId} className="text-gray-600 text-xs">
+    <div className="flex items-center justify-between gap-1.5">
+      <label htmlFor={selectId} className="flex-shrink-0 text-gray-600 text-xs">
         {label}
       </label>
       <select
         id={selectId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded border border-sky-200 bg-sky-50 px-2 py-1 text-xs focus:border-sky-400 focus:outline-none">
+        className="min-w-0 rounded border border-sky-200 bg-sky-50 px-2 py-1 text-xs focus:border-sky-400 focus:outline-none">
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
@@ -55,6 +57,7 @@ export function BatchScrapeSettings({
   compact = false,
   showToast = true
 }: BatchScrapeSettingsProps) {
+  const { t } = useI18n()
   const [strategy, setStrategy] = useStorage("batch_strategy", "fetch")
   const [concurrency, setConcurrency] = useStorage("batch_concurrency", "2")
   const [delay, setDelay] = useStorage("batch_delay", "500")
@@ -65,9 +68,9 @@ export function BatchScrapeSettings({
   const [maxPages, setMaxPages] = useStorage("pagination_max_pages", "5")
   const [pageDelay, setPageDelay] = useStorage("pagination_delay", "2000")
 
-  const currentStrategyDesc = BATCH_STRATEGY_OPTIONS.find(
+  const currentStrategyDescKey = BATCH_STRATEGY_OPTIONS.find(
     (s) => s.value === strategy
-  )?.desc
+  )?.descKey
 
   const handleChange = (
     setter: (v: string) => void,
@@ -84,82 +87,120 @@ export function BatchScrapeSettings({
     <div className="space-y-3">
       {/* 策略选择 - 使用按钮组 */}
       <fieldset className="space-y-2">
-        <legend className="text-gray-600 text-xs">抓取策略</legend>
+        <legend className="text-gray-600 text-xs">
+          {t("batch.settings.strategy")}
+        </legend>
         <div className="grid grid-cols-3 gap-1">
           {BATCH_STRATEGY_OPTIONS.map((s) => (
             <button
               type="button"
               key={s.value}
               onClick={() =>
-                handleChange(setStrategy, s.value, "抓取策略已保存")
+                handleChange(
+                  setStrategy,
+                  s.value,
+                  t("batch.settings.strategy.saved")
+                )
               }
               className={`rounded-md px-1.5 py-1.5 text-center text-xs transition-all ${
                 strategy === s.value
                   ? "bg-sky-500 text-white shadow-sm"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}>
-              {s.label}
+              {t(s.labelKey)}
             </button>
           ))}
         </div>
-        {!compact && currentStrategyDesc && (
-          <p className="text-gray-500 text-xs">{currentStrategyDesc}</p>
+        {!compact && currentStrategyDescKey && (
+          <p className="text-gray-500 text-xs">{t(currentStrategyDescKey)}</p>
         )}
       </fieldset>
 
       {/* 紧凑模式使用2列网格 */}
       {compact ? (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-wrap gap-3">
           <CompactSelect
-            label="并发"
+            label={t("batch.settings.concurrency")}
             value={concurrency}
-            onChange={(v) => handleChange(setConcurrency, v, "并发数量已保存")}
-            options={BATCH_CONCURRENCY_OPTIONS}
+            onChange={(v) =>
+              handleChange(
+                setConcurrency,
+                v,
+                t("batch.settings.concurrency.saved")
+              )
+            }
+            options={translateOptions(BATCH_CONCURRENCY_OPTIONS, t)}
           />
           <CompactSelect
-            label="延迟"
+            label={t("batch.settings.delay")}
             value={delay}
-            onChange={(v) => handleChange(setDelay, v, "批次延迟已保存")}
-            options={BATCH_DELAY_OPTIONS}
+            onChange={(v) =>
+              handleChange(setDelay, v, t("batch.settings.delay.saved"))
+            }
+            options={translateOptions(BATCH_DELAY_OPTIONS, t)}
           />
           <CompactSelect
-            label="超时"
+            label={t("batch.settings.timeout")}
             value={timeout}
-            onChange={(v) => handleChange(setBatchTimeout, v, "超时时间已保存")}
-            options={BATCH_TIMEOUT_OPTIONS}
+            onChange={(v) =>
+              handleChange(
+                setBatchTimeout,
+                v,
+                t("batch.settings.timeout.saved")
+              )
+            }
+            options={translateOptions(BATCH_TIMEOUT_OPTIONS, t)}
           />
           <CompactSelect
-            label="重试"
+            label={t("batch.settings.retry")}
             value={retryCount}
-            onChange={(v) => handleChange(setRetryCount, v, "重试次数已保存")}
-            options={BATCH_RETRY_OPTIONS}
+            onChange={(v) =>
+              handleChange(setRetryCount, v, t("batch.settings.retry.saved"))
+            }
+            options={translateOptions(BATCH_RETRY_OPTIONS, t)}
           />
         </div>
       ) : (
         <>
           <CompactSelect
-            label="并发数量"
+            label={t("batch.settings.concurrency.full")}
             value={concurrency}
-            onChange={(v) => handleChange(setConcurrency, v, "并发数量已保存")}
-            options={BATCH_CONCURRENCY_OPTIONS}
+            onChange={(v) =>
+              handleChange(
+                setConcurrency,
+                v,
+                t("batch.settings.concurrency.saved")
+              )
+            }
+            options={translateOptions(BATCH_CONCURRENCY_OPTIONS, t)}
           />
           <CompactSelect
-            label="批次延迟"
+            label={t("batch.settings.delay.full")}
             value={delay}
-            onChange={(v) => handleChange(setDelay, v, "批次延迟已保存")}
-            options={BATCH_DELAY_OPTIONS}
+            onChange={(v) =>
+              handleChange(setDelay, v, t("batch.settings.delay.saved"))
+            }
+            options={translateOptions(BATCH_DELAY_OPTIONS, t)}
           />
           <CompactSelect
-            label="超时时间"
+            label={t("batch.settings.timeout.full")}
             value={timeout}
-            onChange={(v) => handleChange(setBatchTimeout, v, "超时时间已保存")}
-            options={BATCH_TIMEOUT_OPTIONS}
+            onChange={(v) =>
+              handleChange(
+                setBatchTimeout,
+                v,
+                t("batch.settings.timeout.saved")
+              )
+            }
+            options={translateOptions(BATCH_TIMEOUT_OPTIONS, t)}
           />
           <CompactSelect
-            label="重试次数"
+            label={t("batch.settings.retry.full")}
             value={retryCount}
-            onChange={(v) => handleChange(setRetryCount, v, "重试次数已保存")}
-            options={BATCH_RETRY_OPTIONS}
+            onChange={(v) =>
+              handleChange(setRetryCount, v, t("batch.settings.retry.saved"))
+            }
+            options={translateOptions(BATCH_RETRY_OPTIONS, t)}
           />
         </>
       )}
@@ -169,18 +210,30 @@ export function BatchScrapeSettings({
         className={`flex gap-2 border-gray-200 border-t pt-3 ${compact ? "" : "mt-4"}`}>
         <div className="flex-1">
           <CompactSelect
-            label={compact ? "页数" : "最大页数"}
+            label={
+              compact
+                ? t("batch.settings.maxPages")
+                : t("batch.settings.maxPages.full")
+            }
             value={maxPages}
-            onChange={(v) => handleChange(setMaxPages, v, "最大页数已保存")}
-            options={PAGINATION_MAX_PAGES_OPTIONS}
+            onChange={(v) =>
+              handleChange(setMaxPages, v, t("batch.settings.maxPages.saved"))
+            }
+            options={translateOptions(PAGINATION_MAX_PAGES_OPTIONS, t)}
           />
         </div>
         <div className="flex-1">
           <CompactSelect
-            label={compact ? "翻页" : "翻页延迟"}
+            label={
+              compact
+                ? t("batch.settings.pageDelay")
+                : t("batch.settings.pageDelay.full")
+            }
             value={pageDelay}
-            onChange={(v) => handleChange(setPageDelay, v, "翻页延迟已保存")}
-            options={PAGINATION_DELAY_OPTIONS}
+            onChange={(v) =>
+              handleChange(setPageDelay, v, t("batch.settings.pageDelay.saved"))
+            }
+            options={translateOptions(PAGINATION_DELAY_OPTIONS, t)}
           />
         </div>
       </div>

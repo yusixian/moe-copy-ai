@@ -6,40 +6,62 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **moe-copy-ai** is a Chrome extension built with Plasmo framework that provides AI-powered web content extraction. The extension supports mobile browsers (Kiwi Browser) and offers intelligent content scraping, metadata extraction, and AI-powered summarization.
 
+## Assistant Operating Principles
+
+- Prioritize explicit rules and constraints before user preferences or convenience.
+- Classify tasks as trivial/moderate/complex; for moderate/complex use Plan -> Code workflow with 1-3 options, tradeoffs, risks, and verification steps.
+- Ask clarifying questions only when missing info would change the main solution; otherwise proceed with reasonable assumptions.
+- In Code mode, make minimal reviewable changes, list touched files and intent, and state how to verify; proactively fix mistakes you introduced.
+- Warn before destructive actions; offer safer alternatives; avoid history rewrites unless explicitly requested.
+- Output structure for non-trivial tasks: direct conclusion first, brief reasoning, options (if any), next steps.
+- Language: explanations in Simplified Chinese; code, identifiers, comments, and commit messages in English; avoid beginner-level explanations.
+
 ## Core Engineering Principles
 
 ### 1. Module-First Principle
+
 **Every feature must be implemented as a standalone module with clear boundaries.**
+
 - Logic organized into focused, single-responsibility modules
 - Module structure: `utils/` (core logic), `hooks/` (React hooks), `components/` (UI), `background/messages/` (Chrome messaging), `constants/` (config)
 - Extract shared logic when used 2+ times
 
 ### 2. Interface-First Design
+
 **Modules must expose clear, minimal public APIs.**
+
 - Use barrel exports (`index.ts`) to define public interfaces when a module has multiple related exports
 - Export TypeScript types alongside implementations
 - Document complex functions with JSDoc
 
 ### 3. Functional-First Approach
+
 **Prefer pure functions over stateful classes; manage side effects explicitly.**
+
 - Write pure functions (same input → same output)
 - Isolate side effects at boundaries (storage operations, Chrome API calls, AI service calls)
 - Immutable data transformations
 
 ### 4. Test-Friendly Architecture
+
 **Design code to be testable without excessive mocking.**
+
 - Pure functions are naturally testable
 - Testing priorities: High (utils, data transformations) > Medium (hooks, message handlers) > Low (UI components)
 - Tests located in `utils/__tests__/`
 
 ### 5. Simplicity & Anti-Abstraction
+
 **Resist premature abstraction; extract patterns after 2-3 instances.**
+
 - Don't create abstractions for single-use cases
 - Inline code until pattern becomes clear
 - Keep abstractions simple and focused
 
 ### 6. Dependency Hygiene
+
 **Manage dependencies carefully; avoid circular imports and bloat.**
+
 - No circular dependencies between modules
 - Keep dependency chain shallow
 
@@ -80,6 +102,7 @@ This is a Chrome extension built with **Plasmo framework** that provides AI-powe
 ### Module Organization
 
 **Dependency Flow** (avoid circular dependencies):
+
 ```
 popup.tsx/options.tsx → components/ → hooks/ → utils/ → constants/
                           ↓
@@ -87,12 +110,14 @@ popup.tsx/options.tsx → components/ → hooks/ → utils/ → constants/
 ```
 
 **File Naming**:
+
 - Barrel exports: `index.ts` (when module has multiple related exports)
 - Single export: Match filename (`useIsMobile.ts`)
 - React components: PascalCase (`ContentDisplay.tsx`)
 - Utilities: camelCase (`extractor.ts`, `storage.ts`)
 
 **Module Size Guidelines**:
+
 - Max 500 lines per file (split if larger)
 - Max 15 public exports per module
 - Max 10 imports per file
@@ -168,325 +193,54 @@ Development builds go to `build/chrome-mv3-dev/` for local testing in Chrome dev
 
 ## Code Style & Quality
 
-### General Guidelines
-
-- **Avoid code duplication**: Extract common types and components
-- **Keep components focused**: Use hooks and component composition
-- **TypeScript strict mode**: Leverage type safety throughout, avoid `any`
-- **Atomic components**: Build features from small, focused components
-- **Localized state**: Push data fetching and state management down to components that need them
-
-### Error Handling Strategy
-
-**Layered and context-appropriate:**
-
-1. **Utility Layer** (`utils/`): Return `null` for missing data or throw typed errors for critical failures
-2. **React Components**: Use `ErrorBoundary` for component errors, graceful degradation
-3. **Async Operations**: Explicit try-catch with user feedback
-4. **Chrome API Calls**: Always handle `chrome.runtime.lastError`
-5. **Validation**: At system boundaries only (user input, external APIs, storage reads)
-
-```typescript
-// ✅ Good: Error handling in storage utility
-export async function getSetting<T>(key: string): Promise<T | null> {
-  try {
-    const result = await chrome.storage.sync.get(key);
-    return result[key] ?? null;
-  } catch (error) {
-    console.error(`Failed to get setting: ${key}`, error);
-    return null;
-  }
-}
-
-// ✅ Good: Error handling in component
-function AiSummary() {
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSummarize = async () => {
-    try {
-      const result = await generateSummary(content);
-      setSummary(result);
-    } catch (err) {
-      setError("Failed to generate summary. Please try again.");
-      console.error(err);
-    }
-  };
-}
-```
-
-### State Management Best Practices
-
-#### State Placement
-- **Local first**: Keep state in component unless shared
-- **Lift minimally**: Move state to nearest common ancestor only when needed
-- **Chrome storage**: For persistent settings and cross-context data
-
-#### Derived State
-Prefer computation over synchronization:
-
-```typescript
-// ✅ Good: Computed value
-const filteredLinks = links.filter(link => link.includes(searchTerm));
-
-// ❌ Bad: Synchronized state
-const [filteredLinks, setFilteredLinks] = useState([]);
-useEffect(() => {
-  setFilteredLinks(links.filter(link => link.includes(searchTerm)));
-}, [links, searchTerm]);
-```
-
-#### Immutability
-Always use immutable updates:
-
-```typescript
-// ✅ Good: Immutable update
-setSettings(prev => ({ ...prev, darkMode: true }));
-
-// ❌ Bad: Mutation
-settings.darkMode = true;
-setSettings(settings);
-```
-
-#### Chrome Storage Pattern
-Centralize storage operations in `utils/storage.ts`:
-
-```typescript
-// ✅ Good: Typed storage utilities
-export const storage = {
-  getSettings: async () => {...},
-  updateSettings: async (updates: Partial<Settings>) => {...},
-  getHistory: async () => {...},
-};
-```
-
-### Performance Best Practices
-
-- **Lazy load heavy dependencies**: Dynamic imports for large libraries
-- **Measure before optimizing**: Use Chrome DevTools Performance panel
-- **Memoization**: Only for expensive computations (not premature optimization)
-- **Event listeners**: Always clean up in useEffect return
-
-```typescript
-// ✅ Good: Lazy load heavy library
-const handleExport = async () => {
-  const { exportToPDF } = await import('./heavy-export-lib');
-  await exportToPDF(data);
-};
-```
+- Avoid duplication; extract shared logic after 2+ uses.
+- Keep components small; prefer composition and hooks; keep business logic in utils/hooks.
+- TypeScript strict; avoid `any`; keep types close to logic.
+- State: local-first, lift minimally, prefer derived state; immutable updates.
+- Errors: handle at layer boundaries; check `chrome.runtime.lastError`; graceful UI fallback.
+- Performance: lazy load heavy deps; clean up listeners; memoize only when expensive.
 
 ## React & UI Best Practices
 
-For React and UI development, use the following Claude Code skills:
+- Use `/vercel-react-best-practices` for React components, refactors, and performance work.
+- Use `/web-design-guidelines` for UI work, accessibility, and UX reviews.
+- Prefer existing hooks in `hooks/` (notably `useI18n()`).
+- Key React performance rules:
+  - Parallelize independent async work; avoid waterfalls.
+  - Dynamic import heavy components; load optional code only when used.
+  - Avoid barrel imports for hot paths; import directly.
+  - Prefer derived state and functional setState; keep effect deps primitive.
+  - Memoize expensive subtrees; avoid subscribing to state only used in callbacks.
+  - Deduplicate global event listeners; clean them up on unmount.
 
-### React/Next.js
-- `/vercel-react-best-practices` - React and Next.js performance optimization guidelines from Vercel Engineering. Use when writing, reviewing, or refactoring React components.
+## Internationalization (i18n)
 
-### UI/Web Design
-- `/web-design-guidelines` - Review UI code for Web Interface Guidelines compliance. Use when reviewing UI, checking accessibility, or auditing design.
-
-**When to invoke these skills:**
-- Writing new React components → `/vercel-react-best-practices`
-- Reviewing or refactoring existing React code → `/vercel-react-best-practices`
-- Building UI components or pages → `/web-design-guidelines`
-- Checking accessibility or UX → `/web-design-guidelines`
-- Performance optimization → `/vercel-react-best-practices`
-
-### Available hooks in `hooks/`:
-- `useIsMobile()` - Mobile device detection
-- `useAiSettings()` - AI configuration management
-- `useContentExtraction()` - Content extraction logic
-- `useScrapedData()` - Scraped data management
+- Never hardcode user-visible text; always use `useI18n()` + keys.
+- Keep keys flat with dot notation; use descriptive names (e.g. `error.apiKeyNotSet`).
+- Update both `locales/zh_CN.json` and `locales/en_US.json`.
+- Include `t` in `useCallback` deps; keep background errors in English; use `labelKey`/`descKey` in constants.
 
 ## Development Checklist
 
-### Before Starting
-- [ ] Understand requirement clearly
-- [ ] Check existing code for similar patterns
-- [ ] Verify no circular dependencies would be created
-- [ ] Identify which modules need to be modified
+- Understand requirements; check existing patterns; avoid circular deps.
+- Follow module-first, pure functions, strict TypeScript.
+- Use existing hooks/components; keep components small; handle loading/error states.
+- Clean up listeners; handle `chrome.runtime.lastError`; keep storage async and centralized.
+- Verify with `pnpm lint` and `pnpm test`
 
-### During Implementation
-- [ ] Follow Module-First Principle
-- [ ] Write pure functions where possible
-- [ ] Use TypeScript strictly (no `any` unless unavoidable)
-- [ ] Extract shared logic after 2nd use
-- [ ] Handle errors appropriately for the layer
-- [ ] Use existing hooks when available
-- [ ] Clean up event listeners in useEffect returns
+## Common Code Smells & Pitfalls
 
-### Component Development
-- [ ] Keep components under 300 lines
-- [ ] Use composition over prop drilling
-- [ ] Handle loading and error states
-- [ ] Add proper TypeScript types for props
-- [ ] Use existing UI components from `components/ui/`
-
-### Chrome Extension Specifics
-- [ ] Handle `chrome.runtime.lastError` for Chrome API calls
-- [ ] Message listeners subscribe once (not in dependency arrays)
-- [ ] Storage operations are async and error-handled
-- [ ] Content scripts have proper cleanup on unmount
-
-### Before Committing
-- [ ] Run tests: `pnpm test`
-- [ ] Fix linting issues (if applicable)
-- [ ] Verify build succeeds: `pnpm build`
-- [ ] Test in actual Chrome extension (load `build/chrome-mv3-dev/`)
-
-## Common Code Smells
-
-### Component-Level
-- **Oversized components** (> 300 lines) → Split into smaller components
-- **Props drilling** beyond 2-3 levels → Use Context or lift state differently
-- **Overuse of useEffect** → Prefer derived state or event handlers
-- **Missing error boundaries** → Wrap feature sections in ErrorBoundary
-
-### State Management
-- **Duplicate state** → Single source of truth
-- **Stale state in listeners** → Use refs for event handlers
-- **Unnecessary re-renders** → Check dependency arrays, use memo when needed
-
-### Extension-Specific
-- **Missing chrome.runtime.lastError checks** → Always check after Chrome API calls
-- **Memory leaks in content scripts** → Clean up listeners on unmount
-- **Re-subscribing to Chrome messages** → Subscribe once with refs for state access
-- **Blocking storage operations** → Always use async storage APIs
-
-### Code Organization
-- **Circular dependencies** → Extract shared logic to new module
-- **God modules** (too many exports) → Split into focused modules
-- **Business logic in components** → Extract to utils or hooks
-
-## Common Pitfalls
-
-### 1. Circular Dependencies
-Extract shared logic to separate file instead of importing between peer modules.
-
-```typescript
-// ❌ Bad: componentA imports componentB, componentB imports componentA
-// components/A.tsx
-import { helperB } from './B';
-
-// components/B.tsx
-import { helperA } from './A';
-
-// ✅ Good: Extract shared logic
-// utils/shared-helpers.ts
-export function sharedHelper() { /* ... */ }
-
-// components/A.tsx & components/B.tsx
-import { sharedHelper } from '~utils/shared-helpers';
-```
-
-### 2. Chrome API Error Handling
-Always check for errors after Chrome API calls:
-
-```typescript
-// ❌ Bad: No error handling
-chrome.storage.sync.get('settings', (result) => {
-  setSettings(result.settings);
-});
-
-// ✅ Good: Handle errors
-chrome.storage.sync.get('settings', (result) => {
-  if (chrome.runtime.lastError) {
-    console.error('Storage error:', chrome.runtime.lastError);
-    return;
-  }
-  setSettings(result.settings);
-});
-
-// ✅ Better: Use promise wrapper with try-catch
-async function getSettings() {
-  try {
-    const result = await chrome.storage.sync.get('settings');
-    return result.settings;
-  } catch (error) {
-    console.error('Storage error:', error);
-    return null;
-  }
-}
-```
-
-### 3. Content Script Memory Leaks
-Always clean up listeners when content scripts unmount:
-
-```typescript
-// ✅ Good: Cleanup in React component
-useEffect(() => {
-  const listener = (msg) => handleMessage(msg);
-  chrome.runtime.onMessage.addListener(listener);
-
-  return () => {
-    chrome.runtime.onMessage.removeListener(listener);
-  };
-}, []);
-```
-
-### 4. Overuse of useEffect
-Prefer derived values or event handlers:
-
-```typescript
-// ❌ Bad: Unnecessary useEffect
-const [fullName, setFullName] = useState('');
-useEffect(() => {
-  setFullName(`${firstName} ${lastName}`);
-}, [firstName, lastName]);
-
-// ✅ Good: Derived value
-const fullName = `${firstName} ${lastName}`;
-```
-
-### 5. Over-abstraction
-Inline until pattern appears 2-3 times:
-
-```typescript
-// ❌ Bad: Premature abstraction for single use
-const getButtonClassName = (variant: string, size: string) => {
-  // complex logic for one button
-};
-
-// ✅ Good: Inline first, extract after 3rd use
-<button className="px-4 py-2 bg-blue-500 text-white rounded">
-  Click me
-</button>
-```
+- Circular dependencies, god modules, or business logic inside components.
+- Deep prop drilling, duplicate state, or stale listeners causing re-renders.
+- Overuse of `useEffect` instead of derived values or event handlers.
+- Missing `chrome.runtime.lastError` checks or uncleaned listeners in content scripts.
+- Premature abstraction before a pattern appears 2-3 times.
 
 ## Testing Strategy
 
-**Test business logic rigorously; test UI pragmatically.**
-
-**High Priority**:
-- Content extraction logic (`utils/extractor.ts`)
-- Data transformations
-- Storage utilities
-- Message handlers
-
-**Medium Priority**:
-- Complex React hooks
-- State management logic
-
-**Low Priority**:
-- UI components (manual testing preferred)
-- Simple presentational components
-
-```typescript
-// Example: Pure function test
-describe("extractContent", () => {
-  it("extracts content from article element", () => {
-    document.body.innerHTML = `
-      <article>
-        <h1>Title</h1>
-        <p>Content paragraph</p>
-      </article>
-    `;
-
-    const result = extractContent(document);
-    expect(result.title).toBe("Title");
-    expect(result.content).toContain("Content paragraph");
-  });
-});
-```
+- High: extraction logic, data transforms, storage utilities, message handlers.
+- Medium: complex hooks, state management.
+- Low: presentational UI (manual checks are fine).
 
 ## IMPORTANT
 

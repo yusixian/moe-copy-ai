@@ -2,12 +2,15 @@
 
 import type { MouseEventHandler } from "react"
 
+import { useI18n } from "~/utils/i18n"
+
 interface CatSVGProps {
   className?: string
   onClick?: MouseEventHandler<SVGSVGElement>
 }
 
 export default function CatSVG({ className, onClick }: CatSVGProps) {
+  const { t } = useI18n()
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -27,7 +30,7 @@ export default function CatSVG({ className, onClick }: CatSVGProps) {
       }
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
-      aria-label={onClick ? "Cat icon" : undefined}
+      aria-label={onClick ? t("aria.catIcon") : undefined}
       aria-hidden={onClick ? undefined : true}>
       <radialGradient
         id="FmGFr4qy5fVnlZU2lCKFDa_RouHxOFPEP1c_gr1"

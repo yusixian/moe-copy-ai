@@ -1,7 +1,13 @@
 import { listModels } from "@xsai/model"
-import { useCallback, useLayoutEffect, useRef, useState } from "react"
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState
+} from "react"
 import { toast } from "react-toastify"
-
+import { useI18n } from "~utils/i18n"
 import { syncStorage } from "~utils/storage"
 
 export interface ModelInfo {
@@ -10,13 +16,16 @@ export interface ModelInfo {
 }
 
 const DEFAULT_BASE_URL = "https://api.openai.com/v1/"
-const DEFAULT_SYSTEM_PROMPT =
-  "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}"
 
 export function useAiSettings() {
+  const { t } = useI18n()
+  const defaultSystemPrompt = t("ai.defaultSystemPrompt")
+  const lastDefaultPromptRef = useRef(defaultSystemPrompt)
+  const hasSavedPromptRef = useRef(false)
+
   const [apiKey, setApiKey] = useState("")
   const [baseURL, setBaseURL] = useState(DEFAULT_BASE_URL)
-  const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT)
+  const [systemPrompt, setSystemPrompt] = useState(defaultSystemPrompt)
   const [model, setModel] = useState<string | null>(null)
   const [modelList, setModelList] = useState<ModelInfo[]>([])
   const [isLoadingModels, setIsLoadingModels] = useState(false)
@@ -37,12 +46,12 @@ export function useAiSettings() {
       const currentModel = overrides?.model ?? stateRef.current.model
 
       if (!currentApiKey) {
-        if (showToast) toast.warning("请先填写API密钥")
+        if (showToast) toast.warning(t("toast.ai.apiKeyRequired"))
         return
       }
 
       if (!currentBaseURL) {
-        if (showToast) toast.warning("请先填写API基础URL")
+        if (showToast) toast.warning(t("toast.ai.baseUrlRequired"))
         return
       }
 
@@ -60,15 +69,15 @@ export function useAiSettings() {
           setModel(models[0].id)
         }
 
-        if (showToast) toast.success("模型列表加载成功")
+        if (showToast) toast.success(t("toast.ai.modelsLoadedSuccess"))
       } catch (error) {
         console.error("获取模型列表失败:", error)
-        if (showToast) toast.error("获取模型列表失败，请检查API设置")
+        if (showToast) toast.error(t("toast.ai.modelsLoadedFailed"))
       } finally {
         setIsLoadingModels(false)
       }
     },
-    []
+    [t]
   )
 
   // 加载设置
@@ -76,12 +85,19 @@ export function useAiSettings() {
     try {
       const savedApiKey = await syncStorage.get<string>("ai_api_key")
       const savedBaseURL = await syncStorage.get<string>("ai_base_url")
-      const savedPrompt = await syncStorage.get<string>("ai_system_prompt")
+      const savedPrompt = await syncStorage.get<string | null>(
+        "ai_system_prompt"
+      )
       const savedModel = await syncStorage.get<string>("ai_model")
 
       if (savedApiKey) setApiKey(savedApiKey)
       if (savedBaseURL) setBaseURL(savedBaseURL)
-      if (savedPrompt) setSystemPrompt(savedPrompt)
+      if (savedPrompt !== null && savedPrompt !== undefined) {
+        hasSavedPromptRef.current = true
+        setSystemPrompt(savedPrompt)
+      } else {
+        hasSavedPromptRef.current = false
+      }
       if (savedModel) setModel(savedModel)
 
       setIsLoaded(true)
@@ -100,6 +116,19 @@ export function useAiSettings() {
     }
   }, [fetchModels])
 
+  useEffect(() => {
+    if (hasSavedPromptRef.current) {
+      lastDefaultPromptRef.current = defaultSystemPrompt
+      return
+    }
+
+    setSystemPrompt((current) => {
+      const lastDefault = lastDefaultPromptRef.current
+      lastDefaultPromptRef.current = defaultSystemPrompt
+      return current === lastDefault ? defaultSystemPrompt : current
+    })
+  }, [defaultSystemPrompt])
+
   // 保存设置
   const saveSettings = useCallback(async () => {
     try {
@@ -107,12 +136,13 @@ export function useAiSettings() {
       await syncStorage.set("ai_base_url", baseURL)
       await syncStorage.set("ai_system_prompt", systemPrompt)
       await syncStorage.set("ai_model", model)
-      toast.success("AI设置已保存")
+      hasSavedPromptRef.current = true
+      toast.success(t("toast.ai.settingsSaved"))
     } catch (error) {
-      toast.error("保存设置失败")
+      toast.error(t("toast.ai.settingsSaveFailed"))
       console.error("保存AI设置出错:", error)
     }
-  }, [apiKey, baseURL, systemPrompt, model])
+  }, [apiKey, baseURL, model, systemPrompt, t])
 
   // 初始化加载
   useLayoutEffect(() => {

@@ -1,21 +1,25 @@
 import type React from "react"
 
+import { useI18n } from "~utils/i18n"
+
 import { DEBUG_PANEL_OPTIONS } from "../../constants/options"
 import OptionSection from "./OptionSection"
 import OptionSelect from "./OptionSelect"
 
 export const DevSettingsSection: React.FC = () => {
+  const { t } = useI18n()
+
   return (
     <OptionSection
-      title="开发者选项"
+      title={t("option.dev.title")}
       icon="line-md:coffee-half-empty-filled-loop">
       <OptionSelect
         id="debugPanel"
-        label="调试面板"
+        label={t("option.dev.debugPanel.label")}
         options={DEBUG_PANEL_OPTIONS}
         storageKey="show_debug_panel"
         defaultValue="true"
-        description="控制是否显示调试面板。调试面板提供了额外的技术信息，主要用于开发和故障排除。"
+        description={t("option.dev.debugPanel.desc")}
       />
     </OptionSection>
   )

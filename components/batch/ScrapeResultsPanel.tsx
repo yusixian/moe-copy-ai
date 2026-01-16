@@ -8,6 +8,7 @@ import { useSelectionSet } from "~hooks/useSelectionSet"
 import { cn } from "~utils"
 import { aggregateToSingleMarkdown } from "~utils/content-aggregator"
 import { downloadFile } from "~utils/download"
+import { useI18n } from "~utils/i18n"
 import { exportAsZip } from "~utils/zip-exporter"
 
 import BatchAiSummary from "./BatchAiSummary"
@@ -21,6 +22,7 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
   results,
   onReset
 }: ScrapeResultsPanelProps) {
+  const { t } = useI18n()
   const [isExporting, setIsExporting] = useState(false)
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
   const [fullContentItems, setFullContentItems] = useState<Set<number>>(
@@ -83,7 +85,7 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
       const date = new Date().toISOString().split("T")[0]
       downloadFile(blob, `batch-scrape-${date}.md`)
     } catch (error) {
-      console.error("导出 Markdown 失败:", error)
+      console.error(t("batch.results.export.markdownError"), error)
     } finally {
       setIsExporting(false)
     }
@@ -101,7 +103,7 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
       const date = new Date().toISOString().split("T")[0]
       downloadFile(blob, `batch-scrape-${date}.zip`)
     } catch (error) {
-      console.error("导出 ZIP 失败:", error)
+      console.error(t("batch.results.export.zipError"), error)
     } finally {
       setIsExporting(false)
     }
@@ -142,9 +144,14 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
           <Icon icon="mdi:check-bold" className="h-5 w-5 text-emerald-600" />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-800">抓取完成</h3>
+          <h3 className="font-semibold text-gray-800">
+            {t("batch.results.title")}
+          </h3>
           <p className="text-gray-500 text-sm">
-            成功 {stats.successCount} / {stats.total} 页面
+            {t("batch.results.summary", {
+              success: stats.successCount,
+              total: stats.total
+            })}
           </p>
         </div>
       </div>
@@ -155,13 +162,17 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
           <div className="font-bold text-emerald-600 text-xl">
             {stats.successCount}
           </div>
-          <div className="text-emerald-700 text-xs">成功</div>
+          <div className="text-emerald-700 text-xs">
+            {t("batch.results.stats.success")}
+          </div>
         </div>
         <div className="rounded-lg bg-red-50 p-3 text-center">
           <div className="font-bold text-red-600 text-xl">
             {stats.failedCount}
           </div>
-          <div className="text-red-700 text-xs">失败</div>
+          <div className="text-red-700 text-xs">
+            {t("batch.results.stats.failed")}
+          </div>
         </div>
         <div className="rounded-lg bg-sky-50 p-3 text-center">
           <div className="font-bold text-sky-600 text-xl">
@@ -169,7 +180,9 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
               ? `${(stats.totalChars / 1000).toFixed(1)}k`
               : stats.totalChars}
           </div>
-          <div className="text-sky-700 text-xs">字符</div>
+          <div className="text-sky-700 text-xs">
+            {t("batch.results.stats.chars")}
+          </div>
         </div>
       </div>
 
@@ -181,18 +194,19 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
               icon="mdi:checkbox-multiple-marked"
               className="mr-1 h-3.5 w-3.5"
             />
-            全选
+            {t("batch.results.selectAll")}
           </Button>
           <Button variant="ghost" size="xs" onClick={deselectAll}>
             <Icon
               icon="mdi:checkbox-multiple-blank-outline"
               className="mr-1 h-3.5 w-3.5"
             />
-            取消
+            {t("batch.results.deselectAll")}
           </Button>
         </div>
         <span className="text-gray-500 text-xs">
-          已选 <b className="text-blue-600">{selectedStats.count}</b> /{" "}
+          {t("batch.results.selected")}{" "}
+          <b className="text-blue-600">{selectedStats.count}</b> /{" "}
           {stats.successCount}
         </span>
       </div>
@@ -287,7 +301,9 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
                       }
                       className="mr-1 h-3.5 w-3.5"
                     />
-                    {copiedItemIndex === index ? "已复制" : "JSON"}
+                    {copiedItemIndex === index
+                      ? t("batch.results.copied")
+                      : t("batch.results.json")}
                   </Button>
                 </div>
                 {/* Content */}
@@ -323,7 +339,9 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
                           }
                           className="mr-1 h-4 w-4"
                         />
-                        {fullContentItems.has(index) ? "收起" : "展开全部"}
+                        {fullContentItems.has(index)
+                          ? t("batch.results.collapse")
+                          : t("batch.results.expandAll")}
                       </Button>
                     )}
                   </div>
@@ -347,7 +365,9 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
           icon={copied ? "mdi:check" : "mdi:content-copy"}
           className="mr-1 h-4 w-4"
         />
-        {copied ? "已复制" : `复制选中 (${selectedStats.count})`}
+        {copied
+          ? t("batch.results.copied")
+          : t("batch.results.copySelected", { count: selectedStats.count })}
       </Button>
 
       {/* 导出按钮 */}
@@ -359,7 +379,7 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
           onClick={handleExportMarkdown}
           disabled={isExporting || selectedStats.count === 0}>
           <Icon icon="mdi:file-document-outline" className="mr-1 h-4 w-4" />
-          导出 MD
+          {t("batch.results.exportMd")}
         </Button>
         <Button
           variant="success"
@@ -368,7 +388,7 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
           onClick={handleExportZip}
           disabled={isExporting || selectedStats.count === 0}>
           <Icon icon="mdi:folder-zip-outline" className="mr-1 h-4 w-4" />
-          导出 ZIP
+          {t("batch.results.exportZip")}
         </Button>
       </div>
 
@@ -378,7 +398,7 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
       {/* 重新开始 */}
       <Button variant="outline" size="md" fullWidth onClick={onReset}>
         <Icon icon="mdi:refresh" className="mr-1 h-4 w-4" />
-        重新开始
+        {t("batch.results.reset")}
       </Button>
     </div>
   )

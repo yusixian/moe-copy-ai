@@ -5,6 +5,7 @@ import { memo, useMemo, useState } from "react"
 
 import type { ContentOutputFormat, ExtractedContent } from "~constants/types"
 import { cn } from "~utils"
+import { getIntlLocale, useI18n } from "~utils/i18n"
 
 import ContentDisplay from "../ContentDisplay"
 
@@ -13,20 +14,38 @@ interface ContentFormatTabsProps {
   defaultFormat?: ContentOutputFormat
 }
 
-const formatTabs: { id: ContentOutputFormat; label: string; icon: string }[] = [
-  { id: "html", label: "HTML", icon: "mdi:language-html5" },
-  { id: "markdown", label: "Markdown", icon: "mdi:language-markdown" },
-  { id: "text", label: "纯文本", icon: "mdi:text" }
-]
-
 const ContentFormatTabs = memo(function ContentFormatTabs({
   content,
   defaultFormat = "markdown"
 }: ContentFormatTabsProps) {
+  const { t, locale } = useI18n()
+  const intlLocale = getIntlLocale(locale)
   const [activeFormat, setActiveFormat] =
     useState<ContentOutputFormat>(defaultFormat)
   const [isPreviewMode, setIsPreviewMode] = useState(true)
   const { copy, copied } = useClipboard({ timeout: 2000 })
+
+  // 格式选项
+  const formatTabs = useMemo(
+    () => [
+      {
+        id: "html" as ContentOutputFormat,
+        label: t("extraction.format.html"),
+        icon: "mdi:language-html5"
+      },
+      {
+        id: "markdown" as ContentOutputFormat,
+        label: t("extraction.format.markdown"),
+        icon: "mdi:language-markdown"
+      },
+      {
+        id: "text" as ContentOutputFormat,
+        label: t("extraction.format.text"),
+        icon: "mdi:text"
+      }
+    ],
+    [t]
+  )
 
   // 获取当前格式的内容
   const currentContent = useMemo(() => {
@@ -82,7 +101,9 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
               icon={isPreviewMode ? "mdi:code-tags" : "mdi:eye"}
               width={14}
             />
-            {isPreviewMode ? "源码" : "预览"}
+            {isPreviewMode
+              ? t("extraction.format.source")
+              : t("extraction.format.preview")}
           </button>
         )}
       </div>
@@ -109,8 +130,11 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
       {/* 底部操作栏 */}
       <div className="flex items-center justify-between">
         <div className="text-gray-400 text-xs">
-          {stats.chars.toLocaleString()} 字符 · {stats.words.toLocaleString()}{" "}
-          词 · {stats.tokens.toLocaleString()} tokens
+          {stats.chars.toLocaleString(intlLocale)} {t("extraction.stats.chars")}{" "}
+          · {stats.words.toLocaleString(intlLocale)}{" "}
+          {t("extraction.stats.words")} ·{" "}
+          {stats.tokens.toLocaleString(intlLocale)}{" "}
+          {t("extraction.stats.tokens")}
         </div>
         <button
           type="button"
@@ -122,7 +146,7 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
               : "bg-sky-100 text-sky-700 hover:bg-sky-200"
           )}>
           <Icon icon={copied ? "mdi:check" : "mdi:content-copy"} width={14} />
-          {copied ? "已复制" : "复制"}
+          {copied ? t("extraction.copy.copied") : t("extraction.copy.copy")}
         </button>
       </div>
     </div>

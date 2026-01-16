@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react"
 import { useCallback, useMemo, useState } from "react"
 
 import type { ScrapedContent } from "~constants/types"
+import { useI18n } from "~utils/i18n"
 import { hasAnyPlaceholder, processTemplate } from "~utils/template"
 
 import TokenizationDisplay from "../TokenizationDisplay"
@@ -27,6 +28,7 @@ const PromptInput = ({
   scrapedData?: ScrapedContent
   onSaveAsDefault?: (prompt: string) => void
 }) => {
+  const { t } = useI18n()
   const [showPlaceholders, setShowPlaceholders] = useState(true)
   const [showPreview, setShowPreview] = useState(false)
 
@@ -65,16 +67,14 @@ const PromptInput = ({
             width="16"
             height="16"
           />
-          <span>
-            以下是系统默认提示词，您可以根据需要修改。自定义提示词将覆盖系统设置中的默认提示词。
-          </span>
+          <span>{t("ai.panel.prompt.help")}</span>
         </p>
       </div>
       <div className="relative">
         <textarea
           value={customPrompt}
           onChange={(e) => setCustomPrompt(e.target.value)}
-          placeholder="输入自定义提示词（可选），例如：'总结这篇文章的主要观点，列出3-5个要点'"
+          placeholder={t("ai.panel.prompt.placeholder")}
           className="w-full rounded-xl border border-sky-200 bg-white p-3 text-sm shadow-sm transition-all hover:border-sky-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
           rows={4}
         />
@@ -96,7 +96,9 @@ const PromptInput = ({
                   width="18"
                   height="18"
                 />
-                {showPlaceholders ? "隐藏占位符" : "查看占位符"}
+                {showPlaceholders
+                  ? t("ai.panel.placeholders.hide")
+                  : t("ai.panel.placeholders.show")}
               </button>
             </div>
           )}
@@ -112,7 +114,7 @@ const PromptInput = ({
                   width="18"
                   height="18"
                 />
-                保存为默认
+                {t("scrape.prompt.saveDefault")}
               </button>
             )}
             {customPrompt !== systemPrompt && systemPrompt && (
@@ -126,7 +128,7 @@ const PromptInput = ({
                   width="18"
                   height="18"
                 />
-                还原默认
+                {t("scrape.prompt.resetDefault")}
               </button>
             )}
             {hasPlaceholders && scrapedData && (
@@ -140,7 +142,9 @@ const PromptInput = ({
                   width="18"
                   height="18"
                 />
-                {showPreview ? "隐藏预览" : "预览模板"}
+                {showPreview
+                  ? t("scrape.prompt.hidePreview")
+                  : t("scrape.prompt.showPreview")}
               </button>
             )}
           </div>
@@ -151,7 +155,7 @@ const PromptInput = ({
           supportedPlaceholders.length > 0 && (
             <div className="mt-1 rounded-md border border-sky-100 bg-sky-50 p-2">
               <p className="mb-1 text-sky-700 text-xs">
-                点击以下占位符插入到提示词中：
+                {t("scrape.prompt.placeholderHelp")}
               </p>
               <div className="flex flex-wrap gap-2">
                 {supportedPlaceholders.map((info) => (
@@ -177,7 +181,7 @@ const PromptInput = ({
                 width="16"
                 height="16"
               />
-              占位符替换后的预览：
+              {t("scrape.prompt.previewTitle")}
             </p>
             <div className="max-h-40 overflow-y-auto rounded-md bg-white p-2 text-slate-700 text-xs">
               {getPreviewContent()}

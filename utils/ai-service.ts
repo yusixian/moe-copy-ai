@@ -2,6 +2,13 @@ import { streamText } from "@xsai/stream-text"
 
 import type { AiChatHistory, AiChatHistoryItem } from "~constants/types"
 import { generateUUID } from "~utils"
+import {
+  DEFAULT_LOCALE,
+  getDefaultSystemPrompt,
+  LOCALE_STORAGE_KEY,
+  type Locale,
+  SUPPORTED_LOCALES
+} from "~utils/i18n"
 
 import { debugLog } from "./logger"
 import { localStorage, syncStorage } from "./storage"
@@ -13,9 +20,13 @@ export async function getAiConfig() {
     const baseURL =
       (await syncStorage.get<string>("ai_base_url")) ||
       "https://api.openai.com/v1/"
+    const savedLocale = await syncStorage.get<Locale>(LOCALE_STORAGE_KEY)
+    const locale = SUPPORTED_LOCALES.includes(savedLocale as Locale)
+      ? (savedLocale as Locale)
+      : DEFAULT_LOCALE
     const systemPrompt =
       (await syncStorage.get<string>("ai_system_prompt")) ||
-      "摘要任务：提取核心观点并总结要点\n链接：{{url}}\n标题：{{title}}\n内容：{{cleanedContent}}"
+      getDefaultSystemPrompt(locale)
     const model = (await syncStorage.get<string>("ai_model")) || ""
 
     return {

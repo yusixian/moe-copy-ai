@@ -3,6 +3,7 @@ import MarkdownIt from "markdown-it"
 import { useEffect, useMemo, useRef } from "react"
 
 import { Button } from "~/components/ui/button"
+import { useI18n } from "~utils/i18n"
 
 interface ContentDisplayProps {
   content: string
@@ -24,6 +25,7 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
   isFullscreen = false,
   onContentChange
 }) => {
+  const { t } = useI18n()
   // 文本区域引用
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -94,10 +96,10 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
               </div>
               <div>
                 <h2 className="font-semibold text-gray-900 text-lg">
-                  Markdown 预览
+                  {t("content.fullscreen.title")}
                 </h2>
                 <p className="text-gray-500 text-xs">
-                  按 ESC 或点击关闭按钮退出
+                  {t("content.fullscreen.help")}
                 </p>
               </div>
             </div>
@@ -111,7 +113,7 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
                 document.dispatchEvent(event)
               }}>
               <Icon icon="mdi:close" className="mr-1.5 h-4 w-4" />
-              关闭
+              {t("common.close")}
             </Button>
           </div>
           {/* 全屏内容区域 */}
@@ -140,7 +142,7 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
         value={content}
         onChange={handleContentChange}
         className="min-h-[300px] w-full resize-y rounded bg-transparent p-1 font-normal text-sm focus:outline-none focus:ring-1 focus:ring-sky-300"
-        placeholder="在此输入或粘贴内容..."
+        placeholder={t("content.placeholder")}
       />
     )
   }

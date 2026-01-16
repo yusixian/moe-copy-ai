@@ -17,6 +17,7 @@ import { useEffect, useState } from "react"
 import FloatingButton from "~components/FloatingButton"
 import PopupContent from "~components/PopupContent"
 import { useFloatButtonStorage } from "~hooks/useFloatButtonStorage"
+import { I18nProvider, useI18n } from "~utils/i18n"
 
 // 注入全局样式
 export const getStyle = () => {
@@ -33,6 +34,7 @@ export const config: PlasmoCSConfig = {
 
 // 主组件
 const FloatingPopup = () => {
+  const { t } = useI18n()
   const [isOpen, setIsOpen] = useState(false)
 
   // 使用 useSyncExternalStore 订阅外部存储状态
@@ -128,7 +130,7 @@ const FloatingPopup = () => {
             type="button"
             className="fixed inset-0 z-[998] border-none bg-black/50 backdrop-blur"
             onClick={handleClose} // 点击遮罩层关闭弹窗
-            aria-label="关闭弹窗"
+            aria-label={t("aria.closePopup")}
           />
           {/* 弹窗内容 */}
           <FloatingFocusManager context={context}>
@@ -148,4 +150,12 @@ const FloatingPopup = () => {
   )
 }
 
-export default FloatingPopup
+function FloatingPopupWithI18n() {
+  return (
+    <I18nProvider>
+      <FloatingPopup />
+    </I18nProvider>
+  )
+}
+
+export default FloatingPopupWithI18n

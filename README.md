@@ -1,4 +1,6 @@
-# MoeCopy AI
+# Moe Copy AI
+
+简体中文 | [English](./README.en.md)
 
 [![](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/logo.webp?raw=true)](https://chromewebstore.google.com/detail/moe-copy-ai/dfmlcfckmfgabpgbaobgapdfmjiihnck)
 
@@ -8,7 +10,7 @@
 
 ## 简介
 
-MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩展，能够智能识别并提取网页中的结构化数据，为 AI 模型提供高质量输入。
+Moe Copy AI 是一个基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩展，能够智能识别并提取网页中的结构化数据，为 AI 模型提供高质量输入。
 
 > 需求很简单，是我想在手机端 kiwi 浏览器访问的时候能够直接复制全文、标题、作者和网页元信息等，排除干扰，然后进行摘要，就类似 [llms.txt](https://llmstxt.org/) 那样。这个项目也算是跟 AI 结合的一个尝试，对代码质量没有很高要求，优先满足需求。
 
@@ -117,6 +119,7 @@ MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩
 - [x] 批量抓取多个链接
 - [x] 内容提取（多格式输出）
 - [x] ZIP 打包导出
+- [x] i18n 国际化
 - [ ] 完善工程化 & CI（一开始只是想让 ai 野蛮发展）
 - [ ] 简单文档站
 - [ ] 增加图片的 AI OCR 功能

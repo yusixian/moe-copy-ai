@@ -1,3 +1,5 @@
+import { useI18n } from "~utils/i18n"
+
 import CopyableTextField from "./CopyableTextField"
 import { Image } from "./ui/image"
 
@@ -14,6 +16,7 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
   metadata,
   onLoadError
 }) => {
+  const { t } = useI18n()
   // 重要的元数据字段
   const importantKeys = [
     "description",
@@ -42,10 +45,10 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
         <thead className="bg-gradient-to-r from-blue-100 to-indigo-100">
           <tr>
             <th className="w-1/5 px-3 py-2 text-left font-medium text-sky-600 text-xs uppercase tracking-wider">
-              属性
+              {t("metadata.property")}
             </th>
             <th className="w-4/5 px-3 py-2 text-left font-medium text-sky-600 text-xs uppercase tracking-wider">
-              值
+              {t("metadata.value")}
             </th>
           </tr>
         </thead>
@@ -73,7 +76,7 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
                       <div className="relative h-[80px] w-[120px] transform overflow-hidden rounded-lg border-2 border-sky-200 bg-white shadow-sm transition-all hover:scale-105">
                         <Image
                           src={value}
-                          alt={`${key} 预览`}
+                          alt={`${key} ${t("metadata.preview")}`}
                           variant="rounded"
                           size="full"
                           containerClassName="size-full"
@@ -88,7 +91,7 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
         </tbody>
       </table>
       <div className="border-blue-100 border-t bg-blue-50 p-1 text-center text-sky-400 text-xs">
-        元数据可以帮助 AI 更好地理解页面内容
+        {t("metadata.help")}
       </div>
     </div>
   )

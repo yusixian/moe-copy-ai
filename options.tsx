@@ -2,6 +2,7 @@ import { ToastContainer } from "react-toastify"
 
 import "./styles/global.css"
 
+import { I18nProvider } from "~utils/i18n"
 import AiSettingsSection from "./components/option/AiSettingsSection"
 import DevSettingsSection from "./components/option/DevSettingsSection"
 import ExtractionModeSection from "./components/option/ExtractionModeSection"
@@ -13,19 +14,21 @@ import SelectorSettingsSection from "./components/option/SelectorSettingsSection
 
 function OptionsPage() {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-8">
-      <div className="mx-auto max-w-2xl">
-        <OptionHeader />
-        <ExtractionModeSection />
-        <LogSettingsSection />
-        <InterfaceSettingsSection />
-        <SelectorSettingsSection />
-        <AiSettingsSection />
-        <DevSettingsSection />
-        <Footer />
+    <I18nProvider>
+      <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-8">
+        <div className="mx-auto max-w-2xl">
+          <OptionHeader />
+          <ExtractionModeSection />
+          <LogSettingsSection />
+          <InterfaceSettingsSection />
+          <SelectorSettingsSection />
+          <AiSettingsSection />
+          <DevSettingsSection />
+          <Footer />
+        </div>
+        <ToastContainer />
       </div>
-      <ToastContainer />
-    </div>
+    </I18nProvider>
   )
 }
 
