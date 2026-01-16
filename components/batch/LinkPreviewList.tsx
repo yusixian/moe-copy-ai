@@ -12,6 +12,7 @@ import { useLinkFilter } from "~hooks/useLinkFilter"
 import { useSelectionSet } from "~hooks/useSelectionSet"
 import { cn } from "~utils"
 import { downloadTextFile } from "~utils/download"
+import { useI18n } from "~utils/i18n"
 import { exportLinksToJson, exportLinksToMarkdown } from "~utils/link-exporter"
 
 import LinkFilterBar from "./LinkFilterBar"
@@ -50,6 +51,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
   onSelectNextPage,
   onClearNextPage
 }: LinkPreviewListProps) {
+  const { t } = useI18n()
   const [isExporting, setIsExporting] = useState(false)
 
   // 编辑状态
@@ -135,7 +137,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
       const date = new Date().toISOString().split("T")[0]
       downloadTextFile(content, `links-${date}.md`, "text/markdown")
     } catch (error) {
-      console.error("导出 Markdown 失败:", error)
+      console.error(t("batch.preview.export.markdownError"), error)
     } finally {
       setIsExporting(false)
     }
@@ -149,7 +151,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
       const date = new Date().toISOString().split("T")[0]
       downloadTextFile(content, `links-${date}.json`, "application/json")
     } catch (error) {
-      console.error("导出 JSON 失败:", error)
+      console.error(t("batch.preview.export.jsonError"), error)
     } finally {
       setIsExporting(false)
     }
@@ -175,7 +177,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
           </div>
           <Button variant="ghost" size="xs" onClick={onReselect}>
             <Icon icon="mdi:refresh" className="mr-1 h-3.5 w-3.5" />
-            重新选择
+            {t("batch.preview.reselect")}
           </Button>
         </div>
       )}
@@ -208,23 +210,25 @@ const LinkPreviewList = memo(function LinkPreviewList({
               onChange={toggleAll}
               className="h-4 w-4 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500"
             />
-            <span className="text-gray-500 text-xs">全选</span>
+            <span className="text-gray-500 text-xs">
+              {t("batch.preview.selectAll")}
+            </span>
           </label>
           <span className="text-gray-300">|</span>
           <span className="text-gray-600 text-sm">
-            已选{" "}
+            {t("batch.preview.selected")}{" "}
             <span className="font-bold text-emerald-500">{selectedCount}</span>/
             {filteredLinks.length}
             {filteredLinks.length !== links.length && (
               <span className="ml-1 text-gray-400 text-xs">
-                (共{links.length})
+                {t("batch.preview.total", { total: links.length })}
               </span>
             )}
           </span>
         </div>
         {links.length > 0 && (
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-gray-400">导出</span>
+            <span className="text-gray-400">{t("batch.preview.export")}</span>
             <Button
               variant="ghost"
               size="xs"
@@ -277,7 +281,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
                   onChange={(e) =>
                     setEditForm((f) => ({ ...f, text: e.target.value }))
                   }
-                  placeholder="链接标题"
+                  placeholder={t("batch.preview.linkTitle")}
                   className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
                 <input
@@ -286,16 +290,16 @@ const LinkPreviewList = memo(function LinkPreviewList({
                   onChange={(e) =>
                     setEditForm((f) => ({ ...f, url: e.target.value }))
                   }
-                  placeholder="链接 URL"
+                  placeholder={t("batch.preview.linkUrl")}
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
                 <div className="flex gap-2">
                   <Button variant="success" size="xs" onClick={saveEdit}>
                     <Icon icon="mdi:check" className="mr-1 h-3 w-3" />
-                    保存
+                    {t("batch.preview.save")}
                   </Button>
                   <Button variant="secondary" size="xs" onClick={cancelEdit}>
-                    取消
+                    {t("batch.preview.cancel")}
                   </Button>
                 </div>
               </div>
@@ -304,7 +308,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
               <>
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-medium text-gray-800 text-sm">
-                    {link.text || "无标题"}
+                    {link.text || t("batch.preview.noTitle")}
                   </div>
                   <div className="truncate text-gray-400 text-xs">
                     {link.url}
@@ -316,7 +320,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
                     size="icon"
                     className="h-7 w-7"
                     onClick={() => startEdit(link)}
-                    title="编辑">
+                    title={t("batch.preview.edit")}>
                     <Icon icon="mdi:pencil" className="h-4 w-4" />
                   </Button>
                   <Button
@@ -324,7 +328,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
                     size="icon"
                     className="h-7 w-7 text-red-500 hover:bg-red-50 hover:text-red-600"
                     onClick={() => onRemoveLink(link.index)}
-                    title="删除">
+                    title={t("batch.preview.delete")}>
                     <Icon icon="mdi:close" className="h-4 w-4" />
                   </Button>
                 </div>
@@ -337,12 +341,14 @@ const LinkPreviewList = memo(function LinkPreviewList({
       {/* 添加链接 */}
       {isAdding ? (
         <div className="space-y-2 rounded-lg border border-sky-200 bg-sky-50 p-3">
-          <div className="font-medium text-gray-600 text-xs">添加新链接</div>
+          <div className="font-medium text-gray-600 text-xs">
+            {t("batch.preview.addNew")}
+          </div>
           <input
             type="text"
             value={addForm.url}
             onChange={(e) => setAddForm((f) => ({ ...f, url: e.target.value }))}
-            placeholder="链接 URL"
+            placeholder={t("batch.preview.linkUrl")}
             className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
           <input
@@ -351,7 +357,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
             onChange={(e) =>
               setAddForm((f) => ({ ...f, text: e.target.value }))
             }
-            placeholder="链接标题（可选）"
+            placeholder={t("batch.preview.linkTitleOptional")}
             className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
           <div className="flex gap-2">
@@ -361,10 +367,10 @@ const LinkPreviewList = memo(function LinkPreviewList({
               onClick={handleAddLink}
               disabled={!addForm.url.trim()}>
               <Icon icon="mdi:plus" className="mr-1 h-4 w-4" />
-              添加
+              {t("batch.preview.add")}
             </Button>
             <Button variant="secondary" size="sm" onClick={cancelAdd}>
-              取消
+              {t("batch.preview.cancel")}
             </Button>
           </div>
         </div>
@@ -376,7 +382,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
           className="border-dashed"
           onClick={() => setIsAdding(true)}>
           <Icon icon="mdi:plus" className="mr-1 h-4 w-4" />
-          添加链接
+          {t("batch.preview.addLink")}
         </Button>
       )}
 
@@ -389,7 +395,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
               className="h-4 w-4 text-indigo-500"
             />
             <span className="font-medium text-gray-700 text-sm">
-              自动翻页（可选）
+              {t("batch.preview.pagination.title")}
             </span>
           </div>
           {nextPageButton && (
@@ -398,7 +404,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
               size="xs"
               className="text-gray-400 hover:text-red-500"
               onClick={onClearNextPage}>
-              清除
+              {t("batch.preview.pagination.clear")}
             </Button>
           )}
         </div>
@@ -409,7 +415,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
               className="h-4 w-4 animate-spin text-indigo-500"
             />
             <span className="text-indigo-700 text-sm">
-              请在页面上点击"下一页"按钮...
+              {t("batch.preview.pagination.selecting")}
             </span>
           </div>
         ) : nextPageButton ? (
@@ -429,7 +435,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
               </div>
             </div>
             <Button variant="ghost" size="xs" onClick={onSelectNextPage}>
-              重新选择
+              {t("batch.preview.pagination.reselect")}
             </Button>
           </div>
         ) : (
@@ -440,18 +446,18 @@ const LinkPreviewList = memo(function LinkPreviewList({
             className="border-dashed"
             onClick={onSelectNextPage}>
             <Icon icon="mdi:cursor-default-click" className="mr-1 h-4 w-4" />
-            选择"下一页"按钮
+            {t("batch.preview.pagination.select")}
           </Button>
         )}
         <p className="mt-2 text-gray-400 text-xs">
-          选择后，抓取完当前页会自动点击下一页继续抓取
+          {t("batch.preview.pagination.hint")}
         </p>
       </div>
 
       {/* 操作按钮 */}
       <div className="flex gap-3">
         <Button variant="outline" size="lg" fullWidth onClick={onCancel}>
-          取消
+          {t("batch.preview.cancel")}
         </Button>
         <Button
           variant="success"
@@ -473,7 +479,10 @@ const LinkPreviewList = memo(function LinkPreviewList({
           }
           disabled={selectedCount === 0}>
           <Icon icon="mdi:play" className="mr-1 h-4 w-4" />
-          开始抓取 ({selectedCount}/{filteredLinks.length})
+          {t("batch.preview.startScrape", {
+            selected: selectedCount,
+            total: filteredLinks.length
+          })}
         </Button>
       </div>
     </div>

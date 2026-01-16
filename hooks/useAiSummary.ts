@@ -12,6 +12,7 @@ import {
   generateSummary,
   getAiConfig
 } from "~utils/ai-service"
+import { useI18n } from "~utils/i18n"
 import { debugLog } from "~utils/logger"
 import { processTemplate } from "~utils/template"
 
@@ -64,6 +65,7 @@ export const useAiSummary = (
   onSummaryGenerated?: (summary: string) => void,
   scrapedData?: ScrapedContent
 ): UseAiSummaryResult => {
+  const { t } = useI18n()
   const [isLoading, setIsLoading] = useState(false)
   const [customPrompt, setCustomPrompt] = useState("")
   const [result, setResult] = useState<StreamTextResult | null>(null)
@@ -89,16 +91,19 @@ export const useAiSummary = (
   }, [customPrompt])
 
   // 保存系统默认提示词
-  const saveAsDefaultPrompt = useCallback(async (prompt: string) => {
-    try {
-      await storage.set("ai_system_prompt", prompt)
-      setSystemPrompt(prompt)
-      toast.success("成功保存为系统默认提示词 (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
-    } catch (error) {
-      toast.error("保存默认提示词失败 (╥﹏╥)")
-      console.error("保存默认提示词出错:", error)
-    }
-  }, [])
+  const saveAsDefaultPrompt = useCallback(
+    async (prompt: string) => {
+      try {
+        await storage.set("ai_system_prompt", prompt)
+        setSystemPrompt(prompt)
+        toast.success(t("toast.ai.defaultPromptSaved"))
+      } catch (error) {
+        toast.error(t("toast.ai.defaultPromptSaveFailed"))
+        console.error("保存默认提示词出错:", error)
+      }
+    },
+    [t]
+  )
 
   // 当自定义提示词为空时，获取系统提示词
   useLayoutEffect(() => {
@@ -197,22 +202,22 @@ export const useAiSummary = (
   // 处理摘要生成
   const generateSummaryText = useCallback(async () => {
     if (!content.trim()) {
-      setError("内容为空，无法生成摘要")
-      toast.warning("内容为空，无法生成摘要")
+      setError(t("error.emptyContentForSummary"))
+      toast.warning(t("error.emptyContentForSummary"))
       return
     }
 
     if (!apiKey) {
-      setError("请先在扩展设置中配置AI提供商信息")
-      toast.error("请先在扩展设置中配置AI提供商信息")
+      setError(t("error.aiConfigMissing"))
+      toast.error(t("error.aiConfigMissing"))
       return
     }
 
     // 预先获取配置并验证模型
     const config = await getAiConfig()
     if (!config.model) {
-      setError("请先在设置中选择 AI 模型")
-      toast.error("请先在设置中选择 AI 模型")
+      setError(t("error.aiModelNotSelected"))
+      toast.error(t("error.aiModelNotSelected"))
       return
     }
 
@@ -446,7 +451,8 @@ export const useAiSummary = (
     onSummaryGenerated,
     scrapedData,
     usage,
-    saveToHistory
+    saveToHistory,
+    t
   ])
 
   return {

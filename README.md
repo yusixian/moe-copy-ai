@@ -1,4 +1,6 @@
-# MoeCopy AI
+# Moe Copy AI
+
+简体中文 | [English](./README.en.md)
 
 [![](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/logo.webp?raw=true)](https://chromewebstore.google.com/detail/moe-copy-ai/dfmlcfckmfgabpgbaobgapdfmjiihnck)
 
@@ -8,13 +10,13 @@
 
 ## 简介
 
-MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩展，能够智能识别并提取网页中的结构化数据，为 AI 模型提供高质量输入。
+Moe Copy AI 是一个基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩展，能够智能识别并提取网页中的结构化数据，为 AI 模型提供高质量输入。
 
 > 需求很简单，是我想在手机端 kiwi 浏览器访问的时候能够直接复制全文、标题、作者和网页元信息等，排除干扰，然后进行摘要，就类似 [llms.txt](https://llmstxt.org/) 那样。这个项目也算是跟 AI 结合的一个尝试，对代码质量没有很高要求，优先满足需求。
 
 本插件还处于早期开发阶段～欢迎 Star 关注一下。
 
-这个项目也算是跟 AI 结合的一个尝试，所以对代码质量没有很高要求，优先满足需求。并且因为是插件，想尽可能减少包体积（安利 [xsAI](https://github.com/moeru-ai/xsai) 真的超级轻量）和注入网页对原网页的破坏，样式上不做大要求，纯工具性质 side project～
+这个项目也算是跟 AI 结合的一个尝试，所以对代码质量没有很高要求，优先满足需求。并且因为是插件，想尽可能减少包体积（安利 [xsAI](https://github.com/moeru-ai/xsai) 真的超级轻量）和注入网页对原网页的破坏，样式上不做大要求，纯工具性质 side project ～
 
 ## 安装
 
@@ -41,9 +43,9 @@ MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩
   - **混合模式**: 同时使用两种方式，自动选择最佳结果（推荐）
 - **双版本输出**:
   - 原始格式版: 保留 Markdown 格式和原始换行，适合需要保留格式的场景
-  - 紧凑版: 清理多余空格和换行，使文本更加精简，优化AI模型输入
+  - 紧凑版: 清理多余空格和换行，使文本更加精简，优化 AI 模型输入
 - **智能清理**: 自动去除干扰元素、多余空白和无意义内容
-- **字数与Token统计**: 显示内容实际字数和估算的 AI 模型 token 数量，分词展示（使用 [gpt-tokenizer](https://github.com/niieani/gpt-tokenizer)）
+- **字数与 Token 统计**: 显示内容实际字数和估算的 AI 模型 token 数量，分词展示（使用 [gpt-tokenizer](https://github.com/niieani/gpt-tokenizer)）
 - **移动端适配**: 响应式设计，支持移动设备使用
 - **智能图片提取**: 从文章中提取出所有图片及其元信息
 - **页面元数据**: 自动提取 og:title、og:description 等元标签信息，以表格形式展示
@@ -66,6 +68,15 @@ MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩
   - 三种抓取策略：Fetch API / 后台标签页 / 当前标签页
   - ZIP 打包导出所有抓取结果
 - **内容提取**: 选择页面元素，提取内容为 HTML / Markdown / 纯文本
+
+### 国际化支持 🌍
+
+- **多语言界面**: 完整支持简体中文和英语
+  - 自动检测浏览器语言，首次使用时自动设置
+  - 支持手动切换语言（设置页面）
+  - 语言偏好通过 Chrome sync storage 跨设备同步
+- **本地化内容**: 所有用户界面、错误信息、AI 提示词均已本地化（452 个翻译键）
+- **欢迎贡献翻译**: 查看 [贡献指南](./CONTRIBUTING.md#-翻译贡献) 了解如何改进翻译或添加新语言
 
 ### **配置选项**
 
@@ -101,7 +112,7 @@ MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩
 
 ## 📋 开发计划
 
-- [x] 实现基础UI框架与插件架构
+- [x] 实现基础 UI 框架与插件架构
 - [x] 开发核心网页内容提取功能
 - [x] 添加基本文本格式化与预览功能
 - [x] 网页元数据抓取
@@ -117,6 +128,7 @@ MoeCopy AI 是一款基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器扩
 - [x] 批量抓取多个链接
 - [x] 内容提取（多格式输出）
 - [x] ZIP 打包导出
+- [x] i18n 国际化
 - [ ] 完善工程化 & CI（一开始只是想让 ai 野蛮发展）
 - [ ] 简单文档站
 - [ ] 增加图片的 AI OCR 功能
@@ -139,7 +151,7 @@ pnpm dev
 npm run dev
 ```
 
-打开浏览器并加载相应的开发构建。例如，对于Chrome浏览器(manifest v3)，使用: `build/chrome-mv3-dev`。
+打开浏览器并加载相应的开发构建。例如，对于 Chrome 浏览器(manifest v3)，使用: `build/chrome-mv3-dev`。
 
 ### 构建生产版本
 
@@ -153,7 +165,17 @@ npm run build
 
 ## 🤝 贡献
 
-欢迎各种形式的贡献，包括新功能、Bug修复和文档改进！
+欢迎各种形式的贡献，包括新功能、Bug 修复、文档改进和翻译贡献！
+
+### 翻译贡献
+
+我们欢迎改进现有翻译或添加新语言支持：
+
+- 📝 **反馈翻译问题**: 在 [GitHub Issues](https://github.com/yusixian/moe-copy-ai/issues) 创建 issue，使用 "translation" 标签
+- 🌐 **提交翻译 PR**: 查看 [贡献指南](./CONTRIBUTING.md#-翻译贡献) 了解详细步骤
+- ✨ **添加新语言**: 查看 [i18n 开发者指南](./docs/developer-guide/i18n-guide.mdx) 了解如何添加新语言
+
+### 代码贡献
 
 1. Fork 项目
 2. 从 dev 分支创建特性分支 (`git checkout -b feat/amazing-feature`)
@@ -161,9 +183,15 @@ npm run build
 4. 推送到分支 (`git push origin feat/amazing-feature`)
 5. 创建 Pull Request 给 dev 分支
 
+详细贡献指南请查看 [CONTRIBUTING.md](./CONTRIBUTING.md)
+
 ## 致谢
 
-- Logo 及样式灵感来源 [xsai](https://github.com/moeru-ai/xsai) （对 萌A 拙劣的模仿～）
+- Logo 及样式灵感来源 [xsai](https://github.com/moeru-ai/xsai) （对 萌 A 拙劣的模仿～）
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=yusixian/moe-copy-ai&type=date&legend=top-left)](https://www.star-history.com/#yusixian/moe-copy-ai&type=date&legend=top-left)
 
 ## License
 

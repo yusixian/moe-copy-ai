@@ -6,6 +6,7 @@ import type {
   ExtractedContent,
   SelectedElementInfo
 } from "~constants/types"
+import { useI18n } from "~utils/i18n"
 
 import ContentFormatTabs from "./ContentFormatTabs"
 import ExtractionAiSummary from "./ExtractionAiSummary"
@@ -31,6 +32,8 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
   onCancel,
   onReset
 }: ContentExtractionPanelProps) {
+  const { t } = useI18n()
+
   // 根据模式渲染不同内容
   const renderContent = () => {
     switch (mode) {
@@ -45,12 +48,12 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
             </div>
             <div className="text-center">
               <h3 className="mb-1 font-semibold text-base text-gray-800">
-                内容提取
+                {t("extraction.idle.title")}
               </h3>
               <p className="text-gray-500 text-sm">
-                选择页面元素，提取其内容为
+                {t("extraction.idle.subtitle")}
                 <br />
-                HTML / Markdown / 纯文本
+                {t("extraction.idle.formats")}
               </p>
             </div>
             <button
@@ -58,7 +61,7 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
               onClick={onStartSelection}
               className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-2.5 font-medium text-sm text-white shadow-md transition-all hover:from-amber-600 hover:to-orange-600 hover:shadow-lg">
               <Icon icon="mdi:cursor-default-click" className="h-5 w-5" />
-              选择页面元素
+              {t("extraction.idle.selectElement")}
             </button>
           </div>
         )
@@ -74,10 +77,10 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
             </div>
             <div className="text-center">
               <h3 className="mb-1 font-semibold text-base text-gray-800">
-                正在选择元素...
+                {t("extraction.selecting.title")}
               </h3>
               <p className="text-gray-500 text-sm">
-                请在页面上点击要提取内容的区域
+                {t("extraction.selecting.subtitle")}
               </p>
             </div>
             <button
@@ -85,7 +88,7 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
               onClick={onCancel}
               className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
               <Icon icon="mdi:close" className="h-4 w-4" />
-              取消
+              {t("extraction.selecting.cancel")}
             </button>
           </div>
         )
@@ -134,7 +137,7 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
               onClick={onReset}
               className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-50">
               <Icon icon="mdi:refresh" className="h-4 w-4" />
-              重新选择
+              {t("extraction.extracted.reselect")}
             </button>
           </div>
         )
@@ -147,16 +150,18 @@ const ContentExtractionPanel = memo(function ContentExtractionPanel({
             </div>
             <div className="text-center">
               <h3 className="mb-1 font-semibold text-base text-gray-800">
-                提取失败
+                {t("extraction.error.title")}
               </h3>
-              <p className="text-red-500 text-sm">{error || "未知错误"}</p>
+              <p className="text-red-500 text-sm">
+                {error || t("extraction.error.unknown")}
+              </p>
             </div>
             <button
               type="button"
               onClick={onReset}
               className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-700 text-sm transition-colors hover:bg-gray-200">
               <Icon icon="mdi:refresh" className="h-4 w-4" />
-              重试
+              {t("extraction.error.retry")}
             </button>
           </div>
         )

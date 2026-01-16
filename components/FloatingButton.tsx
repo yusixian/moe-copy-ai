@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react"
 
 import { cn } from "~utils"
+import { useI18n } from "~utils/i18n"
 
 interface FloatingButtonProps {
   onClick: () => void
@@ -8,6 +9,8 @@ interface FloatingButtonProps {
 }
 
 const FloatingButton = ({ onClick, isOpen }: FloatingButtonProps) => {
+  const { t } = useI18n()
+
   return (
     <button
       type="button"
@@ -18,7 +21,11 @@ const FloatingButton = ({ onClick, isOpen }: FloatingButtonProps) => {
           : "border-sky-100 bg-white text-sky-400 hover:border-indigo-200 hover:bg-gradient-to-r hover:from-sky-50 hover:to-indigo-50 hover:text-sky-500"
       )}
       onClick={onClick}
-      title={isOpen ? "关闭萌抓" : "打开萌抓"}>
+      title={
+        isOpen
+          ? t("popup.floatButton.closeTooltip")
+          : t("popup.floatButton.openTooltip")
+      }>
       {isOpen ? (
         <Icon
           icon="line-md:close"
@@ -27,7 +34,9 @@ const FloatingButton = ({ onClick, isOpen }: FloatingButtonProps) => {
           className="rotate-45 text-opacity-80"
         />
       ) : (
-        <div className="flex flex-col items-center text-sm opacity-80">萌</div>
+        <div className="flex flex-col items-center text-sm opacity-80">
+          {t("popup.floatButton.logo")}
+        </div>
       )}
     </button>
   )

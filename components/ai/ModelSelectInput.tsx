@@ -1,5 +1,7 @@
 import { useMemo } from "react"
 
+import { useI18n } from "~utils/i18n"
+
 import { Combobox, type ComboboxOption } from "../ui/Combobox"
 
 interface ModelSelectInputProps {
@@ -15,10 +17,11 @@ export function ModelSelectInput({
   value,
   onChange,
   options,
-  placeholder = "请选择模型",
+  placeholder,
   compact = false,
   id
 }: ModelSelectInputProps) {
+  const { t } = useI18n()
   // 转换 options 格式
   const comboboxOptions: ComboboxOption[] = useMemo(
     () =>
@@ -35,11 +38,11 @@ export function ModelSelectInput({
       value={value}
       onChange={onChange}
       options={comboboxOptions}
-      placeholder={placeholder}
+      placeholder={placeholder || t("ai.model.select")}
       compact={compact}
       inputId={id}
       emptyText={
-        options.length === 0 ? "暂无可用模型，请先获取模型列表" : "无匹配模型"
+        options.length === 0 ? t("ai.model.empty") : t("ai.model.noMatch")
       }
     />
   )

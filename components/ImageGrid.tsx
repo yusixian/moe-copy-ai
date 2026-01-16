@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react"
 import { memo, useState } from "react"
 
 import type { ImageInfo } from "~constants/types"
+import { useI18n } from "~utils/i18n"
 
 import { openInNewTab, preventBubbling } from "../utils"
 import CopyableTextField from "./CopyableTextField"
@@ -20,15 +21,18 @@ import {
 } from "./ui/image-decorations"
 
 // 图片加载失败显示组件
-const ImageLoadError = () => (
-  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 p-2 text-center">
-    <span className="mt-2 text-red-400 text-xs">
-      <SadFaceDecoration />
-      <br />
-      图片加载失败
-    </span>
-  </div>
-)
+const ImageLoadError = () => {
+  const { t } = useI18n()
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 p-2 text-center">
+      <span className="mt-2 text-red-400 text-xs">
+        <SadFaceDecoration />
+        <br />
+        {t("image.loadError")}
+      </span>
+    </div>
+  )
+}
 
 // 单张图片卡片组件
 interface ImageCardProps {
@@ -50,61 +54,67 @@ const ImageCard = memo(
     onHover,
     onOpen,
     onError
-  }: ImageCardProps) => (
-    <Card
-      key={index}
-      variant="image"
-      padding="none"
-      className="overflow-hidden border border-sky-100/60 shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-sky-100/50"
-      onMouseEnter={() => onHover(index)}
-      onMouseLeave={() => onHover(null)}>
-      <div className="relative flex h-[140px] w-full items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 to-white">
-        <CornerDots variant="blue" />
-        <Image
-          src={img.src}
-          alt={img.alt || "萌萌哒图片"}
-          title={img.title || img.alt || ""}
-          variant="rounded"
-          size="full"
-          containerClassName={`transition-all duration-300 ${isHovered ? "scale-110" : ""}`}
-          onLoadError={() => onError(img.src)}
-        />
-        <DownloadButton
-          fileUrl={img.src}
-          fileName={`${img.alt}.jpg`}
-          className="absolute top-2 right-2 z-10"
-        />
-        {isFailed && <ImageLoadError />}
+  }: ImageCardProps) => {
+    const { t } = useI18n()
+    return (
+      <Card
+        key={index}
+        variant="image"
+        padding="none"
+        className="overflow-hidden border border-sky-100/60 shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-sky-100/50"
+        onMouseEnter={() => onHover(index)}
+        onMouseLeave={() => onHover(null)}>
+        <div className="relative flex h-[140px] w-full items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 to-white">
+          <CornerDots variant="blue" />
+          <Image
+            src={img.src}
+            alt={img.alt || t("image.noImages")}
+            title={img.title || img.alt || ""}
+            variant="rounded"
+            size="full"
+            containerClassName={`transition-all duration-300 ${isHovered ? "scale-110" : ""}`}
+            onLoadError={() => onError(img.src)}
+          />
+          <DownloadButton
+            fileUrl={img.src}
+            fileName={`${img.alt}.jpg`}
+            className="absolute top-2 right-2 z-10"
+          />
+          {isFailed && <ImageLoadError />}
 
-        {isHovered && (
-          <AnimatedContainer
-            animation="pulse"
-            className="absolute top-2.5 right-2.5">
-            <HeartDecoration />
-          </AnimatedContainer>
-        )}
-      </div>
-      <div className="truncate border-sky-100/50 border-t bg-gradient-to-r from-blue-50/80 to-sky-50/80 p-2 text-center font-medium text-sky-700 text-xs">
-        {img.alt || img.title || `图片 #${img.index}`}
-      </div>
-
-      <div className="border-sky-100/50 border-t bg-gradient-to-r from-blue-50/60 to-sky-50/60 px-3 py-2 transition-all duration-300">
-        <CopyableTextField text={img.src} isUrl={true} />
-        <div className="mt-2 flex justify-end">
-          <Button
-            onClick={preventBubbling(() => onOpen(img.src))}
-            variant="ghost"
-            size="sm"
-            className="text-sky-600 text-xs hover:bg-sky-50 hover:text-sky-700"
-            icon={
-              <Icon icon="line-md:external-link" className="mr-1 h-3.5 w-3.5" />
-            }>
-            查看原图
-          </Button>
+          {isHovered && (
+            <AnimatedContainer
+              animation="pulse"
+              className="absolute top-2.5 right-2.5">
+              <HeartDecoration />
+            </AnimatedContainer>
+          )}
         </div>
-      </div>
-    </Card>
-  )
+        <div className="truncate border-sky-100/50 border-t bg-gradient-to-r from-blue-50/80 to-sky-50/80 p-2 text-center font-medium text-sky-700 text-xs">
+          {img.alt || img.title || `${t("image.noImages")} #${img.index}`}
+        </div>
+
+        <div className="border-sky-100/50 border-t bg-gradient-to-r from-blue-50/60 to-sky-50/60 px-3 py-2 transition-all duration-300">
+          <CopyableTextField text={img.src} isUrl={true} />
+          <div className="mt-2 flex justify-end">
+            <Button
+              onClick={preventBubbling(() => onOpen(img.src))}
+              variant="ghost"
+              size="sm"
+              className="text-sky-600 text-xs hover:bg-sky-50 hover:text-sky-700"
+              icon={
+                <Icon
+                  icon="line-md:external-link"
+                  className="mr-1 h-3.5 w-3.5"
+                />
+              }>
+              {t("image.openOriginal")}
+            </Button>
+          </div>
+        </div>
+      </Card>
+    )
+  }
 )
 ImageCard.displayName = "ImageCard"
 
@@ -113,27 +123,30 @@ interface ImageGridFooterProps {
   count: number
 }
 
-const ImageGridFooter = ({ count }: ImageGridFooterProps) => (
-  <div className="mt-5 flex justify-center">
-    <Badge
-      variant="info"
-      size="lg"
-      className="relative bg-white/80 px-6 py-2 shadow-sm">
-      <CornerDots variant="mixed" />
+const ImageGridFooter = ({ count }: ImageGridFooterProps) => {
+  const { t } = useI18n()
+  return (
+    <div className="mt-5 flex justify-center">
+      <Badge
+        variant="info"
+        size="lg"
+        className="relative bg-white/80 px-6 py-2 shadow-sm">
+        <CornerDots variant="mixed" />
 
-      <Icon
-        icon="line-md:image-twotone"
-        className="mr-1.5 h-4 w-4 text-sky-500"
-      />
-      <span className="font-medium text-sky-700 text-sm">
-        总共 {count} 张图片
-      </span>
-      <AnimatedContainer animation="bounce" className="ml-1 inline-block">
-        <StarDecoration />
-      </AnimatedContainer>
-    </Badge>
-  </div>
-)
+        <Icon
+          icon="line-md:image-twotone"
+          className="mr-1.5 h-4 w-4 text-sky-500"
+        />
+        <span className="font-medium text-sky-700 text-sm">
+          {t("image.count", { count })}
+        </span>
+        <AnimatedContainer animation="bounce" className="ml-1 inline-block">
+          <StarDecoration />
+        </AnimatedContainer>
+      </Badge>
+    </div>
+  )
+}
 
 interface ImageGridProps {
   images: ImageInfo[]
@@ -149,6 +162,7 @@ export const ImageGrid: React.FC<ImageGridProps> = ({
   onLoadError,
   title
 }) => {
+  const { t } = useI18n()
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [failedImages, setFailedImages] = useState<{ [key: string]: boolean }>(
     {}
@@ -173,7 +187,7 @@ export const ImageGrid: React.FC<ImageGridProps> = ({
         icon="line-md:image-twotone"
         className="mr-1.5 h-4 w-4 text-sky-500"
       />
-      {images.length} 张图片
+      {t("image.count", { count: images.length })}
     </span>
   )
 

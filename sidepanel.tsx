@@ -18,28 +18,33 @@ import type { BatchScrapeMode } from "~constants/types"
 import useBatchScrape from "~hooks/useBatchScrape"
 import useContentExtraction from "~hooks/useContentExtraction"
 import useElementSelector from "~hooks/useElementSelector"
+import { I18nProvider, useI18n } from "~utils/i18n"
 
 type SidePanelView = "batch" | "extraction" | "singlescrape" | "settings"
 
-const tabOptions: SegmentedOption<"batch" | "extraction" | "singlescrape">[] = [
-  {
-    value: "singlescrape",
-    label: "单页抓取",
-    icon: <Icon icon="mdi:file-document-outline" width={14} />
-  },
-  {
-    value: "batch",
-    label: "批量抓取",
-    icon: <Icon icon="mdi:file-document-multiple-outline" width={14} />
-  },
-  {
-    value: "extraction",
-    label: "内容提取",
-    icon: <Icon icon="mdi:text-box-search-outline" width={14} />
-  }
-]
-
 function SidePanel() {
+  const { t } = useI18n()
+
+  // Tab 选项 - 使用翻译
+  const tabOptions: SegmentedOption<"batch" | "extraction" | "singlescrape">[] =
+    [
+      {
+        value: "singlescrape",
+        label: t("sidepanel.title.singlescrape"),
+        icon: <Icon icon="mdi:file-document-outline" width={14} />
+      },
+      {
+        value: "batch",
+        label: t("sidepanel.title.batch"),
+        icon: <Icon icon="mdi:file-document-multiple-outline" width={14} />
+      },
+      {
+        value: "extraction",
+        label: t("sidepanel.title.extraction"),
+        icon: <Icon icon="mdi:text-box-search-outline" width={14} />
+      }
+    ]
+
   const [currentView, setCurrentView] = useState<SidePanelView>("singlescrape")
   const [isSingleScrapeLoading, setIsSingleScrapeLoading] = useState(false)
   const singleScrapePanelRef = useRef<SingleScrapePanelHandle>(null)
@@ -145,20 +150,20 @@ function SidePanel() {
   // 视图标题和描述
   const viewConfig = {
     singlescrape: {
-      title: "单页抓取",
-      description: "抓取当前页面内容，转换为 AI 易读的格式"
+      title: t("sidepanel.title.singlescrape"),
+      description: t("sidepanel.desc.singlescrape")
     },
     batch: {
-      title: "批量抓取",
-      description: "选择页面区域，批量抓取链接中的所有文档"
+      title: t("sidepanel.title.batch"),
+      description: t("sidepanel.desc.batch")
     },
     extraction: {
-      title: "内容提取",
-      description: "选择页面元素，提取内容为多种格式"
+      title: t("sidepanel.title.extraction"),
+      description: t("sidepanel.desc.extraction")
     },
     settings: {
-      title: "设置",
-      description: "配置扩展设置"
+      title: t("sidepanel.title.settings"),
+      description: t("sidepanel.desc.settings")
     }
   }
 
@@ -181,7 +186,7 @@ function SidePanel() {
             variant={currentView === "settings" ? "secondary" : "ghost"}
             size="icon"
             onClick={() => setCurrentView("settings")}
-            title="设置">
+            title={t("sidepanel.title.settings")}>
             <Icon icon="mdi:cog" width={18} />
           </Button>
         </div>
@@ -200,7 +205,7 @@ function SidePanel() {
               size="sm"
               onClick={() => singleScrapePanelRef.current?.refresh()}
               disabled={isSingleScrapeLoading}
-              title="刷新内容">
+              title={t("common.refresh")}>
               <Icon
                 icon={
                   isSingleScrapeLoading
@@ -211,7 +216,9 @@ function SidePanel() {
                 width="16"
                 height="16"
               />
-              {isSingleScrapeLoading ? "抓取中..." : "刷新"}
+              {isSingleScrapeLoading
+                ? t("sidepanel.fetching")
+                : t("common.refresh")}
             </Button>
           )}
         </div>
@@ -265,7 +272,7 @@ function SidePanel() {
 
       {/* 底部链接 */}
       <div className="flex flex-shrink-0 items-center justify-between gap-4 border-gray-100 border-t px-1 pt-2">
-        <span className="text-gray-400 text-xs">Moe Copy AI</span>
+        <span className="text-gray-400 text-xs">{t("app.name")}</span>
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -274,7 +281,7 @@ function SidePanel() {
             onClick={() =>
               window.open("https://github.com/yusixian/moe-copy-ai", "_blank")
             }
-            title="GitHub">
+            title={t("sidepanel.github")}>
             <Icon icon="mdi:github" className="size-full" />
           </Button>
           <Button
@@ -282,7 +289,7 @@ function SidePanel() {
             size="icon"
             className="size-6 p-0"
             onClick={() => window.open("https://moe.cosine.ren/docs", "_blank")}
-            title="文档">
+            title={t("sidepanel.docs")}>
             <Icon icon="mdi:book-open-outline" className="size-full" />
           </Button>
           <Button
@@ -292,7 +299,7 @@ function SidePanel() {
             onClick={() =>
               window.open("https://discord.gg/XzvrvNMcSe", "_blank")
             }
-            title="Discord">
+            title={t("sidepanel.discord")}>
             <Icon icon="mdi:discord" className="size-full" />
           </Button>
         </div>
@@ -315,4 +322,13 @@ function SidePanel() {
   )
 }
 
-export default SidePanel
+// 包装 I18nProvider
+function SidePanelWithI18n() {
+  return (
+    <I18nProvider>
+      <SidePanel />
+    </I18nProvider>
+  )
+}
+
+export default SidePanelWithI18n

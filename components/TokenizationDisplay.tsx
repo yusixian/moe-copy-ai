@@ -1,6 +1,8 @@
 import { decode, encode } from "gpt-tokenizer"
 import { useMemo, useState } from "react"
 
+import { useI18n } from "~utils/i18n"
+
 import { Button } from "./ui/button"
 import { Card } from "./ui/card"
 
@@ -17,6 +19,7 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
   className,
   showOnlySummary = false
 }) => {
+  const { t } = useI18n()
   const [showTokenIds, setShowTokenIds] = useState(false)
 
   // 使用gpt-tokenizer对内容进行分词
@@ -66,12 +69,16 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
       {!showOnlySummary && (
         <>
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="font-medium text-slate-700 text-sm">分词结果</h3>
+            <h3 className="font-medium text-slate-700 text-sm">
+              {t("content.tokenization.title")}
+            </h3>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowTokenIds(!showTokenIds)}>
-              {showTokenIds ? "隐藏 Token IDs" : "显示 Token IDs"}
+              {showTokenIds
+                ? t("content.tokenization.hideIds")
+                : t("content.tokenization.showIds")}
             </Button>
           </div>
 
@@ -91,7 +98,11 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
       )}
 
       <div className="mt-2 text-slate-500 text-xs">
-        共 {content.length} 个字符，预计消耗 {tokens.length} 个 token，(使用
+        {t("content.tokenization.stats", {
+          chars: content.length,
+          tokens: tokens.length
+        })}
+        {"("}
         <a
           href="https://github.com/niieani/gpt-tokenizer"
           target="_blank"
@@ -99,7 +110,7 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
           className="text-blue-500 hover:text-blue-600">
           gpt-tokenizer
         </a>
-        分词，结果可能有误差，请对比实际消耗 token)
+        {t("content.tokenization.disclaimer")}
       </div>
     </div>
   )

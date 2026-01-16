@@ -15,6 +15,7 @@ import { Collapsible } from "~/components/ui/collapsible"
 import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import useScrapedData from "~hooks/useScrapedData"
 import { cn } from "~utils"
+import { useI18n } from "~utils/i18n"
 
 import CopyableTextField from "./CopyableTextField"
 
@@ -24,6 +25,7 @@ interface PopupContentProps {
 }
 
 const PopupContent = ({ className, onClose }: PopupContentProps) => {
+  const { t } = useI18n()
   const {
     isLoading,
     error,
@@ -108,19 +110,23 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
       <header className="relative mb-4 flex flex-col gap-3 rounded-xl border border-blue-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <div className="min-w-0 flex-1">
           <h1 className="flex items-center font-bold text-blue-600 text-lg sm:text-xl">
-            <span className="truncate">Moe Copy AI</span>
-            <span className="ml-2 flex-shrink-0">萌抓</span>
+            <span className="truncate">{t("app.name")}</span>
+            <span className="ml-2 flex-shrink-0">{t("popup.subtitle")}</span>
           </h1>
           <p className="text-blue-500 text-xs sm:text-sm">
-            抓取当前页面内容，转换为 AI 易读的格式
+            {t("popup.description")}
           </p>
           <p className="mt-1 hidden text-blue-400 text-xs sm:block">
-            支持原始格式(保留Markdown格式与换行)和紧凑版(无换行，文本更精简)两种模式
+            {t("popup.descriptionDetail")}
           </p>
         </div>
         <div className="flex flex-shrink-0 items-center justify-end gap-2">
           {onClose && (
-            <Button variant="ghost" size="icon" onClick={onClose} title="关闭">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              title={t("common.close")}>
               <Icon icon="line-md:close" width="20" height="20" />
             </Button>
           )}
@@ -128,28 +134,28 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             variant="secondary"
             size="sm"
             onClick={handleOpenSidePanel}
-            title="批量抓取文档（在侧边栏中打开）">
+            title={t("popup.batchScrapeTip")}>
             <Icon
               icon="mdi:file-document-multiple-outline"
               width="16"
               height="16"
               className="mr-1.5"
             />
-            批量抓取
+            {t("popup.batchScrape")}
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={handleOpenGithub}
-            title="访问GitHub">
+            title={t("popup.openGithub")}>
             <Icon icon="mdi:github" width="20" height="20" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={handleOpenOptions}
-            title="打开设置">
-            <Icon icon="line-md:cog-filled-loop" width="20" height="20" />
+            title={t("popup.openSettings")}>
+            <Icon icon="line-md:cog" width="20" height="20" />
           </Button>
         </div>
       </header>
@@ -158,15 +164,15 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
       <div className="mb-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="font-medium text-gray-700 text-sm">
-            悬浮窗开关：
+            {t("popup.floatButton.label")}
           </span>
           <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleTempHideFloat}
-              title="临时隐藏悬浮窗，刷新后会自动恢复">
-              临时隐藏一次
+              title={t("popup.floatButton.tempHideTip")}>
+              {t("popup.floatButton.tempHide")}
             </Button>
             <Button
               variant={showFloatButton === "true" ? "danger" : "default"}
@@ -174,10 +180,12 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               onClick={handleFloatButtonToggle}
               title={
                 showFloatButton === "true"
-                  ? "快速关闭网页悬浮窗（可在设置页面更改）"
-                  : "快速开启网页悬浮窗（可在设置页面更改）"
+                  ? t("popup.floatButton.closeTip")
+                  : t("popup.floatButton.openTip")
               }>
-              {showFloatButton === "true" ? "永久关闭" : "开启悬浮窗"}
+              {showFloatButton === "true"
+                ? t("popup.floatButton.permanentClose")
+                : t("popup.floatButton.enable")}
             </Button>
           </div>
         </div>
@@ -194,7 +202,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             />
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-medium text-red-600">出错了</p>
+                <p className="font-medium text-red-600">
+                  {t("popup.error.title")}
+                </p>
                 <p className="flex-1 text-red-600 text-sm">{error}</p>
                 <Button
                   variant="outline"
@@ -206,13 +216,13 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                     height="14"
                     className="mr-1"
                   />
-                  重试
+                  {t("popup.error.retry")}
                 </Button>
               </div>
               <div className="mt-2 rounded border border-red-200 bg-red-100/50 p-2 text-xs">
-                <p>可能原因：网络问题、页面结构变化或内容未加载完成</p>
+                <p>{t("popup.error.possibleCauses")}</p>
                 <p className="mt-1 text-red-500">
-                  建议：刷新页面后重试，或等待页面完全加载
+                  {t("popup.error.suggestion")}
                 </p>
               </div>
             </div>
@@ -225,9 +235,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         <Collapsible
           title={
             <span className="flex items-center gap-1.5">
-              调试信息
+              {t("popup.debug.title")}
               <span className="rounded border border-blue-200 bg-blue-100 px-1.5 py-0.5 text-[10px] text-blue-600">
-                开发模式
+                {t("popup.debug.devMode")}
               </span>
             </span>
           }
@@ -247,10 +257,10 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6"
-                title="复制调试信息"
+                title={t("popup.debug.copyInfo")}
                 onClick={() => {
                   copyDebugInfo(debugInfo)
-                  alert("调试信息已复制到剪贴板")
+                  alert(t("popup.debug.copied"))
                 }}>
                 <Icon icon="line-md:clipboard-check" width="14" height="14" />
               </Button>
@@ -274,7 +284,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   width="12"
                   height="12"
                 />
-                <span>{isLoading ? "渲染中..." : "渲染完成"}</span>
+                <span>
+                  {isLoading
+                    ? t("popup.debug.rendering")
+                    : t("popup.debug.renderComplete")}
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="rounded border border-blue-200 bg-blue-100/70 px-1.5 py-0.5">
@@ -284,15 +298,19 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   variant="ghost"
                   size="icon"
                   className="h-5 w-5"
-                  title="查看更多调试信息"
+                  title={t("popup.debug.moreInfo")}
                   onClick={() => {
                     const details = {
-                      页面状态: isLoading ? "加载中" : "已加载",
-                      数据大小: scrapedData
-                        ? `${JSON.stringify(scrapedData).length} 字节`
-                        : "无数据",
-                      浏览器信息: navigator.userAgent,
-                      时间戳: new Date().toISOString()
+                      [t("popup.debug.pageStatus")]: isLoading
+                        ? t("popup.debug.pageLoading")
+                        : t("popup.debug.pageLoaded"),
+                      [t("popup.debug.dataSize")]: scrapedData
+                        ? t("popup.debug.dataSizeValue", {
+                            size: JSON.stringify(scrapedData).length
+                          })
+                        : t("popup.debug.noData"),
+                      [t("popup.debug.browserInfo")]: navigator.userAgent,
+                      [t("popup.debug.timestamp")]: new Date().toISOString()
                     }
                     alert(JSON.stringify(details, null, 2))
                   }}>
@@ -307,7 +325,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center p-8">
           <div className="h-12 w-12 animate-spin rounded-full border-blue-500 border-t-4 border-b-4"></div>
-          <p className="mt-3 text-blue-500">加载中...</p>
+          <p className="mt-3 text-blue-500">{t("common.loading")}</p>
         </div>
       ) : scrapedData ? (
         <div className="rounded-xl border-2 border-indigo-200 bg-white p-4 shadow-lg">
@@ -320,7 +338,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 height="24"
                 className="flex-shrink-0"
               />
-              <span>标题</span>
+              <span>{t("content.title")}</span>
               {titleSelectors.length > 0 && (
                 <SelectorDropdown
                   type="title"
@@ -351,7 +369,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   height="24"
                   className="flex-shrink-0"
                 />
-                <span>作者</span>
+                <span>{t("content.author")}</span>
                 {authorSelectors.length > 0 && (
                   <SelectorDropdown
                     type="author"
@@ -383,7 +401,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   height="24"
                   className="flex-shrink-0"
                 />
-                <span>发布日期</span>
+                <span>{t("content.date")}</span>
                 {dateSelectors.length > 0 && (
                   <SelectorDropdown
                     type="date"
@@ -413,7 +431,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 height="24"
                 className="flex-shrink-0"
               />
-              <span>URL</span>
+              <span>{t("content.url")}</span>
             </h2>
             <CopyableTextField
               text={scrapedData.url}
@@ -434,7 +452,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                       width="24"
                       height="24"
                     />
-                    <span>文章内容</span>
+                    <span>{t("popup.articleContent")}</span>
                     {contentSelectors.length > 0 && (
                       <SelectorDropdown
                         type="content"
@@ -456,7 +474,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                     size="sm"
                     onClick={handleRefreshClick}
                     disabled={isLoading}
-                    title="刷新内容">
+                    title={t("popup.refreshContent")}>
                     <Icon
                       icon={
                         isLoading
@@ -467,7 +485,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                       width="16"
                       height="16"
                     />
-                    {isLoading ? "抓取中..." : "刷新"}
+                    {isLoading ? t("popup.scraping") : t("common.refresh")}
                   </Button>
                 </div>
 
@@ -484,7 +502,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                           className="flex-shrink-0"
                         />
                         <span className="whitespace-nowrap">
-                          Readability 模式
+                          {t("popup.mode.readability")}
                         </span>
                       </span>
                     )}
@@ -496,7 +514,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                           height="12"
                           className="flex-shrink-0"
                         />
-                        <span className="whitespace-nowrap">混合模式</span>
+                        <span className="whitespace-nowrap">
+                          {t("popup.mode.hybrid")}
+                        </span>
                       </span>
                     )}
                     {(!scrapedData.metadata["extraction:mode"] ||
@@ -510,7 +530,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                             height="12"
                             className="flex-shrink-0"
                           />
-                          <span className="whitespace-nowrap">选择器模式</span>
+                          <span className="whitespace-nowrap">
+                            {t("popup.mode.selector")}
+                          </span>
                         </span>
                         {/* 如果用户配置的是混合模式，但实际使用的是选择器模式，显示回退提示 */}
                         {scrapedData.metadata["original:mode"] === "hybrid" && (
@@ -521,7 +543,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                               height="12"
                               className="flex-shrink-0"
                             />
-                            <span className="whitespace-nowrap">智能回退</span>
+                            <span className="whitespace-nowrap">
+                              {t("popup.mode.smartFallback")}
+                            </span>
                           </span>
                         )}
                       </>
@@ -540,7 +564,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                       height="14"
                       className="text-blue-500"
                     />
-                    <span className="font-medium">混合模式评估报告</span>
+                    <span className="font-medium">
+                      {t("popup.mode.hybridEvaluation")}
+                    </span>
                   </div>
                   <p className="mt-1 pl-5">
                     {scrapedData.metadata["evaluation:reason"]}
@@ -558,14 +584,16 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                       height="14"
                       className="text-orange-500"
                     />
-                    <span className="font-medium">智能回退说明</span>
+                    <span className="font-medium">
+                      {t("popup.mode.fallbackExplanation")}
+                    </span>
                   </div>
                   <div className="mt-1 pl-5">
                     <p className="text-orange-600">
                       {scrapedData.metadata["fallback:reason"]}
                     </p>
                     <p className="mt-1 text-orange-500 text-xs">
-                      这是正常的智能回退机制，确保您总能获得内容
+                      {t("popup.mode.fallbackInfo")}
                     </p>
                   </div>
                 </div>
@@ -592,9 +620,9 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   height="24"
                   className="flex-shrink-0"
                 />
-                <span>页面图片</span>
+                <span>{t("popup.pageImages")}</span>
                 <span className="font-normal text-sky-500 text-sm">
-                  ({scrapedData.images.length}张)
+                  {t("popup.imageCount", { count: scrapedData.images.length })}
                 </span>
               </h2>
               <ImageGrid
@@ -614,7 +642,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   height="24"
                   className="flex-shrink-0"
                 />
-                <span>元数据</span>
+                <span>{t("popup.metadata")}</span>
               </h2>
 
               {/* 元数据图片 */}
@@ -638,12 +666,12 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         </div>
       ) : (
         <div className="rounded-lg border border-blue-200 bg-white p-8 text-center text-gray-500">
-          没有找到内容。点击"刷新"按钮重试或新开标签页重试。
+          {t("popup.noContentMessage")}
         </div>
       )}
 
       <footer className="mt-4 flex items-center justify-center border-blue-200 border-t pt-4 text-center text-blue-500 text-xs">
-        Moe Copy AI - 萌抓 v1.0
+        {t("popup.footer", { version: "1.0" })}
       </footer>
     </div>
   )

@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react"
-import { memo, useEffect, useRef, useState } from "react"
+import { memo, useEffect, useMemo, useRef, useState } from "react"
 
 import { Button } from "~/components/ui/button"
 import {
@@ -10,6 +10,7 @@ import {
 } from "~constants/link-filter-presets"
 import type { ExtractedLink } from "~constants/types"
 import { cn } from "~utils"
+import { useI18n } from "~utils/i18n"
 
 import Segmented, { type SegmentedOption } from "../ui/segmented"
 
@@ -28,17 +29,6 @@ interface LinkFilterBarProps {
   onClear: () => void
 }
 
-const targetOptions: SegmentedOption<FilterTarget>[] = [
-  { value: "url", label: "URL" },
-  { value: "text", label: "文本" },
-  { value: "both", label: "两者" }
-]
-
-const modeOptions: SegmentedOption<FilterMode>[] = [
-  { value: "exclude", label: "排除" },
-  { value: "include", label: "保留" }
-]
-
 const LinkFilterBar = memo(function LinkFilterBar({
   links,
   filteredLinks,
@@ -53,8 +43,27 @@ const LinkFilterBar = memo(function LinkFilterBar({
   onApplyPreset,
   onClear
 }: LinkFilterBarProps) {
+  const { t } = useI18n()
   const [isPresetOpen, setIsPresetOpen] = useState(false)
   const presetRef = useRef<HTMLDivElement>(null)
+
+  // Create options with translations
+  const targetOptions = useMemo<SegmentedOption<FilterTarget>[]>(
+    () => [
+      { value: "url", label: t("batch.filter.target.url") },
+      { value: "text", label: t("batch.filter.target.text") },
+      { value: "both", label: t("batch.filter.target.both") }
+    ],
+    [t]
+  )
+
+  const modeOptions = useMemo<SegmentedOption<FilterMode>[]>(
+    () => [
+      { value: "exclude", label: t("batch.filter.mode.exclude") },
+      { value: "include", label: t("batch.filter.mode.include") }
+    ],
+    [t]
+  )
 
   // 点击外部关闭预设菜单
   useEffect(() => {
@@ -88,7 +97,7 @@ const LinkFilterBar = memo(function LinkFilterBar({
             type="text"
             value={pattern}
             onChange={(e) => onPatternChange(e.target.value)}
-            placeholder="输入正则表达式..."
+            placeholder={t("batch.filter.placeholder")}
             className={cn(
               "w-full rounded-md border py-1.5 pr-8 pl-8 text-sm transition-colors focus:outline-none focus:ring-1",
               !isValid
@@ -102,7 +111,7 @@ const LinkFilterBar = memo(function LinkFilterBar({
               size="icon"
               onClick={onClear}
               className="absolute top-1/2 right-2 h-5 w-5 -translate-y-1/2"
-              title="清除过滤">
+              title={t("batch.filter.clear")}>
               <Icon icon="mdi:close" className="h-4 w-4" />
             </Button>
           )}
@@ -115,7 +124,9 @@ const LinkFilterBar = memo(function LinkFilterBar({
             size="sm"
             onClick={() => setIsPresetOpen(!isPresetOpen)}>
             <Icon icon="mdi:lightning-bolt" className="h-4 w-4" />
-            <span className="ml-1 hidden sm:inline">预设</span>
+            <span className="ml-1 hidden sm:inline">
+              {t("batch.filter.preset")}
+            </span>
             <Icon
               icon="mdi:chevron-down"
               className={cn(
@@ -145,14 +156,16 @@ const LinkFilterBar = memo(function LinkFilterBar({
                           ? "bg-red-100 text-red-600"
                           : "bg-emerald-100 text-emerald-600"
                       )}>
-                      {preset.mode === "exclude" ? "排除" : "保留"}
+                      {preset.mode === "exclude"
+                        ? t("batch.filter.mode.exclude")
+                        : t("batch.filter.mode.include")}
                     </span>
                     <span className="font-medium text-gray-700 text-sm">
-                      {preset.name}
+                      {t(preset.nameKey)}
                     </span>
                   </div>
                   <span className="text-gray-400 text-xs">
-                    {preset.description}
+                    {t(preset.descKey)}
                   </span>
                 </button>
               ))}
@@ -196,7 +209,9 @@ const LinkFilterBar = memo(function LinkFilterBar({
                   )}
                 />
                 <span className="text-gray-500">
-                  {mode === "exclude" ? "已排除" : "已保留"}{" "}
+                  {mode === "exclude"
+                    ? t("batch.filter.stats.excluded")
+                    : t("batch.filter.stats.included")}{" "}
                   <span
                     className={cn(
                       "font-medium",
@@ -204,7 +219,7 @@ const LinkFilterBar = memo(function LinkFilterBar({
                     )}>
                     {mode === "exclude" ? filteredCount : filteredLinks.length}
                   </span>
-                  /{links.length} 条
+                  /{links.length} {t("batch.filter.stats.items")}
                 </span>
               </>
             ) : (
@@ -213,7 +228,7 @@ const LinkFilterBar = memo(function LinkFilterBar({
                   icon="mdi:alert-circle"
                   className="mr-1 inline h-3.5 w-3.5"
                 />
-                {error || "正则无效"}
+                {error || t("batch.filter.error.invalid")}
               </span>
             )}
           </div>

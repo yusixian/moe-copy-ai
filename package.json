@@ -1,7 +1,7 @@
 {
   "name": "moe-copy-ai",
   "displayName": "Moe Copy AI",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "✨ 萌萌哒的 AI 网页数据提取助手 ✨",
   "author": "cos <i@cosine.ren>",
   "scripts": {

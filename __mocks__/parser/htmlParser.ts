@@ -1,6 +1,6 @@
 /**
  * Mock for parser/htmlParser.ts
- * Used in Jest tests to avoid importing the full unified ecosystem
+ * Used in Vitest tests to avoid importing the full unified ecosystem
  */
 
 /**

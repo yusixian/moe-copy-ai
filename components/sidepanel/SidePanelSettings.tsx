@@ -7,6 +7,14 @@ import { Button } from "~/components/ui/button"
 import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
 import { useAiSettings } from "~hooks/useAiSettings"
+import {
+  getTranslations,
+  LOCALE_NAMES,
+  type Locale,
+  SUPPORTED_LOCALES,
+  useI18n
+} from "~utils/i18n"
+import { translateOptions } from "~utils/options-helper"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
 import { AccordionSection } from "../AccordionSection"
 import { ModelSelectInput } from "../ai/ModelSelectInput"
@@ -51,6 +59,7 @@ function ToggleRow({
 
 // 抓取模式设置
 function ExtractionModeSettings() {
+  const { t } = useI18n()
   const [mode, setMode] = useState<ExtractionMode>("hybrid")
   const [loading, setLoading] = useState(true)
 
@@ -64,15 +73,32 @@ function ExtractionModeSettings() {
   const handleChange = async (newMode: ExtractionMode) => {
     setMode(newMode)
     await setExtractionMode(newMode)
-    toast.success("抓取模式已保存")
+    toast.success(t("sidepanel.settings.extractionMode.saved"))
   }
 
-  if (loading) return <div className="text-gray-400 text-xs">加载中...</div>
+  if (loading)
+    return (
+      <div className="text-gray-400 text-xs">
+        {t("sidepanel.settings.extractionMode.loading")}
+      </div>
+    )
 
   const modes = [
-    { value: "selector", label: "选择器", desc: "CSS选择器提取" },
-    { value: "readability", label: "阅读", desc: "智能提取算法" },
-    { value: "hybrid", label: "混合", desc: "自动选择最优" }
+    {
+      value: "selector",
+      label: t("sidepanel.settings.extractionMode.selector"),
+      desc: t("sidepanel.settings.extractionMode.selector.desc")
+    },
+    {
+      value: "readability",
+      label: t("sidepanel.settings.extractionMode.readability"),
+      desc: t("sidepanel.settings.extractionMode.readability.desc")
+    },
+    {
+      value: "hybrid",
+      label: t("sidepanel.settings.extractionMode.hybrid"),
+      desc: t("sidepanel.settings.extractionMode.hybrid.desc")
+    }
   ]
 
   return (
@@ -101,6 +127,7 @@ function ExtractionModeSettings() {
 
 // AI 设置
 function AiSettings() {
+  const { t } = useI18n()
   const {
     apiKey,
     setApiKey,
@@ -122,7 +149,7 @@ function AiSettings() {
         <label
           htmlFor="sp-api-key"
           className="mb-1 block text-gray-600 text-xs">
-          API Key
+          {t("sidepanel.settings.ai.apiKey")}
         </label>
         <input
           id="sp-api-key"
@@ -130,7 +157,7 @@ function AiSettings() {
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
           className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
-          placeholder="sk-..."
+          placeholder={t("sidepanel.settings.ai.apiKeyPlaceholder")}
         />
       </div>
 
@@ -138,7 +165,7 @@ function AiSettings() {
         <label
           htmlFor="sp-base-url"
           className="mb-1 block text-gray-600 text-xs">
-          Base URL
+          {t("sidepanel.settings.ai.baseUrl")}
         </label>
         <div className="flex gap-1">
           <input
@@ -147,7 +174,7 @@ function AiSettings() {
             value={baseURL}
             onChange={(e) => setBaseURL(e.target.value)}
             className="flex-1 rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
-            placeholder="https://api.openai.com/v1/"
+            placeholder={t("sidepanel.settings.ai.baseUrlPlaceholder")}
           />
           <Button
             variant="secondary"
@@ -166,7 +193,7 @@ function AiSettings() {
 
       <div>
         <label htmlFor="sp-model" className="mb-1 block text-gray-600 text-xs">
-          模型
+          {t("sidepanel.settings.ai.model")}
         </label>
         <ModelSelectInput
           id="sp-model"
@@ -181,7 +208,7 @@ function AiSettings() {
         <label
           htmlFor="sp-system-prompt"
           className="mb-1 block text-gray-600 text-xs">
-          系统提示词
+          {t("sidepanel.settings.ai.systemPrompt")}
         </label>
         <textarea
           id="sp-system-prompt"
@@ -194,7 +221,7 @@ function AiSettings() {
 
       <Button fullWidth size="sm" onClick={saveSettings}>
         <Icon icon="mdi:content-save" width={14} className="mr-1" />
-        保存
+        {t("sidepanel.settings.ai.save")}
       </Button>
     </div>
   )
@@ -202,42 +229,75 @@ function AiSettings() {
 
 // 日志设置
 function LogSettings() {
+  const { t } = useI18n()
   const [logLevel, setLogLevel] = useStorage("log_level", "silent")
   const [scrapeTiming, setScrapeTiming] = useStorage("scrape_timing", "manual")
 
   const handleLogLevelChange = (value: string) => {
     setLogLevel(value)
-    toast.success("日志级别已保存")
+    toast.success(t("sidepanel.settings.log.levelSaved"))
   }
 
   const handleScrapeTimingChange = (value: string) => {
     setScrapeTiming(value)
-    toast.success("抓取时机已保存")
+    toast.success(t("sidepanel.settings.log.timingSaved"))
   }
 
   return (
     <div className="space-y-3">
       <CompactSelect
-        label="日志级别"
+        label={t("sidepanel.settings.log.level")}
         value={logLevel}
         onChange={handleLogLevelChange}
-        options={LOG_LEVELS.map((l) => ({
-          value: l.value as string,
-          label: l.label
-        }))}
+        options={translateOptions(
+          LOG_LEVELS as Array<{ value: string; labelKey: string }>,
+          t
+        )}
       />
       <CompactSelect
-        label="抓取时机"
+        label={t("sidepanel.settings.log.timing")}
         value={scrapeTiming}
         onChange={handleScrapeTimingChange}
-        options={SCRAPE_TIMING_OPTIONS}
+        options={translateOptions(SCRAPE_TIMING_OPTIONS, t)}
       />
+    </div>
+  )
+}
+
+// 语言设置
+function LanguageSettings() {
+  const { t, locale, setLocale } = useI18n()
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLocale = e.target.value as Locale
+    setLocale(newLocale)
+    const msg = getTranslations(newLocale)["common.success"] ?? "Success"
+    toast.success(msg)
+  }
+
+  return (
+    <div className="flex items-center justify-between rounded-lg border border-sky-200 bg-white p-3">
+      <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
+        <Icon icon="mdi:globe" width={16} />
+        {t("option.interface.language")}
+      </span>
+      <select
+        value={locale}
+        onChange={handleChange}
+        className="rounded border border-sky-200 bg-sky-50 px-2 py-1 text-sm focus:border-sky-400 focus:outline-none">
+        {SUPPORTED_LOCALES.map((loc) => (
+          <option key={loc} value={loc}>
+            {LOCALE_NAMES[loc]}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }
 
 // 主设置组件
 export default function SidePanelSettings() {
+  const { t } = useI18n()
   const [showFloatButton, setShowFloatButton] = useStorage(
     "show_float_button",
     "true"
@@ -253,42 +313,54 @@ export default function SidePanelSettings() {
 
   const handleFloatButtonChange = (checked: boolean) => {
     setShowFloatButton(checked ? "true" : "false")
-    toast.success("悬浮球设置已保存")
+    toast.success(t("sidepanel.settings.floatButton.saved"))
   }
 
   const handleDebugPanelChange = (checked: boolean) => {
     setShowDebugPanel(checked ? "true" : "false")
-    toast.success("调试面板设置已保存")
+    toast.success(t("sidepanel.settings.debugPanel.saved"))
   }
 
   return (
     <div className="space-y-2">
-      <AccordionSection title="抓取模式" icon="line-md:cog-loop" defaultOpen>
+      <AccordionSection
+        title={t("sidepanel.settings.extractionMode.title")}
+        icon="line-md:cog-loop"
+        defaultOpen>
         <ExtractionModeSettings />
       </AccordionSection>
 
-      <AccordionSection title="AI 设置" icon="mdi:robot" defaultOpen>
+      <AccordionSection
+        title={t("sidepanel.settings.ai.title")}
+        icon="mdi:robot"
+        defaultOpen>
         <AiSettings />
       </AccordionSection>
 
-      <AccordionSection title="日志设置" icon="mdi:file-document-outline">
+      <AccordionSection
+        title={t("sidepanel.settings.log.title")}
+        icon="mdi:file-document-outline">
         <LogSettings />
       </AccordionSection>
 
-      <AccordionSection title="批量抓取" icon="mdi:file-document-multiple">
+      <AccordionSection
+        title={t("sidepanel.settings.batch.title")}
+        icon="mdi:file-document-multiple">
         <BatchScrapeSettings />
       </AccordionSection>
 
+      <LanguageSettings />
+
       <ToggleRow
         icon="mdi:palette-outline"
-        label="悬浮球显示"
+        label={t("sidepanel.settings.floatButton.label")}
         checked={showFloatButton === "true"}
         onChange={handleFloatButtonChange}
       />
 
       <ToggleRow
         icon="mdi:code-tags"
-        label="调试面板"
+        label={t("sidepanel.settings.debugPanel.label")}
         checked={showDebugPanel === "true"}
         onChange={handleDebugPanelChange}
       />
@@ -301,10 +373,10 @@ export default function SidePanelSettings() {
         className="justify-between p-3">
         <span className="flex items-center gap-2 font-medium text-sm">
           <Icon icon="mdi:code-braces" width={16} />
-          选择器设置
+          {t("sidepanel.settings.selector.title")}
         </span>
         <span className="flex items-center gap-1 text-gray-400 text-xs">
-          打开完整设置
+          {t("sidepanel.settings.selector.openFull")}
           <Icon icon="mdi:open-in-new" width={14} />
         </span>
       </Button>

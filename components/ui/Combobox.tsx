@@ -104,8 +104,8 @@ export function Combobox({
     : "flex items-center justify-center rounded-r-lg border border-sky-200 bg-blue-50 px-3 text-sky-600 hover:bg-sky-100"
 
   const dropdownClass = compact
-    ? "z-[9999] max-h-40 overflow-auto rounded border border-sky-200 bg-white shadow-lg"
-    : "z-[9999] max-h-48 overflow-auto rounded-lg border border-sky-200 bg-white shadow-lg"
+    ? "z-50 max-h-40 overflow-auto rounded border border-sky-200 bg-white shadow-lg"
+    : "z-50 max-h-48 overflow-auto rounded-lg border border-sky-200 bg-white shadow-lg"
 
   const optionClass = compact
     ? "cursor-pointer px-2 py-1.5 text-xs"

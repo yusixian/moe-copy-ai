@@ -1,3 +1,5 @@
+import { useI18n } from "~utils/i18n"
+
 import DownloadButton from "./DownloadButton"
 import { Image } from "./ui/image"
 
@@ -18,6 +20,7 @@ export const MetadataImage: React.FC<MetadataImageProps> = ({
   label,
   onLoadError
 }) => {
+  const { t } = useI18n()
   return (
     <div className="transform overflow-hidden rounded-lg border-2 border-sky-200 bg-white shadow-sm transition-all hover:scale-105 hover:shadow-md">
       <div className="relative flex h-[150px] w-full items-center justify-center">
@@ -31,7 +34,7 @@ export const MetadataImage: React.FC<MetadataImageProps> = ({
         <DownloadButton
           fileUrl={src}
           fileName={`${label}.jpg`}
-          title="点击下载可爱图片～"
+          title={t("metadata.downloadTitle")}
           className="absolute top-2 right-2 z-10"
         />
       </div>

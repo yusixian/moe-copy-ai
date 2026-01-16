@@ -1,6 +1,7 @@
 import { memo } from "react"
 
 import type { ScrapedContent } from "~constants/types"
+import { useI18n } from "~utils/i18n"
 
 import AiSummaryPanel from "./ai/AiSummaryPanel"
 
@@ -10,22 +11,33 @@ interface AiSummarySectionProps {
   scrapedData: ScrapedContent
 }
 
-// Popup 专用占位符
-const popupPlaceholders = [
-  { placeholder: "{{content}}", description: "文章内容" },
-  { placeholder: "{{title}}", description: "文章标题" },
-  { placeholder: "{{url}}", description: "文章URL" },
-  { placeholder: "{{author}}", description: "作者" },
-  { placeholder: "{{publishDate}}", description: "发布日期" },
-  { placeholder: "{{cleanedContent}}", description: "清理后的内容" },
-  { placeholder: "{{meta.xxx}}", description: "元数据中的字段" }
-]
-
 const AiSummarySection = memo(function AiSummarySection({
   content,
   onSummaryGenerated,
   scrapedData
 }: AiSummarySectionProps) {
+  const { t } = useI18n()
+
+  // Popup 专用占位符
+  const popupPlaceholders = [
+    {
+      placeholder: "{{content}}",
+      description: t("scrape.placeholders.content")
+    },
+    { placeholder: "{{title}}", description: t("scrape.placeholders.title") },
+    { placeholder: "{{url}}", description: t("scrape.placeholders.url") },
+    { placeholder: "{{author}}", description: t("scrape.placeholders.author") },
+    {
+      placeholder: "{{publishDate}}",
+      description: t("scrape.placeholders.publishDate")
+    },
+    {
+      placeholder: "{{cleanedContent}}",
+      description: t("scrape.placeholders.cleanedContent")
+    },
+    { placeholder: "{{meta.xxx}}", description: t("scrape.placeholders.meta") }
+  ]
+
   return (
     <div className="mb-4">
       <AiSummaryPanel
@@ -34,7 +46,7 @@ const AiSummarySection = memo(function AiSummarySection({
         placeholders={popupPlaceholders}
         defaultOpen={true}
         showHistory={true}
-        title="AI 助手"
+        title={t("ai.panel.title")}
         onSummaryGenerated={onSummaryGenerated}
       />
     </div>

@@ -7,77 +7,77 @@ export type FilterMode = "exclude" | "include"
 
 export interface PresetFilter {
   id: string
-  name: string
+  nameKey: string
   pattern: string
   target: FilterTarget
   mode: FilterMode
-  description: string
+  descKey: string
 }
 
 export const LINK_FILTER_PRESETS: PresetFilter[] = [
   {
     id: "exclude-images",
-    name: "排除图片链接",
+    nameKey: "batch.filter.preset.excludeImages.name",
     pattern: "\\.(jpg|jpeg|png|gif|webp|svg|ico|bmp|tiff)(\\?|$)",
     target: "url",
     mode: "exclude",
-    description: "过滤常见图片格式链接"
+    descKey: "batch.filter.preset.excludeImages.desc"
   },
   {
     id: "exclude-anchors",
-    name: "排除锚点链接",
+    nameKey: "batch.filter.preset.excludeAnchors.name",
     pattern: "^#|#[^/]*$",
     target: "url",
     mode: "exclude",
-    description: "过滤页内锚点链接"
+    descKey: "batch.filter.preset.excludeAnchors.desc"
   },
   {
     id: "exclude-pagination",
-    name: "排除分页链接",
+    nameKey: "batch.filter.preset.excludePagination.name",
     pattern: "[?&]page=|/page/\\d+",
     target: "url",
     mode: "exclude",
-    description: "过滤分页相关链接"
+    descKey: "batch.filter.preset.excludePagination.desc"
   },
   {
     id: "exclude-auth",
-    name: "排除登录/注册",
+    nameKey: "batch.filter.preset.excludeAuth.name",
     pattern: "login|signin|sign-in|signup|sign-up|register|logout|sign-out",
     target: "url",
     mode: "exclude",
-    description: "过滤认证相关链接"
+    descKey: "batch.filter.preset.excludeAuth.desc"
   },
   {
     id: "exclude-assets",
-    name: "排除静态资源",
+    nameKey: "batch.filter.preset.excludeAssets.name",
     pattern: "\\.(css|js|woff|woff2|ttf|eot|map)(\\?|$)",
     target: "url",
     mode: "exclude",
-    description: "过滤 CSS、JS、字体等静态资源"
+    descKey: "batch.filter.preset.excludeAssets.desc"
   },
   {
     id: "exclude-media",
-    name: "排除媒体链接",
+    nameKey: "batch.filter.preset.excludeMedia.name",
     pattern: "\\.(mp4|mp3|avi|mov|wmv|flv|wav|ogg|webm)(\\?|$)",
     target: "url",
     mode: "exclude",
-    description: "过滤视频、音频等媒体文件"
+    descKey: "batch.filter.preset.excludeMedia.desc"
   },
   {
     id: "include-docs",
-    name: "仅保留文档链接",
+    nameKey: "batch.filter.preset.includeDocs.name",
     pattern: "\\.(pdf|doc|docx|xls|xlsx|ppt|pptx|txt|md)(\\?|$)",
     target: "url",
     mode: "include",
-    description: "只保留文档格式链接"
+    descKey: "batch.filter.preset.includeDocs.desc"
   },
   {
     id: "include-html",
-    name: "仅保留网页链接",
+    nameKey: "batch.filter.preset.includeHtml.name",
     pattern: "(\\.html?|\\.php|\\.asp|\\.aspx|\\.jsp)(\\?|$)|/[^.]*$",
     target: "url",
     mode: "include",
-    description: "只保留网页链接"
+    descKey: "batch.filter.preset.includeHtml.desc"
   }
 ]
 

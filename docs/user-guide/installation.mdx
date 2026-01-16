@@ -1,113 +1,72 @@
 ---
 title: 安装指南
-description: 详细的 MoeCopy AI 安装和配置指南
+description: 在不同环境下安装和配置 MoeCopy AI
 ---
-
-# 安装指南
-
-本指南将详细介绍如何在不同环境下安装和配置 MoeCopy AI。
-
-## 系统要求
-
-### 支持的浏览器
-
-- **Chrome**: 版本 88 或更高
-- **Edge**: 版本 88 或更高（基于 Chromium）
-- **Brave**: 最新版本
-- **Kiwi Browser**: Android 移动端支持
-
-### 操作系统
-
-- Windows 10/11
-- macOS 10.14+
-- Linux（各主流发行版）
-- Android（通过 Kiwi Browser）
 
 ## 安装方式
 
-### 方式一：Chrome 网上应用店（推荐）
+### Chrome 网上应用店（推荐）
 
-这是最简单快捷的安装方式：
+1. 访问 [Chrome 网上应用店](https://chromewebstore.google.com/detail/moe-copy-ai/dfmlcfckmfgabpgbaobgapdfmjiihnck)
+2. 点击"添加至 Chrome"
+3. 确认权限后完成安装
+4. 建议置顶扩展图标
 
-1. **访问商店页面**
+### Firefox 附加组件
 
-   - 打开 [Chrome 网上应用店](https://chromewebstore.google.com/detail/moe-copy-ai/dfmlcfckmfgabpgbaobgapdfmjiihnck)
-   - 或在 Chrome 网上应用店搜索 "MoeCopy AI"
+1. 访问 [Firefox 附加组件商店](https://addons.mozilla.org/zh-CN/firefox/addon/moe-copy-ai/)
+2. 点击"添加到 Firefox"
+3. 确认权限后完成安装
 
-2. **安装扩展**
+### 开发者模式安装
 
-   - 点击"添加至 Chrome"按钮
-   - 在弹出的权限确认窗口中点击"添加扩展程序"
+适合开发者或想体验最新功能的用户。
 
-3. **确认安装**
-   - 安装完成后，浏览器右上角会出现 MoeCopy AI 图标
-   - 第一次使用时会自动打开欢迎页面
-
-### 方式二：开发者模式安装
-
-适合开发者或想要体验最新功能的用户：
-
-#### 1. 获取源代码
+#### 获取源代码
 
 ```bash
-# 使用 Git 克隆
 git clone https://github.com/yusixian/moe-copy-ai.git
 cd moe-copy-ai
-
-# 或者下载 ZIP 包
-# 访问 https://github.com/yusixian/moe-copy-ai
-# 点击 "Code" -> "Download ZIP"
 ```
 
-#### 2. 安装依赖
+#### 安装依赖
 
 ```bash
-# 使用 pnpm（推荐）
-pnpm install
-
-# 或使用 npm
-npm install
-
-# 或使用 yarn
-yarn install
+pnpm install  # 推荐
+# 或 npm install / yarn install
 ```
 
-#### 3. 构建扩展
+#### 构建扩展
 
 ```bash
-# 开发版本（包含调试信息）
-pnpm dev
+# Chrome
+pnpm dev    # 开发版本
+pnpm build  # 生产版本
 
-# 生产版本（优化体积）
-pnpm build
+# Firefox (v0.2.1+)
+pnpm dev:firefox    # 开发版本
+pnpm build:firefox  # 生产版本
 ```
 
-#### 4. 加载到浏览器
+#### 加载到浏览器
 
-1. 打开 Chrome，访问 `chrome://extensions/`
-2. 开启右上角的"开发者模式"
+**Chrome**:
+1. 打开 `chrome://extensions/`
+2. 开启"开发者模式"
 3. 点击"加载已解压的扩展程序"
-4. 选择构建输出目录：
-   - 开发版：`build/chrome-mv3-dev`
-   - 生产版：`build/chrome-mv3-prod`
+4. 选择 `build/chrome-mv3-dev` 或 `build/chrome-mv3-prod`
 
-### 方式三：移动端安装（Android）
+**Firefox** (v0.2.1+):
+1. 打开 `about:debugging#/runtime/this-firefox`
+2. 点击"临时载入附加组件"
+3. 选择 `build/firefox-mv2-dev` 或 `build/firefox-mv2-prod` 目录下的 `manifest.json`
 
-MoeCopy AI 支持在 Android 设备上使用：
+### 移动端安装（Android）
 
-1. **安装 Kiwi Browser**
-
-   - 从 [Google Play](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser) 下载
-   - 或从 [GitHub Releases](https://github.com/kiwibrowser/src.next/releases) 下载 APK
-
-2. **安装扩展**
-   - 在 Kiwi Browser 中访问 Chrome 网上应用店
-   - 搜索并安装 MoeCopy AI
-   - 或使用开发者模式加载本地扩展
+1. 安装 [Kiwi Browser](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser)（或从 [GitHub Releases](https://github.com/kiwibrowser/src.next/releases) 下载）
+2. 在 Kiwi Browser 中访问 Chrome 商店安装扩展
 
 ## 权限说明
-
-MoeCopy AI 需要以下权限才能正常工作：
 
 ### 必需权限
 
@@ -115,98 +74,57 @@ MoeCopy AI 需要以下权限才能正常工作：
 - **storage**: 保存用户设置和 AI 聊天历史
 - **host_permissions**: 访问 `https://*/*` 用于内容提取
 
-### 权限用途说明
+### 权限用途
 
-1. **网页内容访问**
-
-   - 仅在用户主动触发时读取页面内容
-   - 不会在后台自动收集数据
-   - 不会访问密码或敏感表单数据
-
-2. **存储权限**
-
-   - 保存自定义选择器配置
-   - 存储 AI API 设置
-   - 记录 AI 对话历史（本地存储）
-
-3. **网络权限**
-   - 仅用于调用配置的 AI API
-   - 不会上传网页内容到第三方服务器
+- **网页内容访问**: 仅在用户主动触发时读取，不会后台收集数据，不访问密码或敏感表单
+- **存储权限**: 保存选择器配置、AI API 设置、对话历史（本地存储）
+- **网络权限**: 仅用于调用 AI API，不上传网页内容到第三方服务器
 
 ## 初始配置
 
-### 1. 首次启动
+### 首次启动
 
-安装完成后，建议进行以下配置：
+安装后建议进行配置：右键扩展图标 → 选项
 
-1. 点击扩展图标，选择"选项"进入设置页面
-2. 或右键点击扩展图标，选择"选项"
+### AI 配置（可选）
 
-### 2. AI 配置（可选）
+1. 在选项页面找到"AI 设置"
+2. 填写 API 配置：API Key、API URL、模型
+3. 保存设置
 
-如果您想使用 AI 功能：
+### 界面设置
 
-1. 在选项页面找到"AI 设置"部分
-2. 填写 API 配置：
-
-   - **API Key**: 您的 OpenAI API 密钥
-   - **API URL**: API 端点（默认使用 OpenAI）
-   - **模型**: 选择使用的模型
-
-3. 点击"保存设置"
-
-### 3. 界面设置
-
-根据您的喜好调整：
-
-- **悬浮按钮**: 是否在页面显示快捷入口
 - **抓取时机**: 自动或手动触发
 - **调试面板**: 开发者可开启查看详细信息
+
+> **提示**: v0.2.1 起，悬浮按钮功能已整合至侧边栏的"单页抓取"标签页。
 
 ## 更新和卸载
 
 ### 自动更新
 
-如果从 Chrome 网上应用店安装，扩展会自动更新到最新版本。
-
-### 手动更新
-
-开发者模式下：
-
-1. 拉取最新代码：`git pull`
-2. 重新构建：`pnpm build`
-3. 在扩展管理页面点击"更新"按钮
+从 Chrome 网上应用店安装的扩展会自动更新。
 
 ### 卸载扩展
 
-1. 访问 `chrome://extensions/`
-2. 找到 MoeCopy AI
-3. 点击"移除"按钮
-4. 确认移除
+访问 `chrome://extensions/` → 找到 MoeCopy AI → 移除
 
 ## 故障排除
 
 ### 扩展图标不显示
 
-1. 检查扩展是否已启用
-2. 点击拼图图标，将 MoeCopy AI 固定到工具栏
+检查扩展是否已启用，点击拼图图标将 MoeCopy AI 固定到工具栏。
 
 ### 无法提取内容
 
 1. 确保网页已完全加载
-2. 检查是否是受保护的页面（如银行网站）
-3. 尝试刷新页面后重试
-
-### 构建失败
-
-1. 确保 Node.js 版本 >= 16
-2. 删除 `node_modules` 和 `pnpm-lock.yaml`
-3. 重新运行 `pnpm install`
+2. 检查是否是受保护页面（如银行网站）
+3. 刷新页面后重试
 
 ## 获取帮助
 
-如果遇到其他问题：
-
 - 查看[常见问题](/docs/user-guide/faq)
 - 提交 [GitHub Issue](https://github.com/yusixian/moe-copy-ai/issues)
+- 加入 [Discord 社区](https://discord.gg/XzvrvNMcSe) 交流
 - 发送邮件至 i@cosine.ren
+
