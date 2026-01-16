@@ -26,9 +26,9 @@ Available on [Chrome Web Store](https://chromewebstore.google.com/detail/moe-cop
 
 ## ✨ Features
 
-![example](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example.webp?raw=true)
-![example-2](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example-2.png?raw=true)
-![example-3](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example-3.png?raw=true)
+![example](/assets/docs/example.webp)
+![example-2](/assets/docs/example-2.webp)
+![example-3](/assets/docs/example-3.webp)
 
 ### Popup Mode
 
