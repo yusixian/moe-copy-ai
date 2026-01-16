@@ -69,6 +69,15 @@ Moe Copy AI 是一个基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器�
   - ZIP 打包导出所有抓取结果
 - **内容提取**: 选择页面元素，提取内容为 HTML / Markdown / 纯文本
 
+### 国际化支持 🌍
+
+- **多语言界面**: 完整支持简体中文和英语
+  - 自动检测浏览器语言，首次使用时自动设置
+  - 支持手动切换语言（设置页面）
+  - 语言偏好通过 Chrome sync storage 跨设备同步
+- **本地化内容**: 所有用户界面、错误信息、AI 提示词均已本地化（452 个翻译键）
+- **欢迎贡献翻译**: 查看 [贡献指南](./CONTRIBUTING.md#-翻译贡献) 了解如何改进翻译或添加新语言
+
 ### **配置选项**
 
 - **抓取模式设置**: 支持选择器模式、Readability 模式或混合模式，根据网站特点选择最佳方案
@@ -156,13 +165,25 @@ npm run build
 
 ## 🤝 贡献
 
-欢迎各种形式的贡献，包括新功能、Bug 修复和文档改进！
+欢迎各种形式的贡献，包括新功能、Bug 修复、文档改进和翻译贡献！
+
+### 翻译贡献
+
+我们欢迎改进现有翻译或添加新语言支持：
+
+- 📝 **反馈翻译问题**: 在 [GitHub Issues](https://github.com/yusixian/moe-copy-ai/issues) 创建 issue，使用 "translation" 标签
+- 🌐 **提交翻译 PR**: 查看 [贡献指南](./CONTRIBUTING.md#-翻译贡献) 了解详细步骤
+- ✨ **添加新语言**: 查看 [i18n 开发者指南](./docs/developer-guide/i18n-guide.mdx) 了解如何添加新语言
+
+### 代码贡献
 
 1. Fork 项目
 2. 从 dev 分支创建特性分支 (`git checkout -b feat/amazing-feature`)
 3. 提交更改 (`git commit -m 'feat: add some amazing feature'`)
 4. 推送到分支 (`git push origin feat/amazing-feature`)
 5. 创建 Pull Request 给 dev 分支
+
+详细贡献指南请查看 [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## 致谢
 

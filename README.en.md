@@ -69,6 +69,15 @@ A brand new side panel interface for more efficient workflows.
   - ZIP export for all scraped results
 - **Content Extraction**: Select page elements and extract content as HTML / Markdown / Plain Text
 
+### Internationalization Support 🌍
+
+- **Multilingual Interface**: Full support for Simplified Chinese and English
+  - Automatic browser language detection with auto-setup on first use
+  - Manual language switching available in settings page
+  - Language preferences synced across devices via Chrome sync storage
+- **Localized Content**: All UI text, error messages, and AI prompts are localized (452 translation keys)
+- **Translation Welcome**: See [Contributing Guide](./CONTRIBUTING.md#-translation-contributions) to improve translations or add new languages
+
 ### Configuration Options
 
 - **Extraction Mode Settings**: Choose between Selector, Readability, or Hybrid mode based on site characteristics
@@ -156,13 +165,25 @@ This creates a production bundle that can be packaged and published to various e
 
 ## 🤝 Contributing
 
-All forms of contributions are welcome, including new features, bug fixes, and documentation improvements!
+All forms of contributions are welcome, including new features, bug fixes, documentation improvements, and translations!
+
+### Translation Contributions
+
+We welcome improvements to existing translations or new language support:
+
+- 📝 **Report translation issues**: Create an issue on [GitHub Issues](https://github.com/yusixian/moe-copy-ai/issues) with "translation" label
+- 🌐 **Submit translation PR**: See [Contributing Guide](./CONTRIBUTING.md#-translation-contributions) for detailed steps
+- ✨ **Add new language**: See [i18n Developer Guide](./docs/developer-guide/i18n-guide.mdx) to learn how to add a new language
+
+### Code Contributions
 
 1. Fork the project
 2. Create a feature branch from dev (`git checkout -b feat/amazing-feature`)
 3. Commit changes (`git commit -m 'feat: add some amazing feature'`)
 4. Push to branch (`git push origin feat/amazing-feature`)
 5. Create a Pull Request to the dev branch
+
+For detailed contribution guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## Acknowledgments
 

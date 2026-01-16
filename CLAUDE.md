@@ -75,7 +75,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Testing Commands
 
-- `pnpm test` or `npm run test` - Run Jest test suite
+- `pnpm test` or `npm run test` - Run Vitest test suite
 - `pnpm test:watch` or `npm run test:watch` - Run tests in watch mode
 - `pnpm test:coverage` or `npm run test:coverage` - Generate coverage report
 - `pnpm test:file` or `npm run test:file` - Run specific test file with `--testMatch` parameter
@@ -177,7 +177,7 @@ Built with Tailwind CSS, optimized for mobile browsers (Kiwi Browser support).
 - **Frontend**: React 18 + TypeScript
 - **Styling**: Tailwind CSS with custom animations
 - **AI SDK**: xsAI (lightweight alternative to OpenAI SDK)
-- **Testing**: Jest with ts-jest and jsdom
+- **Testing**: Vitest with jsdom
 - **Build Target**: Chrome Manifest V3
 
 ### Testing Structure

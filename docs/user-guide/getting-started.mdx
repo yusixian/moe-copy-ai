@@ -1,116 +1,79 @@
 ---
 title: 快速开始
-description: 5分钟内开始使用 MoeCopy AI 提取网页数据
+description: 快速上手 MoeCopy AI
 ---
 
-# 快速开始
-
-MoeCopy AI 是一款智能的网页数据提取助手，能够帮助您快速、准确地从网页中提取结构化数据。本指南将帮助您在 5 分钟内开始使用 MoeCopy AI。
+MoeCopy AI 是智能网页数据提取助手，能快速从网页中提取结构化数据。
 
 ## 安装扩展
 
-### 从 Chrome 网上应用店安装（推荐）
+### Chrome 网上应用店（推荐）
 
 1. 访问 [Chrome 网上应用店](https://chromewebstore.google.com/detail/moe-copy-ai/dfmlcfckmfgabpgbaobgapdfmjiihnck)
-2. 点击"添加至 Chrome"按钮
-3. 在弹出窗口中点击"添加扩展程序"
-4. 安装完成后，您会在浏览器工具栏看到 MoeCopy AI 图标
+2. 点击"添加至 Chrome" → 确认添加
+3. 安装完成后工具栏出现 MoeCopy AI 图标
 
-### 从源码安装（开发者）
+### Firefox 附加组件
 
-如果您想要体验最新功能或参与开发，可以从源码安装：
+1. 访问 [Firefox 附加组件商店](https://addons.mozilla.org/zh-CN/firefox/addon/moe-copy-ai/)
+2. 点击"添加到 Firefox" → 确认添加
+
+### 源码安装（开发者）
 
 ```bash
-# 克隆项目
 git clone https://github.com/yusixian/moe-copy-ai.git
 cd moe-copy-ai
-
-# 安装依赖
 pnpm install
-
-# 构建扩展
 pnpm build
 ```
 
-然后在 Chrome 中加载解压的扩展：
-
-1. 打开 Chrome，访问 `chrome://extensions/`
-2. 开启"开发者模式"
-3. 点击"加载已解压的扩展程序"
-4. 选择 `build/chrome-mv3-prod` 目录
+在 Chrome 中加载：`chrome://extensions/` → 开启开发者模式 → 加载已解压的扩展程序 → 选择 `build/chrome-mv3-prod`
 
 ## 基本使用
 
 ### 1. 打开目标网页
 
-访问任何您想要提取数据的网页，例如：
-
-- 新闻文章
-- 博客文章
-- 产品页面
-- 文档页面
+访问任何想提取数据的网页：新闻、博客、产品页面、文档等。
 
 ### 2. 点击扩展图标
 
-点击浏览器工具栏中的 MoeCopy AI 图标，或者点击页面右下角的悬浮按钮。
+点击工具栏中的 MoeCopy AI 图标，或点击页面右下角的悬浮按钮。
 
 ### 3. 自动提取数据
 
-MoeCopy AI 会自动分析页面并提取：
+MoeCopy AI 会自动分析页面并提取：标题、作者、发布日期、正文内容、图片列表、元数据信息。
 
-- 📝 标题
-- 👤 作者
-- 📅 发布日期
-- 📄 正文内容
-- 🖼️ 图片列表
-- 🔗 元数据信息
-
-### 4. 复制或导出数据
-
-您可以：
+### 4. 复制或导出
 
 - 点击"复制"按钮复制特定字段
-- 使用"下载"功能导出为 JSON 或 Markdown 格式
+- 使用"下载"导出为 JSON 或 Markdown
 - 使用 AI 功能生成摘要或翻译
 
-### 5. 使用侧边栏（高级功能）<Badge>v0.2.0 新增</Badge>
+### 5. 使用侧边栏（高级功能）
 
-对于批量抓取和内容提取等高级功能，可以使用侧边栏：
+<Badge>v0.2.0 新增</Badge>
 
-1. 右键点击扩展图标 → "在侧边栏打开"
-2. 选择功能标签页：
-   - **批量抓取**：选择页面区域，批量抓取多个链接中的文档
-   - **内容提取**：选择页面元素，提取为 HTML/Markdown/纯文本
-3. 在设置中配置 AI 和抓取选项
+右键扩展图标 → "在侧边栏打开"：
 
-## 第一次使用示例
+- **批量抓取**：选择页面区域，批量抓取多个链接中的文档
+- **内容提取**：选择页面元素，提取为 HTML/Markdown/纯文本
+- **设置**：配置 AI 和抓取选项
 
-让我们以一个新闻文章为例：
+## 使用示例
 
-1. **访问文章页面**
-   打开任意新闻网站的文章页面
+以新闻文章为例：
 
-2. **点击扩展图标**
-   MoeCopy AI 会立即开始分析页面
-
-3. **查看提取结果**
-   在弹出窗口中，您会看到：
-
-   - 文章标题
-   - 作者信息
-   - 发布时间
-   - 格式化的文章内容
-   - 文章中的所有图片
-
-4. **使用 AI 功能**（可选）
-   点击"AI 摘要"标签页，输入提示词如"总结这篇文章的要点"，即可获得 AI 生成的摘要。
+1. 打开任意新闻文章页面
+2. 点击扩展图标，MoeCopy AI 开始分析
+3. 查看提取结果：标题、作者、发布时间、格式化内容、图片
+4. （可选）切换到 AI 摘要标签页，输入"总结这篇文章的要点"生成摘要
 
 ## 下一步
 
 - 了解[更多功能特性](/docs/features)
-- 学习[高级用法](/docs/usage)
-- 配置[个性化设置](/docs/configuration)
-- 查看[API 文档](/docs/api-reference)
+- 学习[高级用法](/docs/user-guide/usage)
+- 配置[个性化设置](/docs/user-guide/configuration)
+- 查看[API 文档](/docs/developer-guide/api-reference)
 
 ## 需要帮助？
 
@@ -118,4 +81,5 @@ MoeCopy AI 会自动分析页面并提取：
 
 - 查看[常见问题](/docs/user-guide/faq)
 - 在 [GitHub](https://github.com/yusixian/moe-copy-ai/issues) 提交问题
+- 加入 [Discord 社区](https://discord.gg/XzvrvNMcSe) 交流
 - 联系作者：i@cosine.ren

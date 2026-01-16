@@ -3,5 +3,5 @@
   "description": "面向开发者的技术文档",
   "icon": "Code",
   "defaultOpen": false,
-  "pages": ["api-reference", "changelog"]
+  "pages": ["api-reference", "i18n-guide"]
 }

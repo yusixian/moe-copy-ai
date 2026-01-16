@@ -3,8 +3,6 @@ title: API 参考
 description: MoeCopy AI 的技术 API 文档和开发者参考
 ---
 
-# API 参考
-
 本文档详细介绍 MoeCopy AI 的内部 API、消息通信机制和扩展接口。
 
 ## 消息通信 API
@@ -75,7 +73,9 @@ interface SelectorTestResponse {
 }
 ```
 
-#### openSidePanel <Badge>v0.2.0 新增</Badge>
+#### openSidePanel
+
+<Badge>v0.2.0 新增</Badge>
 
 打开侧边栏面板：
 
@@ -85,7 +85,9 @@ interface SelectorTestResponse {
 }
 ```
 
-#### extractLinksFromPage <Badge>v0.2.0 新增</Badge>
+#### extractLinksFromPage
+
+<Badge>v0.2.0 新增</Badge>
 
 从页面指定元素中提取链接：
 
@@ -105,7 +107,9 @@ interface ExtractLinksResponse {
 }
 ```
 
-#### scrapeViaTab <Badge>v0.2.0 新增</Badge>
+#### scrapeViaTab
+
+<Badge>v0.2.0 新增</Badge>
 
 通过后台标签页抓取指定 URL 的内容：
 
@@ -129,7 +133,9 @@ interface ScrapeViaTabResponse {
 }
 ```
 
-#### clickNextPage <Badge>v0.2.0 新增</Badge>
+#### clickNextPage
+
+<Badge>v0.2.0 新增</Badge>
 
 点击下一页按钮并提取新链接：
 
@@ -204,34 +210,40 @@ interface SelectorResultItem {
 }
 ```
 
-### ExtractedLink <Badge>v0.2.0 新增</Badge>
+### ExtractedLink
+
+<Badge>v0.2.0 新增</Badge>
 
 提取的链接信息：
 
 ```typescript
 interface ExtractedLink {
-  url: string    // 链接地址
-  text: string   // 链接文本
-  index: number  // 在列表中的索引
+  url: string // 链接地址
+  text: string // 链接文本
+  index: number // 在列表中的索引
 }
 ```
 
-### SelectedElementInfo <Badge>v0.2.0 新增</Badge>
+### SelectedElementInfo
+
+<Badge>v0.2.0 新增</Badge>
 
 选中元素的信息：
 
 ```typescript
 interface SelectedElementInfo {
-  tagName: string      // 标签名
-  className: string    // 类名
-  id: string           // ID
-  linkCount: number    // 包含的链接数量
-  outerHTML: string    // 外层 HTML
-  selector?: string    // 用于定位元素的 CSS 选择器
+  tagName: string // 标签名
+  className: string // 类名
+  id: string // ID
+  linkCount: number // 包含的链接数量
+  outerHTML: string // 外层 HTML
+  selector?: string // 用于定位元素的 CSS 选择器
 }
 ```
 
-### BatchScrapeResult <Badge>v0.2.0 新增</Badge>
+### BatchScrapeResult
+
+<Badge>v0.2.0 新增</Badge>
 
 单页抓取结果：
 
@@ -246,7 +258,9 @@ interface BatchScrapeResult {
 }
 ```
 
-### BatchProgress <Badge>v0.2.0 新增</Badge>
+### BatchProgress
+
+<Badge>v0.2.0 新增</Badge>
 
 批量抓取进度：
 
@@ -260,7 +274,7 @@ interface BatchProgress {
   } | null
   results: Array<{
     url: string
-    status: 'success' | 'failed'
+    status: "success" | "failed"
     title?: string
     error?: string
   }>
@@ -269,27 +283,31 @@ interface BatchProgress {
 }
 ```
 
-### ExtractedContent <Badge>v0.2.0 新增</Badge>
+### ExtractedContent
+
+<Badge>v0.2.0 新增</Badge>
 
 内容提取结果（多格式）：
 
 ```typescript
 interface ExtractedContent {
-  html: string       // element.outerHTML (完整 HTML)
-  markdown: string   // 转换后的 Markdown
-  text: string       // element.textContent (纯文本)
+  html: string // element.outerHTML (完整 HTML)
+  markdown: string // 转换后的 Markdown
+  text: string // element.textContent (纯文本)
   elementInfo: SelectedElementInfo
 }
 ```
 
-### NextPageButtonInfo <Badge>v0.2.0 新增</Badge>
+### NextPageButtonInfo
+
+<Badge>v0.2.0 新增</Badge>
 
 下一页按钮信息：
 
 ```typescript
 interface NextPageButtonInfo {
-  xpath: string        // XPath 路径
-  text: string         // 按钮文本
+  xpath: string // XPath 路径
+  text: string // 按钮文本
   description?: string // 描述
 }
 ```
@@ -430,28 +448,30 @@ interface UsageStats {
 const { text, usage } = await generateTextWithUsage(options)
 ```
 
-## 抓取策略 API <Badge>v0.2.0 新增</Badge>
+## 抓取策略 API
+
+<Badge>v0.2.0 新增</Badge>
 
 批量抓取支持三种策略，每种策略适用于不同场景。
 
 ### 策略类型
 
 ```typescript
-type ScrapeStrategyType = 'fetch' | 'background-tabs' | 'current-tab'
+type ScrapeStrategyType = "fetch" | "background-tabs" | "current-tab"
 ```
 
-| 策略 | 描述 | 并发支持 | 适用场景 |
-| --- | --- | --- | --- |
-| `fetch` | 使用 Fetch API 直接获取 | 支持 | 静态页面，速度快 |
-| `background-tabs` | 在后台标签页中加载 | 支持 | JS 渲染页面，需要登录态 |
-| `current-tab` | 在当前标签页中依次访问 | 不支持 | 需要监控过程，调试用 |
+| 策略              | 描述                    | 并发支持 | 适用场景                |
+| ----------------- | ----------------------- | -------- | ----------------------- |
+| `fetch`           | 使用 Fetch API 直接获取 | 支持     | 静态页面，速度快        |
+| `background-tabs` | 在后台标签页中加载      | 支持     | JS 渲染页面，需要登录态 |
+| `current-tab`     | 在当前标签页中依次访问  | 不支持   | 需要监控过程，调试用    |
 
 ### 创建策略实例
 
 ```typescript
-import { createScrapeStrategy } from '~utils/scrape-strategies'
+import { createScrapeStrategy } from "~utils/scrape-strategies"
 
-const strategy = createScrapeStrategy('fetch')
+const strategy = createScrapeStrategy("fetch")
 
 // 执行抓取
 const result = await strategy.scrape(url, options)
@@ -473,32 +493,34 @@ interface ScrapeOptions {
 ### 获取策略信息
 
 ```typescript
-import { getStrategyInfo } from '~utils/scrape-strategies'
+import { getStrategyInfo } from "~utils/scrape-strategies"
 
-const info = getStrategyInfo('background-tabs')
+const info = getStrategyInfo("background-tabs")
 // { name: '后台标签页', description: '...', supportsConcurrency: true }
 ```
 
-## 链接过滤 API <Badge>v0.2.0 新增</Badge>
+## 链接过滤 API
+
+<Badge>v0.2.0 新增</Badge>
 
 ### 过滤类型
 
 ```typescript
-import type { FilterTarget, FilterMode } from '~constants/link-filter-presets'
+import type { FilterTarget, FilterMode } from "~constants/link-filter-presets"
 
-type FilterTarget = 'url' | 'text' | 'both'
-type FilterMode = 'exclude' | 'include'
+type FilterTarget = "url" | "text" | "both"
+type FilterMode = "exclude" | "include"
 ```
 
 ### 预设规则
 
 ```typescript
-import { LINK_FILTER_PRESETS } from '~constants/link-filter-presets'
+import { LINK_FILTER_PRESETS } from "~constants/link-filter-presets"
 
 interface PresetFilter {
   id: string
   name: string
-  pattern: string    // 正则表达式
+  pattern: string // 正则表达式
   target: FilterTarget
   mode: FilterMode
   description: string
@@ -506,6 +528,7 @@ interface PresetFilter {
 ```
 
 内置预设：
+
 - `exclude-images` - 排除图片链接
 - `exclude-anchors` - 排除锚点链接
 - `exclude-pagination` - 排除分页链接
@@ -518,7 +541,7 @@ interface PresetFilter {
 ### 使用过滤 Hook
 
 ```typescript
-import { useLinkFilter } from '~hooks/useLinkFilter'
+import { useLinkFilter } from "~hooks/useLinkFilter"
 
 const {
   pattern,
@@ -535,16 +558,18 @@ const {
 } = useLinkFilter(links)
 ```
 
-## ZIP 导出 API <Badge>v0.2.0 新增</Badge>
+## ZIP 导出 API
+
+<Badge>v0.2.0 新增</Badge>
 
 ### 导出为 ZIP
 
 ```typescript
-import { exportAsZip, generateZipFilename } from '~utils/zip-exporter'
+import { exportAsZip, generateZipFilename } from "~utils/zip-exporter"
 
 const blob = await exportAsZip(results, {
   includeIndex: true,
-  filenameFormat: 'title', // 'title' | 'url' | 'index'
+  filenameFormat: "title", // 'title' | 'url' | 'index'
   maxFilenameLength: 50
 })
 
@@ -557,9 +582,9 @@ downloadBlob(blob, filename)
 
 ```typescript
 interface ZipExportOptions {
-  includeIndex: boolean      // 是否包含 index.md 索引文件
-  filenameFormat: 'title' | 'url' | 'index'  // 文件命名方式
-  maxFilenameLength: number  // 文件名最大长度
+  includeIndex: boolean // 是否包含 index.md 索引文件
+  filenameFormat: "title" | "url" | "index" // 文件命名方式
+  maxFilenameLength: number // 文件名最大长度
 }
 ```
 
@@ -781,12 +806,6 @@ MoeCopy AI 完全兼容 Manifest V3：
 - 使用 Service Worker 替代 Background Page
 - 遵循新的权限模型
 - 支持新的 API 限制
-
-### 浏览器兼容性
-
-- Chrome 88+
-- Edge 88+
-- 其他基于 Chromium 的浏览器
 
 ## 贡献指南
 

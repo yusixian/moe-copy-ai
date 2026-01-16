@@ -24,6 +24,7 @@ description: 记录 MoeCopy AI 的所有版本更新、新功能、改进和修�
 
 - [@yusixian](https://github.com/yusixian) - 项目作者
 - [@hyoban](https://github.com/hyoban) - 批量抓取功能贡献者
+- [@XueHua-s](https://github.com/XueHua-s) - htmlToMarkdown 重构贡献者
 - 以及所有提交 Issue 和 PR 的朋友们！
 
 ## 反馈渠道
@@ -32,6 +33,58 @@ description: 记录 MoeCopy AI 的所有版本更新、新功能、改进和修�
 - [GitHub Issues](https://github.com/yusixian/moe-copy-ai/issues)
 - [GitHub Discussions](https://github.com/yusixian/moe-copy-ai/discussions)
 - 邮箱：i@cosine.ren
+
+## [v0.2.2] - 2026-01-16
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.2.2)
+
+### 新功能
+
+- **国际化支持 (i18n)**：添加了多语言支持系统，目前仅支持简体中文和英语两种语言，详见[国际化指南](/developer-guide/i18n-guide)
+  - 自动检测浏览器语言，首次使用时自动设置
+  - 支持运行时切换语言，无需刷新页面
+  - 语言偏好通过 Chrome sync storage 同步至所有扩展窗口
+  - 在设置页面新增语言选择器，可手动切换界面语言
+  - 迁移所有用户可见文本到翻译系统，共 452 个翻译键
+  - AI 系统提示词支持多语言默认值
+  - 欢迎贡献翻译或添加新语言支持，详见[贡献指南](https://github.com/yusixian/moe-copy-ai/blob/dev/CONTRIBUTING.md)
+- 重构 AI 摘要组件并增强显示，历史记录的 AI 摘要结果里也加上了功能按钮，增加源码切换/全屏查看按钮
+- 修复悬浮球关闭后页面加载时仍会出现一瞬间的问题
+
+## [v0.2.1] - 2026-01-15
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.2.1)
+
+### 新功能
+
+- **侧边栏单页抓取** - 悬浮球功能整合至侧边栏，新增单页抓取标签页
+  - 内容提取页新增 **AI 总结按钮**，可快速生成内容摘要
+  - 更便捷的单页内容提取流程
+
+### 改进
+
+- **HTML 转 Markdown 转换升级** - 采用 unified/rehype/remark 解析框架替代手写 DOM 递归
+  - 输出更规范、更一致
+  - 感谢 [@XueHua-s](https://github.com/XueHua-s) 的贡献！
+
+- **HTML 预处理增强**
+  - 清理 script、style、noscript、SVG、meta、link 等标签
+  - 移除 Plasmo 相关节点
+  - 自动补全图片相对路径为绝对 URL
+
+- **无效链接处理** - 对空 href、`javascript:`、`#` 等无效链接进行"去包裹"处理，保留纯文本
+
+### 技术改进
+
+- 测试框架从 Jest 迁移至 Vitest
+- 图标清理和 UI 组件优化
+- 新增 Firefox 构建脚本
+
+### 贡献者
+
+感谢 [@XueHua-s](https://github.com/XueHua-s) 贡献的 htmlToMarkdown 重构！
+
+**Full Changelog**: https://github.com/yusixian/moe-copy-ai/compare/0.2.0...0.2.1
 
 ## [v0.2.0] - 2025-12-31
 
