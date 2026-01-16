@@ -9,7 +9,7 @@ import {
   deleteAiChatHistoryItem,
   getAiChatHistory
 } from "~utils/ai-service"
-import { useI18n } from "~utils/i18n"
+import { getIntlLocale, useI18n } from "~utils/i18n"
 
 import SummaryResultDisplay from "./SummaryResultDisplay"
 
@@ -22,7 +22,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
   isOpen,
   onClose
 }) => {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const [historyItems, setHistoryItems] = useState<AiChatHistoryItem[]>([])
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null)
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set())
@@ -125,7 +125,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
 
   // 格式化日期时间
   const formatDateTime = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString("zh-CN", {
+    return new Date(timestamp).toLocaleString(getIntlLocale(locale), {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",

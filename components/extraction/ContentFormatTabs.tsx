@@ -5,7 +5,7 @@ import { memo, useMemo, useState } from "react"
 
 import type { ContentOutputFormat, ExtractedContent } from "~constants/types"
 import { cn } from "~utils"
-import { useI18n } from "~utils/i18n"
+import { getIntlLocale, useI18n } from "~utils/i18n"
 
 import ContentDisplay from "../ContentDisplay"
 
@@ -18,7 +18,8 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
   content,
   defaultFormat = "markdown"
 }: ContentFormatTabsProps) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const intlLocale = getIntlLocale(locale)
   const [activeFormat, setActiveFormat] =
     useState<ContentOutputFormat>(defaultFormat)
   const [isPreviewMode, setIsPreviewMode] = useState(true)
@@ -129,9 +130,11 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
       {/* 底部操作栏 */}
       <div className="flex items-center justify-between">
         <div className="text-gray-400 text-xs">
-          {stats.chars.toLocaleString()} {t("extraction.stats.chars")} ·{" "}
-          {stats.words.toLocaleString()} {t("extraction.stats.words")} ·{" "}
-          {stats.tokens.toLocaleString()} {t("extraction.stats.tokens")}
+          {stats.chars.toLocaleString(intlLocale)} {t("extraction.stats.chars")}{" "}
+          · {stats.words.toLocaleString(intlLocale)}{" "}
+          {t("extraction.stats.words")} ·{" "}
+          {stats.tokens.toLocaleString(intlLocale)}{" "}
+          {t("extraction.stats.tokens")}
         </div>
         <button
           type="button"

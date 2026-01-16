@@ -34,3 +34,14 @@ export const LOCALE_NAMES: Record<Locale, string> = {
   zh_CN: "简体中文",
   en_US: "English"
 }
+
+// Intl API 使用的语言标签
+export const INTL_LOCALE_MAP: Record<Locale, string> = {
+  zh_CN: "zh-CN",
+  en_US: "en-US"
+}
+
+// 获取 Intl API 使用的语言标签
+export function getIntlLocale(locale: Locale): string {
+  return INTL_LOCALE_MAP[locale] || INTL_LOCALE_MAP[DEFAULT_LOCALE]
+}
