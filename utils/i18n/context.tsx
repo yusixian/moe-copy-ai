@@ -9,6 +9,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from "react"
 
@@ -19,8 +20,58 @@ import {
   DEFAULT_LOCALE,
   type I18nContextValue,
   LOCALE_STORAGE_KEY,
-  type Locale
+  type Locale,
+  SUPPORTED_LOCALES
 } from "./types"
+
+/**
+ * 检测浏览器语言偏好，返回支持的 locale
+ */
+function detectBrowserLocale(): Locale {
+  const toSupportedLocale = (language?: string | null): Locale | null => {
+    if (!language) return null
+
+    const normalized = language.toLowerCase()
+    // 匹配 zh-CN, zh-TW, zh 等变体
+    if (normalized.startsWith("zh")) {
+      return "zh_CN"
+    }
+    // 匹配 en-US, en-GB, en 等变体
+    if (normalized.startsWith("en")) {
+      return "en_US"
+    }
+
+    return null
+  }
+
+  // 优先使用 Extension API (Chrome/Firefox)
+  const runtime = globalThis as typeof globalThis & {
+    chrome?: { i18n?: { getUILanguage?: () => string } }
+    browser?: { i18n?: { getUILanguage?: () => string } }
+  }
+  const uiLanguage =
+    runtime.chrome?.i18n?.getUILanguage?.() ??
+    runtime.browser?.i18n?.getUILanguage?.()
+  const uiLocale = toSupportedLocale(uiLanguage)
+  if (uiLocale) return uiLocale
+
+  // Fallback: 使用 navigator.language / navigator.languages
+  const nav = typeof navigator !== "undefined" ? navigator : undefined
+  const navLanguages =
+    nav && Array.isArray(nav.languages) && nav.languages.length > 0
+      ? nav.languages
+      : nav?.language
+        ? [nav.language]
+        : []
+
+  for (const lang of navLanguages) {
+    const locale = toSupportedLocale(lang)
+    if (locale) return locale
+  }
+
+  // 最终 fallback: 中文
+  return DEFAULT_LOCALE
+}
 
 // 创建 Context
 const I18nContext = createContext<I18nContextValue | null>(null)
@@ -40,6 +91,7 @@ export function I18nProvider({ children, initialLocale }: I18nProviderProps) {
     initialLocale || DEFAULT_LOCALE
   )
   const [isLoading, setIsLoading] = useState(!initialLocale)
+  const hasUserLocaleOverride = useRef(Boolean(initialLocale))
 
   // 初始化时从 storage 读取语言偏好
   useEffect(() => {
@@ -48,14 +100,24 @@ export function I18nProvider({ children, initialLocale }: I18nProviderProps) {
     const loadLocale = async () => {
       try {
         const savedLocale = await syncStorage.get<Locale>(LOCALE_STORAGE_KEY)
-        if (
-          savedLocale &&
-          (savedLocale === "zh_CN" || savedLocale === "en_US")
-        ) {
+
+        if (savedLocale && SUPPORTED_LOCALES.includes(savedLocale)) {
+          // 用户已保存语言偏好，使用保存的值
           setLocaleState(savedLocale)
+        } else {
+          // 首次使用，检测浏览器语言
+          const detectedLocale = detectBrowserLocale()
+          setLocaleState(detectedLocale)
+
+          // 保存检测到的语言，避免下次重复检测
+          if (!hasUserLocaleOverride.current) {
+            await syncStorage.set(LOCALE_STORAGE_KEY, detectedLocale)
+          }
         }
       } catch (error) {
         console.error("Failed to load locale from storage:", error)
+        // 出错时使用浏览器检测作为 fallback
+        setLocaleState(detectBrowserLocale())
       } finally {
         setIsLoading(false)
       }
@@ -68,7 +130,7 @@ export function I18nProvider({ children, initialLocale }: I18nProviderProps) {
   useEffect(() => {
     const handleLocaleChange = (change: { newValue?: unknown }) => {
       const newLocale = change.newValue as Locale | undefined
-      if (newLocale && (newLocale === "zh_CN" || newLocale === "en_US")) {
+      if (newLocale && SUPPORTED_LOCALES.includes(newLocale)) {
         setLocaleState(newLocale)
       }
     }
@@ -84,6 +146,7 @@ export function I18nProvider({ children, initialLocale }: I18nProviderProps) {
 
   // 切换语言并保存到 storage
   const setLocale = useCallback(async (newLocale: Locale) => {
+    hasUserLocaleOverride.current = true
     setLocaleState(newLocale)
     try {
       await syncStorage.set(LOCALE_STORAGE_KEY, newLocale)
