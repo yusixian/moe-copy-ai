@@ -2,23 +2,41 @@ import "./styles/global.css"
 import "react-toastify/dist/ReactToastify.css"
 
 import { Icon } from "@iconify/react"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { ToastContainer } from "react-toastify"
 
-import BatchScrapePanel from "~components/batch/BatchScrapePanel"
-import ContentExtractionPanel from "~components/extraction/ContentExtractionPanel"
-import SidePanelSettings from "~components/sidepanel/SidePanelSettings"
-import {
-  SingleScrapePanel,
-  type SingleScrapePanelHandle
-} from "~components/singlescrape"
+import type { SingleScrapePanelHandle } from "~components/singlescrape"
 import { Button } from "~components/ui/button"
+import { ErrorBoundary } from "~components/ui/ErrorBoundary"
 import Segmented, { type SegmentedOption } from "~components/ui/segmented"
 import type { BatchScrapeMode } from "~constants/types"
 import useBatchScrape from "~hooks/useBatchScrape"
 import useContentExtraction from "~hooks/useContentExtraction"
 import useElementSelector from "~hooks/useElementSelector"
 import { I18nProvider, useI18n } from "~utils/i18n"
+
+// Lazy load heavy tab components
+const SingleScrapePanel = lazy(
+  () => import("~components/singlescrape/SingleScrapePanel")
+)
+const BatchScrapePanel = lazy(
+  () => import("~components/batch/BatchScrapePanel")
+)
+const ContentExtractionPanel = lazy(
+  () => import("~components/extraction/ContentExtractionPanel")
+)
+const SidePanelSettings = lazy(
+  () => import("~components/sidepanel/SidePanelSettings")
+)
+
+// Loading fallback for lazy components
+function TabSkeleton() {
+  return (
+    <div className="flex h-32 items-center justify-center">
+      <Icon icon="line-md:loading-loop" className="h-8 w-8 text-sky-500" />
+    </div>
+  )
+}
 
 type SidePanelView = "batch" | "extraction" | "singlescrape" | "settings"
 
@@ -225,49 +243,51 @@ function SidePanel() {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {currentView === "singlescrape" && (
-          <SingleScrapePanel
-            ref={singleScrapePanelRef}
-            onLoadingChange={setIsSingleScrapeLoading}
-          />
-        )}
-        {currentView === "batch" && (
-          <BatchScrapePanel
-            mode={currentMode}
-            elementInfo={elementInfo || scrapeElementInfo}
-            links={links}
-            progress={progress}
-            paginationProgress={paginationProgress}
-            results={results}
-            error={error}
-            nextPageButton={nextPageButton}
-            isSelectingNextPage={isSelectingNextPage && isSelecting}
-            onStartScrape={startScrape}
-            onPause={pauseScrape}
-            onResume={resumeScrape}
-            onCancel={handleCancel}
-            onReset={handleReset}
-            onSelectElement={handleSelectElement}
-            onAddLink={addLink}
-            onUpdateLink={updateLink}
-            onRemoveLink={removeLink}
-            onSelectNextPage={handleSelectNextPage}
-            onClearNextPage={handleClearNextPage}
-          />
-        )}
-        {currentView === "extraction" && (
-          <ContentExtractionPanel
-            mode={extractionMode}
-            content={extractedContent}
-            elementInfo={extractionElementInfo}
-            error={extractionError}
-            tabInfo={extractionTabInfo}
-            onStartSelection={startContentSelection}
-            onCancel={cancelContentSelection}
-            onReset={resetContentExtraction}
-          />
-        )}
-        {currentView === "settings" && <SidePanelSettings />}
+        <Suspense fallback={<TabSkeleton />}>
+          {currentView === "singlescrape" && (
+            <SingleScrapePanel
+              ref={singleScrapePanelRef}
+              onLoadingChange={setIsSingleScrapeLoading}
+            />
+          )}
+          {currentView === "batch" && (
+            <BatchScrapePanel
+              mode={currentMode}
+              elementInfo={elementInfo || scrapeElementInfo}
+              links={links}
+              progress={progress}
+              paginationProgress={paginationProgress}
+              results={results}
+              error={error}
+              nextPageButton={nextPageButton}
+              isSelectingNextPage={isSelectingNextPage && isSelecting}
+              onStartScrape={startScrape}
+              onPause={pauseScrape}
+              onResume={resumeScrape}
+              onCancel={handleCancel}
+              onReset={handleReset}
+              onSelectElement={handleSelectElement}
+              onAddLink={addLink}
+              onUpdateLink={updateLink}
+              onRemoveLink={removeLink}
+              onSelectNextPage={handleSelectNextPage}
+              onClearNextPage={handleClearNextPage}
+            />
+          )}
+          {currentView === "extraction" && (
+            <ContentExtractionPanel
+              mode={extractionMode}
+              content={extractedContent}
+              elementInfo={extractionElementInfo}
+              error={extractionError}
+              tabInfo={extractionTabInfo}
+              onStartSelection={startContentSelection}
+              onCancel={cancelContentSelection}
+              onReset={resetContentExtraction}
+            />
+          )}
+          {currentView === "settings" && <SidePanelSettings />}
+        </Suspense>
       </div>
 
       {/* 底部链接 */}
@@ -326,7 +346,9 @@ function SidePanel() {
 function SidePanelWithI18n() {
   return (
     <I18nProvider>
-      <SidePanel />
+      <ErrorBoundary>
+        <SidePanel />
+      </ErrorBoundary>
     </I18nProvider>
   )
 }

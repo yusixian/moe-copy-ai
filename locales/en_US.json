@@ -774,5 +774,20 @@
 
   "aria.closePopup": "Close popup",
   "aria.copy": "Copy",
-  "aria.catIcon": "Cat icon"
+  "aria.catIcon": "Cat icon",
+
+  "errorBoundary.title": "Oops, something went wrong",
+  "errorBoundary.defaultMessage": "An unexpected error occurred",
+  "errorBoundary.tryAgain": "Try Again",
+  "errorBoundary.reloadPage": "Reload Page",
+  "errorBoundary.helpTitle": "Need help?",
+  "errorBoundary.helpDesc": "If the problem persists, try the following:",
+  "errorBoundary.docs": "View Docs",
+  "errorBoundary.reportIssue": "Report Issue",
+  "errorBoundary.discord": "Join Discord",
+  "errorBoundary.email": "Send Email",
+  "errorBoundary.version": "Version",
+  "errorBoundary.errorDetails": "Error Details",
+  "errorBoundary.showDetails": "Show Details",
+  "errorBoundary.hideDetails": "Hide Details"
 }

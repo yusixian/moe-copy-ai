@@ -7,8 +7,10 @@ import {
   useState
 } from "react"
 import { toast } from "react-toastify"
+
 import { useI18n } from "~utils/i18n"
 import { syncStorage } from "~utils/storage"
+import { useAsyncCallback } from "./useAsyncCallback"
 
 export interface ModelInfo {
   id: string
@@ -129,20 +131,23 @@ export function useAiSettings() {
     })
   }, [defaultSystemPrompt])
 
-  // 保存设置
-  const saveSettings = useCallback(async () => {
-    try {
+  // 保存设置 - using useAsyncCallback to reduce boilerplate
+  const { execute: saveSettings, isLoading: isSaving } = useAsyncCallback(
+    async () => {
       await syncStorage.set("ai_api_key", apiKey)
       await syncStorage.set("ai_base_url", baseURL)
       await syncStorage.set("ai_system_prompt", systemPrompt)
       await syncStorage.set("ai_model", model)
       hasSavedPromptRef.current = true
-      toast.success(t("toast.ai.settingsSaved"))
-    } catch (error) {
-      toast.error(t("toast.ai.settingsSaveFailed"))
-      console.error("保存AI设置出错:", error)
+    },
+    {
+      onSuccess: () => toast.success(t("toast.ai.settingsSaved")),
+      onError: (error) => {
+        toast.error(t("toast.ai.settingsSaveFailed"))
+        console.error("保存AI设置出错:", error)
+      }
     }
-  }, [apiKey, baseURL, model, systemPrompt, t])
+  )
 
   // 初始化加载
   useLayoutEffect(() => {
@@ -158,6 +163,7 @@ export function useAiSettings() {
     modelList,
     isLoadingModels,
     isLoaded,
+    isSaving,
 
     // Setters
     setApiKey,

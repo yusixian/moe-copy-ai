@@ -171,6 +171,52 @@ Chrome extension messaging pattern for cross-context communication between popup
 
 Built with Tailwind CSS, optimized for mobile browsers (Kiwi Browser support).
 
+### State Management Decision Tree
+
+Choose the appropriate state management approach based on these criteria:
+
+| Use Case | Pattern | Example |
+|----------|---------|---------|
+| Component-local UI state (toggle, hover) | `useState` | Modal open/close, form inputs |
+| Derived values from props/state | `useMemo` | Filtered lists, computed totals |
+| External store sync (Chrome storage) | `useSyncExternalStore` | `useFloatButtonStorage` |
+| Cross-context config (Chrome sync) | `useStorage` (Plasmo) | API keys, user preferences |
+| Avoid stale closures in callbacks | `useRef` + current value | `useAiSettings`, `useElementSelector` |
+| Heavy data + local persistence | Chrome local storage | AI chat history |
+
+**Key Guidelines:**
+
+1. **Prefer derived state over synced state**: Use `useMemo` instead of `useEffect` to sync state
+   ```tsx
+   // ✅ Good - derived state
+   const mode = useMemo(() => {
+     if (isSelecting) return "selecting"
+     if (extractedContent) return "extracted"
+     return "idle"
+   }, [isSelecting, extractedContent])
+
+   // ❌ Bad - synced state via useEffect
+   useEffect(() => {
+     if (isSelecting) setMode("selecting")
+     else if (extractedContent) setMode("extracted")
+   }, [isSelecting, extractedContent])
+   ```
+
+2. **Use refs for values needed in callbacks without triggering re-renders**
+   ```tsx
+   const settingsRef = useRef(settings)
+   settingsRef.current = settings
+
+   const callback = useCallback(() => {
+     // Access current value without dependency
+     doSomething(settingsRef.current)
+   }, [])
+   ```
+
+3. **Chrome storage patterns:**
+   - Sync storage: User preferences, settings (synced across devices)
+   - Local storage: Large data, history, caches (device-specific)
+
 ### Development Environment
 
 - **Framework**: Plasmo (Chrome extension framework)

@@ -45,6 +45,7 @@
     "react": "18.2.0",
     "react-device-detect": "^2.2.3",
     "react-dom": "18.2.0",
+    "react-error-boundary": "^6.1.0",
     "react-responsive": "^10.0.0",
     "react-toastify": "^11.0.5",
     "rehype-parse": "^8.0.5",
