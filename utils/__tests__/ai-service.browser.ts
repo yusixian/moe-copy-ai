@@ -13,6 +13,12 @@ vi.mock("@plasmohq/storage", () => {
       this.store.set(key, value)
     }
 
+    async setMany(items: Record<string, unknown>): Promise<void> {
+      for (const [key, value] of Object.entries(items)) {
+        this.store.set(key, value)
+      }
+    }
+
     clear() {
       this.store.clear()
     }
