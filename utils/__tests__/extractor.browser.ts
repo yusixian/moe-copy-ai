@@ -1,19 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 
-vi.mock("@plasmohq/storage", () => ({
-  Storage: class {
-    private store = new Map<string, unknown>()
-    async get<T>(key: string): Promise<T | undefined> {
-      return this.store.get(key) as T | undefined
-    }
-    async set(key: string, value: unknown): Promise<void> {
-      this.store.set(key, value)
-    }
-    watch(): () => void {
-      return () => {}
-    }
-  }
-}))
+import { createPlasmoStorageMock } from "./mocks"
+
+// Mock @plasmohq/storage with shared mock
+vi.mock("@plasmohq/storage", () => createPlasmoStorageMock())
 
 vi.mock("../logger", () => ({
   debugLog: vi.fn()

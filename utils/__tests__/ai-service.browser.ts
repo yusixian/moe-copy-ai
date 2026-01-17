@@ -1,33 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-// Mock @plasmohq/storage
-vi.mock("@plasmohq/storage", () => {
-  class MockStorage {
-    private store = new Map<string, unknown>()
+import { createPlasmoStorageMock, resetMockStorage } from "./mocks"
 
-    async get<T>(key: string): Promise<T | undefined> {
-      return this.store.get(key) as T | undefined
-    }
-
-    async set(key: string, value: unknown): Promise<void> {
-      this.store.set(key, value)
-    }
-
-    async setMany(items: Record<string, unknown>): Promise<void> {
-      for (const [key, value] of Object.entries(items)) {
-        this.store.set(key, value)
-      }
-    }
-
-    clear() {
-      this.store.clear()
-    }
-  }
-
-  return {
-    Storage: MockStorage
-  }
-})
+// Mock @plasmohq/storage with shared mock
+vi.mock("@plasmohq/storage", () => createPlasmoStorageMock())
 
 // Mock @xsai/stream-text
 vi.mock("@xsai/stream-text", () => ({
@@ -49,18 +25,11 @@ import {
   getAiChatHistory,
   getAiConfig
 } from "../ai-service"
-import { localStorage, syncStorage } from "../storage"
-
-// Type for mocked storage with clear method
-interface MockStorageInstance {
-  get: <T>(key: string) => Promise<T | undefined>
-  set: (key: string, value: unknown) => Promise<void>
-  clear: () => void
-}
+import { syncStorage } from "../storage"
 
 describe("getAiConfig", () => {
   beforeEach(() => {
-    ;(syncStorage as unknown as MockStorageInstance).clear()
+    resetMockStorage()
   })
 
   it("returns valid config from storage", async () => {
@@ -99,7 +68,7 @@ describe("getAiConfig", () => {
 
 describe("generateSummary", () => {
   beforeEach(() => {
-    ;(syncStorage as unknown as MockStorageInstance).clear()
+    resetMockStorage()
     vi.clearAllMocks()
   })
 
@@ -178,11 +147,14 @@ describe("generateSummary", () => {
 
 describe("AI Chat History", () => {
   beforeEach(() => {
-    ;(localStorage as unknown as MockStorageInstance).clear()
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date("2024-01-01T00:00:00.000Z"))
+    resetMockStorage()
   })
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.useRealTimers()
   })
 
   it("returns empty history when storage is empty", async () => {
@@ -213,15 +185,17 @@ describe("AI Chat History", () => {
   })
 
   it("adds multiple items in correct order (newest first)", async () => {
+    // First item at T=0
     await addAiChatHistoryItem({
       url: "https://example.com/1",
       prompt: "First",
       content: "Content 1"
     })
 
-    // Wait a bit to ensure different timestamps
-    await new Promise((resolve) => setTimeout(resolve, 10))
+    // Advance time by 1 second for different timestamp
+    vi.setSystemTime(new Date("2024-01-01T00:00:01.000Z"))
 
+    // Second item at T=1s
     await addAiChatHistoryItem({
       url: "https://example.com/2",
       prompt: "Second",
