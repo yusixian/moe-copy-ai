@@ -134,10 +134,12 @@ export function useAiSettings() {
   // 保存设置 - using useAsyncCallback to reduce boilerplate
   const { execute: saveSettings, isLoading: isSaving } = useAsyncCallback(
     async () => {
-      await syncStorage.set("ai_api_key", apiKey)
-      await syncStorage.set("ai_base_url", baseURL)
-      await syncStorage.set("ai_system_prompt", systemPrompt)
-      await syncStorage.set("ai_model", model)
+      await syncStorage.setMany({
+        ai_api_key: apiKey,
+        ai_base_url: baseURL,
+        ai_system_prompt: systemPrompt,
+        ai_model: model
+      })
       hasSavedPromptRef.current = true
     },
     {

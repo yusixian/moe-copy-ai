@@ -58,10 +58,12 @@ describe("getAiConfig", () => {
   })
 
   it("returns valid config from storage", async () => {
-    await syncStorage.set("ai_api_key", "test-key-123")
-    await syncStorage.set("ai_base_url", "https://api.test.com/v1/")
-    await syncStorage.set("ai_system_prompt", "Custom prompt")
-    await syncStorage.set("ai_model", "gpt-4")
+    await syncStorage.setMany({
+      ai_api_key: "test-key-123",
+      ai_base_url: "https://api.test.com/v1/",
+      ai_system_prompt: "Custom prompt",
+      ai_model: "gpt-4"
+    })
 
     const config = await getAiConfig()
 
@@ -96,9 +98,11 @@ describe("generateSummary", () => {
   })
 
   it("generates summary successfully with valid config", async () => {
-    await syncStorage.set("ai_api_key", "test-key")
-    await syncStorage.set("ai_base_url", "https://api.test.com/v1/")
-    await syncStorage.set("ai_model", "gpt-4")
+    await syncStorage.setMany({
+      ai_api_key: "test-key",
+      ai_base_url: "https://api.test.com/v1/",
+      ai_model: "gpt-4"
+    })
 
     vi.mocked(streamText).mockResolvedValueOnce({
       text: "Generated summary",
@@ -121,8 +125,10 @@ describe("generateSummary", () => {
   })
 
   it("returns null when API key is missing", async () => {
-    await syncStorage.set("ai_base_url", "https://api.test.com/v1/")
-    await syncStorage.set("ai_model", "gpt-4")
+    await syncStorage.setMany({
+      ai_base_url: "https://api.test.com/v1/",
+      ai_model: "gpt-4"
+    })
 
     const result = await generateSummary()
 
@@ -131,9 +137,11 @@ describe("generateSummary", () => {
   })
 
   it("uses custom prompt when provided", async () => {
-    await syncStorage.set("ai_api_key", "test-key")
-    await syncStorage.set("ai_base_url", "https://api.test.com/v1/")
-    await syncStorage.set("ai_model", "gpt-4")
+    await syncStorage.setMany({
+      ai_api_key: "test-key",
+      ai_base_url: "https://api.test.com/v1/",
+      ai_model: "gpt-4"
+    })
 
     vi.mocked(streamText).mockResolvedValueOnce({
       text: "Custom result"
@@ -149,8 +157,10 @@ describe("generateSummary", () => {
   })
 
   it("returns null when API call fails", async () => {
-    await syncStorage.set("ai_api_key", "test-key")
-    await syncStorage.set("ai_model", "gpt-4")
+    await syncStorage.setMany({
+      ai_api_key: "test-key",
+      ai_model: "gpt-4"
+    })
 
     vi.mocked(streamText).mockRejectedValueOnce(new Error("API error"))
 
