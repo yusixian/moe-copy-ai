@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .glass-1 {
+    @apply backdrop-blur-sm brightness-110;
+  }
+
+  .glass-2 {
+    @apply backdrop-blur-md brightness-110;
+  }
+
+  .top-bar {
+    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] shadow-md border border-line-1;
+  }
+
+  .dialog {
+    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] shadow-xl border border-line-1;
+  }
+
+  .popover {
+    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] shadow-sm border border-line-1;
+  }
+
+  .content-1 {
+    @apply bg-content-1 rounded-[12px] border border-line-1;
+  }
+
+  .content-2 {
+    @apply bg-content-2 rounded-[12px] border border-line-1;
+  }
+}
+
+body {
+  @apply text-text-1 font-sans;
+}
+
 /* Markdown 预览样式 */
 .markdown-preview {
   font-size: 14px;

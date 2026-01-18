@@ -224,9 +224,9 @@ const SelectorHeader = memo<{
 }>(({ type, count }) => {
   const { t } = useI18n()
   return (
-    <div className="flex items-center gap-1 font-medium text-sky-600 text-xs">
+    <div className="flex items-center gap-1 font-medium text-text-2 text-xs">
       <span>{t(`selector.type.${type}`)}</span>
-      <span className="whitespace-nowrap rounded-full bg-sky-100 px-1 py-0.5 font-medium text-sky-600 text-xs">
+      <span className="inline-block whitespace-nowrap rounded-full bg-accent-blue-secondary px-1 py-0.5 font-medium text-accent-blue text-xs">
         {t("selector.count", { count })}
       </span>
     </div>
@@ -244,13 +244,13 @@ const DropdownToggle = memo<{
   <button
     type="button"
     onClick={toggleOpen}
-    className="flex min-h-[36px] items-center rounded-lg border border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50 px-3 py-1.5 font-medium text-sky-600 text-xs shadow-sm transition-all hover:shadow">
+    className="flex min-h-[36px] items-center rounded-lg border border-line-1 bg-content-solid-1 px-3 py-1.5 font-medium text-text-1 text-xs shadow-sm transition-all hover:shadow">
     <span className="mr-2 max-w-[12.5rem] truncate font-mono md:max-w-[9.375rem]">
       {selectedText}
     </span>
     <Icon
       icon={isOpen ? "mdi:chevron-up" : "mdi:chevron-down"}
-      className="text-sky-500 transition-transform duration-200"
+      className="text-text-2 transition-transform duration-200"
       width={16}
       height={16}
     />

@@ -104,33 +104,35 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
   return (
     <div
       className={cn(
-        "relative max-h-[600px] overflow-y-auto rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 p-3 sm:p-4",
+        "relative max-h-[600px] overflow-y-auto rounded-xl p-3 sm:p-4",
         className
       )}>
-      <header className="relative mb-4 flex flex-col gap-3 rounded-xl border border-blue-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+      {/* Soft Blue Radial Background */}
+      <div
+        className="fixed inset-0 top-0 left-0 z-[-1] h-full w-full rounded-[inherit] bg-app"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at top center, rgb(37 99 235 / 0.2),transparent 70%)
+          `
+        }}
+      />
+
+      <header className="sticky top-0 top-bar left-0 z-[100] mb-4 flex flex-col gap-3 px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <div className="min-w-0 flex-1">
-          <h1 className="flex items-center font-bold text-blue-600 text-lg sm:text-xl">
+          <h1 className="flex items-center font-bold text-accent-blue text-lg sm:text-xl">
             <span className="truncate">{t("app.name")}</span>
             <span className="ml-2 flex-shrink-0">{t("popup.subtitle")}</span>
           </h1>
-          <p className="text-blue-500 text-xs sm:text-sm">
+          <p className="text-text-2 text-xs sm:text-sm">
             {t("popup.description")}
           </p>
-          <p className="mt-1 hidden text-blue-400 text-xs sm:block">
+          {/* <p className="mt-1 hidden text-blue-400 text-xs sm:block">
             {t("popup.descriptionDetail")}
-          </p>
+          </p> */}
         </div>
         <div className="flex flex-shrink-0 items-center justify-end gap-2">
-          {onClose && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              title={t("common.close")}>
-              <Icon icon="line-md:close" width="20" height="20" />
-            </Button>
-          )}
           <Button
+            className="border-none"
             variant="secondary"
             size="sm"
             onClick={handleOpenSidePanel}
@@ -157,6 +159,16 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             title={t("popup.openSettings")}>
             <Icon icon="line-md:cog" width="20" height="20" />
           </Button>
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              title={t("common.close")}
+              className="hover:bg-error-secondary-hover hover:text-error">
+              <Icon icon="line-md:close" width="20" height="20" />
+            </Button>
+          )}
         </div>
       </header>
 
@@ -245,8 +257,8 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             <Icon
               icon="line-md:coffee-half-empty-twotone-loop"
               className="text-blue-500"
-              width="16"
-              height="16"
+              width="18"
+              height="18"
             />
           }
           defaultExpanded={false}
@@ -324,18 +336,18 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center p-8">
-          <div className="h-12 w-12 animate-spin rounded-full border-blue-500 border-t-4 border-b-4"></div>
-          <p className="mt-3 text-blue-500">{t("common.loading")}</p>
+          <div className="h-12 w-12 animate-spin rounded-full border-accent-blue border-t-4 border-b-4"></div>
+          <p className="mt-3 text-accent-blue">{t("common.loading")}</p>
         </div>
       ) : scrapedData ? (
-        <div className="rounded-xl border-2 border-indigo-200 bg-white p-4 shadow-lg">
+        <div className="p-3 content-1">
           {/* 页面标题 */}
           <div className="mb-4">
-            <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-lg text-sky-600">
+            <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
               <Icon
                 icon="line-md:hash"
-                width="24"
-                height="24"
+                width="18"
+                height="18"
                 className="flex-shrink-0"
               />
               <span>{t("content.title")}</span>
@@ -353,20 +365,17 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               )}
             </h2>
 
-            <CopyableTextField
-              text={scrapedData.title}
-              className="rounded-xl border border-sky-200 bg-blue-50 p-2"
-            />
+            <CopyableTextField text={scrapedData.title} />
           </div>
 
           {/* 作者信息 */}
           {scrapedData.author && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-lg text-sky-600">
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
                 <Icon
                   icon="line-md:account"
-                  width="24"
-                  height="24"
+                  width="18"
+                  height="18"
                   className="flex-shrink-0"
                 />
                 <span>{t("content.author")}</span>
@@ -384,21 +393,18 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 )}
               </h2>
 
-              <CopyableTextField
-                text={scrapedData.author}
-                className="rounded-xl border border-sky-200 bg-blue-50 p-2"
-              />
+              <CopyableTextField text={scrapedData.author} />
             </div>
           )}
 
           {/* 发布日期 */}
           {scrapedData.publishDate && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-lg text-sky-600">
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
                 <Icon
                   icon="line-md:calendar"
-                  width="24"
-                  height="24"
+                  width="18"
+                  height="18"
                   className="flex-shrink-0"
                 />
                 <span>{t("content.date")}</span>
@@ -415,28 +421,22 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                   />
                 )}
               </h2>
-              <CopyableTextField
-                text={scrapedData.publishDate}
-                className="rounded-xl border border-sky-200 bg-blue-50 p-2"
-              />
+              <CopyableTextField text={scrapedData.publishDate} />
             </div>
           )}
 
           {/* URL */}
           <div className="mb-4">
-            <h2 className="mb-2 flex items-center gap-2 font-semibold text-lg text-sky-600">
+            <h2 className="mb-2 flex items-center gap-2 font-semibold text-accent-blue text-lg">
               <Icon
                 icon="line-md:link"
-                width="24"
-                height="24"
+                width="18"
+                height="18"
                 className="flex-shrink-0"
               />
               <span>{t("content.url")}</span>
             </h2>
-            <CopyableTextField
-              text={scrapedData.url}
-              className="rounded-xl border border-sky-200 bg-blue-50 p-2 text-xs"
-            />
+            <CopyableTextField text={scrapedData.url} />
           </div>
 
           {/* 文章内容 */}
@@ -445,12 +445,12 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               {/* 标题行 - 移动端优化 */}
               <div className="mb-3">
                 <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="flex flex-wrap items-center gap-2 font-semibold text-lg text-sky-600">
+                  <h2 className="flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
                     <Icon
-                      icon="line-md:file-document-twotone"
+                      icon="line-md:file-document"
                       className="inline flex-shrink-0"
-                      width="24"
-                      height="24"
+                      width="18"
+                      height="18"
                     />
                     <span>{t("popup.articleContent")}</span>
                     {contentSelectors.length > 0 && (
@@ -613,11 +613,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 页面图片 */}
           {scrapedData.images && scrapedData.images.length > 0 && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-lg text-sky-600">
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
                 <Icon
                   icon="line-md:image"
-                  width="24"
-                  height="24"
+                  width="18"
+                  height="18"
                   className="flex-shrink-0"
                 />
                 <span>{t("popup.pageImages")}</span>
@@ -635,11 +635,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 元数据 */}
           {Object.keys(scrapedData.metadata).length > 0 && (
             <div>
-              <h2 className="mb-2 flex items-center gap-2 font-semibold text-lg text-sky-600">
+              <h2 className="mb-2 flex items-center gap-2 font-semibold text-accent-blue text-lg">
                 <Icon
-                  icon="line-md:emoji-grin-twotone"
-                  width="24"
-                  height="24"
+                  icon="line-md:emoji-grin"
+                  width="18"
+                  height="18"
                   className="flex-shrink-0"
                 />
                 <span>{t("popup.metadata")}</span>
@@ -657,10 +657,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 onLoadError={handleMetadataImageError}
               />
               {/* 元数据 json */}
-              <CopyableTextField
-                text={JSON.stringify(scrapedData.metadata)}
-                className="rounded-xl border border-sky-200 bg-blue-50 p-2 text-xs"
-              />
+              <CopyableTextField text={JSON.stringify(scrapedData.metadata)} />
             </div>
           )}
         </div>

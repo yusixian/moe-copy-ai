@@ -58,7 +58,7 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
         <Button
           variant="ghost"
           fullWidth
-          className="group justify-between border-sky-200 border-b bg-sky-50 p-2 hover:bg-sky-100"
+          className="group justify-between rounded-[inherit] border-sky-200 border-b bg-sky-50 p-3 hover:bg-sky-100"
           onClick={toggleExpand}>
           <div className="flex items-center gap-2">
             {icon && <span className="text-base text-sky-600">{icon}</span>}
