@@ -226,7 +226,7 @@ const SelectorHeader = memo<{
   return (
     <div className="flex items-center gap-1 font-medium text-text-2 text-xs">
       <span>{t(`selector.type.${type}`)}</span>
-      <span className="inline-block whitespace-nowrap rounded-full bg-accent-blue-secondary px-1 py-0.5 font-medium text-accent-blue text-xs">
+      <span className="inline-block whitespace-nowrap rounded-full bg-accent-blue-ghost px-1 py-0.5 font-medium text-accent-blue text-xs">
         {t("selector.count", { count })}
       </span>
     </div>

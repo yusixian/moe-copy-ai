@@ -11,6 +11,8 @@ export interface CollapsibleProps
   title: React.ReactNode
   defaultExpanded?: boolean
   icon?: React.ReactNode
+  iconClassName?: string
+  titleClassName?: string
   onToggle?: (expanded: boolean) => void
 }
 
@@ -26,9 +28,11 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
     {
       className,
       title,
+      titleClassName,
       children,
       defaultExpanded = false,
       icon,
+      iconClassName,
       onToggle,
       ...props
     },
@@ -50,7 +54,7 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
       <div
         ref={ref}
         className={cn(
-          "overflow-hidden rounded-xl border border-sky-200 bg-blue-50 transition-all duration-300",
+          "card overflow-hidden transition-all duration-300",
           className
         )}
         {...props}>
@@ -58,11 +62,17 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
         <Button
           variant="ghost"
           fullWidth
-          className="group justify-between rounded-[inherit] border-sky-200 border-b bg-sky-50 p-3 hover:bg-sky-100"
+          className="group card justify-between rounded-[inherit] p-3 hover:bg-content-hover"
           onClick={toggleExpand}>
           <div className="flex items-center gap-2">
-            {icon && <span className="text-base text-sky-600">{icon}</span>}
-            <span className="text-sky-600 text-sm">{title}</span>
+            {icon && (
+              <span className={cn("text-accent-blue text-base", iconClassName)}>
+                {icon}
+              </span>
+            )}
+            <span className={cn("text-accent-blue text-sm", titleClassName)}>
+              {title}
+            </span>
           </div>
 
           <motion.div
@@ -72,7 +82,10 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
               collapsed: { rotate: 180 }
             }}
             transition={defaultTransition}>
-            <Icon icon="line-md:chevron-up" className="h-4 w-4 text-sky-500" />
+            <Icon
+              icon="line-md:chevron-up"
+              className="h-4 w-4 text-text-secondary"
+            />
           </motion.div>
         </Button>
 

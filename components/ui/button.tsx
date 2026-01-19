@@ -11,7 +11,7 @@ const buttonVariants = cva(
         default:
           "bg-accent-blue text-white border-accent-blue hover:bg-accent-blue-hover",
         secondary:
-          "bg-accent-blue-secondary text-accent-blue border-accent-blue hover:bg-accent-blue-secondary-hover",
+          "bg-accent-blue-ghost text-accent-blue border-accent-blue hover:bg-accent-blue-ghost-hover",
         outline:
           "bg-transparent border-blue-300 text-blue-600 hover:bg-blue-50",
         ghost:

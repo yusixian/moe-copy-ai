@@ -128,7 +128,7 @@ const FloatingPopup = () => {
           {/* 自定义遮罩层 */}
           <button
             type="button"
-            className="fixed inset-0 z-[998] border-none bg-black/50 backdrop-blur"
+            className="fixed inset-0 z-[998] border-none bg-black/50 backdrop-blur-sm"
             onClick={handleClose} // 点击遮罩层关闭弹窗
             aria-label={t("aria.closePopup")}
           />
@@ -136,7 +136,7 @@ const FloatingPopup = () => {
           <FloatingFocusManager context={context}>
             <div
               ref={refs.setFloating}
-              className="fixed top-1/2 left-1/2 z-[999] max-h-[90vh] max-w-[95vw] -translate-x-1/2 -translate-y-1/2 rounded-xl border-2 border-sky-200 bg-white text-black md:fixed md:h-[90vh] md:max-h-[90vh] md:w-[95vw]"
+              className="fixed top-1/2 left-1/2 z-[999] max-h-[90vh] max-w-[95vw] -translate-x-1/2 -translate-y-1/2 rounded-[22px] text-black md:fixed md:h-[90vh] md:max-h-[90vh] md:w-[95vw]"
               {...getFloatingProps()}>
               <PopupContent
                 onClose={handleClose}

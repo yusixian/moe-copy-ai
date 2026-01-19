@@ -4,23 +4,36 @@
 
 @layer components {
   .top-bar {
-    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] shadow-md border border-line-1;
+    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] border border-line-1;
+    box-shadow:
+      inset 1px 1px 2px white,
+      inset -1px -1px 2px rgb(255 255 255 / 0.6),
+      0 4px 6px -1px rgb(0 0 0 / 0.1),
+      0 2px 4px -2px rgb(0 0 0 / 0.1);
   }
 
   .dialog {
-    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] shadow-xl border border-line-1;
+    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] border border-line-1;
+    box-shadow:
+      inset 1px 1px 2px white,
+      inset -1px -1px 2px rgb(255 255 255 / 0.6),
+      0 20px 25px -5px rgb(0 0 0 / 0.1),
+      0 8px 10px -6px rgb(0 0 0 / 0.1);
   }
 
   .popover {
-    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] shadow-sm border border-line-1;
+    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] border border-line-1;
+    box-shadow:
+      inset 1px 1px 2px white,
+      inset -1px -1px 2px rgb(255 255 255 / 0.6),
+      0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
 
-  .card-1 {
-    @apply bg-content-1 rounded-[12px] border border-line-1;
-  }
-
-  .card-2 {
-    @apply bg-content-2 rounded-[12px] border border-line-1;
+  .card {
+    @apply bg-content rounded-[12px] border border-line-1;
+    box-shadow:
+      inset 1px 1px 2px white,
+      inset -1px -1px 2px rgb(255 255 255 / 0.6);
   }
 }
 

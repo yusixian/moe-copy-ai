@@ -28,14 +28,16 @@ const config = {
           hover: "#ffffff14"
         },
         app: "#fafafa",
-        content: {
-          1: "rgba(255, 255, 255, 0.6)",
-          2: "rgba(226, 232, 240, 0.6)",
-          solid: {
-            1: "#fff",
-            2: "#fff"
-          }
-        },
+        content: "rgba(255, 255, 255, 0.6)",
+        "content-hover":
+          "color-mix(in oklab, rgba(255, 255, 255, 0.6), black 5%)",
+        "content-active":
+          "color-mix(in oklab, rgba(255, 255, 255, 0.6), black 10%)",
+        "content-solid": "rgba(255, 255, 255)",
+        "content-solid-hover":
+          "color-mix(in oklab, rgba(255, 255, 255), black 5%)",
+        "content-solid-active":
+          "color-mix(in oklab, rgba(255, 255, 255), black 10%)",
         elevated: {
           1: "rgba(255, 255, 255, 0.6)",
           2: "rgba(255, 255, 255, 0.6)",
@@ -48,40 +50,60 @@ const config = {
           blue: "rgb(37 99 235 / <alpha-value>)",
           "blue-hover": "rgb(37 99 235 / 85%)",
           "blue-active": "rgb(37 99 235 / 75%)",
-          "blue-secondary": "rgb(37 99 235 / 15%)",
-          "blue-secondary-hover": "rgb(37 99 235 / 30%)",
-          "blue-secondary-active": "rgb(37 99 235 / 40%)",
+          "blue-ghost": "rgb(37 99 235 / 15%)",
+          "blue-ghost-hover": "rgb(37 99 235 / 30%)",
+          "blue-ghost-active": "rgb(37 99 235 / 40%)",
+          "blue-light-1":
+            "color-mix(in oklab, color-mix(in oklab, rgb(37 99 235), white 75%), transparent <alpha-value>)",
+          "blue-light-2":
+            "color-mix(in oklab, color-mix(in oklab, rgb(37 99 235), white 60%), transparent <alpha-value>)",
+          "blue-light-3":
+            "color-mix(in oklab, color-mix(in oklab, rgb(37 99 235), white 45%), transparent <alpha-value>)",
+          "blue-light-4":
+            "color-mix(in oklab, color-mix(in oklab, rgb(37 99 235), white 30%), transparent <alpha-value>)",
+          "blue-light-5":
+            "color-mix(in oklab, color-mix(in oklab, rgb(37 99 235), white 15%), transparent <alpha-value>)",
           purple: "rgb(126 34 206 / <alpha-value>)",
           "purple-hover": "rgb(126 34 206 / 85%)",
           "purple-active": "rgb(126 34 206 / 75%)",
-          "purple-secondary": "rgb(126 34 206 / 15%)",
-          "purple-secondary-hover": "rgb(126 34 206 / 30%)",
-          "purple-secondary-active": "rgb(126 34 206 / 40%)"
+          "purple-ghost": "rgb(126 34 206 / 15%)",
+          "purple-ghost-hover": "rgb(126 34 206 / 30%)",
+          "purple-ghost-active": "rgb(126 34 206 / 40%)",
+          "purple-light-1":
+            "color-mix(in oklab, color-mix(in oklab, rgb(126 34 206), white 75%), transparent <alpha-value>)",
+          "purple-light-2":
+            "color-mix(in oklab, color-mix(in oklab, rgb(126 34 206), white 60%), transparent <alpha-value>)",
+          "purple-light-3":
+            "color-mix(in oklab, color-mix(in oklab, rgb(126 34 206), white 45%), transparent <alpha-value>)",
+          "purple-light-4":
+            "color-mix(in oklab, color-mix(in oklab, rgb(126 34 206), white 30%), transparent <alpha-value>)",
+          "purple-light-5":
+            "color-mix(in oklab, color-mix(in oklab, rgb(126 34 206), white 15%), transparent <alpha-value>)"
         },
         info: "oklch(68.5% 0.169 237.323 / <alpha-value>)",
         "info-hover": "oklch(68.5% 0.169 237.323 / 85%)",
         "info-active": "oklch(68.5% 0.169 237.323 / 75%)",
-        "info-secondary": "oklch(68.5% 0.169 237.323 / 15%)",
-        "info-secondary-hover": "oklch(68.5% 0.169 237.323 / 30%)",
-        "info-secondary-active": "oklch(68.5% 0.169 237.323 / 40%)",
+        "info-ghost": "oklch(68.5% 0.169 237.323 / 15%)",
+        "info-ghost-hover": "oklch(68.5% 0.169 237.323 / 30%)",
+        "info-ghost-active": "oklch(68.5% 0.169 237.323 / 40%)",
         success: "oklch(72.3% 0.219 149.579 / <alpha-value>)",
         "success-hover": "oklch(72.3% 0.219 149.579 / 85%)",
         "success-active": "oklch(72.3% 0.219 149.579 / 75%)",
-        "success-secondary": "oklch(72.3% 0.219 149.579 / 15%)",
-        "success-secondary-hover": "oklch(72.3% 0.219 149.579 / 30%)",
-        "success-secondary-active": "oklch(72.3% 0.219 149.579 / 40%)",
+        "success-ghost": "oklch(72.3% 0.219 149.579 / 15%)",
+        "success-ghost-hover": "oklch(72.3% 0.219 149.579 / 30%)",
+        "success-ghost-active": "oklch(72.3% 0.219 149.579 / 40%)",
         warning: "oklch(75% 0.183 55.934 / <alpha-value>)",
         "warning-hover": "oklch(75% 0.183 55.934 / 85%)",
         "warning-active": "oklch(75% 0.183 55.934 / 75%)",
-        "warning-secondary": "oklch(75% 0.183 55.934 / 15%)",
-        "warning-secondary-hover": "oklch(75% 0.183 55.934 / 30%)",
-        "warning-secondary-active": "oklch(75% 0.183 55.934 / 40%)",
+        "warning-ghost": "oklch(75% 0.183 55.934 / 15%)",
+        "warning-ghost-hover": "oklch(75% 0.183 55.934 / 30%)",
+        "warning-ghost-active": "oklch(75% 0.183 55.934 / 40%)",
         error: "oklch(63.7% 0.237 25.331 / <alpha-value>)",
         "error-hover": "oklch(63.7% 0.237 25.331 / 85%)",
         "error-active": "oklch(63.7% 0.237 25.331 / 75%)",
-        "error-secondary": "oklch(63.7% 0.237 25.331 / 15%)",
-        "error-secondary-hover": "oklch(63.7% 0.237 25.331 / 30%)",
-        "error-secondary-active": "oklch(63.7% 0.237 25.331 / 40%)",
+        "error-ghost": "oklch(63.7% 0.237 25.331 / 15%)",
+        "error-ghost-hover": "oklch(63.7% 0.237 25.331 / 30%)",
+        "error-ghost-active": "oklch(63.7% 0.237 25.331 / 40%)",
         text: {
           1: "oklch(12.9% 0.042 264.695 / <alpha-value>)",
           "1-hover": "oklch(12.9% 0.042 264.695 / 85%)",
@@ -96,6 +118,7 @@ const config = {
           "4-hover": "oklch(92.9% 0.013 255.508 / 85%)",
           "4-active": "oklch(92.9% 0.013 255.508 / 75%)"
         },
+        // 边框配色或是分割线配色
         line: {
           1: "rgba(120 120 122 / 0.16)",
           2: "rgba(120 120 122 / 0.28)"

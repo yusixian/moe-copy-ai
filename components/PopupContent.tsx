@@ -1,9 +1,9 @@
+import iconUrl from "data-base64:~assets/icon.png"
 import { Icon } from "@iconify/react"
 import { sendToBackground } from "@plasmohq/messaging"
 import { useStorage } from "@plasmohq/storage/hook"
 import { useClipboard } from "foxact/use-clipboard"
 import { memo, useCallback } from "react"
-
 import AiSummarySection from "~/components/AiSummarySection"
 import ContentSection from "~/components/ContentSection"
 import ImageGrid from "~/components/ImageGrid"
@@ -104,22 +104,29 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
   return (
     <div
       className={cn(
-        "relative max-h-[600px] overflow-y-auto rounded-xl p-3 sm:p-4",
+        "relative max-h-[600px] overflow-y-auto rounded-[inherit] p-3 sm:p-4",
         className
       )}>
       {/* Soft Blue Radial Background */}
       <div
-        className="fixed inset-0 top-0 left-0 z-[-1] h-full w-full rounded-[inherit] bg-app"
+        className="fixed inset-0 top-0 left-0 z-[-1] h-full w-full rounded-[inherit] bg-app/90"
         style={{
           backgroundImage: `
-            radial-gradient(circle at top center, rgb(37 99 235 / 0.2),transparent 70%)
+            radial-gradient(circle at 15% 15%, rgb(37 99 235 / 0.14), transparent 40%),
+            radial-gradient(circle at 50% 10%, rgb(6 182 212 / 0.11), transparent 45%),
+            radial-gradient(circle at 85% 15%, rgb(168 85 247 / 0.08), transparent 40%)
           `
         }}
       />
 
-      <header className="sticky top-0 top-bar left-0 z-[100] mb-4 flex flex-col gap-3 px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+      <header className="!rounded-full sticky top-0 top-bar left-0 z-[100] mb-4 flex flex-col gap-3 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <img
+          src={iconUrl}
+          alt="Moe Copy AI"
+          className="mr-3 h-10 w-10 flex-shrink-0"
+        />
         <div className="min-w-0 flex-1">
-          <h1 className="flex items-center font-bold text-accent-blue text-lg sm:text-xl">
+          <h1 className="flex items-center gap-2 font-bold text-accent-blue text-lg sm:text-xl">
             <span className="truncate">{t("app.name")}</span>
             <span className="ml-2 flex-shrink-0">{t("popup.subtitle")}</span>
           </h1>
@@ -165,7 +172,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               size="icon"
               onClick={onClose}
               title={t("common.close")}
-              className="hover:bg-error-secondary-hover hover:text-error">
+              className="hover:bg-error-ghost-hover hover:text-error">
               <Icon icon="line-md:close" width="20" height="20" />
             </Button>
           )}
@@ -173,7 +180,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
       </header>
 
       {/* 悬浮窗开关区域 */}
-      <div className="mb-4">
+      <div className="card mb-4 p-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="font-medium text-gray-700 text-sm">
             {t("popup.floatButton.label")}
@@ -253,10 +260,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               </span>
             </span>
           }
+          titleClassName="text-base text-accent-blue"
           icon={
             <Icon
               icon="line-md:coffee-half-empty-twotone-loop"
-              className="text-blue-500"
+              className="text-accent-blue"
               width="18"
               height="18"
             />
@@ -340,10 +348,10 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           <p className="mt-3 text-accent-blue">{t("common.loading")}</p>
         </div>
       ) : scrapedData ? (
-        <div className="card-1 p-3">
+        <div className="card p-3">
           {/* 页面标题 */}
           <div className="mb-4">
-            <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
+            <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-base">
               <Icon
                 icon="line-md:hash"
                 width="18"
@@ -371,7 +379,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 作者信息 */}
           {scrapedData.author && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-base">
                 <Icon
                   icon="line-md:account"
                   width="18"
@@ -400,7 +408,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 发布日期 */}
           {scrapedData.publishDate && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-base">
                 <Icon
                   icon="line-md:calendar"
                   width="18"
@@ -427,7 +435,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
           {/* URL */}
           <div className="mb-4">
-            <h2 className="mb-2 flex items-center gap-2 font-semibold text-accent-blue text-lg">
+            <h2 className="mb-2 flex items-center gap-2 font-semibold text-accent-blue text-base">
               <Icon
                 icon="line-md:link"
                 width="18"
@@ -445,7 +453,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               {/* 标题行 - 移动端优化 */}
               <div className="mb-3">
                 <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
+                  <h2 className="flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-base">
                     <Icon
                       icon="line-md:file-document"
                       className="inline flex-shrink-0"
@@ -613,7 +621,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 页面图片 */}
           {scrapedData.images && scrapedData.images.length > 0 && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-base">
                 <Icon
                   icon="line-md:image"
                   width="18"
@@ -635,7 +643,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 元数据 */}
           {Object.keys(scrapedData.metadata).length > 0 && (
             <div>
-              <h2 className="mb-2 flex items-center gap-2 font-semibold text-accent-blue text-lg">
+              <h2 className="mb-2 flex items-center gap-2 font-semibold text-accent-blue text-base">
                 <Icon
                   icon="line-md:emoji-grin"
                   width="18"
