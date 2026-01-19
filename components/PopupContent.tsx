@@ -340,7 +340,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           <p className="mt-3 text-accent-blue">{t("common.loading")}</p>
         </div>
       ) : scrapedData ? (
-        <div className="p-3 content-1">
+        <div className="card-1 p-3">
           {/* 页面标题 */}
           <div className="mb-4">
             <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-lg">
