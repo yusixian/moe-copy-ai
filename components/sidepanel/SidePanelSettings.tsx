@@ -36,8 +36,8 @@ function ToggleRow({
   onChange: (checked: boolean) => void
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-sky-200 bg-white p-3">
-      <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
+    <div className="flex items-center justify-between rounded-lg border border-line-1 bg-content p-3">
+      <span className="flex items-center gap-2 font-medium text-sm text-text-1">
         <Icon icon={icon} width={16} />
         {label}
       </span>
@@ -45,7 +45,7 @@ function ToggleRow({
         type="button"
         onClick={() => onChange(!checked)}
         className={`relative h-5 w-9 rounded-full transition-colors ${
-          checked ? "bg-sky-500" : "bg-gray-300"
+          checked ? "bg-accent-blue" : "bg-line-2"
         }`}>
         <span
           className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${
@@ -78,7 +78,7 @@ function ExtractionModeSettings() {
 
   if (loading)
     return (
-      <div className="text-gray-400 text-xs">
+      <div className="text-xs text-text-3">
         {t("sidepanel.settings.extractionMode.loading")}
       </div>
     )
@@ -111,14 +111,14 @@ function ExtractionModeSettings() {
             onClick={() => handleChange(m.value as ExtractionMode)}
             className={`rounded-md px-2 py-1.5 text-center text-xs transition-all ${
               mode === m.value
-                ? "bg-sky-500 text-white shadow-sm"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                ? "bg-accent-blue text-white shadow-sm"
+                : "bg-fill-hover text-text-2 hover:bg-fill-hover/80"
             }`}>
             {m.label}
           </button>
         ))}
       </div>
-      <p className="text-gray-500 text-xs">
+      <p className="text-xs text-text-2">
         {modes.find((m) => m.value === mode)?.desc}
       </p>
     </div>
@@ -148,7 +148,7 @@ function AiSettings() {
       <div>
         <label
           htmlFor="sp-api-key"
-          className="mb-1 block text-gray-600 text-xs">
+          className="mb-1 block text-xs text-text-1">
           {t("sidepanel.settings.ai.apiKey")}
         </label>
         <input
@@ -156,7 +156,7 @@ function AiSettings() {
           type="password"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
-          className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
+          className="w-full rounded border border-line-1 bg-content px-2 py-1.5 text-xs focus:border-accent-blue focus:outline-none"
           placeholder={t("sidepanel.settings.ai.apiKeyPlaceholder")}
         />
       </div>
@@ -164,7 +164,7 @@ function AiSettings() {
       <div>
         <label
           htmlFor="sp-base-url"
-          className="mb-1 block text-gray-600 text-xs">
+          className="mb-1 block text-xs text-text-1">
           {t("sidepanel.settings.ai.baseUrl")}
         </label>
         <div className="flex gap-1">
@@ -173,7 +173,7 @@ function AiSettings() {
             type="text"
             value={baseURL}
             onChange={(e) => setBaseURL(e.target.value)}
-            className="flex-1 rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
+            className="flex-1 rounded border border-line-1 bg-content px-2 py-1.5 text-xs focus:border-accent-blue focus:outline-none"
             placeholder={t("sidepanel.settings.ai.baseUrlPlaceholder")}
           />
           <Button
@@ -192,7 +192,7 @@ function AiSettings() {
       </div>
 
       <div>
-        <label htmlFor="sp-model" className="mb-1 block text-gray-600 text-xs">
+        <label htmlFor="sp-model" className="mb-1 block text-xs text-text-1">
           {t("sidepanel.settings.ai.model")}
         </label>
         <ModelSelectInput
@@ -207,7 +207,7 @@ function AiSettings() {
       <div>
         <label
           htmlFor="sp-system-prompt"
-          className="mb-1 block text-gray-600 text-xs">
+          className="mb-1 block text-xs text-text-1">
           {t("sidepanel.settings.ai.systemPrompt")}
         </label>
         <textarea
@@ -215,7 +215,7 @@ function AiSettings() {
           value={systemPrompt}
           onChange={(e) => setSystemPrompt(e.target.value)}
           rows={3}
-          className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
+          className="w-full rounded border border-line-1 bg-content px-2 py-1.5 text-xs focus:border-accent-blue focus:outline-none"
         />
       </div>
 
@@ -276,15 +276,15 @@ function LanguageSettings() {
   }
 
   return (
-    <div className="flex items-center justify-between rounded-lg border border-sky-200 bg-white p-3">
-      <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
+    <div className="flex items-center justify-between rounded-lg border border-line-1 bg-content p-3">
+      <span className="flex items-center gap-2 font-medium text-sm text-text-1">
         <Icon icon="mdi:globe" width={16} />
         {t("option.interface.language")}
       </span>
       <select
         value={locale}
         onChange={handleChange}
-        className="rounded border border-sky-200 bg-sky-50 px-2 py-1 text-sm focus:border-sky-400 focus:outline-none">
+        className="rounded border border-line-1 bg-content px-2 py-1 text-sm focus:border-accent-blue focus:outline-none">
         {SUPPORTED_LOCALES.map((loc) => (
           <option key={loc} value={loc}>
             {LOCALE_NAMES[loc]}
@@ -375,7 +375,7 @@ export default function SidePanelSettings() {
           <Icon icon="mdi:code-braces" width={16} />
           {t("sidepanel.settings.selector.title")}
         </span>
-        <span className="flex items-center gap-1 text-gray-400 text-xs">
+        <span className="flex items-center gap-1 text-xs text-text-3">
           {t("sidepanel.settings.selector.openFull")}
           <Icon icon="mdi:open-in-new" width={14} />
         </span>

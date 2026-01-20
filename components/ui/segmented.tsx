@@ -65,7 +65,7 @@ export const Segmented = <T extends string | number = string | number>({
           <motion.div
             className={cn(
               "relative z-0 flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md px-3 py-1.5",
-              selected ? "text-sky-600" : "text-gray-600 hover:text-gray-900",
+              selected ? "text-accent-blue" : "text-text-2 hover:text-text-1",
               itemClass
             )}
             onClick={() => select(value)}

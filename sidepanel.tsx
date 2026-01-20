@@ -33,7 +33,7 @@ const SidePanelSettings = lazy(
 function TabSkeleton() {
   return (
     <div className="flex h-32 items-center justify-center">
-      <Icon icon="line-md:loading-loop" className="h-8 w-8 text-sky-500" />
+      <Icon icon="line-md:loading-loop" className="h-8 w-8 text-accent-blue" />
     </div>
   )
 }
@@ -188,157 +188,175 @@ function SidePanel() {
   const currentConfig = viewConfig[currentView]
 
   return (
-    <div className="flex h-screen flex-col bg-gradient-to-br from-sky-50 via-white to-indigo-50 p-4">
-      {/* Header */}
-      <div className="mb-4 flex-shrink-0">
-        {/* Tab 导航 */}
-        <div className="mb-3 flex items-center gap-1">
-          <Segmented
-            id="sidepanel-tabs"
-            options={tabOptions}
-            value={currentView === "settings" ? undefined : currentView}
-            onChange={(value) => setCurrentView(value)}
-            className="flex-1"
-          />
-          <Button
-            variant={currentView === "settings" ? "secondary" : "ghost"}
-            size="icon"
-            onClick={() => setCurrentView("settings")}
-            title={t("sidepanel.title.settings")}>
-            <Icon icon="mdi:cog" width={18} />
-          </Button>
-        </div>
-
-        {/* 标题 */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-bold text-gray-800 text-lg">
-              {currentConfig.title}
-            </h1>
-            <p className="text-gray-500 text-sm">{currentConfig.description}</p>
-          </div>
-          {currentView === "singlescrape" && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => singleScrapePanelRef.current?.refresh()}
-              disabled={isSingleScrapeLoading}
-              title={t("common.refresh")}>
-              <Icon
-                icon={
-                  isSingleScrapeLoading
-                    ? "line-md:loading-alt-loop"
-                    : "line-md:refresh-twotone"
-                }
-                className={isSingleScrapeLoading ? "mr-1 animate-spin" : "mr-1"}
-                width="16"
-                height="16"
-              />
-              {isSingleScrapeLoading
-                ? t("sidepanel.fetching")
-                : t("common.refresh")}
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <Suspense fallback={<TabSkeleton />}>
-          {currentView === "singlescrape" && (
-            <SingleScrapePanel
-              ref={singleScrapePanelRef}
-              onLoadingChange={setIsSingleScrapeLoading}
-            />
-          )}
-          {currentView === "batch" && (
-            <BatchScrapePanel
-              mode={currentMode}
-              elementInfo={elementInfo || scrapeElementInfo}
-              links={links}
-              progress={progress}
-              paginationProgress={paginationProgress}
-              results={results}
-              error={error}
-              nextPageButton={nextPageButton}
-              isSelectingNextPage={isSelectingNextPage && isSelecting}
-              onStartScrape={startScrape}
-              onPause={pauseScrape}
-              onResume={resumeScrape}
-              onCancel={handleCancel}
-              onReset={handleReset}
-              onSelectElement={handleSelectElement}
-              onAddLink={addLink}
-              onUpdateLink={updateLink}
-              onRemoveLink={removeLink}
-              onSelectNextPage={handleSelectNextPage}
-              onClearNextPage={handleClearNextPage}
-            />
-          )}
-          {currentView === "extraction" && (
-            <ContentExtractionPanel
-              mode={extractionMode}
-              content={extractedContent}
-              elementInfo={extractionElementInfo}
-              error={extractionError}
-              tabInfo={extractionTabInfo}
-              onStartSelection={startContentSelection}
-              onCancel={cancelContentSelection}
-              onReset={resetContentExtraction}
-            />
-          )}
-          {currentView === "settings" && <SidePanelSettings />}
-        </Suspense>
-      </div>
-
-      {/* 底部链接 */}
-      <div className="flex flex-shrink-0 items-center justify-between gap-4 border-gray-100 border-t px-1 pt-2">
-        <span className="text-gray-400 text-xs">{t("app.name")}</span>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-6 p-0"
-            onClick={() =>
-              window.open("https://github.com/yusixian/moe-copy-ai", "_blank")
-            }
-            title={t("sidepanel.github")}>
-            <Icon icon="mdi:github" className="size-full" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-6 p-0"
-            onClick={() => window.open("https://moe.cosine.ren/docs", "_blank")}
-            title={t("sidepanel.docs")}>
-            <Icon icon="mdi:book-open-outline" className="size-full" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-6 p-0"
-            onClick={() =>
-              window.open("https://discord.gg/XzvrvNMcSe", "_blank")
-            }
-            title={t("sidepanel.discord")}>
-            <Icon icon="mdi:discord" className="size-full" />
-          </Button>
-        </div>
-        <span className="text-gray-400 text-xs">
-          v{chrome.runtime.getManifest().version}
-        </span>
-      </div>
-
-      <ToastContainer
-        position="bottom-center"
-        autoClose={2000}
-        hideProgressBar
-        newestOnTop
-        closeOnClick
-        pauseOnHover={false}
-        theme="light"
-        toastClassName="!bg-white !shadow-lg !rounded-lg !text-sm"
+    <>
+      {/* Soft Blue Radial Background */}
+      <div
+        className="fixed inset-0 top-0 left-0 z-1 h-full w-full rounded-[inherit] bg-app"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.18), transparent 40%),
+            radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.15), transparent 45%),
+            radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.12), transparent 40%)
+          `
+        }}
       />
-    </div>
+
+      <div className="relative flex h-screen flex-col p-4">
+        {/* Header */}
+        <div className="mb-4 flex-shrink-0">
+          {/* Tab 导航 */}
+          <div className="mb-3 flex items-center gap-1">
+            <Segmented
+              id="sidepanel-tabs"
+              options={tabOptions}
+              value={currentView === "settings" ? undefined : currentView}
+              onChange={(value) => setCurrentView(value)}
+              className="flex-1"
+            />
+            <Button
+              variant={currentView === "settings" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setCurrentView("settings")}
+              title={t("sidepanel.title.settings")}>
+              <Icon icon="mdi:cog" width={18} />
+            </Button>
+          </div>
+
+          {/* 标题 */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="font-bold text-lg text-text-1">
+                {currentConfig.title}
+              </h1>
+              <p className="text-sm text-text-2">{currentConfig.description}</p>
+            </div>
+            {currentView === "singlescrape" && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => singleScrapePanelRef.current?.refresh()}
+                disabled={isSingleScrapeLoading}
+                title={t("common.refresh")}>
+                <Icon
+                  icon={
+                    isSingleScrapeLoading
+                      ? "line-md:loading-alt-loop"
+                      : "line-md:refresh-twotone"
+                  }
+                  className={
+                    isSingleScrapeLoading ? "mr-1 animate-spin" : "mr-1"
+                  }
+                  width="16"
+                  height="16"
+                />
+                {isSingleScrapeLoading
+                  ? t("sidepanel.fetching")
+                  : t("common.refresh")}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <Suspense fallback={<TabSkeleton />}>
+            {currentView === "singlescrape" && (
+              <SingleScrapePanel
+                ref={singleScrapePanelRef}
+                onLoadingChange={setIsSingleScrapeLoading}
+              />
+            )}
+            {currentView === "batch" && (
+              <BatchScrapePanel
+                mode={currentMode}
+                elementInfo={elementInfo || scrapeElementInfo}
+                links={links}
+                progress={progress}
+                paginationProgress={paginationProgress}
+                results={results}
+                error={error}
+                nextPageButton={nextPageButton}
+                isSelectingNextPage={isSelectingNextPage && isSelecting}
+                onStartScrape={startScrape}
+                onPause={pauseScrape}
+                onResume={resumeScrape}
+                onCancel={handleCancel}
+                onReset={handleReset}
+                onSelectElement={handleSelectElement}
+                onAddLink={addLink}
+                onUpdateLink={updateLink}
+                onRemoveLink={removeLink}
+                onSelectNextPage={handleSelectNextPage}
+                onClearNextPage={handleClearNextPage}
+              />
+            )}
+            {currentView === "extraction" && (
+              <ContentExtractionPanel
+                mode={extractionMode}
+                content={extractedContent}
+                elementInfo={extractionElementInfo}
+                error={extractionError}
+                tabInfo={extractionTabInfo}
+                onStartSelection={startContentSelection}
+                onCancel={cancelContentSelection}
+                onReset={resetContentExtraction}
+              />
+            )}
+            {currentView === "settings" && <SidePanelSettings />}
+          </Suspense>
+        </div>
+
+        {/* 底部链接 */}
+        <div className="flex flex-shrink-0 items-center justify-between gap-4 border-t border-line-1 px-1 pt-2">
+          <span className="text-xs text-text-3">{t("app.name")}</span>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-6 p-0"
+              onClick={() =>
+                window.open("https://github.com/yusixian/moe-copy-ai", "_blank")
+              }
+              title={t("sidepanel.github")}>
+              <Icon icon="mdi:github" className="size-full" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-6 p-0"
+              onClick={() =>
+                window.open("https://moe.cosine.ren/docs", "_blank")
+              }
+              title={t("sidepanel.docs")}>
+              <Icon icon="mdi:book-open-outline" className="size-full" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-6 p-0"
+              onClick={() =>
+                window.open("https://discord.gg/XzvrvNMcSe", "_blank")
+              }
+              title={t("sidepanel.discord")}>
+              <Icon icon="mdi:discord" className="size-full" />
+            </Button>
+          </div>
+          <span className="text-xs text-text-3">
+            v{chrome.runtime.getManifest().version}
+          </span>
+        </div>
+
+        <ToastContainer
+          position="bottom-center"
+          autoClose={2000}
+          hideProgressBar
+          newestOnTop
+          closeOnClick
+          pauseOnHover={false}
+          theme="light"
+          toastClassName="!bg-white !shadow-lg !rounded-lg !text-sm"
+        />
+      </div>
+    </>
   )
 }
 
