@@ -4,36 +4,41 @@
 
 @layer components {
   .top-bar {
-    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] border border-line-1;
+    @apply backdrop-blur-sm backdrop-brightness-110 bg-elevated-1 rounded-2xl border border-line-1 shadow-lg;
     box-shadow:
-      inset 1px 1px 2px white,
-      inset -1px -1px 2px rgb(255 255 255 / 0.6),
+      inset 1px 1px 2px rgb(255 255 255 / 0.4),
+      inset -1px -1px 2px rgb(255 255 255 / 0.2),
+      inset 0 0 6px rgb(255 255 255 / 0.4),
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+
+  .dialog {
+    @apply backdrop-blur-sm backdrop-brightness-110 bg-elevated-1 rounded-2xl border border-line-1;
+    box-shadow:
+      inset 1px 1px 2px rgb(255 255 255 / 0.4),
+      inset 0 0 6px rgb(255 255 255 / 0.4),
+      inset -1px -1px 2px rgb(255 255 255 / 0.2),
+      0 25px 50px -12px rgb(0 0 0 / 0.25);
+  }
+
+  .popover {
+    @apply backdrop-blur-sm backdrop-brightness-110 bg-elevated-1 rounded-2xl border border-line-1;
+    box-shadow:
+      inset 1px 1px 2px rgb(255 255 255 / 0.4),
+      inset 0 0 6px rgb(255 255 255 / 0.4),
+      inset -1px -1px 2px rgb(255 255 255 / 0.2),
       0 4px 6px -1px rgb(0 0 0 / 0.1),
       0 2px 4px -2px rgb(0 0 0 / 0.1);
   }
 
-  .dialog {
-    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] border border-line-1;
-    box-shadow:
-      inset 1px 1px 2px white,
-      inset -1px -1px 2px rgb(255 255 255 / 0.6),
-      0 20px 25px -5px rgb(0 0 0 / 0.1),
-      0 8px 10px -6px rgb(0 0 0 / 0.1);
-  }
-
-  .popover {
-    @apply backdrop-blur-sm brightness-110 bg-elevated-1 rounded-[12px] border border-line-1;
-    box-shadow:
-      inset 1px 1px 2px white,
-      inset -1px -1px 2px rgb(255 255 255 / 0.6),
-      0 1px 2px 0 rgb(0 0 0 / 0.05);
-  }
-
   .card {
-    @apply bg-content rounded-[12px] border border-line-1;
+    @apply bg-content rounded-2xl border border-line-1;
     box-shadow:
-      inset 1px 1px 2px white,
-      inset -1px -1px 2px rgb(255 255 255 / 0.6);
+      inset 1px 1px 2px rgb(255 255 255 / 0.4),
+      inset 0 0 6px rgb(255 255 255 / 0.4),
+      inset -1px -1px 2px rgb(255 255 255 / 0.2),
+      0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
 }
 

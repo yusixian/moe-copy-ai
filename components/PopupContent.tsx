@@ -109,23 +109,23 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
       )}>
       {/* Soft Blue Radial Background */}
       <div
-        className="fixed inset-0 top-0 left-0 z-[-1] h-full w-full rounded-[inherit] bg-app/90"
+        className="fixed inset-0 top-0 left-0 z-[-1] h-full w-full rounded-[inherit]"
         style={{
           backgroundImage: `
-            radial-gradient(circle at 15% 15%, rgb(37 99 235 / 0.14), transparent 40%),
-            radial-gradient(circle at 50% 10%, rgb(6 182 212 / 0.11), transparent 45%),
-            radial-gradient(circle at 85% 15%, rgb(168 85 247 / 0.08), transparent 40%)
+            radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.18), transparent 40%),
+            radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.15), transparent 45%),
+            radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.12), transparent 40%)
           `
         }}
       />
 
-      <header className="!rounded-full sticky top-0 top-bar left-0 z-[100] mb-4 flex flex-col gap-3 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+      <header className="sticky top-0 top-bar left-0 z-[100] mb-4 flex flex-col gap-3 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <img
           src={iconUrl}
           alt="Moe Copy AI"
           className="mr-3 h-10 w-10 flex-shrink-0"
         />
-        <div className="min-w-0 flex-1">
+        <div className="mr-3 min-w-0 flex-1">
           <h1 className="flex items-center gap-2 font-bold text-accent-blue text-lg sm:text-xl">
             <span className="truncate">{t("app.name")}</span>
             <span className="ml-2 flex-shrink-0">{t("popup.subtitle")}</span>
@@ -153,6 +153,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             {t("popup.batchScrape")}
           </Button>
           <Button
+            className="border-none"
             variant="ghost"
             size="icon"
             onClick={handleOpenGithub}
@@ -160,6 +161,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             <Icon icon="mdi:github" width="20" height="20" />
           </Button>
           <Button
+            className="border-none"
             variant="ghost"
             size="icon"
             onClick={handleOpenOptions}
@@ -172,7 +174,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               size="icon"
               onClick={onClose}
               title={t("common.close")}
-              className="hover:bg-error-ghost-hover hover:text-error">
+              className="border-none hover:bg-error-ghost-hover hover:text-error">
               <Icon icon="line-md:close" width="20" height="20" />
             </Button>
           )}
@@ -255,7 +257,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           title={
             <span className="flex items-center gap-1.5">
               {t("popup.debug.title")}
-              <span className="rounded border border-blue-200 bg-blue-100 px-1.5 py-0.5 text-[10px] text-blue-600">
+              <span className="rounded border border-accent-blue bg-accent-blue-ghost px-1.5 py-0 text-[10px] text-accent-blue">
                 {t("popup.debug.devMode")}
               </span>
             </span>
@@ -276,7 +278,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6"
+                className="h-6 w-6 shrink-0 p-2"
                 title={t("popup.debug.copyInfo")}
                 onClick={() => {
                   copyDebugInfo(debugInfo)
@@ -287,10 +289,10 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             </div>
 
             <div className="max-h-[120px] overflow-auto rounded border border-blue-100 bg-white p-2">
-              <pre className="text-blue-800">{debugInfo}</pre>
+              <pre className="text-text-2">{debugInfo}</pre>
             </div>
 
-            <div className="mt-2 flex items-center justify-between text-[10px] text-blue-500">
+            <div className="mt-2 flex items-center justify-between text-[10px] text-text-2">
               <div className="flex items-center gap-1">
                 <Icon
                   icon={
@@ -299,7 +301,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                       : "line-md:confirm-circle"
                   }
                   className={
-                    isLoading ? "animate-spin text-blue-400" : "text-green-500"
+                    isLoading ? "animate-spin text-text-1" : "text-success"
                   }
                   width="12"
                   height="12"

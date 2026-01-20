@@ -47,63 +47,53 @@ const config = {
           }
         },
         accent: {
-          blue: "rgb(37 99 235 / <alpha-value>)",
-          "blue-hover": "rgb(37 99 235 / 85%)",
-          "blue-active": "rgb(37 99 235 / 75%)",
-          "blue-ghost": "rgb(37 99 235 / 15%)",
-          "blue-ghost-hover": "rgb(37 99 235 / 30%)",
-          "blue-ghost-active": "rgb(37 99 235 / 40%)",
-          "blue-light-1":
-            "color-mix(in oklab, color-mix(in oklab, rgb(37 99 235), white 75%), transparent <alpha-value>)",
-          "blue-light-2":
-            "color-mix(in oklab, color-mix(in oklab, rgb(37 99 235), white 60%), transparent <alpha-value>)",
-          "blue-light-3":
-            "color-mix(in oklab, color-mix(in oklab, rgb(37 99 235), white 45%), transparent <alpha-value>)",
-          "blue-light-4":
-            "color-mix(in oklab, color-mix(in oklab, rgb(37 99 235), white 30%), transparent <alpha-value>)",
-          "blue-light-5":
-            "color-mix(in oklab, color-mix(in oklab, rgb(37 99 235), white 15%), transparent <alpha-value>)",
-          purple: "rgb(126 34 206 / <alpha-value>)",
-          "purple-hover": "rgb(126 34 206 / 85%)",
-          "purple-active": "rgb(126 34 206 / 75%)",
-          "purple-ghost": "rgb(126 34 206 / 15%)",
-          "purple-ghost-hover": "rgb(126 34 206 / 30%)",
-          "purple-ghost-active": "rgb(126 34 206 / 40%)",
-          "purple-light-1":
-            "color-mix(in oklab, color-mix(in oklab, rgb(126 34 206), white 75%), transparent <alpha-value>)",
-          "purple-light-2":
-            "color-mix(in oklab, color-mix(in oklab, rgb(126 34 206), white 60%), transparent <alpha-value>)",
-          "purple-light-3":
-            "color-mix(in oklab, color-mix(in oklab, rgb(126 34 206), white 45%), transparent <alpha-value>)",
-          "purple-light-4":
-            "color-mix(in oklab, color-mix(in oklab, rgb(126 34 206), white 30%), transparent <alpha-value>)",
-          "purple-light-5":
-            "color-mix(in oklab, color-mix(in oklab, rgb(126 34 206), white 15%), transparent <alpha-value>)"
+          blue: "oklch(60% 0.203 257.46)",
+          "blue-hover": "oklch(60% 0.203 257.46 / 85%)",
+          "blue-active": "oklch(60% 0.203 257.46 / 75%)",
+          "blue-ghost": "oklch(60% 0.203 257.46 / 10%)",
+          "blue-ghost-hover": "oklch(60% 0.203 257.46 / 15%)",
+          "blue-ghost-active": "oklch(60% 0.203 257.46 / 20%)",
+          "blue-light-1": "oklch(91% 0.048 264.052 / <alpha-value>)",
+          "blue-light-2": "oklch(83% 0.077 264.052 / <alpha-value>)",
+          "blue-light-3": "oklch(75% 0.106 264.052 / <alpha-value>)",
+          "blue-light-4": "oklch(67% 0.135 264.052 / <alpha-value>)",
+          "blue-light-5": "oklch(59% 0.164 264.052 / <alpha-value>)",
+          purple: "oklch(42% 0.196 302.716 / <alpha-value>)",
+          "purple-hover": "oklch(42% 0.196 302.716 / 85%)",
+          "purple-active": "oklch(42% 0.196 302.716 / 75%)",
+          "purple-ghost": "oklch(42% 0.196 302.716 / 10%)",
+          "purple-ghost-hover": "oklch(42% 0.196 302.716 / 15%)",
+          "purple-ghost-active": "oklch(42% 0.196 302.716 / 20%)",
+          "purple-light-1": "oklch(85% 0.049 302.716 / <alpha-value>)",
+          "purple-light-2": "oklch(75% 0.078 302.716 / <alpha-value>)",
+          "purple-light-3": "oklch(65% 0.108 302.716 / <alpha-value>)",
+          "purple-light-4": "oklch(55% 0.137 302.716 / <alpha-value>)",
+          "purple-light-5": "oklch(48% 0.167 302.716 / <alpha-value>)"
         },
         info: "oklch(68.5% 0.169 237.323 / <alpha-value>)",
         "info-hover": "oklch(68.5% 0.169 237.323 / 85%)",
         "info-active": "oklch(68.5% 0.169 237.323 / 75%)",
-        "info-ghost": "oklch(68.5% 0.169 237.323 / 15%)",
-        "info-ghost-hover": "oklch(68.5% 0.169 237.323 / 30%)",
-        "info-ghost-active": "oklch(68.5% 0.169 237.323 / 40%)",
+        "info-ghost": "oklch(68.5% 0.169 237.323 / 10%)",
+        "info-ghost-hover": "oklch(68.5% 0.169 237.323 / 15%)",
+        "info-ghost-active": "oklch(68.5% 0.169 237.323 / 20%)",
         success: "oklch(72.3% 0.219 149.579 / <alpha-value>)",
         "success-hover": "oklch(72.3% 0.219 149.579 / 85%)",
         "success-active": "oklch(72.3% 0.219 149.579 / 75%)",
-        "success-ghost": "oklch(72.3% 0.219 149.579 / 15%)",
-        "success-ghost-hover": "oklch(72.3% 0.219 149.579 / 30%)",
-        "success-ghost-active": "oklch(72.3% 0.219 149.579 / 40%)",
+        "success-ghost": "oklch(72.3% 0.219 149.579 / 10%)",
+        "success-ghost-hover": "oklch(72.3% 0.219 149.579 / 15%)",
+        "success-ghost-active": "oklch(72.3% 0.219 149.579 / 20%)",
         warning: "oklch(75% 0.183 55.934 / <alpha-value>)",
         "warning-hover": "oklch(75% 0.183 55.934 / 85%)",
         "warning-active": "oklch(75% 0.183 55.934 / 75%)",
-        "warning-ghost": "oklch(75% 0.183 55.934 / 15%)",
-        "warning-ghost-hover": "oklch(75% 0.183 55.934 / 30%)",
-        "warning-ghost-active": "oklch(75% 0.183 55.934 / 40%)",
+        "warning-ghost": "oklch(75% 0.183 55.934 / 10%)",
+        "warning-ghost-hover": "oklch(75% 0.183 55.934 / 15%)",
+        "warning-ghost-active": "oklch(75% 0.183 55.934 / 20%)",
         error: "oklch(63.7% 0.237 25.331 / <alpha-value>)",
         "error-hover": "oklch(63.7% 0.237 25.331 / 85%)",
         "error-active": "oklch(63.7% 0.237 25.331 / 75%)",
-        "error-ghost": "oklch(63.7% 0.237 25.331 / 15%)",
-        "error-ghost-hover": "oklch(63.7% 0.237 25.331 / 30%)",
-        "error-ghost-active": "oklch(63.7% 0.237 25.331 / 40%)",
+        "error-ghost": "oklch(63.7% 0.237 25.331 / 10%)",
+        "error-ghost-hover": "oklch(63.7% 0.237 25.331 / 15%)",
+        "error-ghost-active": "oklch(63.7% 0.237 25.331 / 20%)",
         text: {
           1: "oklch(12.9% 0.042 264.695 / <alpha-value>)",
           "1-hover": "oklch(12.9% 0.042 264.695 / 85%)",
@@ -120,8 +110,8 @@ const config = {
         },
         // 边框配色或是分割线配色
         line: {
-          1: "rgba(120 120 122 / 0.16)",
-          2: "rgba(120 120 122 / 0.28)"
+          1: "rgba(120 120 122 / 0.32)",
+          2: "rgba(120 120 122 / 0.44)"
         },
         // 填充色, 可以用于填充像是按钮、下拉框背景、输入框背景等
         fill: {
