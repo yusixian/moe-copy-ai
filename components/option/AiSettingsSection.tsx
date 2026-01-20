@@ -30,7 +30,7 @@ function AiSettingsSection() {
   return (
     <OptionSection title={t("option.ai.title")} icon="line-md:ai">
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-blue-500 text-sm">{t("option.ai.desc")}</span>
+        <span className="text-sm text-text-2">{t("option.ai.desc")}</span>
         <Button
           variant="outline"
           size="xs"
@@ -50,12 +50,12 @@ function AiSettingsSection() {
             ? "mb-4 max-h-[300px] scale-100 opacity-100"
             : "mb-0 max-h-0 scale-98 overflow-hidden opacity-0"
         }`}>
-        <div className="rounded-lg border border-sky-200 bg-blue-50 p-3">
-          <strong className="mb-2 flex items-center text-sky-600">
+        <div className="rounded-lg border border-info/20 bg-info-ghost p-3">
+          <strong className="mb-2 flex items-center text-info">
             <Icon icon="mdi:information-outline" className="mr-1" width={16} />
             {t("option.ai.tips.title")}
           </strong>
-          <ol className="ml-5 list-decimal space-y-1 text-sky-500">
+          <ol className="ml-5 list-decimal space-y-1 text-info">
             <li>{t("option.ai.tips.tip1")}</li>
             <li>{t("option.ai.tips.tip2")}</li>
             <li>{t("option.ai.tips.tip3")}</li>
@@ -67,7 +67,7 @@ function AiSettingsSection() {
         <div className="mb-4">
           <label
             htmlFor="ai-api-key"
-            className="mb-2 block font-medium text-sky-600">
+            className="mb-2 block font-medium text-text-1">
             <Icon icon="mdi:key-outline" className="mr-1.5 inline" width={18} />
             {t("option.ai.apiKey.label")}
           </label>
@@ -76,10 +76,10 @@ function AiSettingsSection() {
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+            className="w-full rounded-lg border border-line-1 bg-content p-2.5 text-sm focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/20"
             placeholder={t("option.ai.apiKey.placeholder")}
           />
-          <p className="mt-2 text-sky-500 text-sm">
+          <p className="mt-2 text-sm text-text-2">
             {t("option.ai.apiKey.helper")}
           </p>
         </div>
@@ -87,7 +87,7 @@ function AiSettingsSection() {
         <div className="mb-4">
           <label
             htmlFor="ai-base-url"
-            className="mb-2 block font-medium text-sky-600">
+            className="mb-2 block font-medium text-text-1">
             <Icon icon="mdi:web" className="mr-1.5 inline" width={18} />
             {t("option.ai.baseUrl.label")}
           </label>
@@ -97,7 +97,7 @@ function AiSettingsSection() {
               type="text"
               value={baseURL}
               onChange={(e) => setBaseURL(e.target.value)}
-              className="flex-1 rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+              className="flex-1 rounded-lg border border-line-1 bg-content p-2.5 text-sm focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/20"
               placeholder={t("option.ai.baseUrl.placeholder")}
             />
             <Button
@@ -113,7 +113,7 @@ function AiSettingsSection() {
               {t("option.ai.baseUrl.fetchModels")}
             </Button>
           </div>
-          <p className="mt-2 text-sky-500 text-sm">
+          <p className="mt-2 text-sm text-text-2">
             {t("option.ai.baseUrl.helper")}
           </p>
         </div>
@@ -121,7 +121,7 @@ function AiSettingsSection() {
         <div className="mb-4">
           <label
             htmlFor="ai-model"
-            className="mb-2 block font-medium text-sky-600">
+            className="mb-2 block font-medium text-text-1">
             <Icon
               icon="mdi:robot-excited-outline"
               className="mr-1.5 inline"
@@ -135,7 +135,7 @@ function AiSettingsSection() {
             onChange={setModel}
             options={modelList}
           />
-          <p className="mt-2 text-sky-500 text-sm">
+          <p className="mt-2 text-sm text-text-2">
             {t("option.ai.model.helper")}
           </p>
         </div>
@@ -143,7 +143,7 @@ function AiSettingsSection() {
         <div className="mb-4">
           <label
             htmlFor="ai-system-prompt"
-            className="mb-2 block font-medium text-sky-600">
+            className="mb-2 block font-medium text-text-1">
             <Icon
               icon="mdi:message-text-outline"
               className="mr-1.5 inline"
@@ -156,10 +156,10 @@ function AiSettingsSection() {
             value={systemPrompt}
             onChange={(e) => setSystemPrompt(e.target.value)}
             rows={4}
-            className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+            className="w-full rounded-lg border border-line-1 bg-content p-2.5 text-sm focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/20"
             placeholder={t("option.ai.systemPrompt.placeholder")}
           />
-          <p className="mt-2 text-sky-500 text-sm">
+          <p className="mt-2 text-sm text-text-2">
             {t("option.ai.systemPrompt.helper")}
           </p>
         </div>

@@ -34,8 +34,8 @@ export const Footer: React.FC = () => {
           <Icon icon="mdi:discord" width={20} />
         </Button>
       </div>
-      <div className="inline-block rounded-full border border-sky-200 bg-sky-100 px-4 py-2">
-        <p className="text-sky-600 text-sm">
+      <div className="inline-block rounded-full border border-accent-blue/20 bg-accent-blue-ghost px-4 py-2">
+        <p className="text-accent-blue text-sm">
           {t("app.name")} ©<span>{` ${new Date().getFullYear()} `}</span>
           <Icon
             icon="line-md:heart-twotone"

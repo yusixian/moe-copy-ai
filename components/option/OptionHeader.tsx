@@ -1,3 +1,4 @@
+import iconUrl from "data-base64:~assets/icon.png"
 import { Icon } from "@iconify/react"
 import type React from "react"
 import { useCallback } from "react"
@@ -13,10 +14,19 @@ export const OptionHeader: React.FC = () => {
   }, [])
 
   return (
-    <header className="mb-6 flex items-center justify-between rounded-lg border border-blue-200 bg-white p-4 shadow-sm">
-      <div>
-        <h1 className="font-bold text-2xl text-blue-600">{t("app.name")}</h1>
-        <p className="text-blue-500 text-sm">{t("app.description")}</p>
+    <header className="card mb-6 flex items-center justify-between p-4">
+      <div className="flex items-center gap-3">
+        <img
+          src={iconUrl}
+          alt="Moe Copy AI"
+          className="h-10 w-10 flex-shrink-0"
+        />
+        <div>
+          <h1 className="font-bold text-2xl text-accent-blue">
+            {t("app.name")}
+          </h1>
+          <p className="text-sm text-text-2">{t("app.description")}</p>
+        </div>
       </div>
 
       <Button

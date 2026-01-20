@@ -29,14 +29,14 @@ export const LogSettingsSection: React.FC = () => {
         description={t("option.log.scrapeTiming.desc")}
       />
 
-      <div className="mt-6 rounded-lg border border-sky-200 bg-blue-50 p-4">
-        <h3 className="mb-2 flex items-center font-medium text-lg text-sky-600">
+      <div className="mt-6 rounded-lg border border-info/20 bg-info-ghost p-4">
+        <h3 className="mb-2 flex items-center font-medium text-info text-lg">
           <span className="mr-2">📝</span>
           {t("option.log.levelExplanation.title")}
         </h3>
-        <ul className="space-y-2 text-sky-600 text-sm">
+        <ul className="space-y-2 text-info text-sm">
           <li className="flex items-center">
-            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-sky-400"></span>
+            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-info"></span>
             <span className="font-semibold">
               {t("option.log.levelExplanation.debug")}
             </span>{" "}
@@ -45,7 +45,7 @@ export const LogSettingsSection: React.FC = () => {
             </span>
           </li>
           <li className="flex items-center">
-            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-blue-500"></span>
+            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-accent-blue"></span>
             <span className="font-semibold">
               {t("option.log.levelExplanation.info")}
             </span>{" "}
@@ -54,7 +54,7 @@ export const LogSettingsSection: React.FC = () => {
             </span>
           </li>
           <li className="flex items-center">
-            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-orange-400"></span>
+            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-warning"></span>
             <span className="font-semibold">
               {t("option.log.levelExplanation.error")}
             </span>{" "}
@@ -63,7 +63,7 @@ export const LogSettingsSection: React.FC = () => {
             </span>
           </li>
           <li className="flex items-center">
-            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-gray-400"></span>
+            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-text-3"></span>
             <span className="font-semibold">
               {t("option.log.levelExplanation.silent")}
             </span>{" "}
