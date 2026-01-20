@@ -78,7 +78,7 @@ function ExtractionModeSettings() {
 
   if (loading)
     return (
-      <div className="text-xs text-text-3">
+      <div className="text-text-3 text-xs">
         {t("sidepanel.settings.extractionMode.loading")}
       </div>
     )
@@ -118,7 +118,7 @@ function ExtractionModeSettings() {
           </button>
         ))}
       </div>
-      <p className="text-xs text-text-2">
+      <p className="text-text-2 text-xs">
         {modes.find((m) => m.value === mode)?.desc}
       </p>
     </div>
@@ -146,9 +146,7 @@ function AiSettings() {
   return (
     <div className="space-y-3">
       <div>
-        <label
-          htmlFor="sp-api-key"
-          className="mb-1 block text-xs text-text-1">
+        <label htmlFor="sp-api-key" className="mb-1 block text-text-1 text-xs">
           {t("sidepanel.settings.ai.apiKey")}
         </label>
         <input
@@ -162,9 +160,7 @@ function AiSettings() {
       </div>
 
       <div>
-        <label
-          htmlFor="sp-base-url"
-          className="mb-1 block text-xs text-text-1">
+        <label htmlFor="sp-base-url" className="mb-1 block text-text-1 text-xs">
           {t("sidepanel.settings.ai.baseUrl")}
         </label>
         <div className="flex gap-1">
@@ -192,7 +188,7 @@ function AiSettings() {
       </div>
 
       <div>
-        <label htmlFor="sp-model" className="mb-1 block text-xs text-text-1">
+        <label htmlFor="sp-model" className="mb-1 block text-text-1 text-xs">
           {t("sidepanel.settings.ai.model")}
         </label>
         <ModelSelectInput
@@ -207,7 +203,7 @@ function AiSettings() {
       <div>
         <label
           htmlFor="sp-system-prompt"
-          className="mb-1 block text-xs text-text-1">
+          className="mb-1 block text-text-1 text-xs">
           {t("sidepanel.settings.ai.systemPrompt")}
         </label>
         <textarea
@@ -375,7 +371,7 @@ export default function SidePanelSettings() {
           <Icon icon="mdi:code-braces" width={16} />
           {t("sidepanel.settings.selector.title")}
         </span>
-        <span className="flex items-center gap-1 text-xs text-text-3">
+        <span className="flex items-center gap-1 text-text-3 text-xs">
           {t("sidepanel.settings.selector.openFull")}
           <Icon icon="mdi:open-in-new" width={14} />
         </span>

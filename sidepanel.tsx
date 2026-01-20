@@ -306,8 +306,8 @@ function SidePanel() {
         </div>
 
         {/* 底部链接 */}
-        <div className="flex flex-shrink-0 items-center justify-between gap-4 border-t border-line-1 px-1 pt-2">
-          <span className="text-xs text-text-3">{t("app.name")}</span>
+        <div className="flex flex-shrink-0 items-center justify-between gap-4 border-line-1 border-t px-1 pt-2">
+          <span className="text-text-3 text-xs">{t("app.name")}</span>
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -340,7 +340,7 @@ function SidePanel() {
               <Icon icon="mdi:discord" className="size-full" />
             </Button>
           </div>
-          <span className="text-xs text-text-3">
+          <span className="text-text-3 text-xs">
             v{chrome.runtime.getManifest().version}
           </span>
         </div>
