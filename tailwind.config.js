@@ -29,21 +29,23 @@ const config = {
         },
         app: "#fafafa",
         content: "oklch(100% 0 0 / 0.6)",
-        "content-hover":
-          "color-mix(in oklab, oklch(100% 0 0 / 0.6), black 5%)",
+        "content-hover": "color-mix(in oklab, oklch(100% 0 0 / 0.6), black 5%)",
         "content-active":
           "color-mix(in oklab, oklch(100% 0 0 / 0.6), black 10%)",
         "content-solid": "oklch(100% 0 0)",
-        "content-solid-hover":
-          "color-mix(in oklab, oklch(100% 0 0), black 5%)",
+        "content-solid-hover": "color-mix(in oklab, oklch(100% 0 0), black 5%)",
         "content-solid-active":
           "color-mix(in oklab, oklch(100% 0 0), black 10%)",
         "content-alt": "oklch(96.8% 0.0069 247.9 / 0.6)",
-        "content-alt-hover": "color-mix(in oklab, oklch(96.8% 0.0069 247.9 / 0.6), black 5%)",
-        "content-alt-active": "color-mix(in oklab, oklch(96.8% 0.0069 247.9 / 0.6), black 10%)",
+        "content-alt-hover":
+          "color-mix(in oklab, oklch(96.8% 0.0069 247.9 / 0.6), black 5%)",
+        "content-alt-active":
+          "color-mix(in oklab, oklch(96.8% 0.0069 247.9 / 0.6), black 10%)",
         "content-alt-solid": "oklch(96.8% 0.0069 247.9)",
-        "content-alt-solid-hover": "color-mix(in oklab, oklch(96.8% 0.0069 247.9), black 5%)",
-        "content-alt-solid-active": "color-mix(in oklab, oklch(96.8% 0.0069 247.9), black 10%)",
+        "content-alt-solid-hover":
+          "color-mix(in oklab, oklch(96.8% 0.0069 247.9), black 5%)",
+        "content-alt-solid-active":
+          "color-mix(in oklab, oklch(96.8% 0.0069 247.9), black 10%)",
         elevated: {
           1: "rgba(255, 255, 255, 0.6)",
           2: "rgba(255, 255, 255, 0.6)",
