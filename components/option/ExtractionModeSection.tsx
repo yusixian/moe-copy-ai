@@ -148,7 +148,7 @@ export const ExtractionModeSection: React.FC = () => {
                             ? style.color === "sky"
                               ? "oklch(60% 0.203 257.46)"
                               : style.color === "emerald"
-                                ? "oklch(72.3% 0.219 149.579)"
+                                ? "oklch(62.7% 0.1699 149.21)"
                                 : "oklch(42% 0.196 302.716)"
                             : "transparent"
                       }}

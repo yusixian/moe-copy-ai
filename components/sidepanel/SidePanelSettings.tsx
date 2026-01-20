@@ -4,6 +4,7 @@ import { useLayoutEffect, useState } from "react"
 import { toast } from "react-toastify"
 
 import { Button } from "~/components/ui/button"
+import Segmented from "~/components/ui/segmented"
 import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
 import { useAiSettings } from "~hooks/useAiSettings"
@@ -85,17 +86,17 @@ function ExtractionModeSettings() {
 
   const modes = [
     {
-      value: "selector",
+      value: "selector" as const,
       label: t("sidepanel.settings.extractionMode.selector"),
       desc: t("sidepanel.settings.extractionMode.selector.desc")
     },
     {
-      value: "readability",
+      value: "readability" as const,
       label: t("sidepanel.settings.extractionMode.readability"),
       desc: t("sidepanel.settings.extractionMode.readability.desc")
     },
     {
-      value: "hybrid",
+      value: "hybrid" as const,
       label: t("sidepanel.settings.extractionMode.hybrid"),
       desc: t("sidepanel.settings.extractionMode.hybrid.desc")
     }
@@ -103,21 +104,13 @@ function ExtractionModeSettings() {
 
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-3 gap-1">
-        {modes.map((m) => (
-          <button
-            type="button"
-            key={m.value}
-            onClick={() => handleChange(m.value as ExtractionMode)}
-            className={`rounded-md px-2 py-1.5 text-center text-xs transition-all ${
-              mode === m.value
-                ? "bg-accent-blue text-white shadow-sm"
-                : "bg-fill-hover text-text-2 hover:bg-fill-hover/80"
-            }`}>
-            {m.label}
-          </button>
-        ))}
-      </div>
+      <Segmented
+        id="extraction-mode"
+        options={modes}
+        value={mode}
+        onChange={handleChange}
+        className="w-full"
+      />
       <p className="text-text-2 text-xs">
         {modes.find((m) => m.value === mode)?.desc}
       </p>
