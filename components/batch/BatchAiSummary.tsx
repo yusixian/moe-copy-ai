@@ -7,10 +7,9 @@ import { useAiSummary } from "~hooks/useAiSummary"
 import { aggregateToSingleMarkdown } from "~utils/content-aggregator"
 import { useI18n } from "~utils/i18n"
 import { processTemplate } from "~utils/template"
-
-import { AccordionSection } from "../AccordionSection"
 import CompactPromptInput from "../ai/CompactPromptInput"
 import SummaryResultDisplay from "../ai/SummaryResultDisplay"
+import { Collapsible } from "../ui/collapsible"
 
 interface BatchAiSummaryProps {
   results: BatchScrapeResult[]
@@ -130,10 +129,10 @@ const BatchAiSummary = memo(function BatchAiSummary({
         </span>
       </div>
 
-      <AccordionSection
+      <Collapsible
         title={t("batch.ai.sectionTitle")}
-        icon="line-md:chat-round-dots-twotone"
-        defaultOpen>
+        icon={<Icon icon="line-md:chat-round-dots-twotone" width={16} />}
+        defaultExpanded>
         <div className="space-y-3">
           {/* 提示词输入 */}
           <CompactPromptInput
@@ -212,7 +211,7 @@ const BatchAiSummary = memo(function BatchAiSummary({
             </div>
           )}
         </div>
-      </AccordionSection>
+      </Collapsible>
     </div>
   )
 })

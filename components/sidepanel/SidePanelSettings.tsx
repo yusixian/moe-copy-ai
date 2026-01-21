@@ -4,6 +4,7 @@ import { useLayoutEffect, useState } from "react"
 import { toast } from "react-toastify"
 
 import { Button } from "~/components/ui/button"
+import { Collapsible } from "~/components/ui/collapsible"
 import Segmented from "~/components/ui/segmented"
 import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
@@ -17,7 +18,6 @@ import {
 } from "~utils/i18n"
 import { translateOptions } from "~utils/options-helper"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
-import { AccordionSection } from "../AccordionSection"
 import { ModelSelectInput } from "../ai/ModelSelectInput"
 import {
   BatchScrapeSettings,
@@ -312,31 +312,31 @@ export default function SidePanelSettings() {
 
   return (
     <div className="space-y-2">
-      <AccordionSection
+      <Collapsible
         title={t("sidepanel.settings.extractionMode.title")}
-        icon="line-md:cog-loop"
-        defaultOpen>
+        icon={<Icon icon="line-md:cog-loop" width={16} />}
+        defaultExpanded>
         <ExtractionModeSettings />
-      </AccordionSection>
+      </Collapsible>
 
-      <AccordionSection
+      <Collapsible
         title={t("sidepanel.settings.ai.title")}
-        icon="mdi:robot"
-        defaultOpen>
+        icon={<Icon icon="mdi:robot" width={16} />}
+        defaultExpanded>
         <AiSettings />
-      </AccordionSection>
+      </Collapsible>
 
-      <AccordionSection
+      <Collapsible
         title={t("sidepanel.settings.log.title")}
-        icon="mdi:file-document-outline">
+        icon={<Icon icon="mdi:file-document-outline" width={16} />}>
         <LogSettings />
-      </AccordionSection>
+      </Collapsible>
 
-      <AccordionSection
+      <Collapsible
         title={t("sidepanel.settings.batch.title")}
-        icon="mdi:file-document-multiple">
+        icon={<Icon icon="mdi:file-document-multiple" width={16} />}>
         <BatchScrapeSettings />
-      </AccordionSection>
+      </Collapsible>
 
       <LanguageSettings />
 

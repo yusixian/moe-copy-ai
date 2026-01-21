@@ -12,7 +12,7 @@ import type {
 import type { LinkFilterConfig } from "~hooks/useBatchScrape"
 import { useI18n } from "~utils/i18n"
 
-import { AccordionSection } from "../AccordionSection"
+import { Collapsible } from "../ui/collapsible"
 import { BatchScrapeSettings } from "./BatchScrapeSettings"
 import LinkPreviewList from "./LinkPreviewList"
 import ScrapeProgressPanel from "./ScrapeProgressPanel"
@@ -108,12 +108,12 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
             </div>
 
             {/* 快捷设置区域 */}
-            <AccordionSection
+            <Collapsible
               title={t("batch.idle.settings")}
-              icon="mdi:cog-outline"
-              defaultOpen>
+              icon={<Icon icon="mdi:cog-outline" width={16} />}
+              defaultExpanded>
               <BatchScrapeSettings compact showToast={false} />
-            </AccordionSection>
+            </Collapsible>
           </div>
         )
 
@@ -145,11 +145,11 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
       case "previewing":
         return (
           <div className="flex flex-col gap-4">
-            <AccordionSection
+            <Collapsible
               title={t("batch.previewing.settings")}
-              icon="mdi:cog-outline">
+              icon={<Icon icon="mdi:cog-outline" width={16} />}>
               <BatchScrapeSettings compact showToast={false} />
-            </AccordionSection>
+            </Collapsible>
             <LinkPreviewList
               elementInfo={elementInfo}
               links={links}
