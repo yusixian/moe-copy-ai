@@ -8,16 +8,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-blue-600 text-white border-blue-600 hover:bg-blue-700",
+        default:
+          "bg-accent-blue text-white border-accent-blue hover:bg-accent-blue-hover",
         secondary:
-          "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200",
+          "bg-accent-blue-ghost text-accent-blue border-accent-blue hover:bg-accent-blue-ghost-hover",
         outline:
           "bg-transparent border-blue-300 text-blue-600 hover:bg-blue-50",
         ghost:
-          "bg-transparent border-transparent text-blue-600 hover:bg-blue-50",
-        success:
-          "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700",
-        danger: "bg-red-600 text-white border-red-600 hover:bg-red-700"
+          "bg-transparent border-transparent text-text-1 hover:bg-text-1/15",
+        success: "bg-success text-white border-success hover:bg-success-hover",
+        danger: "bg-error text-white border-error hover:bg-error-hover"
       },
       size: {
         xs: "px-2 py-1 text-xs",

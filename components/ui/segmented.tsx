@@ -54,7 +54,7 @@ export const Segmented = <T extends string | number = string | number>({
   return (
     <div
       className={cn(
-        "flex w-fit cursor-pointer select-none rounded-lg bg-gray-100 p-1 font-medium text-xs",
+        "flex w-fit cursor-pointer select-none rounded-lg bg-content-alt p-1 font-medium text-xs",
         className
       )}>
       {options.map((option) => {
@@ -65,7 +65,7 @@ export const Segmented = <T extends string | number = string | number>({
           <motion.div
             className={cn(
               "relative z-0 flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md px-3 py-1.5",
-              selected ? "text-sky-600" : "text-gray-600 hover:text-gray-900",
+              selected ? "text-accent-blue" : "text-text-2 hover:text-text-1",
               itemClass
             )}
             onClick={() => select(value)}
@@ -105,7 +105,7 @@ export const Segmented = <T extends string | number = string | number>({
               <motion.div
                 layoutId={`segmented_selected_bg_${id ?? "default"}`}
                 className={cn(
-                  "absolute inset-0 -z-10 rounded-md bg-white shadow-sm",
+                  "absolute inset-0 -z-10 rounded-md bg-content-solid shadow-sm",
                   indicateClass
                 )}
                 transition={

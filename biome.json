@@ -41,6 +41,9 @@
     }
   },
   "css": {
+    "parser": {
+      "tailwindDirectives": true
+    },
     "linter": {
       "enabled": false
     }
