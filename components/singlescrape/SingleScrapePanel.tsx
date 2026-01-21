@@ -361,14 +361,9 @@ const SingleScrapePanel = forwardRef<
                     height="16"
                     className="text-accent-blue"
                   />
-                  <span className="font-medium text-sm">
-                    URL
-                  </span>
+                  <span className="font-medium text-sm">URL</span>
                 </div>
-                <CopyableTextField
-                  text={scrapedData.url}
-                  className="text-xs"
-                />
+                <CopyableTextField text={scrapedData.url} className="text-xs" />
               </div>
             </div>
           </Collapsible>

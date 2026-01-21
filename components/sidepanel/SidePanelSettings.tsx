@@ -361,7 +361,11 @@ export default function SidePanelSettings() {
         onClick={openFullSettings}
         className="justify-between rounded-xl p-3">
         <span className="flex items-center gap-2 font-medium text-sm text-text-1">
-          <Icon icon="mdi:code-braces" width={16} className="text-accent-blue" />
+          <Icon
+            icon="mdi:code-braces"
+            width={16}
+            className="text-accent-blue"
+          />
           {t("sidepanel.settings.selector.title")}
         </span>
         <span className="flex items-center gap-1 text-text-2 text-xs">

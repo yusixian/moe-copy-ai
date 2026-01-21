@@ -652,7 +652,10 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 onLoadError={handleMetadataImageError}
               />
               {/* 元数据 json */}
-              <CopyableTextField className="mt-4" text={JSON.stringify(scrapedData.metadata)} />
+              <CopyableTextField
+                className="mt-4"
+                text={JSON.stringify(scrapedData.metadata)}
+              />
             </div>
           )}
         </div>
