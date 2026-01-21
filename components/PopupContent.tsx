@@ -2,7 +2,6 @@ import iconUrl from "data-base64:~assets/icon.png"
 import { Icon } from "@iconify/react"
 import { sendToBackground } from "@plasmohq/messaging"
 import { useStorage } from "@plasmohq/storage/hook"
-import { useClipboard } from "foxact/use-clipboard"
 import { memo, useCallback } from "react"
 import AiSummarySection from "~/components/AiSummarySection"
 import ContentSection from "~/components/ContentSection"
@@ -41,8 +40,6 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
     handleSelectorChange,
     handleSelectContent
   } = useScrapedData()
-
-  const { copy: copyDebugInfo } = useClipboard()
 
   // 打开侧边栏（批量抓取功能已移至侧边栏）
   const handleOpenSidePanel = async () => {
@@ -184,7 +181,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
       {/* 悬浮窗开关区域 */}
       <div className="card mb-4 p-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="font-medium text-gray-700 text-sm">
+          <span className="font-medium text-sm text-text-1">
             {t("popup.floatButton.label")}
           </span>
           <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
@@ -262,7 +259,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               </span>
             </span>
           }
-          titleClassName="text-base text-accent-blue"
+          titleClassName="text-base"
           icon={
             <Icon
               icon="line-md:coffee-half-empty-twotone-loop"
@@ -274,23 +271,11 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           defaultExpanded={false}
           className="mb-4">
           <div className="text-blue-700 text-xs">
-            <div className="mb-2 flex justify-end">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 shrink-0 p-2"
-                title={t("popup.debug.copyInfo")}
-                onClick={() => {
-                  copyDebugInfo(debugInfo)
-                  alert(t("popup.debug.copied"))
-                }}>
-                <Icon icon="line-md:clipboard-check" width="14" height="14" />
-              </Button>
-            </div>
-
-            <div className="max-h-[120px] overflow-auto rounded border border-blue-100 bg-white p-2">
-              <pre className="text-text-2">{debugInfo}</pre>
-            </div>
+            <CopyableTextField
+              text={debugInfo}
+              rows={5}
+              onCopied={() => alert(t("popup.debug.copied"))}
+            />
 
             <div className="mt-2 flex items-center justify-between text-[10px] text-text-2">
               <div className="flex items-center gap-1">
@@ -313,13 +298,13 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="rounded border border-blue-200 bg-blue-100/70 px-1.5 py-0.5">
+                <span className="rounded border bg-fill-1 px-1.5 py-0.5">
                   {new Date().toLocaleTimeString()}
                 </span>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-5 w-5"
+                  className="h-5 w-5 p-0"
                   title={t("popup.debug.moreInfo")}
                   onClick={() => {
                     const details = {
@@ -336,7 +321,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                     }
                     alert(JSON.stringify(details, null, 2))
                   }}>
-                  <Icon icon="line-md:information" width="12" height="12" />
+                  <Icon icon="line-md:alert-circle" width="12" height="12" />
                 </Button>
               </div>
             </div>
@@ -353,14 +338,14 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         <div className="card p-3">
           {/* 页面标题 */}
           <div className="mb-4">
-            <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-base">
+            <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-base">
               <Icon
                 icon="line-md:hash"
                 width="18"
                 height="18"
-                className="flex-shrink-0"
+                className="flex-shrink-0 text-accent-blue"
               />
-              <span>{t("content.title")}</span>
+              <span className="text-text-1">{t("content.title")}</span>
               {titleSelectors.length > 0 && (
                 <SelectorDropdown
                   type="title"
@@ -381,12 +366,12 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 作者信息 */}
           {scrapedData.author && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-base">
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-base">
                 <Icon
                   icon="line-md:account"
                   width="18"
                   height="18"
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 text-accent-blue"
                 />
                 <span>{t("content.author")}</span>
                 {authorSelectors.length > 0 && (
@@ -410,12 +395,12 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 发布日期 */}
           {scrapedData.publishDate && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-base">
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-base">
                 <Icon
                   icon="line-md:calendar"
                   width="18"
                   height="18"
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 text-accent-blue"
                 />
                 <span>{t("content.date")}</span>
                 {dateSelectors.length > 0 && (
@@ -437,12 +422,12 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
 
           {/* URL */}
           <div className="mb-4">
-            <h2 className="mb-2 flex items-center gap-2 font-semibold text-accent-blue text-base">
+            <h2 className="mb-2 flex items-center gap-2 font-semibold text-base">
               <Icon
                 icon="line-md:link"
                 width="18"
                 height="18"
-                className="flex-shrink-0"
+                className="flex-shrink-0 text-accent-blue"
               />
               <span>{t("content.url")}</span>
             </h2>
@@ -455,10 +440,10 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               {/* 标题行 - 移动端优化 */}
               <div className="mb-3">
                 <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-base">
+                  <h2 className="flex flex-wrap items-center gap-2 font-semibold text-base">
                     <Icon
                       icon="line-md:file-document"
-                      className="inline flex-shrink-0"
+                      className="inline flex-shrink-0 text-accent-blue"
                       width="18"
                       height="18"
                     />
@@ -623,15 +608,15 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 页面图片 */}
           {scrapedData.images && scrapedData.images.length > 0 && (
             <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-accent-blue text-base">
+              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-base">
                 <Icon
                   icon="line-md:image"
                   width="18"
                   height="18"
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 text-accent-blue"
                 />
                 <span>{t("popup.pageImages")}</span>
-                <span className="font-normal text-sky-500 text-sm">
+                <span className="font-normal text-accent-blue text-sm">
                   {t("popup.imageCount", { count: scrapedData.images.length })}
                 </span>
               </h2>
@@ -645,12 +630,12 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           {/* 元数据 */}
           {Object.keys(scrapedData.metadata).length > 0 && (
             <div>
-              <h2 className="mb-2 flex items-center gap-2 font-semibold text-accent-blue text-base">
+              <h2 className="mb-2 flex items-center gap-2 font-semibold text-base">
                 <Icon
                   icon="line-md:emoji-grin"
                   width="18"
                   height="18"
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 text-accent-blue"
                 />
                 <span>{t("popup.metadata")}</span>
               </h2>
@@ -667,7 +652,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 onLoadError={handleMetadataImageError}
               />
               {/* 元数据 json */}
-              <CopyableTextField text={JSON.stringify(scrapedData.metadata)} />
+              <CopyableTextField className="mt-4" text={JSON.stringify(scrapedData.metadata)} />
             </div>
           )}
         </div>

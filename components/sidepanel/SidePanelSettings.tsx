@@ -37,9 +37,9 @@ function ToggleRow({
   onChange: (checked: boolean) => void
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-line-1 bg-content p-3">
+    <div className="flex items-center justify-between rounded-xl border border-line-1 bg-content p-3">
       <span className="flex items-center gap-2 font-medium text-sm text-text-1">
-        <Icon icon={icon} width={16} />
+        <Icon icon={icon} width={16} className="text-accent-blue" />
         {label}
       </span>
       <button
@@ -265,9 +265,9 @@ function LanguageSettings() {
   }
 
   return (
-    <div className="flex items-center justify-between rounded-lg border border-line-1 bg-content p-3">
+    <div className="flex items-center justify-between rounded-xl border border-line-1 bg-content p-3">
       <span className="flex items-center gap-2 font-medium text-sm text-text-1">
-        <Icon icon="mdi:globe" width={16} />
+        <Icon icon="mdi:globe" width={16} className="text-accent-blue" />
         {t("option.interface.language")}
       </span>
       <select
@@ -359,12 +359,12 @@ export default function SidePanelSettings() {
         variant="outline"
         fullWidth
         onClick={openFullSettings}
-        className="justify-between p-3">
-        <span className="flex items-center gap-2 font-medium text-sm">
-          <Icon icon="mdi:code-braces" width={16} />
+        className="justify-between rounded-xl p-3">
+        <span className="flex items-center gap-2 font-medium text-sm text-text-1">
+          <Icon icon="mdi:code-braces" width={16} className="text-accent-blue" />
           {t("sidepanel.settings.selector.title")}
         </span>
-        <span className="flex items-center gap-1 text-text-3 text-xs">
+        <span className="flex items-center gap-1 text-text-2 text-xs">
           {t("sidepanel.settings.selector.openFull")}
           <Icon icon="mdi:open-in-new" width={14} />
         </span>

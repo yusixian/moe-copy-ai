@@ -1,6 +1,5 @@
 import { Icon } from "@iconify/react"
 import { useStorage } from "@plasmohq/storage/hook"
-import { useClipboard } from "foxact/use-clipboard"
 import {
   forwardRef,
   memo,
@@ -49,8 +48,6 @@ const SingleScrapePanel = forwardRef<
     handleSelectorChange,
     handleSelectContent
   } = useScrapedData()
-
-  const { copy: copyDebugInfo } = useClipboard()
 
   // 暴露 refresh 方法给父组件
   useImperativeHandle(
@@ -161,14 +158,14 @@ const SingleScrapePanel = forwardRef<
       {showDebugPanel === "true" && debugInfo && (
         <Collapsible
           title={
-            <span className="flex items-center gap-1.5 text-base">
+            <span className="flex items-center gap-1.5 text-sm">
               {t("singlescrape.debug.title")}
               <span className="rounded border border-accent-blue bg-accent-blue-ghost px-1.5 py-0 text-[10px] text-accent-blue">
                 {t("singlescrape.debug.devMode")}
               </span>
             </span>
           }
-          titleClassName="text-base text-accent-blue"
+          titleClassName="text-sm"
           icon={
             <Icon
               icon="line-md:coffee-half-empty-twotone-loop"
@@ -180,23 +177,11 @@ const SingleScrapePanel = forwardRef<
           defaultExpanded={false}
           className="flex-shrink-0">
           <div className="text-blue-700 text-xs">
-            <div className="mb-2 flex justify-end">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 shrink-0 p-2"
-                title={t("singlescrape.debug.copy")}
-                onClick={() => {
-                  copyDebugInfo(debugInfo)
-                  alert(t("singlescrape.debug.copied"))
-                }}>
-                <Icon icon="line-md:clipboard-check" width="14" height="14" />
-              </Button>
-            </div>
-
-            <div className="max-h-[120px] overflow-auto rounded border border-blue-100 bg-white p-2">
-              <pre className="text-text-2">{debugInfo}</pre>
-            </div>
+            <CopyableTextField
+              text={debugInfo}
+              rows={5}
+              onCopied={() => alert(t("singlescrape.debug.copied"))}
+            />
 
             <div className="mt-2 flex items-center justify-between text-[10px] text-text-2">
               <div className="flex items-center gap-1">
@@ -219,13 +204,13 @@ const SingleScrapePanel = forwardRef<
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="rounded border border-blue-200 bg-blue-100/70 px-1.5 py-0.5">
+                <span className="rounded border bg-fill-1 px-1.5 py-0.5">
                   {new Date().toLocaleTimeString()}
                 </span>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-5 w-5"
+                  className="h-5 w-5 p-0"
                   title={t("singlescrape.debug.moreInfo")}
                   onClick={() => {
                     const details = {
@@ -244,7 +229,7 @@ const SingleScrapePanel = forwardRef<
                     }
                     alert(JSON.stringify(details, null, 2))
                   }}>
-                  <Icon icon="line-md:information" width="12" height="12" />
+                  <Icon icon="line-md:alert-circle" width="12" height="12" />
                 </Button>
               </div>
             </div>
@@ -275,7 +260,7 @@ const SingleScrapePanel = forwardRef<
                     height="16"
                     className="text-accent-blue"
                   />
-                  <span className="font-medium text-accent-blue text-sm">
+                  <span className="font-medium text-sm">
                     {t("singlescrape.field.title")}
                   </span>
                   {titleSelectors.length > 0 && (
@@ -293,7 +278,7 @@ const SingleScrapePanel = forwardRef<
                 </div>
                 <CopyableTextField
                   text={scrapedData.title}
-                  className="rounded-lg border border-accent-blue/20 bg-accent-blue-ghost p-2 text-sm"
+                  className="text-sm"
                 />
               </div>
 
@@ -307,7 +292,7 @@ const SingleScrapePanel = forwardRef<
                       height="16"
                       className="text-accent-blue"
                     />
-                    <span className="font-medium text-accent-blue text-sm">
+                    <span className="font-medium text-sm">
                       {t("singlescrape.field.author")}
                     </span>
                     {authorSelectors.length > 0 && (
@@ -327,7 +312,7 @@ const SingleScrapePanel = forwardRef<
                   </div>
                   <CopyableTextField
                     text={scrapedData.author}
-                    className="rounded-lg border border-accent-blue/20 bg-accent-blue-ghost p-2 text-sm"
+                    className="text-sm"
                   />
                 </div>
               )}
@@ -342,7 +327,7 @@ const SingleScrapePanel = forwardRef<
                       height="16"
                       className="text-accent-blue"
                     />
-                    <span className="font-medium text-accent-blue text-sm">
+                    <span className="font-medium text-sm">
                       {t("singlescrape.field.date")}
                     </span>
                     {dateSelectors.length > 0 && (
@@ -362,7 +347,7 @@ const SingleScrapePanel = forwardRef<
                   </div>
                   <CopyableTextField
                     text={scrapedData.publishDate}
-                    className="rounded-lg border border-accent-blue/20 bg-accent-blue-ghost p-2 text-sm"
+                    className="text-sm"
                   />
                 </div>
               )}
@@ -376,13 +361,13 @@ const SingleScrapePanel = forwardRef<
                     height="16"
                     className="text-accent-blue"
                   />
-                  <span className="font-medium text-accent-blue text-sm">
+                  <span className="font-medium text-sm">
                     URL
                   </span>
                 </div>
                 <CopyableTextField
                   text={scrapedData.url}
-                  className="rounded-lg border border-accent-blue/20 bg-accent-blue-ghost p-2 text-xs"
+                  className="text-xs"
                 />
               </div>
             </div>
@@ -570,7 +555,7 @@ const SingleScrapePanel = forwardRef<
                 {/* 元数据 JSON */}
                 <CopyableTextField
                   text={JSON.stringify(scrapedData.metadata)}
-                  className="rounded-lg border border-accent-blue/20 bg-accent-blue-ghost p-2 text-xs"
+                  className="text-xs"
                 />
               </div>
             </Collapsible>

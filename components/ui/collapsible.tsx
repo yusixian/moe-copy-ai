@@ -70,7 +70,7 @@ const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps>(
                 {icon}
               </span>
             )}
-            <span className={cn("text-accent-blue text-sm", titleClassName)}>
+            <span className={cn("text-sm text-text-1", titleClassName)}>
               {title}
             </span>
           </div>
