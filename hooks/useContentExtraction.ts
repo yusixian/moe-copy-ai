@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import type {
   ContentExtractionMode,
@@ -28,8 +28,10 @@ interface UseContentExtractionReturn {
  * 用于管理内容提取功能的状态
  */
 export function useContentExtraction(): UseContentExtractionReturn {
-  const [mode, setMode] = useState<ContentExtractionMode>("idle")
-  const [error, setError] = useState<string | null>(null)
+  const [errorState, setErrorState] = useState<{
+    error: string | null
+    hasError: boolean
+  }>({ error: null, hasError: false })
   const [tabInfo, setTabInfo] = useState<TabInfo | null>(null)
 
   const {
@@ -41,15 +43,13 @@ export function useContentExtraction(): UseContentExtractionReturn {
     clearSelection
   } = useElementSelector()
 
-  // 同步选择状态到 mode
-  useEffect(() => {
-    if (isSelecting) {
-      setMode("selecting")
-      setError(null)
-    } else if (extractedContent) {
-      setMode("extracted")
-    }
-  }, [isSelecting, extractedContent])
+  // Derive mode from state instead of using useEffect
+  const mode = useMemo<ContentExtractionMode>(() => {
+    if (errorState.hasError) return "error"
+    if (isSelecting) return "selecting"
+    if (extractedContent) return "extracted"
+    return "idle"
+  }, [isSelecting, extractedContent, errorState.hasError])
 
   // 当内容提取成功时，获取当前标签页信息
   useEffect(() => {
@@ -73,26 +73,26 @@ export function useContentExtraction(): UseContentExtractionReturn {
   // 开始选择
   const startSelection = useCallback(async () => {
     try {
-      setError(null)
+      setErrorState({ error: null, hasError: false })
       await activateSelector("content-extraction")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "启动选择器失败")
-      setMode("error")
+      setErrorState({
+        error: err instanceof Error ? err.message : "启动选择器失败",
+        hasError: true
+      })
     }
   }, [activateSelector])
 
   // 取消选择
   const cancelSelection = useCallback(() => {
     deactivateSelector()
-    setMode("idle")
-    setError(null)
+    setErrorState({ error: null, hasError: false })
   }, [deactivateSelector])
 
   // 重置状态
   const reset = useCallback(() => {
     clearSelection()
-    setMode("idle")
-    setError(null)
+    setErrorState({ error: null, hasError: false })
     setTabInfo(null)
   }, [clearSelection])
 
@@ -100,7 +100,7 @@ export function useContentExtraction(): UseContentExtractionReturn {
     mode,
     content: extractedContent,
     elementInfo,
-    error,
+    error: errorState.error,
     tabInfo,
     startSelection,
     cancelSelection,

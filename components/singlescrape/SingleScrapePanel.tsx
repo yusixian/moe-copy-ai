@@ -1,6 +1,5 @@
 import { Icon } from "@iconify/react"
 import { useStorage } from "@plasmohq/storage/hook"
-import { useClipboard } from "foxact/use-clipboard"
 import {
   forwardRef,
   memo,
@@ -9,7 +8,6 @@ import {
   useImperativeHandle
 } from "react"
 
-import { AccordionSection } from "~/components/AccordionSection"
 import AiSummarySection from "~/components/AiSummarySection"
 import ContentSection from "~/components/ContentSection"
 import CopyableTextField from "~/components/CopyableTextField"
@@ -50,8 +48,6 @@ const SingleScrapePanel = forwardRef<
     handleSelectorChange,
     handleSelectContent
   } = useScrapedData()
-
-  const { copy: copyDebugInfo } = useClipboard()
 
   // 暴露 refresh 方法给父组件
   useImperativeHandle(
@@ -99,8 +95,8 @@ const SingleScrapePanel = forwardRef<
   return (
     <div className="flex h-full flex-col gap-3 overflow-auto">
       {/* 悬浮窗开关区域 */}
-      <div className="flex flex-shrink-0 items-center justify-between rounded-lg border border-sky-200 bg-white p-3">
-        <span className="font-medium text-gray-700 text-sm">
+      <div className="card flex flex-shrink-0 items-center justify-between p-3">
+        <span className="font-medium text-sm text-text-1">
           {t("singlescrape.floatToggle.label")}
         </span>
         <Button
@@ -120,20 +116,20 @@ const SingleScrapePanel = forwardRef<
 
       {/* 错误提示 */}
       {error && (
-        <div className="flex-shrink-0 rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">
+        <div className="flex-shrink-0 rounded-lg border border-error/20 bg-error-ghost p-3 text-error">
           <div className="flex items-start gap-3">
             <Icon
               icon="mdi:alert-circle"
-              className="mt-0.5 flex-shrink-0 text-red-500"
+              className="mt-0.5 flex-shrink-0 text-error"
               width="20"
               height="20"
             />
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-medium text-red-600">
+                <p className="font-medium text-error">
                   {t("singlescrape.error.title")}
                 </p>
-                <p className="flex-1 text-red-600 text-sm">{error}</p>
+                <p className="flex-1 text-error text-sm">{error}</p>
                 <Button
                   variant="outline"
                   size="xs"
@@ -147,9 +143,9 @@ const SingleScrapePanel = forwardRef<
                   {t("singlescrape.error.retry")}
                 </Button>
               </div>
-              <div className="mt-2 rounded border border-red-200 bg-red-100/50 p-2 text-xs">
+              <div className="mt-2 rounded border border-error/20 bg-error-ghost-hover p-2 text-xs">
                 <p>{t("singlescrape.error.causes")}</p>
-                <p className="mt-1 text-red-500">
+                <p className="mt-1 text-error">
                   {t("singlescrape.error.suggestion")}
                 </p>
               </div>
@@ -162,17 +158,18 @@ const SingleScrapePanel = forwardRef<
       {showDebugPanel === "true" && debugInfo && (
         <Collapsible
           title={
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 text-sm">
               {t("singlescrape.debug.title")}
-              <span className="rounded border border-blue-200 bg-blue-100 px-1.5 py-0.5 text-[10px] text-blue-600">
+              <span className="rounded border border-accent-blue bg-accent-blue-ghost px-1.5 py-0 text-[10px] text-accent-blue">
                 {t("singlescrape.debug.devMode")}
               </span>
             </span>
           }
+          titleClassName="text-sm"
           icon={
             <Icon
               icon="line-md:coffee-half-empty-twotone-loop"
-              className="text-blue-500"
+              className="text-accent-blue"
               width="16"
               height="16"
             />
@@ -180,25 +177,13 @@ const SingleScrapePanel = forwardRef<
           defaultExpanded={false}
           className="flex-shrink-0">
           <div className="text-blue-700 text-xs">
-            <div className="mb-2 flex justify-end">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                title={t("singlescrape.debug.copy")}
-                onClick={() => {
-                  copyDebugInfo(debugInfo)
-                  alert(t("singlescrape.debug.copied"))
-                }}>
-                <Icon icon="line-md:clipboard-check" width="14" height="14" />
-              </Button>
-            </div>
+            <CopyableTextField
+              text={debugInfo}
+              rows={5}
+              onCopied={() => alert(t("singlescrape.debug.copied"))}
+            />
 
-            <div className="max-h-[120px] overflow-auto rounded border border-blue-100 bg-white p-2">
-              <pre className="text-blue-800">{debugInfo}</pre>
-            </div>
-
-            <div className="mt-2 flex items-center justify-between text-[10px] text-blue-500">
+            <div className="mt-2 flex items-center justify-between text-[10px] text-text-2">
               <div className="flex items-center gap-1">
                 <Icon
                   icon={
@@ -207,7 +192,7 @@ const SingleScrapePanel = forwardRef<
                       : "line-md:confirm-circle"
                   }
                   className={
-                    isLoading ? "animate-spin text-blue-400" : "text-green-500"
+                    isLoading ? "animate-spin text-text-1" : "text-success"
                   }
                   width="12"
                   height="12"
@@ -219,13 +204,13 @@ const SingleScrapePanel = forwardRef<
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="rounded border border-blue-200 bg-blue-100/70 px-1.5 py-0.5">
+                <span className="rounded border bg-fill-1 px-1.5 py-0.5">
                   {new Date().toLocaleTimeString()}
                 </span>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-5 w-5"
+                  className="h-5 w-5 p-0"
                   title={t("singlescrape.debug.moreInfo")}
                   onClick={() => {
                     const details = {
@@ -244,7 +229,7 @@ const SingleScrapePanel = forwardRef<
                     }
                     alert(JSON.stringify(details, null, 2))
                   }}>
-                  <Icon icon="line-md:information" width="12" height="12" />
+                  <Icon icon="line-md:alert-circle" width="12" height="12" />
                 </Button>
               </div>
             </div>
@@ -255,16 +240,16 @@ const SingleScrapePanel = forwardRef<
       {/* 主内容区 */}
       {isLoading ? (
         <div className="flex flex-1 flex-col items-center justify-center p-8">
-          <div className="h-12 w-12 animate-spin rounded-full border-blue-500 border-t-4 border-b-4" />
-          <p className="mt-3 text-blue-500">{t("singlescrape.loading")}</p>
+          <div className="h-12 w-12 animate-spin rounded-full border-accent-blue border-t-4 border-b-4" />
+          <p className="mt-3 text-accent-blue">{t("singlescrape.loading")}</p>
         </div>
       ) : scrapedData ? (
         <div className="flex flex-col gap-3">
           {/* 基础信息区 */}
-          <AccordionSection
+          <Collapsible
             title={t("singlescrape.section.basicInfo")}
-            icon="line-md:document-list"
-            defaultOpen={true}>
+            icon={<Icon icon="line-md:document-list" width={16} />}
+            defaultExpanded={true}>
             <div className="flex flex-col gap-3">
               {/* 页面标题 */}
               <div>
@@ -273,9 +258,9 @@ const SingleScrapePanel = forwardRef<
                     icon="line-md:hash"
                     width="16"
                     height="16"
-                    className="text-sky-600"
+                    className="text-accent-blue"
                   />
-                  <span className="font-medium text-sky-600 text-sm">
+                  <span className="font-medium text-sm">
                     {t("singlescrape.field.title")}
                   </span>
                   {titleSelectors.length > 0 && (
@@ -293,7 +278,7 @@ const SingleScrapePanel = forwardRef<
                 </div>
                 <CopyableTextField
                   text={scrapedData.title}
-                  className="rounded-lg border border-sky-200 bg-sky-50 p-2 text-sm"
+                  className="text-sm"
                 />
               </div>
 
@@ -305,9 +290,9 @@ const SingleScrapePanel = forwardRef<
                       icon="line-md:account"
                       width="16"
                       height="16"
-                      className="text-sky-600"
+                      className="text-accent-blue"
                     />
-                    <span className="font-medium text-sky-600 text-sm">
+                    <span className="font-medium text-sm">
                       {t("singlescrape.field.author")}
                     </span>
                     {authorSelectors.length > 0 && (
@@ -327,7 +312,7 @@ const SingleScrapePanel = forwardRef<
                   </div>
                   <CopyableTextField
                     text={scrapedData.author}
-                    className="rounded-lg border border-sky-200 bg-sky-50 p-2 text-sm"
+                    className="text-sm"
                   />
                 </div>
               )}
@@ -340,9 +325,9 @@ const SingleScrapePanel = forwardRef<
                       icon="line-md:calendar"
                       width="16"
                       height="16"
-                      className="text-sky-600"
+                      className="text-accent-blue"
                     />
-                    <span className="font-medium text-sky-600 text-sm">
+                    <span className="font-medium text-sm">
                       {t("singlescrape.field.date")}
                     </span>
                     {dateSelectors.length > 0 && (
@@ -362,7 +347,7 @@ const SingleScrapePanel = forwardRef<
                   </div>
                   <CopyableTextField
                     text={scrapedData.publishDate}
-                    className="rounded-lg border border-sky-200 bg-sky-50 p-2 text-sm"
+                    className="text-sm"
                   />
                 </div>
               )}
@@ -374,25 +359,22 @@ const SingleScrapePanel = forwardRef<
                     icon="line-md:link"
                     width="16"
                     height="16"
-                    className="text-sky-600"
+                    className="text-accent-blue"
                   />
-                  <span className="font-medium text-sky-600 text-sm">URL</span>
+                  <span className="font-medium text-sm">URL</span>
                 </div>
-                <CopyableTextField
-                  text={scrapedData.url}
-                  className="rounded-lg border border-sky-200 bg-sky-50 p-2 text-xs"
-                />
+                <CopyableTextField text={scrapedData.url} className="text-xs" />
               </div>
             </div>
-          </AccordionSection>
+          </Collapsible>
 
           {/* 文章内容 */}
           {scrapedData.articleContent && (
-            <AccordionSection
+            <Collapsible
               title={t("singlescrape.section.content")}
-              icon="line-md:file-document-twotone"
-              defaultOpen={false}
-              maxHeight="500px">
+              icon={<Icon icon="line-md:file-document" width={16} />}
+              defaultExpanded={false}
+              className="max-h-[500px] overflow-auto">
               <div className="flex flex-col gap-2">
                 {/* 标题行 */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -439,7 +421,7 @@ const SingleScrapePanel = forwardRef<
                   <div className="flex flex-wrap items-center gap-2">
                     {scrapedData.metadata["extraction:mode"] ===
                       "readability" && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-gradient-to-r from-green-100 to-emerald-100 px-2 py-0.5 font-medium text-green-700 text-xs">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-success/20 bg-success-ghost px-2 py-0.5 font-medium text-success text-xs">
                         <Icon
                           icon="line-md:target-twotone"
                           width="12"
@@ -449,7 +431,7 @@ const SingleScrapePanel = forwardRef<
                       </span>
                     )}
                     {scrapedData.metadata["extraction:mode"] === "hybrid" && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-gradient-to-r from-blue-100 to-purple-100 px-2 py-0.5 font-medium text-blue-700 text-xs">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-info/20 bg-info-ghost px-2 py-0.5 font-medium text-info text-xs">
                         <Icon
                           icon="line-md:switch-filled"
                           width="12"
@@ -462,7 +444,7 @@ const SingleScrapePanel = forwardRef<
                       scrapedData.metadata["extraction:mode"] ===
                         "selector") && (
                       <>
-                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-gradient-to-r from-slate-100 to-gray-100 px-2 py-0.5 font-medium text-slate-700 text-xs">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-text-3/20 bg-fill-hover px-2 py-0.5 font-medium text-text-2 text-xs">
                           <Icon
                             icon="line-md:settings-twotone"
                             width="12"
@@ -471,7 +453,7 @@ const SingleScrapePanel = forwardRef<
                           {t("singlescrape.mode.selector")}
                         </span>
                         {scrapedData.metadata["original:mode"] === "hybrid" && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-100 px-2 py-0.5 font-medium text-orange-700 text-xs">
+                          <span className="inline-flex items-center gap-1 rounded-full border border-warning/20 bg-warning-ghost px-2 py-0.5 font-medium text-warning text-xs">
                             <Icon
                               icon="line-md:alert-twotone"
                               width="12"
@@ -487,13 +469,13 @@ const SingleScrapePanel = forwardRef<
 
                 {/* 混合模式评估信息 */}
                 {scrapedData.metadata?.["evaluation:reason"] && (
-                  <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-blue-700 text-xs">
+                  <div className="rounded-lg border border-info/20 bg-info-ghost px-3 py-2 text-info text-xs">
                     <div className="flex items-center gap-1.5">
                       <Icon
                         icon="line-md:chart-rising-twotone"
                         width="14"
                         height="14"
-                        className="text-blue-500"
+                        className="text-info"
                       />
                       <span className="font-medium">
                         {t("singlescrape.mode.evaluation")}
@@ -507,23 +489,23 @@ const SingleScrapePanel = forwardRef<
 
                 {/* 回退说明 */}
                 {scrapedData.metadata?.["fallback:reason"] && (
-                  <div className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-orange-700 text-xs">
+                  <div className="rounded-lg border border-warning/20 bg-warning-ghost px-3 py-2 text-warning text-xs">
                     <div className="flex items-center gap-1.5">
                       <Icon
                         icon="line-md:alert-circle-twotone"
                         width="14"
                         height="14"
-                        className="text-orange-500"
+                        className="text-warning"
                       />
                       <span className="font-medium">
                         {t("singlescrape.mode.fallback")}
                       </span>
                     </div>
                     <div className="mt-1 pl-5">
-                      <p className="text-orange-600">
+                      <p className="text-warning">
                         {scrapedData.metadata["fallback:reason"]}
                       </p>
-                      <p className="mt-1 text-orange-500 text-xs">
+                      <p className="mt-1 text-warning text-xs">
                         {t("singlescrape.mode.fallbackInfo")}
                       </p>
                     </div>
@@ -536,7 +518,7 @@ const SingleScrapePanel = forwardRef<
                   isMarkdown={isMarkdown}
                 />
               </div>
-            </AccordionSection>
+            </Collapsible>
           )}
 
           {/* AI 摘要 */}
@@ -547,11 +529,11 @@ const SingleScrapePanel = forwardRef<
 
           {/* 元数据 */}
           {Object.keys(scrapedData.metadata).length > 0 && (
-            <AccordionSection
+            <Collapsible
               title={t("singlescrape.section.metadata")}
-              icon="line-md:emoji-grin-twotone"
-              defaultOpen={false}
-              maxHeight="400px">
+              icon={<Icon icon="line-md:emoji-grin" width={16} />}
+              defaultExpanded={false}
+              className="max-h-[400px] overflow-auto">
               <div className="flex flex-col gap-3">
                 {/* 元数据图片 */}
                 <MetadataImageSection
@@ -568,35 +550,35 @@ const SingleScrapePanel = forwardRef<
                 {/* 元数据 JSON */}
                 <CopyableTextField
                   text={JSON.stringify(scrapedData.metadata)}
-                  className="rounded-lg border border-sky-200 bg-sky-50 p-2 text-xs"
+                  className="text-xs"
                 />
               </div>
-            </AccordionSection>
+            </Collapsible>
           )}
 
           {/* 页面图片 */}
           {scrapedData.images && scrapedData.images.length > 0 && (
-            <AccordionSection
+            <Collapsible
               title={t("singlescrape.section.imagesCount", {
                 count: scrapedData.images.length
               })}
-              icon="line-md:image"
-              defaultOpen={false}
-              maxHeight="400px">
+              icon={<Icon icon="line-md:image" width={16} />}
+              defaultExpanded={false}
+              className="max-h-[400px] overflow-auto">
               <ImageGrid
                 images={scrapedData.images}
                 onLoadError={handleImageLoadError}
               />
-            </AccordionSection>
+            </Collapsible>
           )}
         </div>
       ) : (
-        <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-sky-200 bg-white p-8 text-center text-gray-500">
+        <div className="card flex flex-1 flex-col items-center justify-center p-8 text-center text-text-2">
           <Icon
             icon="line-md:document-report"
             width="48"
             height="48"
-            className="mb-3 text-sky-300"
+            className="mb-3 text-accent-blue/30"
           />
           <p>{t("singlescrape.empty.title")}</p>
           <p className="mt-1 text-sm">{t("singlescrape.empty.hint")}</p>

@@ -4,6 +4,8 @@ import { useLayoutEffect, useState } from "react"
 import { toast } from "react-toastify"
 
 import { Button } from "~/components/ui/button"
+import { Collapsible } from "~/components/ui/collapsible"
+import Segmented from "~/components/ui/segmented"
 import { LOG_LEVELS, SCRAPE_TIMING_OPTIONS } from "~constants/options"
 import type { ExtractionMode } from "~constants/types"
 import { useAiSettings } from "~hooks/useAiSettings"
@@ -16,7 +18,6 @@ import {
 } from "~utils/i18n"
 import { translateOptions } from "~utils/options-helper"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
-import { AccordionSection } from "../AccordionSection"
 import { ModelSelectInput } from "../ai/ModelSelectInput"
 import {
   BatchScrapeSettings,
@@ -36,16 +37,16 @@ function ToggleRow({
   onChange: (checked: boolean) => void
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-sky-200 bg-white p-3">
-      <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
-        <Icon icon={icon} width={16} />
+    <div className="flex items-center justify-between rounded-xl border border-line-1 bg-content p-3">
+      <span className="flex items-center gap-2 font-medium text-sm text-text-1">
+        <Icon icon={icon} width={16} className="text-accent-blue" />
         {label}
       </span>
       <button
         type="button"
         onClick={() => onChange(!checked)}
         className={`relative h-5 w-9 rounded-full transition-colors ${
-          checked ? "bg-sky-500" : "bg-gray-300"
+          checked ? "bg-accent-blue" : "bg-line-2"
         }`}>
         <span
           className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${
@@ -78,24 +79,24 @@ function ExtractionModeSettings() {
 
   if (loading)
     return (
-      <div className="text-gray-400 text-xs">
+      <div className="text-text-3 text-xs">
         {t("sidepanel.settings.extractionMode.loading")}
       </div>
     )
 
   const modes = [
     {
-      value: "selector",
+      value: "selector" as const,
       label: t("sidepanel.settings.extractionMode.selector"),
       desc: t("sidepanel.settings.extractionMode.selector.desc")
     },
     {
-      value: "readability",
+      value: "readability" as const,
       label: t("sidepanel.settings.extractionMode.readability"),
       desc: t("sidepanel.settings.extractionMode.readability.desc")
     },
     {
-      value: "hybrid",
+      value: "hybrid" as const,
       label: t("sidepanel.settings.extractionMode.hybrid"),
       desc: t("sidepanel.settings.extractionMode.hybrid.desc")
     }
@@ -103,22 +104,14 @@ function ExtractionModeSettings() {
 
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-3 gap-1">
-        {modes.map((m) => (
-          <button
-            type="button"
-            key={m.value}
-            onClick={() => handleChange(m.value as ExtractionMode)}
-            className={`rounded-md px-2 py-1.5 text-center text-xs transition-all ${
-              mode === m.value
-                ? "bg-sky-500 text-white shadow-sm"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}>
-            {m.label}
-          </button>
-        ))}
-      </div>
-      <p className="text-gray-500 text-xs">
+      <Segmented
+        id="extraction-mode"
+        options={modes}
+        value={mode}
+        onChange={handleChange}
+        className="w-full"
+      />
+      <p className="text-text-2 text-xs">
         {modes.find((m) => m.value === mode)?.desc}
       </p>
     </div>
@@ -146,9 +139,7 @@ function AiSettings() {
   return (
     <div className="space-y-3">
       <div>
-        <label
-          htmlFor="sp-api-key"
-          className="mb-1 block text-gray-600 text-xs">
+        <label htmlFor="sp-api-key" className="mb-1 block text-text-1 text-xs">
           {t("sidepanel.settings.ai.apiKey")}
         </label>
         <input
@@ -156,15 +147,13 @@ function AiSettings() {
           type="password"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
-          className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
+          className="w-full rounded border border-line-1 bg-content px-2 py-1.5 text-xs focus:border-accent-blue focus:outline-none"
           placeholder={t("sidepanel.settings.ai.apiKeyPlaceholder")}
         />
       </div>
 
       <div>
-        <label
-          htmlFor="sp-base-url"
-          className="mb-1 block text-gray-600 text-xs">
+        <label htmlFor="sp-base-url" className="mb-1 block text-text-1 text-xs">
           {t("sidepanel.settings.ai.baseUrl")}
         </label>
         <div className="flex gap-1">
@@ -173,7 +162,7 @@ function AiSettings() {
             type="text"
             value={baseURL}
             onChange={(e) => setBaseURL(e.target.value)}
-            className="flex-1 rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
+            className="flex-1 rounded border border-line-1 bg-content px-2 py-1.5 text-xs focus:border-accent-blue focus:outline-none"
             placeholder={t("sidepanel.settings.ai.baseUrlPlaceholder")}
           />
           <Button
@@ -192,7 +181,7 @@ function AiSettings() {
       </div>
 
       <div>
-        <label htmlFor="sp-model" className="mb-1 block text-gray-600 text-xs">
+        <label htmlFor="sp-model" className="mb-1 block text-text-1 text-xs">
           {t("sidepanel.settings.ai.model")}
         </label>
         <ModelSelectInput
@@ -207,7 +196,7 @@ function AiSettings() {
       <div>
         <label
           htmlFor="sp-system-prompt"
-          className="mb-1 block text-gray-600 text-xs">
+          className="mb-1 block text-text-1 text-xs">
           {t("sidepanel.settings.ai.systemPrompt")}
         </label>
         <textarea
@@ -215,7 +204,7 @@ function AiSettings() {
           value={systemPrompt}
           onChange={(e) => setSystemPrompt(e.target.value)}
           rows={3}
-          className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
+          className="w-full rounded border border-line-1 bg-content px-2 py-1.5 text-xs focus:border-accent-blue focus:outline-none"
         />
       </div>
 
@@ -276,15 +265,15 @@ function LanguageSettings() {
   }
 
   return (
-    <div className="flex items-center justify-between rounded-lg border border-sky-200 bg-white p-3">
-      <span className="flex items-center gap-2 font-medium text-sky-700 text-sm">
-        <Icon icon="mdi:globe" width={16} />
+    <div className="flex items-center justify-between rounded-xl border border-line-1 bg-content p-3">
+      <span className="flex items-center gap-2 font-medium text-sm text-text-1">
+        <Icon icon="mdi:globe" width={16} className="text-accent-blue" />
         {t("option.interface.language")}
       </span>
       <select
         value={locale}
         onChange={handleChange}
-        className="rounded border border-sky-200 bg-sky-50 px-2 py-1 text-sm focus:border-sky-400 focus:outline-none">
+        className="rounded border border-line-1 bg-content px-2 py-1 text-sm focus:border-accent-blue focus:outline-none">
         {SUPPORTED_LOCALES.map((loc) => (
           <option key={loc} value={loc}>
             {LOCALE_NAMES[loc]}
@@ -323,31 +312,31 @@ export default function SidePanelSettings() {
 
   return (
     <div className="space-y-2">
-      <AccordionSection
+      <Collapsible
         title={t("sidepanel.settings.extractionMode.title")}
-        icon="line-md:cog-loop"
-        defaultOpen>
+        icon={<Icon icon="line-md:cog-loop" width={16} />}
+        defaultExpanded>
         <ExtractionModeSettings />
-      </AccordionSection>
+      </Collapsible>
 
-      <AccordionSection
+      <Collapsible
         title={t("sidepanel.settings.ai.title")}
-        icon="mdi:robot"
-        defaultOpen>
+        icon={<Icon icon="mdi:robot" width={16} />}
+        defaultExpanded>
         <AiSettings />
-      </AccordionSection>
+      </Collapsible>
 
-      <AccordionSection
+      <Collapsible
         title={t("sidepanel.settings.log.title")}
-        icon="mdi:file-document-outline">
+        icon={<Icon icon="mdi:file-document-outline" width={16} />}>
         <LogSettings />
-      </AccordionSection>
+      </Collapsible>
 
-      <AccordionSection
+      <Collapsible
         title={t("sidepanel.settings.batch.title")}
-        icon="mdi:file-document-multiple">
+        icon={<Icon icon="mdi:file-document-multiple" width={16} />}>
         <BatchScrapeSettings />
-      </AccordionSection>
+      </Collapsible>
 
       <LanguageSettings />
 
@@ -370,12 +359,16 @@ export default function SidePanelSettings() {
         variant="outline"
         fullWidth
         onClick={openFullSettings}
-        className="justify-between p-3">
-        <span className="flex items-center gap-2 font-medium text-sm">
-          <Icon icon="mdi:code-braces" width={16} />
+        className="justify-between rounded-xl p-3">
+        <span className="flex items-center gap-2 font-medium text-sm text-text-1">
+          <Icon
+            icon="mdi:code-braces"
+            width={16}
+            className="text-accent-blue"
+          />
           {t("sidepanel.settings.selector.title")}
         </span>
-        <span className="flex items-center gap-1 text-gray-400 text-xs">
+        <span className="flex items-center gap-1 text-text-2 text-xs">
           {t("sidepanel.settings.selector.openFull")}
           <Icon icon="mdi:open-in-new" width={14} />
         </span>

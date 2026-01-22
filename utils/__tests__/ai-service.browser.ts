@@ -1,27 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-// Mock @plasmohq/storage
-vi.mock("@plasmohq/storage", () => {
-  class MockStorage {
-    private store = new Map<string, unknown>()
+import { createPlasmoStorageMock, resetMockStorage } from "./mocks"
 
-    async get<T>(key: string): Promise<T | undefined> {
-      return this.store.get(key) as T | undefined
-    }
-
-    async set(key: string, value: unknown): Promise<void> {
-      this.store.set(key, value)
-    }
-
-    clear() {
-      this.store.clear()
-    }
-  }
-
-  return {
-    Storage: MockStorage
-  }
-})
+// Mock @plasmohq/storage with shared mock
+vi.mock("@plasmohq/storage", () => createPlasmoStorageMock())
 
 // Mock @xsai/stream-text
 vi.mock("@xsai/stream-text", () => ({
@@ -43,25 +25,20 @@ import {
   getAiChatHistory,
   getAiConfig
 } from "../ai-service"
-import { localStorage, syncStorage } from "../storage"
-
-// Type for mocked storage with clear method
-interface MockStorageInstance {
-  get: <T>(key: string) => Promise<T | undefined>
-  set: (key: string, value: unknown) => Promise<void>
-  clear: () => void
-}
+import { syncStorage } from "../storage"
 
 describe("getAiConfig", () => {
   beforeEach(() => {
-    ;(syncStorage as unknown as MockStorageInstance).clear()
+    resetMockStorage()
   })
 
   it("returns valid config from storage", async () => {
-    await syncStorage.set("ai_api_key", "test-key-123")
-    await syncStorage.set("ai_base_url", "https://api.test.com/v1/")
-    await syncStorage.set("ai_system_prompt", "Custom prompt")
-    await syncStorage.set("ai_model", "gpt-4")
+    await syncStorage.setMany({
+      ai_api_key: "test-key-123",
+      ai_base_url: "https://api.test.com/v1/",
+      ai_system_prompt: "Custom prompt",
+      ai_model: "gpt-4"
+    })
 
     const config = await getAiConfig()
 
@@ -91,14 +68,16 @@ describe("getAiConfig", () => {
 
 describe("generateSummary", () => {
   beforeEach(() => {
-    ;(syncStorage as unknown as MockStorageInstance).clear()
+    resetMockStorage()
     vi.clearAllMocks()
   })
 
   it("generates summary successfully with valid config", async () => {
-    await syncStorage.set("ai_api_key", "test-key")
-    await syncStorage.set("ai_base_url", "https://api.test.com/v1/")
-    await syncStorage.set("ai_model", "gpt-4")
+    await syncStorage.setMany({
+      ai_api_key: "test-key",
+      ai_base_url: "https://api.test.com/v1/",
+      ai_model: "gpt-4"
+    })
 
     vi.mocked(streamText).mockResolvedValueOnce({
       text: "Generated summary",
@@ -121,8 +100,10 @@ describe("generateSummary", () => {
   })
 
   it("returns null when API key is missing", async () => {
-    await syncStorage.set("ai_base_url", "https://api.test.com/v1/")
-    await syncStorage.set("ai_model", "gpt-4")
+    await syncStorage.setMany({
+      ai_base_url: "https://api.test.com/v1/",
+      ai_model: "gpt-4"
+    })
 
     const result = await generateSummary()
 
@@ -131,9 +112,11 @@ describe("generateSummary", () => {
   })
 
   it("uses custom prompt when provided", async () => {
-    await syncStorage.set("ai_api_key", "test-key")
-    await syncStorage.set("ai_base_url", "https://api.test.com/v1/")
-    await syncStorage.set("ai_model", "gpt-4")
+    await syncStorage.setMany({
+      ai_api_key: "test-key",
+      ai_base_url: "https://api.test.com/v1/",
+      ai_model: "gpt-4"
+    })
 
     vi.mocked(streamText).mockResolvedValueOnce({
       text: "Custom result"
@@ -149,8 +132,10 @@ describe("generateSummary", () => {
   })
 
   it("returns null when API call fails", async () => {
-    await syncStorage.set("ai_api_key", "test-key")
-    await syncStorage.set("ai_model", "gpt-4")
+    await syncStorage.setMany({
+      ai_api_key: "test-key",
+      ai_model: "gpt-4"
+    })
 
     vi.mocked(streamText).mockRejectedValueOnce(new Error("API error"))
 
@@ -162,11 +147,14 @@ describe("generateSummary", () => {
 
 describe("AI Chat History", () => {
   beforeEach(() => {
-    ;(localStorage as unknown as MockStorageInstance).clear()
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date("2024-01-01T00:00:00.000Z"))
+    resetMockStorage()
   })
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.useRealTimers()
   })
 
   it("returns empty history when storage is empty", async () => {
@@ -197,15 +185,17 @@ describe("AI Chat History", () => {
   })
 
   it("adds multiple items in correct order (newest first)", async () => {
+    // First item at T=0
     await addAiChatHistoryItem({
       url: "https://example.com/1",
       prompt: "First",
       content: "Content 1"
     })
 
-    // Wait a bit to ensure different timestamps
-    await new Promise((resolve) => setTimeout(resolve, 10))
+    // Advance time by 1 second for different timestamp
+    vi.setSystemTime(new Date("2024-01-01T00:00:01.000Z"))
 
+    // Second item at T=1s
     await addAiChatHistoryItem({
       url: "https://example.com/2",
       prompt: "Second",

@@ -13,9 +13,9 @@ export const OptionSection: React.FC<OptionSectionProps> = ({
   children
 }) => {
   return (
-    <div className="mb-6 rounded-xl border-2 border-sky-200 bg-white p-6 shadow-md">
-      <h2 className="mb-4 flex items-center font-semibold text-sky-600 text-xl">
-        <Icon icon={icon} className="mr-2" />
+    <div className="card mb-4 p-4">
+      <h2 className="mb-4 flex items-center font-semibold text-text-1 text-xl">
+        <Icon icon={icon} className="mr-2 text-accent-blue" />
         {title}
       </h2>
       {children}

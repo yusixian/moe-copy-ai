@@ -2,28 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import type { ExtractionMode } from "~constants/types"
 
-// Mock @plasmohq/storage
-vi.mock("@plasmohq/storage", () => {
-  class MockStorage {
-    private store = new Map<string, unknown>()
+import { createPlasmoStorageMock, resetMockStorage } from "./mocks"
 
-    async get<T>(key: string): Promise<T | undefined> {
-      return this.store.get(key) as T | undefined
-    }
-
-    async set(key: string, value: unknown): Promise<void> {
-      this.store.set(key, value)
-    }
-
-    clear() {
-      this.store.clear()
-    }
-  }
-
-  return {
-    Storage: MockStorage
-  }
-})
+// Mock @plasmohq/storage with shared mock
+vi.mock("@plasmohq/storage", () => createPlasmoStorageMock())
 
 // Mock logger
 vi.mock("../logger", () => ({
@@ -37,16 +19,9 @@ import {
   syncStorage
 } from "../storage"
 
-// Type for mocked storage with clear method
-interface MockStorageInstance {
-  get: <T>(key: string) => Promise<T | undefined>
-  set: (key: string, value: unknown) => Promise<void>
-  clear: () => void
-}
-
 describe("getExtractionMode", () => {
   beforeEach(() => {
-    ;(syncStorage as unknown as MockStorageInstance).clear()
+    resetMockStorage()
   })
 
   it("returns valid mode from storage", async () => {
@@ -74,7 +49,7 @@ describe("getExtractionMode", () => {
 
 describe("setExtractionMode", () => {
   beforeEach(() => {
-    ;(syncStorage as unknown as MockStorageInstance).clear()
+    resetMockStorage()
   })
 
   it("sets valid extraction mode successfully", async () => {

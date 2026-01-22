@@ -7,7 +7,7 @@ import { useAiSummary } from "~hooks/useAiSummary"
 import { useI18n } from "~utils/i18n"
 import { processTemplate } from "~utils/template"
 
-import { AccordionSection } from "../AccordionSection"
+import { Collapsible } from "../ui/collapsible"
 import AiHistoryDrawer from "./AiHistoryDrawer"
 import CompactPromptInput from "./CompactPromptInput"
 import SummaryResultDisplay from "./SummaryResultDisplay"
@@ -111,11 +111,10 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
         </div>
       )}
 
-      <AccordionSection
+      <Collapsible
         title={finalTitle}
-        icon="line-md:chat-round-dots-twotone"
-        defaultOpen={defaultOpen}
-        contentBorder={false}>
+        icon={<Icon icon="line-md:chat-round-dots-twotone" width={16} />}
+        defaultExpanded={defaultOpen}>
         <div className="space-y-3">
           {/* 提示词输入 */}
           <CompactPromptInput
@@ -206,7 +205,7 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
             </div>
           )}
         </div>
-      </AccordionSection>
+      </Collapsible>
 
       {/* 历史记录抽屉 */}
       {showHistory && (

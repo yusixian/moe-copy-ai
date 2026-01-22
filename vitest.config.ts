@@ -5,6 +5,9 @@ import { defineConfig } from "vitest/config"
 
 export default defineConfig({
   plugins: [tsconfigPaths(), react()],
+  optimizeDeps: {
+    include: ["vitest-browser-react"]
+  },
   test: {
     setupFiles: ["vitest.browser.setup.ts"],
     include: ["./**/*.browser.{ts,tsx}"],

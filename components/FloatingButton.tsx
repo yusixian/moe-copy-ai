@@ -1,3 +1,4 @@
+import iconUrl from "data-base64:~assets/icon.png"
 import { Icon } from "@iconify/react"
 
 import { cn } from "~utils"
@@ -34,9 +35,7 @@ const FloatingButton = ({ onClick, isOpen }: FloatingButtonProps) => {
           className="rotate-45 text-opacity-80"
         />
       ) : (
-        <div className="flex flex-col items-center text-sm opacity-80">
-          {t("popup.floatButton.logo")}
-        </div>
+        <img src={iconUrl} alt="Moe Copy AI" className="h-[36px] w-[36px]" />
       )}
     </button>
   )

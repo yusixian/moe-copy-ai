@@ -88,16 +88,16 @@ export const ExtractionModeSection: React.FC = () => {
         title={t("option.extraction.mode")}
         icon="line-md:cog-loop">
         <div className="space-y-3">
-          <div className="animate-pulse rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 p-4">
+          <div className="animate-pulse rounded-lg bg-accent-purple-ghost p-4">
             <div className="flex items-center space-x-3">
-              <div className="h-4 w-4 rounded-full bg-purple-200"></div>
+              <div className="h-4 w-4 rounded-full bg-accent-purple-ghost-active"></div>
               <div className="flex-1">
-                <div className="mb-2 h-4 w-3/4 rounded bg-purple-200"></div>
-                <div className="h-3 w-1/2 rounded bg-purple-100"></div>
+                <div className="mb-2 h-4 w-3/4 rounded bg-accent-purple-ghost-active"></div>
+                <div className="h-3 w-1/2 rounded bg-accent-purple-ghost"></div>
               </div>
             </div>
           </div>
-          <div className="text-center text-purple-500 text-sm">
+          <div className="text-center text-accent-purple text-sm">
             <span className="animate-bounce">{t("common.loading")}</span>
           </div>
         </div>
@@ -118,7 +118,7 @@ export const ExtractionModeSection: React.FC = () => {
                 className={`group relative flex cursor-pointer items-start space-x-3 rounded-xl border-2 p-4 transition-all duration-300 ${
                   extractionMode === modeKey
                     ? `${style.borderColor} transform shadow-md`
-                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm"
+                    : "border-line-1 hover:border-line-2 hover:bg-fill-hover hover:shadow-sm"
                 } ${saving && "cursor-not-allowed opacity-50"}`}>
                 <div className="relative flex items-center">
                   <input
@@ -134,7 +134,7 @@ export const ExtractionModeSection: React.FC = () => {
                     className={`mt-0.5 h-5 w-5 rounded-full border-2 transition-all duration-300 ${
                       extractionMode === modeKey
                         ? `${style.borderColor} ${style.bgColor}`
-                        : "border-gray-300 bg-white"
+                        : "border-line-2 bg-content-solid"
                     }`}>
                     <div
                       className={`m-0.5 h-3 w-3 rounded-full transition-all duration-300 ${
@@ -146,10 +146,10 @@ export const ExtractionModeSection: React.FC = () => {
                         backgroundColor:
                           extractionMode === modeKey
                             ? style.color === "sky"
-                              ? "#0ea5e9"
+                              ? "oklch(60% 0.203 257.46)"
                               : style.color === "emerald"
-                                ? "#10b981"
-                                : "#a855f7"
+                                ? "oklch(62.7% 0.1699 149.21)"
+                                : "oklch(42% 0.196 302.716)"
                             : "transparent"
                       }}
                     />
@@ -167,7 +167,7 @@ export const ExtractionModeSection: React.FC = () => {
                       />
                     </div>
                     <span
-                      className={`font-medium text-sm/5 ${extractionMode === modeKey ? style.textColor : "text-gray-900"}`}>
+                      className={`font-medium text-sm/5 ${extractionMode === modeKey ? style.textColor : "text-text-1"}`}>
                       {t(`option.extraction.mode.${modeKey}`)}
                     </span>
                     {extractionMode === modeKey && (
@@ -183,19 +183,19 @@ export const ExtractionModeSection: React.FC = () => {
                       </span>
                     )}
                     {modeKey === "hybrid" && extractionMode !== "hybrid" && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-purple-50 px-2.5 py-1 font-medium text-purple-600 text-xs shadow-sm">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-accent-purple/20 bg-accent-purple-ghost px-2.5 py-1 font-medium text-accent-purple text-xs shadow-sm">
                         <Icon
                           icon="line-md:heart-twotone"
                           width="14"
                           height="14"
-                          className="text-purple-500"
+                          className="text-accent-purple"
                         />
                         <span>{t("option.extraction.recommended")}</span>
                       </span>
                     )}
                   </div>
                   <p
-                    className={`mt-2 text-sm ${extractionMode === modeKey ? style.textColor.replace("-700", "-600") : "text-gray-600"}`}>
+                    className={`mt-2 text-sm ${extractionMode === modeKey ? style.textColor.replace("-700", "-600") : "text-text-2"}`}>
                     {t(`option.extraction.mode.${modeKey}.desc`)}
                   </p>
                 </div>
@@ -205,21 +205,21 @@ export const ExtractionModeSection: React.FC = () => {
         </div>
 
         {extractionMode === "readability" && (
-          <div className="mt-4 rounded-xl border-2 border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50 p-4 shadow-sm">
+          <div className="mt-4 rounded-xl border-2 border-success/20 bg-success-ghost p-4 shadow-sm">
             <div className="flex items-start space-x-3">
               <Icon
                 icon="line-md:lightbulb-twotone"
-                className="animate-pulse text-emerald-500"
+                className="animate-pulse text-success"
                 width="18"
                 height="18"
               />
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
-                  <p className="font-medium text-emerald-700">
+                  <p className="font-medium text-success">
                     {t("option.extraction.readability.infoTitle")}
                   </p>
                 </div>
-                <p className="text-emerald-600 text-sm leading-relaxed">
+                <p className="text-sm text-success leading-relaxed">
                   {t("option.extraction.readability.info")}
                 </p>
               </div>
@@ -228,21 +228,21 @@ export const ExtractionModeSection: React.FC = () => {
         )}
 
         {extractionMode === "hybrid" && (
-          <div className="mt-4 rounded-xl border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50 p-4 shadow-sm">
+          <div className="mt-4 rounded-xl border-2 border-accent-purple/20 bg-accent-purple-ghost p-4 shadow-sm">
             <div className="flex items-start space-x-3">
               <Icon
                 icon="line-md:lightbulb-twotone"
-                className="animate-pulse text-purple-500"
+                className="animate-pulse text-accent-purple"
                 width="18"
                 height="18"
               />
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
-                  <p className="font-medium text-purple-700">
+                  <p className="font-medium text-accent-purple">
                     {t("option.extraction.hybrid.infoTitle")}
                   </p>
                 </div>
-                <p className="text-purple-600 text-sm leading-relaxed">
+                <p className="text-accent-purple text-sm leading-relaxed">
                   {t("option.extraction.hybrid.info")}
                 </p>
               </div>
@@ -251,21 +251,21 @@ export const ExtractionModeSection: React.FC = () => {
         )}
 
         {extractionMode === "selector" && (
-          <div className="mt-4 rounded-xl border-2 border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50 p-4 shadow-sm">
+          <div className="mt-4 rounded-xl border-2 border-accent-blue/20 bg-accent-blue-ghost p-4 shadow-sm">
             <div className="flex items-start space-x-3">
               <Icon
                 icon="line-md:lightbulb-twotone"
-                className="animate-pulse text-sky-500"
+                className="animate-pulse text-accent-blue"
                 width="18"
                 height="18"
               />
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
-                  <p className="font-medium text-sky-700">
+                  <p className="font-medium text-accent-blue">
                     {t("option.extraction.selector.infoTitle")}
                   </p>
                 </div>
-                <p className="text-sky-600 text-sm leading-relaxed">
+                <p className="text-accent-blue text-sm leading-relaxed">
                   {t("option.extraction.selector.info")}
                 </p>
               </div>

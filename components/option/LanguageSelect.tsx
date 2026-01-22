@@ -31,7 +31,7 @@ export const LanguageSelect: React.FC = () => {
   return (
     <div className="mb-4">
       <label
-        className="mb-2 block font-medium text-sky-600"
+        className="mb-2 block font-medium text-text-1"
         htmlFor="language-select">
         {t("option.interface.language")}
       </label>
@@ -39,14 +39,14 @@ export const LanguageSelect: React.FC = () => {
         id="language-select"
         value={locale}
         onChange={handleChange}
-        className="w-full rounded-lg border border-sky-200 bg-blue-50 p-2.5 focus:border-sky-400 focus:ring-2 focus:ring-sky-200">
+        className="w-full rounded-lg border border-line-1 bg-content p-2.5 focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20">
         {SUPPORTED_LOCALES.map((loc) => (
           <option key={loc} value={loc}>
             {LOCALE_NAMES[loc]}
           </option>
         ))}
       </select>
-      <p className="mt-2 text-sky-500 text-sm">
+      <p className="mt-2 text-sm text-text-2">
         {t("option.interface.language.desc")}
       </p>
     </div>

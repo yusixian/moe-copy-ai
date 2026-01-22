@@ -26,9 +26,9 @@ Moe Copy AI 是一个基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器�
 
 ## ✨ 功能
 
-![example](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example.webp?raw=true)
-![example-2](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example-2.png?raw=true)
-![example-3](https://github.com/yusixian/moe-copy-ai/blob/main/assets/docs/example-3.png?raw=true)
+![example](/assets/docs/example.webp)
+![example-2](/assets/docs/example-2.webp)
+![example-3](/assets/docs/example-3.webp)
 
 ### 弹窗模式 (Popup)
 

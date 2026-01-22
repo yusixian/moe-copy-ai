@@ -91,8 +91,8 @@ const SelectorItem = memo<SelectorItemProps>(
       <li
         className={`relative transition-colors duration-150 ${
           isSelected
-            ? "bg-gradient-to-r from-sky-50 to-blue-50 font-medium text-sky-700"
-            : "hover:bg-blue-50"
+            ? "bg-accent-blue-ghost-active"
+            : "hover:bg-accent-blue-ghost-hover"
         }`}>
         <button
           type="button"
@@ -102,7 +102,7 @@ const SelectorItem = memo<SelectorItemProps>(
             {isSelected ? (
               <Icon
                 icon="mdi:check-circle"
-                className="mr-1.5 text-sky-500 md:mr-2"
+                className="mr-1.5 text-accent-blue md:mr-2"
                 width={16}
                 height={16}
               />
@@ -121,7 +121,7 @@ const SelectorItem = memo<SelectorItemProps>(
           <div className="flex items-center">
             {hasContent ? (
               <span
-                className={`inline-block max-w-[5rem] truncate whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-xs ${hasMultipleContents ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"}`}>
+                className={`inline-block max-w-[5rem] truncate whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-xs ${hasMultipleContents ? "bg-green-100 text-green-600" : "bg-blue-100 text-text-1"}`}>
                 {hasMultipleContents
                   ? t("selector.count", {
                       count: allPreviewContents?.length
@@ -138,8 +138,8 @@ const SelectorItem = memo<SelectorItemProps>(
                 type="button"
                 className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
                   showPreview
-                    ? "bg-sky-100 text-sky-600 hover:bg-sky-200"
-                    : "text-sky-500 hover:bg-sky-50"
+                    ? "bg-accent-blue-ghost-active text-accent-blue hover:bg-accent-blue-ghost-hover"
+                    : "text-accent-blue hover:bg-accent-blue-ghost"
                 }`}
                 onClick={handleTogglePreview}
                 title={
@@ -224,9 +224,9 @@ const SelectorHeader = memo<{
 }>(({ type, count }) => {
   const { t } = useI18n()
   return (
-    <div className="flex items-center gap-1 font-medium text-sky-600 text-xs">
+    <div className="flex items-center gap-1 font-medium text-text-2 text-xs">
       <span>{t(`selector.type.${type}`)}</span>
-      <span className="whitespace-nowrap rounded-full bg-sky-100 px-1 py-0.5 font-medium text-sky-600 text-xs">
+      <span className="inline-block whitespace-nowrap rounded-full bg-accent-blue-ghost px-1 py-0.5 font-medium text-accent-blue text-xs">
         {t("selector.count", { count })}
       </span>
     </div>
@@ -244,13 +244,13 @@ const DropdownToggle = memo<{
   <button
     type="button"
     onClick={toggleOpen}
-    className="flex min-h-[36px] items-center rounded-lg border border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50 px-3 py-1.5 font-medium text-sky-600 text-xs shadow-sm transition-all hover:shadow">
+    className="flex min-h-[36px] items-center rounded-lg border border-line-1 bg-content px-3 py-1.5 font-medium text-text-1 text-xs shadow-sm transition-all hover:shadow">
     <span className="mr-2 max-w-[12.5rem] truncate font-mono md:max-w-[9.375rem]">
       {selectedText}
     </span>
     <Icon
       icon={isOpen ? "mdi:chevron-up" : "mdi:chevron-down"}
-      className="text-sky-500 transition-transform duration-200"
+      className="text-text-2 transition-transform duration-200"
       width={16}
       height={16}
     />
@@ -396,19 +396,19 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
 
       {/* 下拉菜单 */}
       {isOpen && (
-        <div className="absolute top-full right-0 z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-auto rounded-lg border border-sky-200 bg-white shadow-lg">
-          <div className="border-sky-100 border-b bg-gradient-to-r from-sky-50 to-indigo-50 p-2.5 text-sky-600 text-xs">
+        <div className="popover absolute top-full right-0 z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-auto rounded-lg">
+          <div className="border-line-1 border-b p-2.5 text-text-2 text-xs">
             <div className="flex items-center">
               <Icon
                 icon="mdi:information-outline"
-                className="mr-1.5 text-indigo-500 md:mr-2"
+                className="mr-1.5 text-text-2 md:mr-2"
                 width={14}
                 height={14}
               />
               <span>{t("selector.info")}</span>
             </div>
           </div>
-          <ul className="max-h-[calc(60vh-3rem)] divide-y divide-sky-50 overflow-auto">
+          <ul className="max-h-[calc(60vh-3rem)] divide-y divide-line-1 overflow-auto">
             {selectors.map((selector, index) => {
               const selectorHasContent = hasContent(selector)
               const allContents = getAllResultContents(selector)
