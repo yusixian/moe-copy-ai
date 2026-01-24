@@ -225,6 +225,8 @@
   "batch.error.title": "Scrape Failed",
   "batch.error.unknown": "Unknown Error",
   "batch.error.retry": "Start Over",
+  "batch.error.noLinks": "No links to scrape",
+  "batch.error.scrapeError": "An error occurred during scraping",
   "batch.progress.title": "Scraping...",
   "batch.progress.resume": "Resume",
   "batch.progress.pause": "Pause",

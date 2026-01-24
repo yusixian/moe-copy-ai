@@ -64,11 +64,12 @@ export function useAiSettings() {
           baseURL: currentBaseURL
         })
 
-        setModelList(models)
+        const safeModels = Array.isArray(models) ? models : []
+        setModelList(safeModels)
 
         // 仅当没有已保存模型时才设置默认模型
-        if (models.length > 0 && !currentModel) {
-          setModel(models[0].id)
+        if (safeModels.length > 0 && !currentModel) {
+          setModel(safeModels[0].id)
         }
 
         if (showToast) toast.success(t("toast.ai.modelsLoadedSuccess"))

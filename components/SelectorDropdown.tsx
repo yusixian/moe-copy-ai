@@ -15,6 +15,7 @@ interface SelectorDropdownProps {
   results?: SelectorResultItem[]
   onChange: (index: number) => void
   onSelectContent?: (selector: string, contentIndex: number) => void
+  enablePortal?: boolean // Whether to enable Portal rendering, default true. Set to false for Shadow DOM environments (content scripts)
 }
 
 // 选择器列表项组件
@@ -367,7 +368,8 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
   selectedIndex,
   results = [],
   onChange,
-  onSelectContent
+  onSelectContent,
+  enablePortal = true
 }) => {
   const { t } = useI18n()
 
@@ -429,21 +431,43 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
     </>
   )
 
+  if (enablePortal) {
+    // Use FloatingDropdown (with Portal) for extension pages (popup, sidepanel)
+    return (
+      <div className="relative ml-auto flex h-9 flex-wrap items-center justify-end gap-1">
+        <SelectorHeader type={type} count={selectors.length} />
+        <FloatingDropdown
+          open={isOpen}
+          onOpenChange={setIsOpen}
+          matchWidth={false}
+          className="popover z-50 max-h-[60vh] w-auto max-w-[80vw] overflow-auto rounded-lg"
+          content={dropdownContent}>
+          <DropdownToggle
+            isOpen={isOpen}
+            toggleOpen={toggleDropdown}
+            selectedText={selectors[selectedIndex] || t("common.none")}
+          />
+        </FloatingDropdown>
+      </div>
+    )
+  }
+
+  // Without Portal, use absolute positioning for Shadow DOM environments (content scripts)
   return (
     <div className="relative ml-auto flex h-9 flex-wrap items-center justify-end gap-1">
       <SelectorHeader type={type} count={selectors.length} />
-      <FloatingDropdown
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        matchWidth={false}
-        className="popover z-50 max-h-[60vh] w-auto max-w-[80vw] overflow-auto rounded-lg"
-        content={dropdownContent}>
+      <div className="relative">
         <DropdownToggle
           isOpen={isOpen}
           toggleOpen={toggleDropdown}
           selectedText={selectors[selectedIndex] || t("common.none")}
         />
-      </FloatingDropdown>
+        {isOpen && (
+          <div className="popover absolute top-full right-0 z-50 mt-1 max-h-[60vh] w-auto min-w-[20rem] max-w-[80vw] overflow-auto rounded-lg">
+            {dropdownContent}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

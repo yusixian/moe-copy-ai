@@ -25,11 +25,13 @@ export function ModelSelectInput({
   // 转换 options 格式
   const comboboxOptions: ComboboxOption[] = useMemo(
     () =>
-      options.map((opt) => ({
-        id: opt.id,
-        label: opt.id,
-        description: opt.owned_by
-      })),
+      options?.length
+        ? options.map((opt) => ({
+            id: opt.id,
+            label: opt.id,
+            description: opt.owned_by
+          }))
+        : [],
     [options]
   )
 
@@ -42,7 +44,7 @@ export function ModelSelectInput({
       compact={compact}
       inputId={id}
       emptyText={
-        options.length === 0 ? t("ai.model.empty") : t("ai.model.noMatch")
+        options?.length === 0 ? t("ai.model.empty") : t("ai.model.noMatch")
       }
     />
   )

@@ -3,13 +3,13 @@ import type { ReactNode } from "react"
 
 import CopyableTextField from "~/components/CopyableTextField"
 import SelectorDropdown from "~/components/SelectorDropdown"
-import type { SelectorResult } from "~constants/types"
+import type { SelectorResultItem } from "~constants/types"
 
 interface SelectorConfig {
   type: "title" | "author" | "date" | "content"
   selectors: string[]
   selectedIndex: number
-  results: SelectorResult[]
+  results: SelectorResultItem[]
   onSelectorChange: (index: number) => void
   onSelectContent: (selector: string, contentIndex: number) => void
 }
@@ -20,6 +20,7 @@ interface MetadataFieldSectionProps {
   value: string
   selectorConfig?: SelectorConfig
   children?: ReactNode
+  enablePortal?: boolean // Whether to enable Portal rendering for dropdowns
 }
 
 export function MetadataFieldSection({
@@ -27,7 +28,8 @@ export function MetadataFieldSection({
   label,
   value,
   selectorConfig,
-  children
+  children,
+  enablePortal
 }: MetadataFieldSectionProps) {
   return (
     <div className="mb-4">
@@ -47,6 +49,7 @@ export function MetadataFieldSection({
             results={selectorConfig.results}
             onChange={selectorConfig.onSelectorChange}
             onSelectContent={selectorConfig.onSelectContent}
+            enablePortal={enablePortal}
           />
         )}
       </h2>

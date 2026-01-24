@@ -2,29 +2,36 @@ import iconUrl from "data-base64:~assets/icon.png"
 import { Icon } from "@iconify/react"
 import { sendToBackground } from "@plasmohq/messaging"
 import { useStorage } from "@plasmohq/storage/hook"
-import { memo, useCallback } from "react"
+import { memo } from "react"
 import AiSummarySection from "~/components/AiSummarySection"
 import ContentSection from "~/components/ContentSection"
 import ImageGrid from "~/components/ImageGrid"
 import MetadataImageSection from "~/components/MetadataImageSection"
 import MetadataTable from "~/components/MetadataTable"
-import SelectorDropdown from "~/components/SelectorDropdown"
 import { Button } from "~/components/ui/button"
-import { Collapsible } from "~/components/ui/collapsible"
 import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import useScrapedData from "~hooks/useScrapedData"
 import { cn } from "~utils"
 import { useI18n } from "~utils/i18n"
 
 import CopyableTextField from "./CopyableTextField"
+import { ArticleContentHeader } from "./popup/ArticleContentHeader"
+import { DebugPanel } from "./popup/DebugPanel"
+import { ErrorAlert } from "./popup/ErrorAlert"
+import { FloatButtonControl } from "./popup/FloatButtonControl"
 import { MetadataFieldSection } from "./popup/MetadataFieldSection"
 
 interface PopupContentProps {
   className?: string
   onClose?: () => void
+  enablePortal?: boolean
 }
 
-const PopupContent = ({ className, onClose }: PopupContentProps) => {
+const PopupContent = ({
+  className,
+  onClose,
+  enablePortal
+}: PopupContentProps) => {
   const { t } = useI18n()
   const {
     isLoading,
@@ -42,62 +49,28 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
     handleSelectContent
   } = useScrapedData()
 
-  // 打开侧边栏（批量抓取功能已移至侧边栏）
+  const [showDebugPanel] = useStorage<string>("show_debug_panel", "true")
+  const handleOpenOptions = useOpenOptionPage()
+
   const handleOpenSidePanel = async () => {
     try {
-      // 通过 Plasmo messaging 打开侧边栏（兼容内容脚本和扩展页面）
       await sendToBackground({ name: "openSidePanel" })
     } catch (error) {
-      console.error("打开侧边栏失败:", error)
+      console.error("Failed to open side panel:", error)
     }
   }
 
-  // 从存储中获取是否显示调试面板的设置
-  const [showDebugPanel] = useStorage<string>("show_debug_panel", "true")
-
-  // 从存储中获取悬浮窗显示设置
-  const [showFloatButton, setShowFloatButton] = useStorage<string>(
-    "show_float_button",
-    "true"
-  )
-
-  // 添加临时隐藏状态，使用Plasmo的存储管理
-  const [_, setTempHideButton] = useStorage<boolean>("temp_hide_button", false)
-
-  const handleRefreshClick = useCallback(() => {
-    handleRefresh()
-  }, [handleRefresh])
-
-  // 处理悬浮窗设置变更
-  const handleFloatButtonToggle = useCallback(() => {
-    const newValue = showFloatButton === "true" ? "false" : "true"
-    setShowFloatButton(newValue)
-  }, [showFloatButton, setShowFloatButton])
-
-  // 处理临时隐藏悬浮窗
-  const handleTempHideFloat = useCallback(() => {
-    setTempHideButton(true)
-    if (onClose) {
-      onClose()
-    }
-  }, [setTempHideButton, onClose])
-
-  // 图片加载错误处理
-  const handleImageLoadError = useCallback((src: string) => {
-    console.error("图片加载失败:", src)
-  }, [])
-
-  // 元数据图片加载错误处理
-  const handleMetadataImageError = useCallback((label: string) => {
-    console.error(`${label} 加载失败`)
-  }, [])
-
-  // 打开选项页面
-  const handleOpenOptions = useOpenOptionPage()
-  // 打开GitHub仓库
-  const handleOpenGithub = useCallback(() => {
+  const handleOpenGithub = () => {
     window.open("https://github.com/yusixian/moe-copy-ai", "_blank")
-  }, [])
+  }
+
+  const handleImageLoadError = (src: string) => {
+    console.error("Image load failed:", src)
+  }
+
+  const handleMetadataImageError = (label: string) => {
+    console.error(`${label} load failed`)
+  }
 
   return (
     <div
@@ -131,9 +104,6 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
           <p className="text-text-2 text-xs sm:text-sm">
             {t("popup.description")}
           </p>
-          {/* <p className="mt-1 hidden text-blue-400 text-xs sm:block">
-            {t("popup.descriptionDetail")}
-          </p> */}
         </div>
         <div className="flex flex-shrink-0 items-center justify-end gap-2">
           <Button
@@ -179,155 +149,16 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         </div>
       </header>
 
-      {/* 悬浮窗开关区域 */}
-      <div className="card mb-4 p-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="font-medium text-sm text-text-1">
-            {t("popup.floatButton.label")}
-          </span>
-          <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleTempHideFloat}
-              title={t("popup.floatButton.tempHideTip")}>
-              {t("popup.floatButton.tempHide")}
-            </Button>
-            <Button
-              variant={showFloatButton === "true" ? "danger" : "default"}
-              size="sm"
-              onClick={handleFloatButtonToggle}
-              title={
-                showFloatButton === "true"
-                  ? t("popup.floatButton.closeTip")
-                  : t("popup.floatButton.openTip")
-              }>
-              {showFloatButton === "true"
-                ? t("popup.floatButton.permanentClose")
-                : t("popup.floatButton.enable")}
-            </Button>
-          </div>
-        </div>
-      </div>
+      <FloatButtonControl onClose={onClose} />
 
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">
-          <div className="flex items-start gap-3">
-            <Icon
-              icon="mdi:alert-circle"
-              className="mt-0.5 flex-shrink-0 text-red-500"
-              width="20"
-              height="20"
-            />
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-medium text-red-600">
-                  {t("popup.error.title")}
-                </p>
-                <p className="flex-1 text-red-600 text-sm">{error}</p>
-                <Button
-                  variant="outline"
-                  size="xs"
-                  onClick={handleRefreshClick}>
-                  <Icon
-                    icon="mdi:refresh"
-                    width="14"
-                    height="14"
-                    className="mr-1"
-                  />
-                  {t("popup.error.retry")}
-                </Button>
-              </div>
-              <div className="mt-2 rounded border border-red-200 bg-red-100/50 p-2 text-xs">
-                <p>{t("popup.error.possibleCauses")}</p>
-                <p className="mt-1 text-red-500">
-                  {t("popup.error.suggestion")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {error && <ErrorAlert error={error} onRetry={handleRefresh} />}
 
-      {/* 根据设置控制是否显示调试信息 */}
       {showDebugPanel === "true" && debugInfo && (
-        <Collapsible
-          title={
-            <span className="flex items-center gap-1.5">
-              {t("popup.debug.title")}
-              <span className="rounded border border-accent-blue bg-accent-blue-ghost px-1.5 py-0 text-[10px] text-accent-blue">
-                {t("popup.debug.devMode")}
-              </span>
-            </span>
-          }
-          titleClassName="text-base"
-          icon={
-            <Icon
-              icon="line-md:coffee-half-empty-twotone-loop"
-              className="text-accent-blue"
-              width="18"
-              height="18"
-            />
-          }
-          defaultExpanded={false}
-          className="mb-4">
-          <div className="text-blue-700 text-xs">
-            <CopyableTextField
-              text={debugInfo}
-              rows={5}
-              onCopied={() => alert(t("popup.debug.copied"))}
-            />
-
-            <div className="mt-2 flex items-center justify-between text-[10px] text-text-2">
-              <div className="flex items-center gap-1">
-                <Icon
-                  icon={
-                    isLoading
-                      ? "line-md:loading-twotone-loop"
-                      : "line-md:confirm-circle"
-                  }
-                  className={
-                    isLoading ? "animate-spin text-text-1" : "text-success"
-                  }
-                  width="12"
-                  height="12"
-                />
-                <span>
-                  {isLoading
-                    ? t("popup.debug.rendering")
-                    : t("popup.debug.renderComplete")}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="rounded border bg-fill-1 px-1.5 py-0.5">
-                  {new Date().toLocaleTimeString()}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-5 w-5 p-0"
-                  title={t("popup.debug.moreInfo")}
-                  onClick={() => {
-                    const details = {
-                      [t("popup.debug.pageStatus")]: isLoading
-                        ? t("popup.debug.pageLoading")
-                        : t("popup.debug.pageLoaded"),
-                      [t("popup.debug.dataSize")]: scrapedData
-                        ? t("popup.debug.dataSizeValue", {
-                            size: JSON.stringify(scrapedData).length
-                          })
-                        : t("popup.debug.noData"),
-                      [t("popup.debug.browserInfo")]: navigator.userAgent,
-                      [t("popup.debug.timestamp")]: new Date().toISOString()
-                    }
-                    alert(JSON.stringify(details, null, 2))
-                  }}>
-                  <Icon icon="line-md:alert-circle" width="12" height="12" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </Collapsible>
+        <DebugPanel
+          debugInfo={debugInfo}
+          isLoading={isLoading}
+          scrapedData={scrapedData}
+        />
       )}
 
       {isLoading ? (
@@ -337,11 +168,12 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
         </div>
       ) : scrapedData ? (
         <div className="card p-3">
-          {/* 页面标题 */}
+          {/* Page Title */}
           <MetadataFieldSection
             icon="line-md:hash"
             label={t("content.title")}
             value={scrapedData.title}
+            enablePortal={enablePortal}
             selectorConfig={
               titleSelectors.length > 0
                 ? {
@@ -358,12 +190,13 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             }
           />
 
-          {/* 作者信息 */}
+          {/* Author */}
           {scrapedData.author && (
             <MetadataFieldSection
               icon="line-md:account"
               label={t("content.author")}
               value={scrapedData.author}
+              enablePortal={enablePortal}
               selectorConfig={
                 authorSelectors.length > 0
                   ? {
@@ -381,12 +214,13 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             />
           )}
 
-          {/* 发布日期 */}
+          {/* Publish Date */}
           {scrapedData.publishDate && (
             <MetadataFieldSection
               icon="line-md:calendar"
               label={t("content.date")}
               value={scrapedData.publishDate}
+              enablePortal={enablePortal}
               selectorConfig={
                 dateSelectors.length > 0
                   ? {
@@ -411,165 +245,24 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             value={scrapedData.url}
           />
 
-          {/* 文章内容 */}
+          {/* Article Content */}
           {scrapedData.articleContent && (
             <div className="mb-4">
-              {/* 标题行 - 移动端优化 */}
-              <div className="mb-3">
-                <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="flex flex-wrap items-center gap-2 font-semibold text-base">
-                    <Icon
-                      icon="line-md:file-document"
-                      className="inline flex-shrink-0 text-accent-blue"
-                      width="18"
-                      height="18"
-                    />
-                    <span>{t("popup.articleContent")}</span>
-                    {contentSelectors.length > 0 && (
-                      <SelectorDropdown
-                        type="content"
-                        selectors={contentSelectors}
-                        selectedIndex={selectedSelectorIndices.content}
-                        results={scrapedData?.selectorResults?.content || []}
-                        onChange={(index) =>
-                          handleSelectorChange("content", index)
-                        }
-                        onSelectContent={(selector, contentIndex) =>
-                          handleSelectContent("content", selector, contentIndex)
-                        }
-                      />
-                    )}
-                  </h2>
-
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={handleRefreshClick}
-                    disabled={isLoading}
-                    title={t("popup.refreshContent")}>
-                    <Icon
-                      icon={
-                        isLoading
-                          ? "line-md:loading-alt-loop"
-                          : "line-md:refresh-twotone"
-                      }
-                      className={cn("mr-1", isLoading && "animate-spin")}
-                      width="16"
-                      height="16"
-                    />
-                    {isLoading ? t("popup.scraping") : t("common.refresh")}
-                  </Button>
-                </div>
-
-                {/* 抓取模式标识 - 独立行，更好的移动端布局 */}
-                {scrapedData.metadata && (
-                  <div className="flex flex-wrap items-center gap-2">
-                    {scrapedData.metadata["extraction:mode"] ===
-                      "readability" && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-gradient-to-r from-green-100 to-emerald-100 px-2.5 py-1 font-medium text-green-700 text-xs shadow-sm">
-                        <Icon
-                          icon="line-md:target-twotone"
-                          width="12"
-                          height="12"
-                          className="flex-shrink-0"
-                        />
-                        <span className="whitespace-nowrap">
-                          {t("popup.mode.readability")}
-                        </span>
-                      </span>
-                    )}
-                    {scrapedData.metadata["extraction:mode"] === "hybrid" && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-gradient-to-r from-blue-100 to-purple-100 px-2.5 py-1 font-medium text-blue-700 text-xs shadow-sm">
-                        <Icon
-                          icon="line-md:switch-filled"
-                          width="12"
-                          height="12"
-                          className="flex-shrink-0"
-                        />
-                        <span className="whitespace-nowrap">
-                          {t("popup.mode.hybrid")}
-                        </span>
-                      </span>
-                    )}
-                    {(!scrapedData.metadata["extraction:mode"] ||
-                      scrapedData.metadata["extraction:mode"] ===
-                        "selector") && (
-                      <>
-                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-gradient-to-r from-slate-100 to-gray-100 px-2.5 py-1 font-medium text-slate-700 text-xs shadow-sm">
-                          <Icon
-                            icon="line-md:settings-twotone"
-                            width="12"
-                            height="12"
-                            className="flex-shrink-0"
-                          />
-                          <span className="whitespace-nowrap">
-                            {t("popup.mode.selector")}
-                          </span>
-                        </span>
-                        {/* 如果用户配置的是混合模式，但实际使用的是选择器模式，显示回退提示 */}
-                        {scrapedData.metadata["original:mode"] === "hybrid" && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-100 px-2.5 py-1 font-medium text-orange-700 text-xs">
-                            <Icon
-                              icon="line-md:alert-twotone"
-                              width="12"
-                              height="12"
-                              className="flex-shrink-0"
-                            />
-                            <span className="whitespace-nowrap">
-                              {t("popup.mode.smartFallback")}
-                            </span>
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* 如果是混合模式，显示评估信息 */}
-              {scrapedData.metadata?.["evaluation:reason"] && (
-                <div className="mb-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-blue-700 text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <Icon
-                      icon="line-md:chart-rising-twotone"
-                      width="14"
-                      height="14"
-                      className="text-blue-500"
-                    />
-                    <span className="font-medium">
-                      {t("popup.mode.hybridEvaluation")}
-                    </span>
-                  </div>
-                  <p className="mt-1 pl-5">
-                    {scrapedData.metadata["evaluation:reason"]}
-                  </p>
-                </div>
-              )}
-
-              {/* 如果发生了回退，显示回退说明 */}
-              {scrapedData.metadata?.["fallback:reason"] && (
-                <div className="mb-3 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-orange-700 text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <Icon
-                      icon="line-md:alert-circle-twotone"
-                      width="14"
-                      height="14"
-                      className="text-orange-500"
-                    />
-                    <span className="font-medium">
-                      {t("popup.mode.fallbackExplanation")}
-                    </span>
-                  </div>
-                  <div className="mt-1 pl-5">
-                    <p className="text-orange-600">
-                      {scrapedData.metadata["fallback:reason"]}
-                    </p>
-                    <p className="mt-1 text-orange-500 text-xs">
-                      {t("popup.mode.fallbackInfo")}
-                    </p>
-                  </div>
-                </div>
-              )}
+              <ArticleContentHeader
+                isLoading={isLoading}
+                onRefresh={handleRefresh}
+                contentSelectors={contentSelectors}
+                selectedIndex={selectedSelectorIndices.content}
+                selectorResults={scrapedData?.selectorResults?.content || []}
+                onSelectorChange={(index) =>
+                  handleSelectorChange("content", index)
+                }
+                onSelectContent={(selector, contentIndex) =>
+                  handleSelectContent("content", selector, contentIndex)
+                }
+                enablePortal={enablePortal}
+                metadata={scrapedData.metadata}
+              />
               <ContentSection
                 articleContent={scrapedData.articleContent}
                 cleanedContent={scrapedData.cleanedContent}
@@ -577,12 +270,14 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
               />
             </div>
           )}
-          {/* 添加AI摘要组件 */}
+
+          {/* AI Summary */}
           <AiSummarySection
             content={scrapedData.articleContent}
             scrapedData={scrapedData}
           />
-          {/* 页面图片 */}
+
+          {/* Page Images */}
           {scrapedData.images && scrapedData.images.length > 0 && (
             <div className="mb-4">
               <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-base">
@@ -604,7 +299,7 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
             </div>
           )}
 
-          {/* 元数据 */}
+          {/* Metadata */}
           {Object.keys(scrapedData.metadata).length > 0 && (
             <div>
               <h2 className="mb-2 flex items-center gap-2 font-semibold text-base">
@@ -617,18 +312,16 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
                 <span>{t("popup.metadata")}</span>
               </h2>
 
-              {/* 元数据图片 */}
               <MetadataImageSection
                 metadata={scrapedData.metadata}
                 onLoadError={handleMetadataImageError}
               />
 
-              {/* 元数据表格 */}
               <MetadataTable
                 metadata={scrapedData.metadata}
                 onLoadError={handleMetadataImageError}
               />
-              {/* 元数据 json */}
+
               <CopyableTextField
                 className="mt-4"
                 text={JSON.stringify(scrapedData.metadata)}

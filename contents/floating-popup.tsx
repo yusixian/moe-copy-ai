@@ -141,6 +141,7 @@ const FloatingPopup = () => {
               <PopupContent
                 onClose={handleClose}
                 className="h-full max-h-[90vh]"
+                enablePortal={false}
               />
             </div>
           </FloatingFocusManager>
