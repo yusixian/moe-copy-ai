@@ -91,9 +91,13 @@ export function useElementSelector(): UseElementSelectorReturn {
     setNextPageButton(null)
   }, [])
 
-  // 清除选择（保留数据）
+  // 清除选择（清除所有数据）
   const clearSelection = useCallback(() => {
     setIsSelecting(false)
+    setElementInfo(null)
+    setExtractedLinks([])
+    setExtractedContent(null)
+    // Note: We don't reset nextPageButton here as it's independent functionality
   }, [])
 
   // 监听来自内容脚本的消息
