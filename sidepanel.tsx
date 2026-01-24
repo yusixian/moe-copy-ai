@@ -2,17 +2,15 @@ import "./styles/global.css"
 import "react-toastify/dist/ReactToastify.css"
 
 import { Icon } from "@iconify/react"
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
+import { lazy, Suspense, useRef, useState } from "react"
 import { ToastContainer } from "react-toastify"
 
 import type { SingleScrapePanelHandle } from "~components/singlescrape"
 import { Button } from "~components/ui/button"
 import { ErrorBoundary } from "~components/ui/ErrorBoundary"
 import Segmented, { type SegmentedOption } from "~components/ui/segmented"
-import type { BatchScrapeMode } from "~constants/types"
-import useBatchScrape from "~hooks/useBatchScrape"
+import { BatchScrapeProvider } from "~contexts/BatchScrapeContext"
 import useContentExtraction from "~hooks/useContentExtraction"
-import useElementSelector from "~hooks/useElementSelector"
 import { I18nProvider, useI18n } from "~utils/i18n"
 
 // Lazy load heavy tab components
@@ -29,7 +27,6 @@ const SidePanelSettings = lazy(
   () => import("~components/sidepanel/SidePanelSettings")
 )
 
-// Loading fallback for lazy components
 function TabSkeleton() {
   return (
     <div className="flex h-32 items-center justify-center">
@@ -43,7 +40,6 @@ type SidePanelView = "batch" | "extraction" | "singlescrape" | "settings"
 function SidePanel() {
   const { t } = useI18n()
 
-  // Tab 选项 - 使用翻译
   const tabOptions: SegmentedOption<"batch" | "extraction" | "singlescrape">[] =
     [
       {
@@ -67,38 +63,6 @@ function SidePanel() {
   const [isSingleScrapeLoading, setIsSingleScrapeLoading] = useState(false)
   const singleScrapePanelRef = useRef<SingleScrapePanelHandle>(null)
 
-  const [isSelectingNextPage, setIsSelectingNextPage] = useState(false)
-
-  const {
-    isSelecting,
-    elementInfo,
-    extractedLinks,
-    nextPageButton,
-    activateSelector,
-    deactivateSelector,
-    clearSelection,
-    clearNextPageButton
-  } = useElementSelector()
-
-  const {
-    mode,
-    elementInfo: scrapeElementInfo,
-    links,
-    progress,
-    results,
-    error,
-    paginationProgress,
-    setLinks,
-    addLink,
-    updateLink,
-    removeLink,
-    startScrape,
-    pauseScrape,
-    resumeScrape,
-    cancelScrape,
-    reset
-  } = useBatchScrape()
-
   const {
     mode: extractionMode,
     content: extractedContent,
@@ -110,62 +74,6 @@ function SidePanel() {
     reset: resetContentExtraction
   } = useContentExtraction()
 
-  // 当选择器选中元素时，更新批量抓取的链接
-  // setLinks is stable (useCallback with []) so we don't include it in deps
-  useEffect(() => {
-    if (elementInfo && extractedLinks.length > 0) {
-      setLinks(elementInfo, extractedLinks)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [elementInfo, extractedLinks, setLinks])
-
-  // 当选择完成时，重置 isSelectingNextPage 状态
-  useEffect(() => {
-    if (!isSelecting && isSelectingNextPage) {
-      setIsSelectingNextPage(false)
-    }
-  }, [isSelecting, isSelectingNextPage])
-
-  // 计算当前模式
-  // 如果正在选择下一页按钮，保持在 previewing 模式
-  const currentMode: BatchScrapeMode =
-    isSelecting && !isSelectingNextPage ? "selecting" : mode
-
-  // 处理选择元素
-  const handleSelectElement = useCallback(() => {
-    setIsSelectingNextPage(false)
-    activateSelector()
-  }, [activateSelector])
-
-  // 处理选择下一页按钮
-  const handleSelectNextPage = useCallback(() => {
-    setIsSelectingNextPage(true)
-    activateSelector("next-page-button")
-  }, [activateSelector])
-
-  // 处理清除下一页按钮选择
-  const handleClearNextPage = useCallback(() => {
-    clearNextPageButton()
-  }, [clearNextPageButton])
-
-  // 处理取消选择
-  const handleCancel = useCallback(() => {
-    if (isSelecting) {
-      deactivateSelector()
-      setIsSelectingNextPage(false)
-    } else {
-      cancelScrape()
-    }
-  }, [isSelecting, deactivateSelector, cancelScrape])
-
-  // 处理重置
-  const handleReset = useCallback(() => {
-    clearSelection()
-    clearNextPageButton()
-    reset()
-  }, [clearSelection, clearNextPageButton, reset])
-
-  // 视图标题和描述
   const viewConfig = {
     singlescrape: {
       title: t("sidepanel.title.singlescrape"),
@@ -204,7 +112,7 @@ function SidePanel() {
       <div className="relative flex h-screen flex-col p-4">
         {/* Header */}
         <div className="mb-4 flex-shrink-0">
-          {/* Tab 导航 */}
+          {/* Tab navigation */}
           <div className="mb-3 flex items-center gap-1">
             <Segmented
               id="sidepanel-tabs"
@@ -222,7 +130,7 @@ function SidePanel() {
             </Button>
           </div>
 
-          {/* 标题 */}
+          {/* Title */}
           <div className="flex items-center justify-between">
             <div>
               <h1 className="font-bold text-lg text-text-1">
@@ -265,30 +173,7 @@ function SidePanel() {
                 onLoadingChange={setIsSingleScrapeLoading}
               />
             )}
-            {currentView === "batch" && (
-              <BatchScrapePanel
-                mode={currentMode}
-                elementInfo={elementInfo || scrapeElementInfo}
-                links={links}
-                progress={progress}
-                paginationProgress={paginationProgress}
-                results={results}
-                error={error}
-                nextPageButton={nextPageButton}
-                isSelectingNextPage={isSelectingNextPage && isSelecting}
-                onStartScrape={startScrape}
-                onPause={pauseScrape}
-                onResume={resumeScrape}
-                onCancel={handleCancel}
-                onReset={handleReset}
-                onSelectElement={handleSelectElement}
-                onAddLink={addLink}
-                onUpdateLink={updateLink}
-                onRemoveLink={removeLink}
-                onSelectNextPage={handleSelectNextPage}
-                onClearNextPage={handleClearNextPage}
-              />
-            )}
+            {currentView === "batch" && <BatchScrapePanel />}
             {currentView === "extraction" && (
               <ContentExtractionPanel
                 mode={extractionMode}
@@ -305,8 +190,8 @@ function SidePanel() {
           </Suspense>
         </div>
 
-        {/* 底部链接 */}
-        <div className="flex flex-shrink-0 items-center justify-between gap-4 border-line-1 border-t px-1 pt-2">
+        {/* Footer links */}
+        <div className="flex flex-shrink-0 items-center justify-between gap-4 border-line-1 px-1 pt-2">
           <span className="text-text-3 text-xs">{t("app.name")}</span>
           <div className="flex items-center gap-3">
             <Button
@@ -360,15 +245,17 @@ function SidePanel() {
   )
 }
 
-// 包装 I18nProvider
-function SidePanelWithI18n() {
+// Wrap with I18nProvider and BatchScrapeProvider
+function SidePanelWithProviders() {
   return (
     <I18nProvider>
       <ErrorBoundary>
-        <SidePanel />
+        <BatchScrapeProvider>
+          <SidePanel />
+        </BatchScrapeProvider>
       </ErrorBoundary>
     </I18nProvider>
   )
 }
 
-export default SidePanelWithI18n
+export default SidePanelWithProviders

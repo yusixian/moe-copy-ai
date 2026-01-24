@@ -244,7 +244,7 @@ const SingleScrapePanel = forwardRef<
           <p className="mt-3 text-accent-blue">{t("singlescrape.loading")}</p>
         </div>
       ) : scrapedData ? (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 pb-10">
           {/* 基础信息区 */}
           <Collapsible
             title={t("singlescrape.section.basicInfo")}

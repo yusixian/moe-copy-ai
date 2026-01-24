@@ -225,6 +225,8 @@
   "batch.error.title": "抓取失败",
   "batch.error.unknown": "未知错误",
   "batch.error.retry": "重新开始",
+  "batch.error.noLinks": "没有可抓取的链接",
+  "batch.error.scrapeError": "抓取过程中发生错误",
   "batch.progress.title": "正在批量抓取...",
   "batch.progress.resume": "继续",
   "batch.progress.pause": "暂停",

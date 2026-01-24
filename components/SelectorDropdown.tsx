@@ -6,6 +6,8 @@ import { memo, useCallback, useEffect, useRef, useState } from "react"
 import type { SelectorResultItem, SelectorType } from "~constants/types"
 import { useI18n } from "~utils/i18n"
 
+import { FloatingDropdown } from "./ui/FloatingDropdown"
+
 interface SelectorDropdownProps {
   type: SelectorType
   selectors: string[]
@@ -13,6 +15,7 @@ interface SelectorDropdownProps {
   results?: SelectorResultItem[]
   onChange: (index: number) => void
   onSelectContent?: (selector: string, contentIndex: number) => void
+  enablePortal?: boolean // Whether to enable Portal rendering, default true. Set to false for Shadow DOM environments (content scripts)
 }
 
 // 选择器列表项组件
@@ -346,6 +349,7 @@ function useSelectorState(
 
   return {
     isOpen,
+    setIsOpen,
     showPreviewIndex,
     getResultContent,
     getAllResultContents,
@@ -364,13 +368,15 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
   selectedIndex,
   results = [],
   onChange,
-  onSelectContent
+  onSelectContent,
+  enablePortal = true
 }) => {
   const { t } = useI18n()
 
   // 使用自定义钩子管理状态
   const {
     isOpen,
+    setIsOpen,
     showPreviewIndex,
     getResultContent,
     getAllResultContents,
@@ -385,54 +391,83 @@ const SelectorDropdown: React.FC<SelectorDropdownProps> = ({
   // 如果没有选择器，不显示下拉菜单
   if (!selectors?.length) return null
 
+  // 下拉菜单内容
+  const dropdownContent = (
+    <>
+      <div className="border-line-1 border-b p-2.5 text-text-2 text-xs">
+        <div className="flex items-center">
+          <Icon
+            icon="mdi:information-outline"
+            className="mr-1.5 text-text-2 md:mr-2"
+            width={14}
+            height={14}
+          />
+          <span>{t("selector.info")}</span>
+        </div>
+      </div>
+      <ul className="max-h-[calc(60vh-3rem)] divide-y divide-line-1 overflow-auto">
+        {selectors.map((selector, index) => {
+          const selectorHasContent = hasContent(selector)
+          const allContents = getAllResultContents(selector)
+
+          return (
+            <SelectorItem
+              key={selector}
+              selector={selector}
+              index={index}
+              isSelected={index === selectedIndex}
+              hasContent={selectorHasContent}
+              onSelect={handleSelectorChange}
+              onTogglePreview={togglePreview}
+              showPreview={showPreviewIndex === index}
+              previewContent={getResultContent(selector)}
+              allPreviewContents={allContents}
+              onSelectContent={handleSelectContent}
+              closeDropdown={closeDropdown}
+            />
+          )
+        })}
+      </ul>
+    </>
+  )
+
+  if (enablePortal) {
+    // Use FloatingDropdown (with Portal) for extension pages (popup, sidepanel)
+    return (
+      <div className="relative ml-auto flex h-9 flex-wrap items-center justify-end gap-1">
+        <SelectorHeader type={type} count={selectors.length} />
+        <FloatingDropdown
+          open={isOpen}
+          onOpenChange={setIsOpen}
+          matchWidth={false}
+          className="popover z-50 max-h-[60vh] w-auto max-w-[80vw] overflow-auto rounded-lg"
+          content={dropdownContent}>
+          <DropdownToggle
+            isOpen={isOpen}
+            toggleOpen={toggleDropdown}
+            selectedText={selectors[selectedIndex] || t("common.none")}
+          />
+        </FloatingDropdown>
+      </div>
+    )
+  }
+
+  // Without Portal, use absolute positioning for Shadow DOM environments (content scripts)
   return (
     <div className="relative ml-auto flex h-9 flex-wrap items-center justify-end gap-1">
       <SelectorHeader type={type} count={selectors.length} />
-      <DropdownToggle
-        isOpen={isOpen}
-        toggleOpen={toggleDropdown}
-        selectedText={selectors[selectedIndex] || t("common.none")}
-      />
-
-      {/* 下拉菜单 */}
-      {isOpen && (
-        <div className="popover absolute top-full right-0 z-50 mt-2 max-h-[60vh] w-auto max-w-[80vw] overflow-auto rounded-lg">
-          <div className="border-line-1 border-b p-2.5 text-text-2 text-xs">
-            <div className="flex items-center">
-              <Icon
-                icon="mdi:information-outline"
-                className="mr-1.5 text-text-2 md:mr-2"
-                width={14}
-                height={14}
-              />
-              <span>{t("selector.info")}</span>
-            </div>
+      <div className="relative">
+        <DropdownToggle
+          isOpen={isOpen}
+          toggleOpen={toggleDropdown}
+          selectedText={selectors[selectedIndex] || t("common.none")}
+        />
+        {isOpen && (
+          <div className="popover absolute top-full right-0 z-50 mt-1 max-h-[60vh] w-auto min-w-[20rem] max-w-[80vw] overflow-auto rounded-lg">
+            {dropdownContent}
           </div>
-          <ul className="max-h-[calc(60vh-3rem)] divide-y divide-line-1 overflow-auto">
-            {selectors.map((selector, index) => {
-              const selectorHasContent = hasContent(selector)
-              const allContents = getAllResultContents(selector)
-
-              return (
-                <SelectorItem
-                  key={selector}
-                  selector={selector}
-                  index={index}
-                  isSelected={index === selectedIndex}
-                  hasContent={selectorHasContent}
-                  onSelect={handleSelectorChange}
-                  onTogglePreview={togglePreview}
-                  showPreview={showPreviewIndex === index}
-                  previewContent={getResultContent(selector)}
-                  allPreviewContents={allContents}
-                  onSelectContent={handleSelectContent}
-                  closeDropdown={closeDropdown}
-                />
-              )
-            })}
-          </ul>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

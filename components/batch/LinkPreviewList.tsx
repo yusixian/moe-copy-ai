@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react"
-import { memo, useMemo, useState } from "react"
+import { memo, useMemo, useReducer } from "react"
 
 import { Button } from "~/components/ui/button"
 import type {
@@ -16,6 +16,79 @@ import { useI18n } from "~utils/i18n"
 import { exportLinksToJson, exportLinksToMarkdown } from "~utils/link-exporter"
 
 import LinkFilterBar from "./LinkFilterBar"
+
+// State and action types for the link list reducer
+interface LinkListState {
+  isExporting: boolean
+  editingIndex: number | null
+  editForm: { url: string; text: string }
+  isAdding: boolean
+  addForm: { url: string; text: string }
+}
+
+type LinkListAction =
+  | { type: "START_EXPORT" }
+  | { type: "END_EXPORT" }
+  | { type: "START_EDIT"; index: number; url: string; text: string }
+  | { type: "UPDATE_EDIT_FORM"; url?: string; text?: string }
+  | { type: "CANCEL_EDIT" }
+  | { type: "SAVE_EDIT" }
+  | { type: "START_ADD" }
+  | { type: "UPDATE_ADD_FORM"; url?: string; text?: string }
+  | { type: "CANCEL_ADD" }
+  | { type: "SAVE_ADD" }
+
+const initialState: LinkListState = {
+  isExporting: false,
+  editingIndex: null,
+  editForm: { url: "", text: "" },
+  isAdding: false,
+  addForm: { url: "", text: "" }
+}
+
+function linkListReducer(
+  state: LinkListState,
+  action: LinkListAction
+): LinkListState {
+  switch (action.type) {
+    case "START_EXPORT":
+      return { ...state, isExporting: true }
+    case "END_EXPORT":
+      return { ...state, isExporting: false }
+    case "START_EDIT":
+      return {
+        ...state,
+        editingIndex: action.index,
+        editForm: { url: action.url, text: action.text }
+      }
+    case "UPDATE_EDIT_FORM":
+      return {
+        ...state,
+        editForm: {
+          url: action.url ?? state.editForm.url,
+          text: action.text ?? state.editForm.text
+        }
+      }
+    case "CANCEL_EDIT":
+    case "SAVE_EDIT":
+      return { ...state, editingIndex: null, editForm: { url: "", text: "" } }
+    case "START_ADD":
+      return { ...state, isAdding: true }
+    case "UPDATE_ADD_FORM":
+      return {
+        ...state,
+        addForm: {
+          url: action.url ?? state.addForm.url,
+          text: action.text ?? state.addForm.text
+        }
+      }
+    case "CANCEL_ADD":
+    case "SAVE_ADD":
+      return { ...state, isAdding: false, addForm: { url: "", text: "" } }
+    default:
+      return state
+  }
+}
 
 interface LinkPreviewListProps {
   elementInfo: SelectedElementInfo | null
@@ -52,15 +125,10 @@ const LinkPreviewList = memo(function LinkPreviewList({
   onClearNextPage
 }: LinkPreviewListProps) {
   const { t } = useI18n()
-  const [isExporting, setIsExporting] = useState(false)
 
-  // 编辑状态
-  const [editingIndex, setEditingIndex] = useState<number | null>(null)
-  const [editForm, setEditForm] = useState({ url: "", text: "" })
-
-  // 添加链接状态
-  const [isAdding, setIsAdding] = useState(false)
-  const [addForm, setAddForm] = useState({ url: "", text: "" })
+  // Centralized state management for editing/adding modes
+  const [state, dispatch] = useReducer(linkListReducer, initialState)
+  const { isExporting, editingIndex, editForm, isAdding, addForm } = state
 
   // 过滤功能
   const {
@@ -78,8 +146,12 @@ const LinkPreviewList = memo(function LinkPreviewList({
 
   // 开始编辑
   const startEdit = (link: ExtractedLink) => {
-    setEditingIndex(link.index)
-    setEditForm({ url: link.url, text: link.text })
+    dispatch({
+      type: "START_EDIT",
+      index: link.index,
+      url: link.url,
+      text: link.text
+    })
   }
 
   // 保存编辑
@@ -90,30 +162,26 @@ const LinkPreviewList = memo(function LinkPreviewList({
         editForm.url.trim(),
         editForm.text.trim() || editForm.url.trim()
       )
-      setEditingIndex(null)
-      setEditForm({ url: "", text: "" })
+      dispatch({ type: "SAVE_EDIT" })
     }
   }
 
   // 取消编辑
   const cancelEdit = () => {
-    setEditingIndex(null)
-    setEditForm({ url: "", text: "" })
+    dispatch({ type: "CANCEL_EDIT" })
   }
 
   // 添加新链接
   const handleAddLink = () => {
     if (addForm.url.trim()) {
       onAddLink(addForm.url.trim(), addForm.text.trim() || undefined)
-      setAddForm({ url: "", text: "" })
-      setIsAdding(false)
+      dispatch({ type: "SAVE_ADD" })
     }
   }
 
   // 取消添加
   const cancelAdd = () => {
-    setIsAdding(false)
-    setAddForm({ url: "", text: "" })
+    dispatch({ type: "CANCEL_ADD" })
   }
 
   // 使用 useSelectionSet 管理选中状态（基于过滤后的链接）
@@ -131,7 +199,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
 
   // 导出为 Markdown
   const handleExportMarkdown = () => {
-    setIsExporting(true)
+    dispatch({ type: "START_EXPORT" })
     try {
       const content = exportLinksToMarkdown(links)
       const date = new Date().toISOString().split("T")[0]
@@ -139,13 +207,13 @@ const LinkPreviewList = memo(function LinkPreviewList({
     } catch (error) {
       console.error(t("batch.preview.export.markdownError"), error)
     } finally {
-      setIsExporting(false)
+      dispatch({ type: "END_EXPORT" })
     }
   }
 
   // 导出为 JSON
   const handleExportJson = () => {
-    setIsExporting(true)
+    dispatch({ type: "START_EXPORT" })
     try {
       const content = exportLinksToJson(links)
       const date = new Date().toISOString().split("T")[0]
@@ -153,7 +221,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
     } catch (error) {
       console.error(t("batch.preview.export.jsonError"), error)
     } finally {
-      setIsExporting(false)
+      dispatch({ type: "END_EXPORT" })
     }
   }
 
@@ -279,7 +347,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
                   type="text"
                   value={editForm.text}
                   onChange={(e) =>
-                    setEditForm((f) => ({ ...f, text: e.target.value }))
+                    dispatch({ type: "UPDATE_EDIT_FORM", text: e.target.value })
                   }
                   placeholder={t("batch.preview.linkTitle")}
                   className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
@@ -288,7 +356,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
                   type="text"
                   value={editForm.url}
                   onChange={(e) =>
-                    setEditForm((f) => ({ ...f, url: e.target.value }))
+                    dispatch({ type: "UPDATE_EDIT_FORM", url: e.target.value })
                   }
                   placeholder={t("batch.preview.linkUrl")}
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
@@ -347,7 +415,9 @@ const LinkPreviewList = memo(function LinkPreviewList({
           <input
             type="text"
             value={addForm.url}
-            onChange={(e) => setAddForm((f) => ({ ...f, url: e.target.value }))}
+            onChange={(e) =>
+              dispatch({ type: "UPDATE_ADD_FORM", url: e.target.value })
+            }
             placeholder={t("batch.preview.linkUrl")}
             className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
@@ -355,7 +425,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
             type="text"
             value={addForm.text}
             onChange={(e) =>
-              setAddForm((f) => ({ ...f, text: e.target.value }))
+              dispatch({ type: "UPDATE_ADD_FORM", text: e.target.value })
             }
             placeholder={t("batch.preview.linkTitleOptional")}
             className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
@@ -380,7 +450,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
           size="sm"
           fullWidth
           className="border-dashed"
-          onClick={() => setIsAdding(true)}>
+          onClick={() => dispatch({ type: "START_ADD" })}>
           <Icon icon="mdi:plus" className="mr-1 h-4 w-4" />
           {t("batch.preview.addLink")}
         </Button>

@@ -1,15 +1,7 @@
 import { Icon } from "@iconify/react"
 import { memo } from "react"
 
-import type {
-  BatchProgress,
-  BatchScrapeMode,
-  BatchScrapeResult,
-  ExtractedLink,
-  NextPageButtonInfo,
-  SelectedElementInfo
-} from "~constants/types"
-import type { LinkFilterConfig } from "~hooks/useBatchScrape"
+import { useBatchScrapeContext } from "~contexts/BatchScrapeContext"
 import { useI18n } from "~utils/i18n"
 
 import { Collapsible } from "../ui/collapsible"
@@ -18,71 +10,38 @@ import LinkPreviewList from "./LinkPreviewList"
 import ScrapeProgressPanel from "./ScrapeProgressPanel"
 import ScrapeResultsPanel from "./ScrapeResultsPanel"
 
-interface PaginationProgress {
-  currentPage: number
-  maxPages: number
-  isLoadingNextPage: boolean
-}
-
-interface BatchScrapePanelProps {
-  mode: BatchScrapeMode
-  elementInfo: SelectedElementInfo | null
-  links: ExtractedLink[]
-  progress: BatchProgress | null
-  paginationProgress?: PaginationProgress | null
-  results: BatchScrapeResult[]
-  error: string | null
-  nextPageButton: NextPageButtonInfo | null
-  isSelectingNextPage: boolean
-  onStartScrape: (
-    selectedLinks: ExtractedLink[],
-    nextPageXPath?: string,
-    linkContainerSelector?: string,
-    filterConfig?: LinkFilterConfig
-  ) => void
-  onPause: () => void
-  onResume: () => void
-  onCancel: () => void
-  onReset: () => void
-  onSelectElement: () => void
-  onAddLink: (url: string, text?: string) => void
-  onUpdateLink: (index: number, url: string, text: string) => void
-  onRemoveLink: (index: number) => void
-  onSelectNextPage: () => void
-  onClearNextPage: () => void
-}
-
-const BatchScrapePanel = memo(function BatchScrapePanel({
-  mode,
-  elementInfo,
-  links,
-  progress,
-  paginationProgress,
-  results,
-  error,
-  nextPageButton,
-  isSelectingNextPage,
-  onStartScrape,
-  onPause,
-  onResume,
-  onCancel,
-  onReset,
-  onSelectElement,
-  onAddLink,
-  onUpdateLink,
-  onRemoveLink,
-  onSelectNextPage,
-  onClearNextPage
-}: BatchScrapePanelProps) {
+const BatchScrapePanel = memo(function BatchScrapePanel() {
   const { t } = useI18n()
+  const {
+    mode,
+    elementInfo,
+    links,
+    progress,
+    paginationProgress,
+    results,
+    error,
+    nextPageButton,
+    isSelectingNextPage,
+    startScrape,
+    pauseScrape,
+    resumeScrape,
+    handleCancel,
+    handleReset,
+    handleSelectElement,
+    addLink,
+    updateLink,
+    removeLink,
+    handleSelectNextPage,
+    handleClearNextPage
+  } = useBatchScrapeContext()
 
-  // 根据模式渲染不同内容
+  // Render content based on mode
   const renderContent = () => {
     switch (mode) {
       case "idle":
         return (
           <div className="flex flex-col gap-4 py-4">
-            {/* 顶部介绍区域 */}
+            {/* Top intro area */}
             <div className="flex flex-col items-center gap-3">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-blue-ghost-active">
                 <Icon
@@ -100,14 +59,14 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
               </div>
               <button
                 type="button"
-                onClick={onSelectElement}
+                onClick={handleSelectElement}
                 className="flex items-center gap-2 rounded-lg bg-accent-blue px-6 py-2.5 font-medium text-sm text-white shadow-md transition-all hover:bg-accent-blue-hover hover:shadow-lg">
                 <Icon icon="mdi:cursor-default-click" className="h-5 w-5" />
                 {t("batch.idle.selectElement")}
               </button>
             </div>
 
-            {/* 快捷设置区域 */}
+            {/* Quick settings area */}
             <Collapsible
               title={t("batch.idle.settings")}
               icon={<Icon icon="mdi:cog-outline" width={16} />}
@@ -134,7 +93,7 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
             </div>
             <button
               type="button"
-              onClick={onCancel}
+              onClick={handleCancel}
               className="flex items-center gap-2 rounded-lg border border-line-1 bg-content px-4 py-2 font-medium text-sm text-text-1 transition-colors hover:bg-content-hover">
               <Icon icon="mdi:close" className="h-4 w-4" />
               {t("batch.selecting.cancel")}
@@ -155,14 +114,14 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
               links={links}
               nextPageButton={nextPageButton}
               isSelectingNextPage={isSelectingNextPage}
-              onStartScrape={onStartScrape}
-              onCancel={onReset}
-              onReselect={onSelectElement}
-              onAddLink={onAddLink}
-              onUpdateLink={onUpdateLink}
-              onRemoveLink={onRemoveLink}
-              onSelectNextPage={onSelectNextPage}
-              onClearNextPage={onClearNextPage}
+              onStartScrape={startScrape}
+              onCancel={handleReset}
+              onReselect={handleSelectElement}
+              onAddLink={addLink}
+              onUpdateLink={updateLink}
+              onRemoveLink={removeLink}
+              onSelectNextPage={handleSelectNextPage}
+              onClearNextPage={handleClearNextPage}
             />
           </div>
         )
@@ -172,14 +131,14 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
           <ScrapeProgressPanel
             progress={progress}
             paginationProgress={paginationProgress}
-            onPause={onPause}
-            onResume={onResume}
-            onCancel={onCancel}
+            onPause={pauseScrape}
+            onResume={resumeScrape}
+            onCancel={handleCancel}
           />
         )
 
       case "completed":
-        return <ScrapeResultsPanel results={results} onReset={onReset} />
+        return <ScrapeResultsPanel results={results} onReset={handleReset} />
 
       case "error":
         return (
@@ -197,7 +156,7 @@ const BatchScrapePanel = memo(function BatchScrapePanel({
             </div>
             <button
               type="button"
-              onClick={onReset}
+              onClick={handleReset}
               className="flex items-center gap-2 rounded-lg bg-content px-4 py-2 font-medium text-sm text-text-1 transition-colors hover:bg-content-hover">
               <Icon icon="mdi:refresh" className="h-4 w-4" />
               {t("batch.error.retry")}
