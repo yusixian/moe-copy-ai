@@ -334,7 +334,7 @@ export const useAiSummary = (
             }
 
             // 启动异步处理，但不等待它完成
-            processChunkStream()
+            processChunkStream().catch(console.error)
 
             // 处理文本流
             const textStream =

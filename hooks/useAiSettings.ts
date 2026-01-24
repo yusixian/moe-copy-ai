@@ -85,12 +85,16 @@ export function useAiSettings() {
   // 加载设置
   const loadSettings = useCallback(async () => {
     try {
-      const savedApiKey = await syncStorage.get<string>("ai_api_key")
-      const savedBaseURL = await syncStorage.get<string>("ai_base_url")
-      const savedPrompt = await syncStorage.get<string | null>(
-        "ai_system_prompt"
-      )
-      const savedModel = await syncStorage.get<string>("ai_model")
+      const settings = await syncStorage.getMany<string>([
+        "ai_api_key",
+        "ai_base_url",
+        "ai_system_prompt",
+        "ai_model"
+      ])
+      const savedApiKey = settings.ai_api_key
+      const savedBaseURL = settings.ai_base_url
+      const savedPrompt = settings.ai_system_prompt
+      const savedModel = settings.ai_model
 
       if (savedApiKey) setApiKey(savedApiKey)
       if (savedBaseURL) setBaseURL(savedBaseURL)

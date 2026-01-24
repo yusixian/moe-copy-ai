@@ -17,6 +17,7 @@ import { cn } from "~utils"
 import { useI18n } from "~utils/i18n"
 
 import CopyableTextField from "./CopyableTextField"
+import { MetadataFieldSection } from "./popup/MetadataFieldSection"
 
 interface PopupContentProps {
   className?: string
@@ -337,102 +338,78 @@ const PopupContent = ({ className, onClose }: PopupContentProps) => {
       ) : scrapedData ? (
         <div className="card p-3">
           {/* 页面标题 */}
-          <div className="mb-4">
-            <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-base">
-              <Icon
-                icon="line-md:hash"
-                width="18"
-                height="18"
-                className="flex-shrink-0 text-accent-blue"
-              />
-              <span className="text-text-1">{t("content.title")}</span>
-              {titleSelectors.length > 0 && (
-                <SelectorDropdown
-                  type="title"
-                  selectors={titleSelectors}
-                  selectedIndex={selectedSelectorIndices.title}
-                  results={scrapedData?.selectorResults?.title || []}
-                  onChange={(index) => handleSelectorChange("title", index)}
-                  onSelectContent={(selector, contentIndex) =>
-                    handleSelectContent("title", selector, contentIndex)
+          <MetadataFieldSection
+            icon="line-md:hash"
+            label={t("content.title")}
+            value={scrapedData.title}
+            selectorConfig={
+              titleSelectors.length > 0
+                ? {
+                    type: "title",
+                    selectors: titleSelectors,
+                    selectedIndex: selectedSelectorIndices.title,
+                    results: scrapedData?.selectorResults?.title || [],
+                    onSelectorChange: (index) =>
+                      handleSelectorChange("title", index),
+                    onSelectContent: (selector, contentIndex) =>
+                      handleSelectContent("title", selector, contentIndex)
                   }
-                />
-              )}
-            </h2>
-
-            <CopyableTextField text={scrapedData.title} />
-          </div>
+                : undefined
+            }
+          />
 
           {/* 作者信息 */}
           {scrapedData.author && (
-            <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-base">
-                <Icon
-                  icon="line-md:account"
-                  width="18"
-                  height="18"
-                  className="flex-shrink-0 text-accent-blue"
-                />
-                <span>{t("content.author")}</span>
-                {authorSelectors.length > 0 && (
-                  <SelectorDropdown
-                    type="author"
-                    selectors={authorSelectors}
-                    selectedIndex={selectedSelectorIndices.author}
-                    results={scrapedData?.selectorResults?.author || []}
-                    onChange={(index) => handleSelectorChange("author", index)}
-                    onSelectContent={(selector, contentIndex) =>
-                      handleSelectContent("author", selector, contentIndex)
+            <MetadataFieldSection
+              icon="line-md:account"
+              label={t("content.author")}
+              value={scrapedData.author}
+              selectorConfig={
+                authorSelectors.length > 0
+                  ? {
+                      type: "author",
+                      selectors: authorSelectors,
+                      selectedIndex: selectedSelectorIndices.author,
+                      results: scrapedData?.selectorResults?.author || [],
+                      onSelectorChange: (index) =>
+                        handleSelectorChange("author", index),
+                      onSelectContent: (selector, contentIndex) =>
+                        handleSelectContent("author", selector, contentIndex)
                     }
-                  />
-                )}
-              </h2>
-
-              <CopyableTextField text={scrapedData.author} />
-            </div>
+                  : undefined
+              }
+            />
           )}
 
           {/* 发布日期 */}
           {scrapedData.publishDate && (
-            <div className="mb-4">
-              <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-base">
-                <Icon
-                  icon="line-md:calendar"
-                  width="18"
-                  height="18"
-                  className="flex-shrink-0 text-accent-blue"
-                />
-                <span>{t("content.date")}</span>
-                {dateSelectors.length > 0 && (
-                  <SelectorDropdown
-                    type="date"
-                    selectors={dateSelectors}
-                    selectedIndex={selectedSelectorIndices.date}
-                    results={scrapedData?.selectorResults?.date || []}
-                    onChange={(index) => handleSelectorChange("date", index)}
-                    onSelectContent={(selector, contentIndex) =>
-                      handleSelectContent("date", selector, contentIndex)
+            <MetadataFieldSection
+              icon="line-md:calendar"
+              label={t("content.date")}
+              value={scrapedData.publishDate}
+              selectorConfig={
+                dateSelectors.length > 0
+                  ? {
+                      type: "date",
+                      selectors: dateSelectors,
+                      selectedIndex: selectedSelectorIndices.date,
+                      results: scrapedData?.selectorResults?.date || [],
+                      onSelectorChange: (index) =>
+                        handleSelectorChange("date", index),
+                      onSelectContent: (selector, contentIndex) =>
+                        handleSelectContent("date", selector, contentIndex)
                     }
-                  />
-                )}
-              </h2>
-              <CopyableTextField text={scrapedData.publishDate} />
-            </div>
+                  : undefined
+              }
+            />
           )}
 
           {/* URL */}
-          <div className="mb-4">
-            <h2 className="mb-2 flex items-center gap-2 font-semibold text-base">
-              <Icon
-                icon="line-md:link"
-                width="18"
-                height="18"
-                className="flex-shrink-0 text-accent-blue"
-              />
-              <span>{t("content.url")}</span>
-            </h2>
-            <CopyableTextField text={scrapedData.url} />
-          </div>
+          <MetadataFieldSection
+            icon="line-md:link"
+            label={t("content.url")}
+            value={scrapedData.url}
+          />
 
           {/* 文章内容 */}
           {scrapedData.articleContent && (
