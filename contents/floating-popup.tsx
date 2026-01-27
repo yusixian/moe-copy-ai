@@ -18,6 +18,7 @@ import FloatingButton from "~components/FloatingButton"
 import PopupContent from "~components/PopupContent"
 import { useFloatButtonStorage } from "~hooks/useFloatButtonStorage"
 import { I18nProvider, useI18n } from "~utils/i18n"
+import { ThemeProvider } from "~utils/theme"
 
 // 注入全局样式
 export const getStyle = () => {
@@ -153,9 +154,11 @@ const FloatingPopup = () => {
 
 function FloatingPopupWithI18n() {
   return (
-    <I18nProvider>
-      <FloatingPopup />
-    </I18nProvider>
+    <ThemeProvider>
+      <I18nProvider>
+        <FloatingPopup />
+      </I18nProvider>
+    </ThemeProvider>
   )
 }
 

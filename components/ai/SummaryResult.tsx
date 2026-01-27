@@ -24,9 +24,9 @@ export const SummaryResult = ({
   }
 
   return (
-    <div className="mt-4 rounded-xl border-2 border-sky-200 border-dashed bg-white p-4 shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
+    <div className="mt-4 rounded-xl border-2 border-accent-blue/30 border-dashed bg-content-solid p-4 shadow-sm transition-all hover:border-accent-blue/50 hover:shadow-md">
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="flex items-center font-medium text-sky-600 text-sm">
+        <h3 className="flex items-center font-medium text-accent-blue text-sm">
           <Icon
             icon="line-md:lightbulb-twotone"
             className="mr-1 text-amber-400"

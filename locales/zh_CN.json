@@ -140,6 +140,12 @@
   "sidepanel.settings.selector.title": "选择器设置",
   "sidepanel.settings.selector.openFull": "打开完整设置",
 
+  "settings.theme": "主题",
+  "settings.theme.light": "浅色",
+  "settings.theme.dark": "深色",
+  "settings.theme.system": "跟随系统",
+  "settings.theme.desc": "选择界面外观主题",
+
   "settings.log.level.debug": "调试 (Debug)",
   "settings.log.level.info": "信息 (Info)",
   "settings.log.level.error": "错误 (Error)",

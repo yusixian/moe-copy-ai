@@ -73,7 +73,7 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
     <div className="flex flex-col gap-2">
       {/* Tab 切换 */}
       <div className="flex items-center justify-between">
-        <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
+        <div className="flex gap-1 rounded-lg bg-content-alt p-1">
           {formatTabs.map((tab) => (
             <button
               type="button"
@@ -82,8 +82,8 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
               className={cn(
                 "flex items-center gap-1 rounded-md px-3 py-1.5 font-medium text-xs transition-colors",
                 activeFormat === tab.id
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-content-solid text-text-1 shadow-sm"
+                  : "text-text-2 hover:text-text-1"
               )}>
               <Icon icon={tab.icon} width={14} />
               {tab.label}
@@ -96,7 +96,7 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
           <button
             type="button"
             onClick={() => setIsPreviewMode(!isPreviewMode)}
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-gray-500 text-xs hover:bg-gray-100">
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-text-3 text-xs hover:bg-content-alt">
             <Icon
               icon={isPreviewMode ? "mdi:code-tags" : "mdi:eye"}
               width={14}
@@ -109,7 +109,7 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
       </div>
 
       {/* 内容显示区域 */}
-      <div className="max-h-[400px] min-h-[200px] overflow-auto rounded-lg border border-gray-200 bg-white p-3">
+      <div className="max-h-[400px] min-h-[200px] overflow-auto rounded-lg border border-line-1 bg-content-solid p-3">
         {activeFormat === "markdown" ? (
           <ContentDisplay
             content={currentContent}
@@ -117,11 +117,11 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
             isPreviewMode={isPreviewMode}
           />
         ) : activeFormat === "html" ? (
-          <pre className="whitespace-pre-wrap break-all font-mono text-gray-700 text-xs">
+          <pre className="whitespace-pre-wrap break-all font-mono text-text-2 text-xs">
             {currentContent}
           </pre>
         ) : (
-          <pre className="whitespace-pre-wrap text-gray-700 text-sm">
+          <pre className="whitespace-pre-wrap text-sm text-text-2">
             {currentContent}
           </pre>
         )}
@@ -129,7 +129,7 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
 
       {/* 底部操作栏 */}
       <div className="flex items-center justify-between">
-        <div className="text-gray-400 text-xs">
+        <div className="text-text-4 text-xs">
           {stats.chars.toLocaleString(intlLocale)} {t("extraction.stats.chars")}{" "}
           · {stats.words.toLocaleString(intlLocale)}{" "}
           {t("extraction.stats.words")} ·{" "}

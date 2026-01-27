@@ -26,7 +26,6 @@ export const useScrapedData = () => {
   const {
     selectorsMap,
     selectedSelectorIndices,
-    selectorResults,
     updateSelectorResults,
     createSelectorChangeHandler,
     createSelectContentHandler

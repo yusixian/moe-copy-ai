@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react"
 
-import type { FilterMode, FilterTarget } from "~constants/link-filter-presets"
 import type {
   BatchProgress,
   BatchScrapeMode,
