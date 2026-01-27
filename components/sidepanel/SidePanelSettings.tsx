@@ -18,12 +18,12 @@ import {
 } from "~utils/i18n"
 import { translateOptions } from "~utils/options-helper"
 import { getExtractionMode, setExtractionMode } from "~utils/storage"
-import { SUPPORTED_THEMES, type Theme, useTheme } from "~utils/theme"
 import { ModelSelectInput } from "../ai/ModelSelectInput"
 import {
   BatchScrapeSettings,
   CompactSelect
 } from "../batch/BatchScrapeSettings"
+import { ThemeSelect } from "../option/ThemeSelect"
 
 // 开关行组件（用于单选项设置）
 function ToggleRow({
@@ -285,47 +285,6 @@ function LanguageSettings() {
   )
 }
 
-// 主题设置
-function ThemeSettings() {
-  const { t } = useI18n()
-  const { theme, setTheme } = useTheme()
-
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newTheme = e.target.value as Theme
-    setTheme(newTheme)
-    toast.success(t("common.success"))
-  }
-
-  const themeLabels: Record<Theme, string> = {
-    light: t("settings.theme.light"),
-    dark: t("settings.theme.dark"),
-    system: t("settings.theme.system")
-  }
-
-  return (
-    <div className="flex items-center justify-between rounded-xl border border-line-1 bg-content p-3">
-      <span className="flex items-center gap-2 font-medium text-sm text-text-1">
-        <Icon
-          icon="mdi:theme-light-dark"
-          width={16}
-          className="text-accent-blue"
-        />
-        {t("settings.theme")}
-      </span>
-      <select
-        value={theme}
-        onChange={handleChange}
-        className="rounded border border-line-1 bg-content px-2 py-1 text-sm focus:border-accent-blue focus:outline-none">
-        {SUPPORTED_THEMES.map((th) => (
-          <option key={th} value={th}>
-            {themeLabels[th]}
-          </option>
-        ))}
-      </select>
-    </div>
-  )
-}
-
 // 主设置组件
 export default function SidePanelSettings() {
   const { t } = useI18n()
@@ -380,7 +339,7 @@ export default function SidePanelSettings() {
         <BatchScrapeSettings />
       </Collapsible>
 
-      <ThemeSettings />
+      <ThemeSelect variant="inline" />
 
       <LanguageSettings />
 

@@ -28,13 +28,12 @@ const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 interface ThemeProviderProps {
   children: React.ReactNode
-  /** 初始主题（可选，默认从 storage 读取或使用系统主题） */
-  initialTheme?: Theme
 }
 
 /**
  * 应用主题到 document
  * 添加或移除 dark class
+ * @param resolvedTheme - 解析后的主题（light 或 dark）
  */
 function applyTheme(resolvedTheme: ResolvedTheme) {
   if (typeof document === "undefined") return
@@ -50,10 +49,11 @@ function applyTheme(resolvedTheme: ResolvedTheme) {
 /**
  * Theme Provider 组件
  * 提供主题切换能力和主题状态
+ * 初始化时从 Chrome sync storage 读取用户偏好
  */
-export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(initialTheme || DEFAULT_THEME)
-  const [isLoading, setIsLoading] = useState(!initialTheme)
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const [theme, setThemeState] = useState<Theme>(DEFAULT_THEME)
+  const [isLoading, setIsLoading] = useState(true)
   const systemTheme = useSystemTheme()
 
   // 计算解析后的主题
@@ -63,8 +63,6 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
 
   // 初始化时从 storage 读取主题偏好
   useEffect(() => {
-    if (initialTheme) return
-
     const loadTheme = async () => {
       try {
         const savedTheme = await syncStorage.get<Theme>(THEME_STORAGE_KEY)
@@ -84,7 +82,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     }
 
     loadTheme()
-  }, [initialTheme])
+  }, [])
 
   // 监听 storage 变化，实现跨 context 同步
   useEffect(() => {
@@ -95,12 +93,11 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
       }
     }
     const watchMap = { [THEME_STORAGE_KEY]: handleThemeChange }
-    const isWatching = syncStorage.watch(watchMap)
+    syncStorage.watch(watchMap)
 
     return () => {
-      if (isWatching) {
-        syncStorage.unwatch(watchMap)
-      }
+      // Always call unwatch on cleanup (should be idempotent)
+      syncStorage.unwatch(watchMap)
     }
   }, [])
 
@@ -109,7 +106,11 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     applyTheme(resolvedTheme)
   }, [resolvedTheme])
 
-  // 切换主题并保存到 storage
+  /**
+   * 切换主题并保存到 storage
+   * 更新会自动同步到所有使用 ThemeProvider 的上下文
+   * @param newTheme - 新主题值 (light | dark | system)
+   */
   const setTheme = useCallback(async (newTheme: Theme) => {
     setThemeState(newTheme)
     try {
