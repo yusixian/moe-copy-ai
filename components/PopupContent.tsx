@@ -9,6 +9,7 @@ import ImageGrid from "~/components/ImageGrid"
 import MetadataImageSection from "~/components/MetadataImageSection"
 import MetadataTable from "~/components/MetadataTable"
 import { Button } from "~/components/ui/button"
+import { BACKGROUND_GRADIENTS } from "~constants/theme"
 import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import useScrapedData from "~hooks/useScrapedData"
 import { cn } from "~utils"
@@ -84,18 +85,7 @@ const PopupContent = ({
       <div
         className="fixed inset-0 top-0 left-0 z-[-1] h-full w-full rounded-[inherit] bg-app"
         style={{
-          backgroundImage:
-            resolvedTheme === "dark"
-              ? `
-                radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.10), transparent 40%),
-                radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.08), transparent 45%),
-                radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.06), transparent 40%)
-              `
-              : `
-                radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.18), transparent 40%),
-                radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.15), transparent 45%),
-                radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.12), transparent 40%)
-              `
+          backgroundImage: BACKGROUND_GRADIENTS[resolvedTheme]
         }}
       />
 

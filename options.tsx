@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify"
 import "./styles/global.css"
 
 import { ErrorBoundary } from "~/components/ui/ErrorBoundary"
+import { BACKGROUND_GRADIENTS_SUBTLE } from "~constants/theme"
 import { I18nProvider } from "~utils/i18n"
 import { ThemeProvider, useTheme } from "~utils/theme"
 import Footer from "./components/option/Footer"
@@ -47,18 +48,7 @@ function OptionsPageContent() {
       <div
         className="fixed inset-0 z-0 h-full w-full"
         style={{
-          backgroundImage:
-            resolvedTheme === "dark"
-              ? `
-                radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.08), transparent 40%),
-                radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.06), transparent 45%),
-                radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.05), transparent 40%)
-              `
-              : `
-                radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.14), transparent 40%),
-                radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.11), transparent 45%),
-                radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.08), transparent 40%)
-              `
+          backgroundImage: BACKGROUND_GRADIENTS_SUBTLE[resolvedTheme]
         }}
       />
       <div className="relative z-1 mx-auto max-w-2xl">
@@ -90,13 +80,13 @@ function OptionsPageContent() {
 
 function OptionsPage() {
   return (
-    <ThemeProvider>
-      <I18nProvider>
+    <I18nProvider>
+      <ThemeProvider>
         <ErrorBoundary>
           <OptionsPageContent />
         </ErrorBoundary>
-      </I18nProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </I18nProvider>
   )
 }
 

@@ -9,6 +9,7 @@ import type { SingleScrapePanelHandle } from "~components/singlescrape"
 import { Button } from "~components/ui/button"
 import { ErrorBoundary } from "~components/ui/ErrorBoundary"
 import Segmented, { type SegmentedOption } from "~components/ui/segmented"
+import { BACKGROUND_GRADIENTS } from "~constants/theme"
 import { BatchScrapeProvider } from "~contexts/BatchScrapeContext"
 import useContentExtraction from "~hooks/useContentExtraction"
 import { I18nProvider, useI18n } from "~utils/i18n"
@@ -103,18 +104,7 @@ function SidePanel() {
       <div
         className="fixed inset-0 top-0 left-0 z-1 h-full w-full rounded-[inherit] bg-app"
         style={{
-          backgroundImage:
-            resolvedTheme === "dark"
-              ? `
-                radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.10), transparent 40%),
-                radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.08), transparent 45%),
-                radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.06), transparent 40%)
-              `
-              : `
-                radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.18), transparent 40%),
-                radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.15), transparent 45%),
-                radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.12), transparent 40%)
-              `
+          backgroundImage: BACKGROUND_GRADIENTS[resolvedTheme]
         }}
       />
 
@@ -258,18 +248,19 @@ function SidePanel() {
   )
 }
 
-// Wrap with ThemeProvider, I18nProvider and BatchScrapeProvider
+// Wrap with I18nProvider, ThemeProvider and BatchScrapeProvider
+// I18nProvider outermost as it's the most fundamental service
 function SidePanelWithProviders() {
   return (
-    <ThemeProvider>
-      <I18nProvider>
+    <I18nProvider>
+      <ThemeProvider>
         <ErrorBoundary>
           <BatchScrapeProvider>
             <SidePanel />
           </BatchScrapeProvider>
         </ErrorBoundary>
-      </I18nProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </I18nProvider>
   )
 }
 

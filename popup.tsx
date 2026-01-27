@@ -7,15 +7,15 @@ import { ThemeProvider } from "~utils/theme"
 
 function IndexPopup() {
   return (
-    <ThemeProvider>
-      <I18nProvider>
+    <I18nProvider>
+      <ThemeProvider>
         <ErrorBoundary>
           <div className="w-[35rem]">
             <PopupContent />
           </div>
         </ErrorBoundary>
-      </I18nProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </I18nProvider>
   )
 }
 
