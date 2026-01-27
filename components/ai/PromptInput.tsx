@@ -85,7 +85,7 @@ const PromptInput = ({
               <button
                 type="button"
                 onClick={() => setShowPlaceholders(!showPlaceholders)}
-                className="flex items-center rounded-md bg-sky-100 px-3 py-1.5 font-medium text-sky-600 text-sm shadow-sm transition-all hover:bg-sky-200 hover:shadow">
+                className="flex items-center rounded-md bg-fill-1 px-3 py-1.5 font-medium text-accent-blue text-sm shadow-sm transition-all hover:bg-fill-2 hover:shadow">
                 <Icon
                   icon={
                     showPlaceholders
@@ -107,7 +107,7 @@ const PromptInput = ({
               <button
                 type="button"
                 onClick={handleSaveAsDefault}
-                className="flex items-center rounded-md bg-purple-100 px-3 py-1.5 font-medium text-purple-600 text-sm shadow-sm transition-all hover:bg-purple-200 hover:shadow">
+                className="flex items-center rounded-md bg-purple-500/10 px-3 py-1.5 font-medium text-purple-600 text-sm shadow-sm transition-all hover:bg-purple-500/20 hover:shadow">
                 <Icon
                   icon="line-md:check-list-3"
                   className="mr-1.5"
@@ -121,7 +121,7 @@ const PromptInput = ({
               <button
                 type="button"
                 onClick={() => setCustomPrompt(systemPrompt)}
-                className="flex items-center rounded-md bg-indigo-100 px-3 py-1.5 font-medium text-indigo-600 text-sm shadow-sm transition-all hover:bg-indigo-200 hover:shadow">
+                className="flex items-center rounded-md bg-accent-indigo/10 px-3 py-1.5 font-medium text-accent-indigo text-sm shadow-sm transition-all hover:bg-accent-indigo/20 hover:shadow">
                 <Icon
                   icon="line-md:restore"
                   className="mr-1.5"
@@ -135,7 +135,7 @@ const PromptInput = ({
               <button
                 type="button"
                 onClick={() => setShowPreview(!showPreview)}
-                className="flex items-center rounded-md bg-emerald-100 px-3 py-1.5 font-medium text-emerald-600 text-sm shadow-sm transition-all hover:bg-emerald-200 hover:shadow">
+                className="flex items-center rounded-md bg-emerald-500/10 px-3 py-1.5 font-medium text-emerald-600 text-sm shadow-sm transition-all hover:bg-emerald-500/20 hover:shadow">
                 <Icon
                   icon={showPreview ? "line-md:eye-off" : "line-md:eye"}
                   className="mr-1.5"

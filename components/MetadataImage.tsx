@@ -22,7 +22,7 @@ export const MetadataImage: React.FC<MetadataImageProps> = ({
 }) => {
   const { t } = useI18n()
   return (
-    <div className="transform overflow-hidden rounded-lg border-2 border-accent-blue/30 bg-content-solid shadow-sm transition-all hover:scale-105 hover:shadow-md">
+    <div className="transform overflow-hidden rounded-lg border border-accent-blue/30 bg-content-solid shadow-sm transition-all hover:scale-105 hover:shadow-md">
       <div className="relative flex h-[150px] w-full items-center justify-center">
         <Image
           src={src}

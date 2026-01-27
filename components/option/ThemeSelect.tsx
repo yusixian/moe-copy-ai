@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react"
 import type React from "react"
-import { useCallback, useMemo } from "react"
+import { useCallback } from "react"
 import { toast } from "react-toastify"
 
 import { cn } from "~utils"
@@ -45,15 +45,11 @@ export const ThemeSelect: React.FC<ThemeSelectProps> = ({
     [setTheme, t]
   )
 
-  // 使用 useMemo 缓存派生值
-  const themeLabels: Record<Theme, string> = useMemo(
-    () => ({
-      light: t("settings.theme.light"),
-      dark: t("settings.theme.dark"),
-      system: t("settings.theme.system")
-    }),
-    [t]
-  )
+  const themeLabels: Record<Theme, string> = {
+    light: t("settings.theme.light"),
+    dark: t("settings.theme.dark"),
+    system: t("settings.theme.system")
+  }
 
   // Block 布局（垂直，用于 options 页面）
   if (variant === "block") {

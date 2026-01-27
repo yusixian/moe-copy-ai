@@ -339,7 +339,7 @@ export default function SidePanelSettings() {
         <BatchScrapeSettings />
       </Collapsible>
 
-      <ThemeSelect variant="inline" />
+      <ThemeSelect variant="inline" showDescription={false} />
 
       <LanguageSettings />
 

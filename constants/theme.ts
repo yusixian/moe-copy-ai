@@ -3,7 +3,7 @@
  * Background gradients and theme-specific visual elements
  */
 
-import type { ResolvedTheme } from "~utils/theme/types"
+import type { ResolvedTheme } from "~utils/theme"
 
 /**
  * Radial background gradients for light and dark modes
