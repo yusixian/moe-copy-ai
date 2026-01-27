@@ -13,7 +13,7 @@ const buttonVariants = cva(
         secondary:
           "bg-accent-blue-ghost text-accent-blue border-accent-blue hover:bg-accent-blue-ghost-hover",
         outline:
-          "bg-transparent border-blue-300 text-blue-600 hover:bg-blue-50",
+          "bg-transparent border-accent-blue/50 text-accent-blue hover:bg-accent-blue-ghost",
         ghost:
           "bg-transparent border-transparent text-text-1 hover:bg-text-1/15",
         success: "bg-success text-white border-success hover:bg-success-hover",

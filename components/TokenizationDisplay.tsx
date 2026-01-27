@@ -69,7 +69,7 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
       {!showOnlySummary && (
         <>
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="font-medium text-slate-700 text-sm">
+            <h3 className="font-medium text-sm text-text-1">
               {t("content.tokenization.title")}
             </h3>
             <Button
@@ -87,7 +87,7 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
               {tokenTextPairs.map((pair, index) => (
                 <div
                   key={`${pair.token}-${index}`}
-                  className="group relative rounded px-1 py-0.5 text-slate-700 text-sm transition-all hover:shadow-md"
+                  className="group relative rounded px-1 py-0.5 text-sm text-text-2 transition-all hover:shadow-md"
                   style={{ backgroundColor: getTokenColor(pair.token) }}>
                   {showTokenIds ? pair.token : pair.text}
                 </div>
@@ -97,7 +97,7 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
         </>
       )}
 
-      <div className="mt-2 text-slate-500 text-xs">
+      <div className="mt-2 text-text-3 text-xs">
         {t("content.tokenization.stats", {
           chars: content.length,
           tokens: tokens.length
@@ -107,7 +107,7 @@ const TokenizationDisplay: React.FC<TokenizationDisplayProps> = ({
           href="https://github.com/niieani/gpt-tokenizer"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-500 hover:text-blue-600">
+          className="text-accent-blue hover:text-accent-blue-hover">
           gpt-tokenizer
         </a>
         {t("content.tokenization.disclaimer")}

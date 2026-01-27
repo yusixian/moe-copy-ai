@@ -75,13 +75,13 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
   if (isMarkdown && isPreviewMode) {
     if (isFullscreen) {
       return (
-        <div className="fixed inset-0 z-50 flex h-full w-full flex-col bg-white">
+        <div className="fixed inset-0 z-50 flex h-full w-full flex-col bg-content-solid">
           {/* 全屏模式顶部栏 */}
-          <div className="flex items-center justify-between border-gray-200 border-b bg-white px-4 py-3 shadow-sm">
+          <div className="flex items-center justify-between border-line-1 border-b bg-content-solid px-4 py-3 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-100">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-blue-ghost">
                 <svg
-                  className="h-4 w-4 text-sky-600"
+                  className="h-4 w-4 text-accent-blue"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -95,10 +95,10 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
                 </svg>
               </div>
               <div>
-                <h2 className="font-semibold text-gray-900 text-lg">
+                <h2 className="font-semibold text-lg text-text-1">
                   {t("content.fullscreen.title")}
                 </h2>
-                <p className="text-gray-500 text-xs">
+                <p className="text-text-3 text-xs">
                   {t("content.fullscreen.help")}
                 </p>
               </div>
@@ -118,7 +118,7 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
           </div>
           {/* 全屏内容区域 */}
           <div
-            className="markdown-preview markdown-preview-fullscreen flex-1 overflow-auto bg-white px-6 py-4"
+            className="markdown-preview markdown-preview-fullscreen flex-1 overflow-auto bg-content-solid px-6 py-4"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: renderMarkdown sanitizes output
             dangerouslySetInnerHTML={renderMarkdown(content)}
           />

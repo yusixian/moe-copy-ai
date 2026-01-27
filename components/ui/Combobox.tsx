@@ -96,16 +96,16 @@ export function Combobox({
 
   // 样式
   const inputClass = compact
-    ? "flex-1 rounded-l border border-r-0 border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none"
-    : "flex-1 rounded-l-lg border border-r-0 border-sky-200 bg-blue-50 p-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+    ? "flex-1 rounded-l border border-r-0 border-line-1 bg-content px-2 py-1.5 text-xs text-text-1 focus:border-accent-blue focus:outline-none"
+    : "flex-1 rounded-l-lg border border-r-0 border-line-1 bg-content p-2.5 text-sm text-text-1 focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/20"
 
   const buttonClass = compact
-    ? "flex items-center justify-center rounded-r border border-sky-200 bg-sky-50 px-2 text-sky-600 hover:bg-sky-100"
-    : "flex items-center justify-center rounded-r-lg border border-sky-200 bg-blue-50 px-3 text-sky-600 hover:bg-sky-100"
+    ? "flex items-center justify-center rounded-r border border-line-1 bg-content px-2 text-accent-blue hover:bg-accent-blue-ghost"
+    : "flex items-center justify-center rounded-r-lg border border-line-1 bg-content px-3 text-accent-blue hover:bg-accent-blue-ghost"
 
   const dropdownClass = compact
-    ? "z-50 max-h-40 overflow-auto rounded border border-sky-200 bg-white shadow-lg"
-    : "z-50 max-h-48 overflow-auto rounded-lg border border-sky-200 bg-white shadow-lg"
+    ? "z-50 max-h-40 overflow-auto rounded border border-line-1 bg-elevated-solid-1 shadow-lg"
+    : "z-50 max-h-48 overflow-auto rounded-lg border border-line-1 bg-elevated-solid-1 shadow-lg"
 
   const optionClass = compact
     ? "cursor-pointer px-2 py-1.5 text-xs"
@@ -169,23 +169,21 @@ export function Combobox({
                     })}
                     className={`${optionClass} ${
                       index === activeIndex
-                        ? "bg-sky-100 text-sky-700"
+                        ? "bg-accent-blue-ghost-active text-accent-blue"
                         : opt.id === value
-                          ? "bg-sky-50 text-sky-600"
-                          : "text-gray-700 hover:bg-sky-50"
+                          ? "bg-accent-blue-ghost text-accent-blue"
+                          : "text-text-1 hover:bg-accent-blue-ghost-hover"
                     }`}>
                     {opt.label}
                     {opt.description && (
-                      <span className="ml-1 text-gray-400">
+                      <span className="ml-1 text-text-3">
                         ({opt.description})
                       </span>
                     )}
                   </div>
                 ))
               ) : (
-                <div className={`${optionClass} text-gray-400`}>
-                  {emptyText}
-                </div>
+                <div className={`${optionClass} text-text-3`}>{emptyText}</div>
               )}
             </div>
           </FloatingFocusManager>

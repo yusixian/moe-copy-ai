@@ -28,14 +28,14 @@ export function CompactSelect({
   const selectId = `select-${label.replace(/\s+/g, "-").toLowerCase()}`
   return (
     <div className="flex items-center justify-between gap-1.5">
-      <label htmlFor={selectId} className="flex-shrink-0 text-gray-600 text-xs">
+      <label htmlFor={selectId} className="flex-shrink-0 text-text-2 text-xs">
         {label}
       </label>
       <select
         id={selectId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="min-w-0 rounded border border-sky-200 bg-sky-50 px-2 py-1 text-xs focus:border-sky-400 focus:outline-none">
+        className="min-w-0 rounded border border-line-1 bg-content px-2 py-1 text-text-1 text-xs focus:border-accent-blue focus:outline-none">
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
@@ -87,7 +87,7 @@ export function BatchScrapeSettings({
     <div className="space-y-3">
       {/* 策略选择 - 使用按钮组 */}
       <fieldset className="space-y-2">
-        <legend className="text-gray-600 text-xs">
+        <legend className="text-text-2 text-xs">
           {t("batch.settings.strategy")}
         </legend>
         <div className="grid grid-cols-3 gap-1">
@@ -104,15 +104,15 @@ export function BatchScrapeSettings({
               }
               className={`rounded-md px-1.5 py-1.5 text-center text-xs transition-all ${
                 strategy === s.value
-                  ? "bg-sky-500 text-white shadow-sm"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-accent-blue text-white shadow-sm"
+                  : "bg-content-alt text-text-2 hover:bg-content-alt/80"
               }`}>
               {t(s.labelKey)}
             </button>
           ))}
         </div>
         {!compact && currentStrategyDescKey && (
-          <p className="text-gray-500 text-xs">{t(currentStrategyDescKey)}</p>
+          <p className="text-text-3 text-xs">{t(currentStrategyDescKey)}</p>
         )}
       </fieldset>
 
@@ -207,7 +207,7 @@ export function BatchScrapeSettings({
 
       {/* 分页抓取设置 */}
       <div
-        className={`flex gap-2 border-gray-200 border-t pt-3 ${compact ? "" : "mt-4"}`}>
+        className={`flex gap-2 border-line-1 border-t pt-3 ${compact ? "" : "mt-4"}`}>
         <div className="flex-1">
           <CompactSelect
             label={

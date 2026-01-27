@@ -2,48 +2,208 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* 浅色模式变量 */
+  :root {
+    /* 背景色 */
+    --color-app: #fafafa;
+    --color-content: oklch(100% 0 0 / 0.6);
+    --color-content-hover: color-mix(in oklab, oklch(100% 0 0 / 0.6), black 5%);
+    --color-content-active: color-mix(
+      in oklab,
+      oklch(100% 0 0 / 0.6),
+      black 10%
+    );
+    --color-content-solid: oklch(100% 0 0);
+    --color-content-solid-hover: color-mix(in oklab, oklch(100% 0 0), black 5%);
+    --color-content-solid-active: color-mix(
+      in oklab,
+      oklch(100% 0 0),
+      black 10%
+    );
+    --color-content-alt: oklch(96.8% 0.0069 247.9 / 0.6);
+    --color-content-alt-hover: color-mix(
+      in oklab,
+      oklch(96.8% 0.0069 247.9 / 0.6),
+      black 5%
+    );
+    --color-content-alt-active: color-mix(
+      in oklab,
+      oklch(96.8% 0.0069 247.9 / 0.6),
+      black 10%
+    );
+    --color-content-alt-solid: oklch(96.8% 0.0069 247.9);
+    --color-content-alt-solid-hover: color-mix(
+      in oklab,
+      oklch(96.8% 0.0069 247.9),
+      black 5%
+    );
+    --color-content-alt-solid-active: color-mix(
+      in oklab,
+      oklch(96.8% 0.0069 247.9),
+      black 10%
+    );
+
+    /* 高亮层 */
+    --color-elevated-1: rgba(255, 255, 255, 0.6);
+    --color-elevated-2: rgba(255, 255, 255, 0.6);
+    --color-elevated-solid-1: #fff;
+    --color-elevated-solid-2: #fff;
+
+    /* 文本颜色 */
+    --color-text-1: oklch(12.9% 0.042 264.695);
+    --color-text-1-hover: oklch(12.9% 0.042 264.695 / 85%);
+    --color-text-1-active: oklch(12.9% 0.042 264.695 / 75%);
+    --color-text-2: oklch(44.6% 0.043 257.281);
+    --color-text-2-hover: oklch(44.6% 0.043 257.281 / 85%);
+    --color-text-2-active: oklch(44.6% 0.043 257.281 / 75%);
+    --color-text-3: oklch(70.4% 0.04 256.788);
+    --color-text-3-hover: oklch(70.4% 0.04 256.788 / 85%);
+    --color-text-3-active: oklch(70.4% 0.04 256.788 / 75%);
+    --color-text-4: oklch(92.9% 0.013 255.508);
+    --color-text-4-hover: oklch(92.9% 0.013 255.508 / 85%);
+    --color-text-4-active: oklch(92.9% 0.013 255.508 / 75%);
+
+    /* 边框/分割线 */
+    --color-line-1: rgba(120, 120, 122, 0.32);
+    --color-line-2: rgba(120, 120, 122, 0.44);
+
+    /* 填充色 */
+    --color-fill-1: rgba(120, 120, 122, 0.08);
+    --color-fill-2: rgba(120, 120, 122, 0.16);
+    --color-fill-3: rgba(120, 120, 122, 0.24);
+
+    /* 阴影高光 */
+    --shadow-highlight: rgb(255 255 255 / 0.4);
+    --shadow-highlight-weak: rgb(255 255 255 / 0.2);
+  }
+
+  /* 深色模式变量 */
+  .dark {
+    /* 背景色 */
+    --color-app: #0f0f10;
+    --color-content: oklch(20% 0.01 264 / 0.6);
+    --color-content-hover: color-mix(
+      in oklab,
+      oklch(20% 0.01 264 / 0.6),
+      white 5%
+    );
+    --color-content-active: color-mix(
+      in oklab,
+      oklch(20% 0.01 264 / 0.6),
+      white 10%
+    );
+    --color-content-solid: oklch(18% 0.01 264);
+    --color-content-solid-hover: color-mix(
+      in oklab,
+      oklch(18% 0.01 264),
+      white 5%
+    );
+    --color-content-solid-active: color-mix(
+      in oklab,
+      oklch(18% 0.01 264),
+      white 10%
+    );
+    --color-content-alt: oklch(22% 0.012 264 / 0.6);
+    --color-content-alt-hover: color-mix(
+      in oklab,
+      oklch(22% 0.012 264 / 0.6),
+      white 5%
+    );
+    --color-content-alt-active: color-mix(
+      in oklab,
+      oklch(22% 0.012 264 / 0.6),
+      white 10%
+    );
+    --color-content-alt-solid: oklch(22% 0.012 264);
+    --color-content-alt-solid-hover: color-mix(
+      in oklab,
+      oklch(22% 0.012 264),
+      white 5%
+    );
+    --color-content-alt-solid-active: color-mix(
+      in oklab,
+      oklch(22% 0.012 264),
+      white 10%
+    );
+
+    /* 高亮层 */
+    --color-elevated-1: rgba(40, 40, 45, 0.6);
+    --color-elevated-2: rgba(40, 40, 45, 0.6);
+    --color-elevated-solid-1: #1a1a1d;
+    --color-elevated-solid-2: #1a1a1d;
+
+    /* 文本颜色 - 反转亮度 */
+    --color-text-1: oklch(92% 0.01 264);
+    --color-text-1-hover: oklch(92% 0.01 264 / 85%);
+    --color-text-1-active: oklch(92% 0.01 264 / 75%);
+    --color-text-2: oklch(70% 0.02 257);
+    --color-text-2-hover: oklch(70% 0.02 257 / 85%);
+    --color-text-2-active: oklch(70% 0.02 257 / 75%);
+    --color-text-3: oklch(50% 0.02 257);
+    --color-text-3-hover: oklch(50% 0.02 257 / 85%);
+    --color-text-3-active: oklch(50% 0.02 257 / 75%);
+    --color-text-4: oklch(30% 0.01 255);
+    --color-text-4-hover: oklch(30% 0.01 255 / 85%);
+    --color-text-4-active: oklch(30% 0.01 255 / 75%);
+
+    /* 边框/分割线 */
+    --color-line-1: rgba(180, 180, 185, 0.2);
+    --color-line-2: rgba(180, 180, 185, 0.3);
+
+    /* 填充色 */
+    --color-fill-1: rgba(180, 180, 185, 0.08);
+    --color-fill-2: rgba(180, 180, 185, 0.16);
+    --color-fill-3: rgba(180, 180, 185, 0.24);
+
+    /* 阴影高光 - 深色模式降低白色高光强度 */
+    --shadow-highlight: rgb(255 255 255 / 0.05);
+    --shadow-highlight-weak: rgb(255 255 255 / 0.03);
+  }
+}
+
 @layer components {
   .top-bar {
-    @apply backdrop-blur-sm backdrop-brightness-110 bg-elevated-1 rounded-2xl border border-line-1 shadow-lg;
+    @apply rounded-2xl border border-line-1 bg-elevated-1 shadow-lg backdrop-blur-sm backdrop-brightness-110;
     box-shadow:
-      inset 1px 1px 2px rgb(255 255 255 / 0.4),
-      inset -1px -1px 2px rgb(255 255 255 / 0.2),
-      inset 0 0 6px rgb(255 255 255 / 0.4),
+      inset 1px 1px 2px var(--shadow-highlight),
+      inset -1px -1px 2px var(--shadow-highlight-weak),
+      inset 0 0 6px var(--shadow-highlight),
       0 10px 15px -3px rgb(0 0 0 / 0.1),
       0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
 
   .dialog {
-    @apply backdrop-blur-sm backdrop-brightness-110 bg-elevated-1 rounded-2xl border border-line-1;
+    @apply rounded-2xl border border-line-1 bg-elevated-1 backdrop-blur-sm backdrop-brightness-110;
     box-shadow:
-      inset 1px 1px 2px rgb(255 255 255 / 0.4),
-      inset 0 0 6px rgb(255 255 255 / 0.4),
-      inset -1px -1px 2px rgb(255 255 255 / 0.2),
+      inset 1px 1px 2px var(--shadow-highlight),
+      inset 0 0 6px var(--shadow-highlight),
+      inset -1px -1px 2px var(--shadow-highlight-weak),
       0 25px 50px -12px rgb(0 0 0 / 0.25);
   }
 
   .popover {
-    @apply backdrop-blur-sm backdrop-brightness-110 bg-elevated-1 rounded-2xl border border-line-1;
+    @apply rounded-2xl border border-line-1 bg-elevated-1 backdrop-blur-sm backdrop-brightness-110;
     box-shadow:
-      inset 1px 1px 2px rgb(255 255 255 / 0.4),
-      inset 0 0 6px rgb(255 255 255 / 0.4),
-      inset -1px -1px 2px rgb(255 255 255 / 0.2),
+      inset 1px 1px 2px var(--shadow-highlight),
+      inset 0 0 6px var(--shadow-highlight),
+      inset -1px -1px 2px var(--shadow-highlight-weak),
       0 4px 6px -1px rgb(0 0 0 / 0.1),
       0 2px 4px -2px rgb(0 0 0 / 0.1);
   }
 
   .card {
-    @apply bg-content rounded-2xl border border-line-1;
+    @apply rounded-2xl border border-line-1 bg-content;
     box-shadow:
-      inset 1px 1px 2px rgb(255 255 255 / 0.4),
-      inset 0 0 6px rgb(255 255 255 / 0.4),
-      inset -1px -1px 2px rgb(255 255 255 / 0.2),
+      inset 1px 1px 2px var(--shadow-highlight),
+      inset 0 0 6px var(--shadow-highlight),
+      inset -1px -1px 2px var(--shadow-highlight-weak),
       0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
 }
 
 body {
-  @apply text-text-1 font-sans;
+  @apply font-sans text-text-1;
 }
 
 /* Markdown 预览样式 */
@@ -61,6 +221,10 @@ body {
   color: #2d3748;
 }
 
+.dark .markdown-preview-fullscreen {
+  color: #e2e8f0;
+}
+
 .markdown-preview-fullscreen h1 {
   font-size: 2em;
   margin-top: 1.2em;
@@ -68,6 +232,11 @@ body {
   color: #1a202c;
   border-bottom: 2px solid #e2e8f0;
   padding-bottom: 0.3em;
+}
+
+.dark .markdown-preview-fullscreen h1 {
+  color: #f7fafc;
+  border-bottom-color: #4a5568;
 }
 
 .markdown-preview-fullscreen h2 {
@@ -79,11 +248,20 @@ body {
   padding-bottom: 0.2em;
 }
 
+.dark .markdown-preview-fullscreen h2 {
+  color: #f7fafc;
+  border-bottom-color: #4a5568;
+}
+
 .markdown-preview-fullscreen h3 {
   font-size: 1.3em;
   margin-top: 1em;
   margin-bottom: 0.5em;
   color: #2d3748;
+}
+
+.dark .markdown-preview-fullscreen h3 {
+  color: #e2e8f0;
 }
 
 .markdown-preview-fullscreen p {
@@ -101,12 +279,22 @@ body {
   overflow-x: auto;
 }
 
+.dark .markdown-preview-fullscreen pre {
+  background-color: #1a202c;
+  border-color: #4a5568;
+}
+
 .markdown-preview-fullscreen blockquote {
   margin: 1.2em 0;
   padding: 0.6em 1em;
   border-left: 4px solid #4299e1;
   background-color: #ebf8ff;
   color: #2b6cb0;
+}
+
+.dark .markdown-preview-fullscreen blockquote {
+  background-color: rgba(66, 153, 225, 0.1);
+  color: #90cdf4;
 }
 
 .markdown-preview-fullscreen ul,
@@ -127,13 +315,26 @@ body {
   border-radius: 3px;
 }
 
+.dark .markdown-preview-fullscreen code {
+  background-color: #2d3748;
+  color: #f687b3;
+}
+
 .markdown-preview-fullscreen a {
   color: #3182ce;
   text-decoration: underline;
 }
 
+.dark .markdown-preview-fullscreen a {
+  color: #63b3ed;
+}
+
 .markdown-preview-fullscreen a:hover {
   color: #2c5282;
+}
+
+.dark .markdown-preview-fullscreen a:hover {
+  color: #90cdf4;
 }
 
 .markdown-preview h1 {
@@ -145,6 +346,10 @@ body {
   border-bottom: 1px solid #eaecef;
 }
 
+.dark .markdown-preview h1 {
+  border-bottom-color: #4a5568;
+}
+
 .markdown-preview h2 {
   font-size: 1.5em;
   font-weight: 600;
@@ -152,6 +357,10 @@ body {
   margin-bottom: 0.5em;
   padding-bottom: 0.3em;
   border-bottom: 1px solid #eaecef;
+}
+
+.dark .markdown-preview h2 {
+  border-bottom-color: #4a5568;
 }
 
 .markdown-preview h3 {
@@ -173,6 +382,10 @@ body {
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
 }
 
+.dark .markdown-preview code {
+  background-color: rgba(200, 200, 210, 0.1);
+}
+
 .markdown-preview pre {
   background-color: #f6f8fa;
   border-radius: 3px;
@@ -180,6 +393,10 @@ body {
   overflow: auto;
   margin-top: 0.5em;
   margin-bottom: 0.5em;
+}
+
+.dark .markdown-preview pre {
+  background-color: #1a202c;
 }
 
 .markdown-preview pre code {
@@ -208,6 +425,10 @@ body {
   text-decoration: none;
 }
 
+.dark .markdown-preview a {
+  color: #58a6ff;
+}
+
 .markdown-preview a:hover {
   text-decoration: underline;
 }
@@ -218,6 +439,11 @@ body {
   border-left: 0.25em solid #dfe2e5;
   margin-top: 0.5em;
   margin-bottom: 0.5em;
+}
+
+.dark .markdown-preview blockquote {
+  color: #8b949e;
+  border-left-color: #4a5568;
 }
 
 .markdown-preview img {
@@ -237,11 +463,25 @@ body {
   border: 1px solid #dfe2e5;
 }
 
+.dark .markdown-preview table th,
+.dark .markdown-preview table td {
+  border-color: #4a5568;
+}
+
 .markdown-preview table tr {
   background-color: #fff;
   border-top: 1px solid #c6cbd1;
 }
 
+.dark .markdown-preview table tr {
+  background-color: #1a202c;
+  border-top-color: #4a5568;
+}
+
 .markdown-preview table tr:nth-child(2n) {
   background-color: #f6f8fa;
+}
+
+.dark .markdown-preview table tr:nth-child(2n) {
+  background-color: #2d3748;
 }

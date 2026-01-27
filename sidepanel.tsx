@@ -12,6 +12,7 @@ import Segmented, { type SegmentedOption } from "~components/ui/segmented"
 import { BatchScrapeProvider } from "~contexts/BatchScrapeContext"
 import useContentExtraction from "~hooks/useContentExtraction"
 import { I18nProvider, useI18n } from "~utils/i18n"
+import { ThemeProvider, useTheme } from "~utils/theme"
 
 // Lazy load heavy tab components
 const SingleScrapePanel = lazy(
@@ -39,6 +40,7 @@ type SidePanelView = "batch" | "extraction" | "singlescrape" | "settings"
 
 function SidePanel() {
   const { t } = useI18n()
+  const { resolvedTheme } = useTheme()
 
   const tabOptions: SegmentedOption<"batch" | "extraction" | "singlescrape">[] =
     [
@@ -97,15 +99,22 @@ function SidePanel() {
 
   return (
     <>
-      {/* Soft Blue Radial Background */}
+      {/* Soft Blue Radial Background - adjust opacity for dark mode */}
       <div
         className="fixed inset-0 top-0 left-0 z-1 h-full w-full rounded-[inherit] bg-app"
         style={{
-          backgroundImage: `
-            radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.18), transparent 40%),
-            radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.15), transparent 45%),
-            radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.12), transparent 40%)
-          `
+          backgroundImage:
+            resolvedTheme === "dark"
+              ? `
+                radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.10), transparent 40%),
+                radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.08), transparent 45%),
+                radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.06), transparent 40%)
+              `
+              : `
+                radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.18), transparent 40%),
+                radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.15), transparent 45%),
+                radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.12), transparent 40%)
+              `
         }}
       />
 
@@ -237,24 +246,30 @@ function SidePanel() {
           newestOnTop
           closeOnClick
           pauseOnHover={false}
-          theme="light"
-          toastClassName="!bg-white !shadow-lg !rounded-lg !text-sm"
+          theme={resolvedTheme === "dark" ? "dark" : "light"}
+          toastClassName={
+            resolvedTheme === "dark"
+              ? "!bg-[#1a1a1d] !shadow-lg !rounded-lg !text-sm"
+              : "!bg-white !shadow-lg !rounded-lg !text-sm"
+          }
         />
       </div>
     </>
   )
 }
 
-// Wrap with I18nProvider and BatchScrapeProvider
+// Wrap with ThemeProvider, I18nProvider and BatchScrapeProvider
 function SidePanelWithProviders() {
   return (
-    <I18nProvider>
-      <ErrorBoundary>
-        <BatchScrapeProvider>
-          <SidePanel />
-        </BatchScrapeProvider>
-      </ErrorBoundary>
-    </I18nProvider>
+    <ThemeProvider>
+      <I18nProvider>
+        <ErrorBoundary>
+          <BatchScrapeProvider>
+            <SidePanel />
+          </BatchScrapeProvider>
+        </ErrorBoundary>
+      </I18nProvider>
+    </ThemeProvider>
   )
 }
 
