@@ -19,7 +19,7 @@ const FloatingButton = ({ onClick, isOpen }: FloatingButtonProps) => {
         "fixed right-3 bottom-10 z-[1000] flex h-10 w-10 items-center justify-center rounded-full border border-opacity-60 opacity-70 shadow-md transition-all duration-300 hover:opacity-100",
         isOpen
           ? "rotate-45 border-pink-200 bg-pink-50 text-pink-500"
-          : "border-sky-100 bg-white text-sky-400 hover:border-indigo-200 hover:bg-gradient-to-r hover:from-sky-50 hover:to-indigo-50 hover:text-sky-500"
+          : "border-line-1 bg-content-solid text-accent-blue hover:border-accent-blue/30 hover:bg-fill-1"
       )}
       onClick={onClick}
       title={

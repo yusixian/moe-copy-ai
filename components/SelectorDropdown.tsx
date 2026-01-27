@@ -112,7 +112,7 @@ const SelectorItem = memo<SelectorItemProps>(
             ) : (
               <Icon
                 icon="mdi:selector"
-                className="mr-1.5 text-gray-300 md:mr-2"
+                className="mr-1.5 text-text-4 md:mr-2"
                 width={16}
                 height={16}
               />
@@ -124,7 +124,7 @@ const SelectorItem = memo<SelectorItemProps>(
           <div className="flex items-center">
             {hasContent ? (
               <span
-                className={`inline-block max-w-[5rem] truncate whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-xs ${hasMultipleContents ? "bg-green-100 text-green-600" : "bg-blue-100 text-text-1"}`}>
+                className={`inline-block max-w-[5rem] truncate whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-xs ${hasMultipleContents ? "bg-green-500/10 text-green-600" : "bg-accent-blue/10 text-accent-blue"}`}>
                 {hasMultipleContents
                   ? t("selector.count", {
                       count: allPreviewContents?.length
@@ -132,7 +132,7 @@ const SelectorItem = memo<SelectorItemProps>(
                   : t("batch.results")}
               </span>
             ) : (
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-500 text-xs">
+              <span className="rounded-full bg-fill-1 px-2 py-0.5 font-medium text-text-3 text-xs">
                 {t("common.noData")}
               </span>
             )}

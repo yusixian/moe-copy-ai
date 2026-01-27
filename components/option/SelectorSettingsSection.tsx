@@ -123,7 +123,7 @@ const SelectorEditor: React.FC<{
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-xl bg-content-solid p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-semibold text-sky-600 text-xl">
+          <h3 className="font-semibold text-accent-blue text-xl">
             <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2 inline" />
             {t("option.selector.edit", {
               type: t(`option.selector.type.${type}`)
@@ -215,7 +215,7 @@ const SelectorEditor: React.FC<{
             value={newSelector}
             onChange={(e) => setNewSelector(e.target.value)}
             placeholder={t("option.selector.inputPlaceholder")}
-            className="flex-1 rounded-l-lg border border-sky-200 bg-content p-2 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+            className="flex-1 rounded-l-lg border border-line-2 bg-content p-2 focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/30"
           />
           <Button onClick={handleAddSelector} className="rounded-l-none">
             {t("option.selector.add")}
@@ -223,9 +223,9 @@ const SelectorEditor: React.FC<{
         </div>
 
         {/* 选择器列表 */}
-        <div className="mb-4 max-h-[40vh] overflow-auto rounded-lg border border-sky-100">
+        <div className="mb-4 max-h-[40vh] overflow-auto rounded-lg border border-line-1">
           {editingSelectors.length > 0 ? (
-            <ul className="divide-y divide-sky-100">
+            <ul className="divide-y divide-line-1">
               {editingSelectors.map((selector, index) => {
                 // Selectors may be duplicated, so index is needed for uniqueness
                 const itemKey = `selector-${index}-${selector.slice(0, 10)}`
@@ -297,8 +297,8 @@ const SelectorTypeCard: React.FC<{
     <button
       type="button"
       onClick={onClick}
-      className="w-full cursor-pointer rounded-lg border-2 border-sky-100 bg-content-solid p-4 text-left shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
-      <div className="mb-2 flex items-center text-sky-600">
+      className="w-full cursor-pointer rounded-lg border border-line-1 bg-content-solid p-4 text-left shadow-sm transition-all hover:border-accent-blue/30 hover:shadow-md">
+      <div className="mb-2 flex items-center text-accent-blue">
         <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2" width={24} />
         <h3 className="font-medium text-lg">
           {t(`option.selector.type.${type}`)}
@@ -315,8 +315,8 @@ const SelectorTypeCard: React.FC<{
 const ScrapeRulesExplanation = () => {
   const { t } = useI18n()
   return (
-    <div className="rounded-lg border-2 border-sky-100 bg-content-solid p-5 text-sm shadow-sm">
-      <h4 className="mb-3 flex items-center font-semibold text-sky-600">
+    <div className="rounded-lg border border-line-1 bg-content-solid p-5 text-sm shadow-sm">
+      <h4 className="mb-3 flex items-center font-semibold text-accent-blue">
         <Icon icon="mdi:information-outline" className="mr-2" width={20} />
         {t("option.selector.rulesExplanationTitle")}
       </h4>
@@ -332,7 +332,7 @@ const ScrapeRulesExplanation = () => {
         <p className="mb-2 font-medium text-accent-blue">
           {t("option.selector.defaultListTitle")}
         </p>
-        <div className="max-h-32 overflow-y-auto rounded border border-sky-100 bg-content-solid p-2">
+        <div className="max-h-32 overflow-y-auto rounded border border-line-1 bg-content-solid p-2">
           <code className="font-mono text-text-3 text-xs">
             {CONTENT_SELECTORS.join(", ")}
           </code>

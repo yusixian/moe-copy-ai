@@ -6,10 +6,10 @@ import { cn } from "~/utils"
 const cardVariants = cva("overflow-hidden transition-all duration-300", {
   variants: {
     variant: {
-      default: "rounded-xl border border-sky-200 bg-blue-50",
-      content: "rounded-xl border border-sky-200 bg-blue-50 shadow-sm",
+      default: "rounded-xl border border-line-1 bg-content-alt",
+      content: "rounded-xl border border-line-1 bg-content-alt shadow-sm",
       image:
-        "rounded-lg border-2 border-sky-200 shadow-sm hover:scale-105 hover:shadow-md transform"
+        "rounded-lg border border-line-1 shadow-sm hover:scale-105 hover:shadow-md transform"
     },
     padding: {
       none: "",
@@ -52,7 +52,7 @@ const CardHeader = forwardRef<
   <div
     ref={ref}
     className={cn(
-      "group relative flex cursor-pointer items-center justify-between border-sky-200 border-b bg-gradient-to-r from-sky-100 to-indigo-100 p-2 transition-all duration-300",
+      "group relative flex cursor-pointer items-center justify-between border-line-1 border-b bg-accent-blue-ghost p-2 transition-all duration-300",
       className
     )}
     {...props}

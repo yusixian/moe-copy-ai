@@ -96,7 +96,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     syncStorage.watch(watchMap)
 
     return () => {
-      // Always call unwatch on cleanup (should be idempotent)
       syncStorage.unwatch(watchMap)
     }
   }, [])

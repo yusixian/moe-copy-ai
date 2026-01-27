@@ -180,7 +180,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                     <button
                       type="button"
                       onClick={handleExport}
-                      className="flex items-center rounded-md bg-blue-100 px-2 py-1 font-medium text-blue-600 text-xs hover:bg-blue-200">
+                      className="flex items-center rounded-md bg-accent-blue/10 px-2 py-1 font-medium text-accent-blue text-xs hover:bg-accent-blue/20">
                       <Icon
                         icon="line-md:cloud-alt-download"
                         className="mr-1"
@@ -192,7 +192,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                     <button
                       type="button"
                       onClick={handleClearAll}
-                      className="flex items-center rounded-md bg-red-100 px-2 py-1 font-medium text-red-600 text-xs hover:bg-red-200">
+                      className="flex items-center rounded-md bg-red-500/10 px-2 py-1 font-medium text-red-600 text-xs hover:bg-red-500/20">
                       <Icon
                         icon="line-md:trash"
                         className="mr-1"
@@ -206,7 +206,7 @@ const AiHistoryDrawer: React.FC<AiHistoryDrawerProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex items-center rounded-md bg-sky-100 px-2 py-1 font-medium text-sky-600 text-xs hover:bg-sky-200">
+                  className="flex items-center rounded-md bg-fill-1 px-2 py-1 font-medium text-text-2 text-xs hover:bg-fill-2">
                   <Icon icon="line-md:close" width="16" height="16" />
                 </button>
               </div>

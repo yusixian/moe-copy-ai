@@ -40,19 +40,19 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border-2 border-accent-blue/30 bg-content-alt shadow-sm">
-      <table className="min-w-full divide-y divide-sky-200">
+    <div className="overflow-hidden rounded-xl border border-accent-blue/30 bg-content-alt shadow-sm">
+      <table className="min-w-full divide-y divide-line-2">
         <thead className="bg-accent-blue-ghost">
           <tr>
-            <th className="w-1/5 px-3 py-2 text-left font-medium text-sky-600 text-xs uppercase tracking-wider">
+            <th className="w-1/5 px-3 py-2 text-left font-medium text-accent-blue text-xs uppercase tracking-wider">
               {t("metadata.property")}
             </th>
-            <th className="w-4/5 px-3 py-2 text-left font-medium text-sky-600 text-xs uppercase tracking-wider">
+            <th className="w-4/5 px-3 py-2 text-left font-medium text-accent-blue text-xs uppercase tracking-wider">
               {t("metadata.value")}
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-blue-100 bg-content-solid">
+        <tbody className="divide-y divide-line-1 bg-content-solid">
           {filteredEntries.map(([key, value], index) => (
             <tr
               key={key}
@@ -75,7 +75,7 @@ export const MetadataTable: React.FC<MetadataTableProps> = ({
                   key === "image") &&
                   value && (
                     <div className="mt-1">
-                      <div className="relative h-[80px] w-[120px] transform overflow-hidden rounded-lg border-2 border-accent-blue/30 bg-content-solid shadow-sm transition-all hover:scale-105">
+                      <div className="relative h-[80px] w-[120px] transform overflow-hidden rounded-lg border border-accent-blue/30 bg-content-solid shadow-sm transition-all hover:scale-105">
                         <Image
                           src={value}
                           alt={`${key} ${t("metadata.preview")}`}

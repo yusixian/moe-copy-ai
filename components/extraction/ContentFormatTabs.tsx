@@ -142,8 +142,8 @@ const ContentFormatTabs = memo(function ContentFormatTabs({
           className={cn(
             "flex items-center gap-1 rounded-md px-3 py-1.5 font-medium text-xs transition-colors",
             copied
-              ? "bg-green-100 text-green-700"
-              : "bg-sky-100 text-sky-700 hover:bg-sky-200"
+              ? "bg-green-500/10 text-green-600"
+              : "bg-fill-1 text-text-1 hover:bg-fill-2"
           )}>
           <Icon icon={copied ? "mdi:check" : "mdi:content-copy"} width={14} />
           {copied ? t("extraction.copy.copied") : t("extraction.copy.copy")}

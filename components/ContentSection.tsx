@@ -151,13 +151,13 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
 
   return (
     <div className="relative mb-4">
-      <h2 className="absolute top-1 right-1 z-20 flex w-auto items-center justify-between font-semibold text-lg text-sky-600">
+      <h2 className="absolute top-1 right-1 z-20 flex w-auto items-center justify-between font-semibold text-accent-blue text-lg">
         {currentContent?.length ? (
-          <div className="flex w-auto items-center gap-1.5 rounded-full bg-gradient-to-r from-sky-50 to-indigo-50 px-3 py-1 font-medium text-sky-600 text-xs shadow-sm ring-1 ring-sky-100 transition-opacity hover:opacity-80">
+          <div className="flex w-auto items-center gap-1.5 rounded-full border border-line-1 bg-content-alt px-3 py-1 font-medium text-accent-blue text-xs shadow-sm transition-opacity hover:opacity-80">
             <span className="flex items-center">
               {t("content.characters", { count: currentContent.length })}
             </span>
-            <span className="mx-0.5 text-sky-300">•</span>
+            <span className="mx-0.5 text-text-4">•</span>
             <span>{t("content.tokens", { count: tokenCount })}</span>
           </div>
         ) : null}
