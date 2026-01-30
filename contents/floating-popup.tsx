@@ -12,13 +12,14 @@ import {
   useRole
 } from "@floating-ui/react"
 import type { PlasmoCSConfig } from "plasmo"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 
 import FloatingButton from "~components/FloatingButton"
 import PopupContent from "~components/PopupContent"
+import { THEME_CSS_VARIABLES } from "~constants/theme-colors"
 import { useFloatButtonStorage } from "~hooks/useFloatButtonStorage"
 import { I18nProvider, useI18n } from "~utils/i18n"
-import { ThemeProvider } from "~utils/theme"
+import { ThemeProvider, useTheme } from "~utils/theme"
 
 // 注入全局样式
 export const getStyle = () => {
@@ -36,32 +37,14 @@ export const config: PlasmoCSConfig = {
 // 主组件
 const FloatingPopup = () => {
   const { t } = useI18n()
+  const { resolvedTheme } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
 
   // 使用 useSyncExternalStore 订阅外部存储状态
   const storageState = useFloatButtonStorage()
 
-  // CSS 变量样式（固定使用暗色主题）
-  const themeStyles: React.CSSProperties = {
-    "--color-app": "#0f0f10",
-    "--color-text-1": "oklch(92% 0.01 264)",
-    "--color-text-2": "oklch(70% 0.02 257)",
-    "--color-text-3": "oklch(50% 0.02 257)",
-    "--color-text-4": "oklch(30% 0.01 255)",
-    "--color-content": "oklch(20% 0.01 264 / 0.6)",
-    "--color-content-solid": "oklch(18% 0.01 264)",
-    "--color-content-alt": "oklch(22% 0.012 264 / 0.6)",
-    "--color-content-alt-solid": "oklch(22% 0.012 264)",
-    "--color-elevated-1": "rgba(40, 40, 45, 0.6)",
-    "--color-elevated-solid-1": "#1a1a1d",
-    "--color-line-1": "rgba(180, 180, 185, 0.2)",
-    "--color-line-2": "rgba(180, 180, 185, 0.3)",
-    "--color-fill-1": "rgba(180, 180, 185, 0.08)",
-    "--color-fill-2": "rgba(180, 180, 185, 0.16)",
-    "--color-fill-3": "rgba(180, 180, 185, 0.24)",
-    "--shadow-highlight": "rgb(255 255 255 / 0.05)",
-    "--shadow-highlight-weak": "rgb(255 255 255 / 0.03)"
-  }
+  // CSS 变量样式，从常量获取（无需 useMemo，常量引用稳定）
+  const themeStyles = THEME_CSS_VARIABLES[resolvedTheme]
 
   // 使用floating-ui来定位弹窗
   const { refs, context } = useFloating({

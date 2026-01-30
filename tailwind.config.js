@@ -1,3 +1,5 @@
+import themePlugin from "./tailwind-theme-plugin"
+
 /** @type {import('tailwindcss').Config} */
 const config = {
   darkMode: "class",
@@ -153,6 +155,7 @@ const config = {
         bounce: "bounce 0.6s ease-in-out infinite"
       }
     }
-  }
+  },
+  plugins: [themePlugin]
 }
 export default config
