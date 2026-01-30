@@ -90,21 +90,24 @@ const PopupContent = ({
         }}
       />
 
-      <header className="sticky top-0 top-bar left-0 z-[100] mb-4 flex flex-col gap-3 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-        <img
-          src={iconUrl}
-          alt="Moe Copy AI"
-          className="mr-3 h-10 w-10 flex-shrink-0"
-        />
-        <div className="mr-3 min-w-0 flex-1">
-          <h1 className="flex items-center gap-2 font-bold text-accent-blue text-lg sm:text-xl">
-            <span className="truncate">{t("app.name")}</span>
-            <span className="ml-2 flex-shrink-0">{t("popup.subtitle")}</span>
-          </h1>
-          <p className="text-text-2 text-xs sm:text-sm">
-            {t("popup.description")}
-          </p>
+      <header className="sticky top-0 top-bar left-0 z-[100] mb-4 flex flex-row items-center justify-between gap-3 px-3 py-2 sm:gap-0">
+        <div className="mr-3 flex items-center gap-3">
+          <img
+            src={iconUrl}
+            alt="Moe Copy AI"
+            className="hidden h-10 w-10 flex-shrink-0 lg:block"
+          />
+          <div className="min-w-0">
+            <h1 className="flex items-center gap-2 font-bold text-accent-blue text-lg md:text-xl">
+              <span className="truncate">{t("app.name")}</span>
+              <span className="ml-0 flex-shrink-0">{t("popup.subtitle")}</span>
+            </h1>
+            <p className="text-text-2 text-xs sm:text-sm">
+              {t("popup.description")}
+            </p>
+          </div>
         </div>
+
         <div className="flex flex-shrink-0 items-center justify-end gap-2">
           <Button
             className="border-none"
