@@ -118,7 +118,7 @@ const FloatingPopup = () => {
   }
 
   return (
-    <>
+    <div data-moe-copy-ai>
       {/* 浮动按钮 */}
       <div ref={refs.setReference} {...getReferenceProps()}>
         <FloatingButton onClick={handleButtonClick} isOpen={isOpen} />
@@ -136,7 +136,7 @@ const FloatingPopup = () => {
           <FloatingFocusManager context={context}>
             <div
               ref={refs.setFloating}
-              className="dialog fixed top-1/2 left-1/2 z-[999] max-h-[90vh] max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-app/80 text-text-1 backdrop-blur-md backdrop-brightness-110 md:fixed md:h-[90vh] md:max-h-[90vh] md:w-[95vw]"
+              className="dialog fixed top-1/2 left-1/2 z-[999] max-h-[90vh] w-[80vw] max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-app/80 text-text-1 backdrop-blur-md backdrop-brightness-110 md:fixed md:h-[90vh] md:max-h-[90vh] md:w-[95vw]"
               {...getFloatingProps()}>
               <PopupContent
                 onClose={handleClose}
@@ -147,7 +147,7 @@ const FloatingPopup = () => {
           </FloatingFocusManager>
         </>
       )}
-    </>
+    </div>
   )
 }
 

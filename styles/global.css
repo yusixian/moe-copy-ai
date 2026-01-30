@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 插件根容器 - 定义独立的字体大小基准 */
+:root,
+#moe-copy-ai-root,
+[data-moe-copy-ai],
+.moe-copy-ai-container {
+  --moe-base-font-size: 16px;
+}
+
+/* 强制设置插件容器的字体大小基准,隔离宿主页面影响 */
+#moe-copy-ai-root,
+[data-moe-copy-ai],
+.moe-copy-ai-container {
+  font-size: var(--moe-base-font-size) !important;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+/* 确保所有子元素继承 box-sizing */
+#moe-copy-ai-root *,
+[data-moe-copy-ai] *,
+.moe-copy-ai-container * {
+  box-sizing: border-box;
+}
+
 @layer components {
   .top-bar {
     @apply backdrop-blur-sm backdrop-brightness-110 bg-elevated-1 rounded-2xl border border-line-1 shadow-lg;
