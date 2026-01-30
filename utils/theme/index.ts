@@ -5,6 +5,8 @@
 
 // Context 和 Hooks
 export { ThemeProvider, useTheme } from "./context"
+// 运行时环境检测
+export { isContentScript, isExtensionPage } from "./runtime-env"
 // 类型
 export {
   DEFAULT_THEME,

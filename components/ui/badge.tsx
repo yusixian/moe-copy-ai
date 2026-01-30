@@ -2,6 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { forwardRef } from "react"
 
 import { cn } from "~/utils"
+import { useTheme } from "~/utils/theme"
 
 const badgeVariants = cva(
   "inline-flex items-center rounded-full text-[10px] px-1.5 py-0.5 font-medium border",
@@ -36,11 +37,23 @@ export interface BadgeProps
 }
 
 const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant, size, icon, children, ...props }, ref) => {
+  ({ className, variant = "default", size, icon, children, ...props }, ref) => {
+    const { resolvedTheme } = useTheme()
+
+    // Light mode: restore original sky blue colors for default variant
+    const lightModeDefault =
+      variant === "default" && resolvedTheme === "light"
+        ? "bg-sky-100 text-sky-600 border-sky-200"
+        : ""
+
     return (
       <span
         ref={ref}
-        className={cn(badgeVariants({ variant, size, className }))}
+        className={cn(
+          badgeVariants({ variant, size }),
+          lightModeDefault,
+          className
+        )}
         {...props}>
         {icon && <span className="mr-0.5">{icon}</span>}
         {children}
