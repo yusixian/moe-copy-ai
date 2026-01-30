@@ -2,6 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { forwardRef } from "react"
 
 import { cn } from "~/utils"
+import { useTheme } from "~/utils/theme"
 
 const cardVariants = cva("overflow-hidden transition-all duration-300", {
   variants: {
@@ -48,16 +49,25 @@ Card.displayName = "Card"
 const CardHeader = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "group relative flex cursor-pointer items-center justify-between border-line-1 border-b bg-accent-blue-ghost p-2 transition-all duration-300",
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const { resolvedTheme } = useTheme()
+
+  const lightMode =
+    "border-sky-200 border-b bg-gradient-to-r from-sky-100 to-indigo-100"
+  const darkMode = "border-line-1 border-b bg-accent-blue-ghost"
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "group relative flex cursor-pointer items-center justify-between p-2 transition-all duration-300",
+        resolvedTheme === "light" ? lightMode : darkMode,
+        className
+      )}
+      {...props}
+    />
+  )
+})
 CardHeader.displayName = "CardHeader"
 
 // 卡片内容

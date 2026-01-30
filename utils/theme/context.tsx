@@ -14,6 +14,7 @@ import {
 
 import { useSystemTheme } from "~hooks/useSystemTheme"
 import { syncStorage } from "~utils/storage"
+import { isContentScript } from "./runtime-env"
 import type { ResolvedTheme } from "./types"
 import {
   DEFAULT_THEME,
@@ -33,6 +34,9 @@ interface ThemeProviderProps {
 /**
  * 应用主题到 document
  * 添加或移除 dark class
+ *
+ * 注意：此函数应该只在扩展页面中调用
+ * 在 content script 中调用会污染用户网页
  * @param resolvedTheme - 解析后的主题（light 或 dark）
  */
 function applyTheme(resolvedTheme: ResolvedTheme) {
@@ -101,7 +105,13 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, [])
 
   // 当解析后的主题变化时，应用到 document
+  // 注意：在 content script 环境中跳过，避免污染用户网页
   useEffect(() => {
+    // Content script 中只使用内联样式，不修改 documentElement
+    if (isContentScript()) {
+      return
+    }
+
     applyTheme(resolvedTheme)
   }, [resolvedTheme])
 
