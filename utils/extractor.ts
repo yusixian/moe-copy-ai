@@ -13,13 +13,20 @@ import type {
   SelectorResultItem,
   SelectorType
 } from "../constants/types"
-import { cleanContent } from "./formatter"
 import { debugLog } from "./logger"
+import { buildScrapeActions, type SelectorScraper } from "./pipeline/actions"
+import { createDebugLogAspect } from "./pipeline/aspects"
+import {
+  cloneScrapedContent,
+  createBaseScrapedContent,
+  finalizeScrapedContent,
+  getErrorMessage
+} from "./pipeline/context"
+import type { ScrapePipelineContext } from "./pipeline/scrape-machine"
+import { runScrapePipeline } from "./pipeline/scrape-machine"
 import {
   convertHtmlToMarkdown,
-  evaluateContentQuality,
-  extractImagesFromMarkdown,
-  extractWithReadability
+  extractImagesFromMarkdown
 } from "./readability-extractor"
 
 // 存储键
@@ -393,22 +400,9 @@ async function scrapeWithSelectors(
   }
 
   // 创建一个对象存储抓取的内容
-  const scrapedContent: ScrapedContent = baseContent || {
-    title: "",
-    url: window.location.href,
-    articleContent: "",
-    cleanedContent: "",
-    author: "",
-    publishDate: "",
-    metadata: {},
-    images: [],
-    selectorResults: {
-      content: [],
-      author: [],
-      date: [],
-      title: []
-    }
-  }
+  const scrapedContent = baseContent
+    ? cloneScrapedContent(baseContent)
+    : createBaseScrapedContent()
 
   // 确保 selectorResults 已初始化
   if (!scrapedContent.selectorResults) {
@@ -450,9 +444,6 @@ async function scrapeWithSelectors(
   scrapedContent.articleContent = content
   scrapedContent.selectorResults.content = contentResults
 
-  // 生成清洁版内容
-  scrapedContent.cleanedContent = cleanContent(scrapedContent.articleContent)
-
   // 提取元数据
   scrapedContent.metadata = {
     ...extractMetadata(),
@@ -466,208 +457,58 @@ async function scrapeWithSelectors(
 export async function scrapeWebpageContent(
   options?: ExtractorOptions
 ): Promise<ScrapedContent> {
-  const {
-    mode = "selector",
-    customSelectors,
-    readabilityConfig: _readabilityConfig
-  } = options || {}
+  const mode = options?.mode ?? "selector"
+  const customSelectors = options?.customSelectors
+  const readabilityConfig = options?.readabilityConfig
 
   debugLog("开始抓取网页内容，模式:", mode)
+  type PipelineContext = ScrapePipelineContext<ScrapedContent>
+  const pipelineAspects = [
+    createDebugLogAspect<[PipelineContext], ScrapedContent>(debugLog)
+  ]
 
-  // 创建基础结果对象
-  const scrapedContent: ScrapedContent = {
-    title: "",
-    url: window.location.href,
-    articleContent: "",
-    cleanedContent: "",
-    author: "",
-    publishDate: "",
-    metadata: {},
-    images: [],
-    selectorResults: {
-      content: [],
-      author: [],
-      date: [],
-      title: []
-    }
-  }
-
-  // 根据模式执行不同的抓取策略
-  switch (mode) {
-    case "readability":
-      try {
-        debugLog("使用 Readability 模式")
-        const readabilityResult = await extractWithReadability()
-
-        if (readabilityResult.success) {
-          // 将 HTML 转换为 Markdown
-          scrapedContent.articleContent = await convertHtmlToMarkdown(
-            readabilityResult.content,
-            getBaseUrl()
-          )
-          scrapedContent.title = readabilityResult.metadata.title || ""
-          scrapedContent.author = readabilityResult.metadata.byline || ""
-          scrapedContent.publishDate =
-            readabilityResult.metadata.publishedTime || ""
-
-          // 设置额外的元数据
-          scrapedContent.metadata = {
-            ...scrapedContent.metadata,
-            "extraction:mode": "readability",
-            "readability:siteName": readabilityResult.metadata.siteName || "",
-            "readability:excerpt": readabilityResult.metadata.excerpt || "",
-            "readability:lang": readabilityResult.metadata.lang || "",
-            "readability:length": readabilityResult.metadata.length.toString()
-          }
-
-          debugLog("Readability 抓取成功")
-        } else {
-          debugLog("Readability 抓取失败，回退到选择器模式")
-          const fallbackResult = await scrapeWithSelectors(
-            customSelectors,
-            scrapedContent
-          )
-          // 添加原始模式信息，用于UI显示
-          fallbackResult.metadata = {
-            ...fallbackResult.metadata,
-            "original:mode": "readability",
-            "fallback:reason": "Readability解析失败，自动切换到选择器模式"
-          }
-          return fallbackResult
-        }
-      } catch (error) {
-        debugLog("Readability 抓取异常，回退到选择器模式:", error)
-        const fallbackResult = await scrapeWithSelectors(
-          customSelectors,
-          scrapedContent
-        )
-        // 添加原始模式信息，用于UI显示
-        fallbackResult.metadata = {
-          ...fallbackResult.metadata,
-          "original:mode": "readability",
-          "fallback:reason": `Readability解析异常(${error.message || error})，自动切换到选择器模式`
-        }
-        return fallbackResult
-      }
-      break
-
-    case "hybrid":
-      try {
-        debugLog("使用混合模式")
-
-        // 串行执行两种抓取方式，避免DOM冲突
-        debugLog("混合模式：首先执行选择器抓取")
-        const selectorResult = await scrapeWithSelectors(customSelectors, {
-          ...scrapedContent
-        })
-
-        debugLog("混合模式：然后执行 Readability 抓取")
-        const readabilityResult = await extractWithReadability()
-
-        if (readabilityResult.success) {
-          const readabilityContent = await convertHtmlToMarkdown(
-            readabilityResult.content,
-            getBaseUrl()
-          )
-          const evaluation = evaluateContentQuality(
-            selectorResult.articleContent,
-            readabilityContent
-          )
-
-          debugLog("混合模式内容评估:", evaluation.reason)
-
-          // 使用质量更高的内容
-          scrapedContent.articleContent = evaluation.betterContent
-
-          // 合并元数据，优先使用 Readability 的元数据
-          if (
-            evaluation.betterContent === readabilityContent ||
-            !selectorResult.title
-          ) {
-            scrapedContent.title =
-              readabilityResult.metadata.title || selectorResult.title
-            scrapedContent.author =
-              readabilityResult.metadata.byline || selectorResult.author
-            scrapedContent.publishDate =
-              readabilityResult.metadata.publishedTime ||
-              selectorResult.publishDate
-          } else {
-            scrapedContent.title = selectorResult.title
-            scrapedContent.author = selectorResult.author
-            scrapedContent.publishDate = selectorResult.publishDate
-          }
-
-          // 合并选择器结果和图片
-          scrapedContent.selectorResults = selectorResult.selectorResults
-          scrapedContent.images = selectorResult.images
-          scrapedContent.metadata = {
-            ...selectorResult.metadata,
-            "extraction:mode": "hybrid",
-            "readability:siteName": readabilityResult.metadata.siteName || "",
-            "readability:excerpt": readabilityResult.metadata.excerpt || "",
-            "readability:lang": readabilityResult.metadata.lang || "",
-            "readability:length": readabilityResult.metadata.length.toString(),
-            "evaluation:reason": evaluation.reason,
-            "evaluation:selectorScore": evaluation.scores.selector.toString(),
-            "evaluation:readabilityScore":
-              evaluation.scores.readability.toString()
-          }
-        } else {
-          debugLog("Readability 在混合模式中失败，使用选择器结果")
-          // 添加原始模式信息，用于UI显示
-          selectorResult.metadata = {
-            ...selectorResult.metadata,
-            "original:mode": "hybrid",
-            "fallback:reason":
-              "混合模式中Readability解析失败，自动使用选择器模式结果"
-          }
-          return selectorResult
-        }
-      } catch (error) {
-        debugLog("混合模式执行异常，回退到选择器模式:", error)
-        const fallbackResult = await scrapeWithSelectors(
-          customSelectors,
-          scrapedContent
-        )
-        // 添加原始模式信息，用于UI显示
-        fallbackResult.metadata = {
-          ...fallbackResult.metadata,
-          "original:mode": "hybrid",
-          "fallback:reason": `混合模式执行异常(${error.message || error})，自动切换到选择器模式`
-        }
-        return fallbackResult
-      }
-      break
-
-    default: // 'selector'
-      debugLog("使用选择器模式")
-      return await scrapeWithSelectors(customSelectors, scrapedContent)
-  }
-
-  // 生成清洁版内容
-  scrapedContent.cleanedContent = cleanContent(scrapedContent.articleContent)
-
-  // 如果没有提取到图片信息，尝试从内容中解析
-  if (scrapedContent.images.length === 0) {
-    scrapedContent.images = extractImagesFromMarkdown(
-      scrapedContent.articleContent
-    )
-  }
-
-  // 将结果输出到控制台
-  debugLog("抓取完成，结果概览:", {
-    mode: mode,
-    title: scrapedContent.title,
-    url: scrapedContent.url,
-    author: scrapedContent.author,
-    publishDate: scrapedContent.publishDate,
-    contentLength: scrapedContent.articleContent.length,
-    cleanedContentLength: scrapedContent.cleanedContent.length,
-    metadataCount: Object.keys(scrapedContent.metadata).length,
-    imageCount: scrapedContent.images.length
+  const actions = buildScrapeActions({
+    customSelectors,
+    aspects: pipelineAspects,
+    getBaseUrl,
+    selectorScraper: scrapeWithSelectors as SelectorScraper
   })
 
-  return scrapedContent
+  const pipelineResult = await runScrapePipeline(
+    {
+      options: {
+        mode,
+        customSelectors,
+        readabilityConfig
+      },
+      base: createBaseScrapedContent()
+    },
+    actions
+  )
+
+  if (pipelineResult.status === "success" && pipelineResult.result) {
+    debugLog("抓取完成，结果概览:", {
+      mode,
+      title: pipelineResult.result.title,
+      url: pipelineResult.result.url,
+      author: pipelineResult.result.author,
+      publishDate: pipelineResult.result.publishDate,
+      contentLength: pipelineResult.result.articleContent.length,
+      cleanedContentLength: pipelineResult.result.cleanedContent.length,
+      metadataCount: Object.keys(pipelineResult.result.metadata).length,
+      imageCount: pipelineResult.result.images.length
+    })
+    return pipelineResult.result
+  }
+
+  debugLog("抓取流程失败，返回空结果:", pipelineResult.error)
+  const fallback = finalizeScrapedContent(createBaseScrapedContent())
+  fallback.metadata = {
+    ...fallback.metadata,
+    "extraction:mode": mode,
+    "pipeline:error": getErrorMessage(pipelineResult.error)
+  }
+  return fallback
 }
 
 // 为了向后兼容，保留原有函数签名的包装函数

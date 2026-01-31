@@ -117,7 +117,13 @@ async function renderSidePanel() {
 }
 
 test("renders single scrape view by default", async () => {
-  const screen = await renderSidePanel()
+  const screen = (await renderSidePanel()) as Awaited<
+    ReturnType<typeof renderSidePanel>
+  > & {
+    getByRole: (...args: any[]) => any
+    getByText: (...args: any[]) => any
+    getByTitle: (...args: any[]) => any
+  }
 
   await expect
     .element(screen.getByRole("heading", { name: "Scrape" }))
@@ -126,7 +132,13 @@ test("renders single scrape view by default", async () => {
 })
 
 test("switches to batch view", async () => {
-  const screen = await renderSidePanel()
+  const screen = (await renderSidePanel()) as Awaited<
+    ReturnType<typeof renderSidePanel>
+  > & {
+    getByRole: (...args: any[]) => any
+    getByText: (...args: any[]) => any
+    getByTitle: (...args: any[]) => any
+  }
 
   await expect
     .element(screen.getByRole("heading", { name: "Scrape" }))
@@ -140,7 +152,13 @@ test("switches to batch view", async () => {
 })
 
 test("switches to settings view via the gear button", async () => {
-  const screen = await renderSidePanel()
+  const screen = (await renderSidePanel()) as Awaited<
+    ReturnType<typeof renderSidePanel>
+  > & {
+    getByRole: (...args: any[]) => any
+    getByText: (...args: any[]) => any
+    getByTitle: (...args: any[]) => any
+  }
 
   await expect
     .element(screen.getByRole("heading", { name: "Scrape" }))

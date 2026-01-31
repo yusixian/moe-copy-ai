@@ -18,7 +18,8 @@
     "prepare": "npx simple-git-hooks",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec biome check --staged --write --no-errors-on-unmatched"
@@ -52,6 +53,7 @@
     "rehype-remark": "^9.1.2",
     "remark-gfm": "^3.0.1",
     "remark-stringify": "^10.0.3",
+    "robot3": "^1.2.0",
     "tailwind-merge": "^3.0.2",
     "unified": "^10.1.2"
   },
