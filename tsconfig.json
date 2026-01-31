@@ -1,7 +1,12 @@
 {
   "extends": "plasmo/templates/tsconfig.base",
   "exclude": ["node_modules", "vitest.config.ts"],
-  "include": [".plasmo/index.d.ts", "./types/**/*.d.ts", "./**/*.ts", "./**/*.tsx"],
+  "include": [
+    ".plasmo/index.d.ts",
+    "./types/**/*.d.ts",
+    "./**/*.ts",
+    "./**/*.tsx"
+  ],
   "compilerOptions": {
     "paths": {
       "~*": ["./*"]

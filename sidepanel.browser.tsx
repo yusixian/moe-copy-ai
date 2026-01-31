@@ -1,5 +1,5 @@
 import { beforeAll, expect, test, vi } from "vitest"
-import { render } from "vitest-browser-react"
+import { type RenderResult, render } from "vitest-browser-react"
 
 vi.mock("~components/batch/BatchScrapePanel", () => ({
   default: function MockBatchScrapePanel() {
@@ -117,56 +117,44 @@ async function renderSidePanel() {
 }
 
 test("renders single scrape view by default", async () => {
-  const screen = (await renderSidePanel()) as Awaited<
-    ReturnType<typeof renderSidePanel>
-  > & {
-    getByRole: (...args: any[]) => any
-    getByText: (...args: any[]) => any
-    getByTitle: (...args: any[]) => any
-  }
+  const screen = (await renderSidePanel()) as RenderResult
 
   await expect
-    .element(screen.getByRole("heading", { name: "Scrape" }))
+    .element(screen.locator.getByRole("heading", { name: "Scrape" }))
     .toBeVisible()
-  await expect.element(screen.getByText("SingleScrapePanel")).toBeVisible()
+  await expect
+    .element(screen.locator.getByText("SingleScrapePanel"))
+    .toBeVisible()
 })
 
 test("switches to batch view", async () => {
-  const screen = (await renderSidePanel()) as Awaited<
-    ReturnType<typeof renderSidePanel>
-  > & {
-    getByRole: (...args: any[]) => any
-    getByText: (...args: any[]) => any
-    getByTitle: (...args: any[]) => any
-  }
+  const screen = (await renderSidePanel()) as RenderResult
 
   await expect
-    .element(screen.getByRole("heading", { name: "Scrape" }))
+    .element(screen.locator.getByRole("heading", { name: "Scrape" }))
     .toBeVisible()
-  await screen.getByText("Batch").click()
+  await screen.locator.getByText("Batch").click()
 
   await expect
-    .element(screen.getByRole("heading", { name: "Batch" }))
+    .element(screen.locator.getByRole("heading", { name: "Batch" }))
     .toBeVisible()
-  await expect.element(screen.getByText("BatchScrapePanel")).toBeVisible()
+  await expect
+    .element(screen.locator.getByText("BatchScrapePanel"))
+    .toBeVisible()
 })
 
 test("switches to settings view via the gear button", async () => {
-  const screen = (await renderSidePanel()) as Awaited<
-    ReturnType<typeof renderSidePanel>
-  > & {
-    getByRole: (...args: any[]) => any
-    getByText: (...args: any[]) => any
-    getByTitle: (...args: any[]) => any
-  }
+  const screen = (await renderSidePanel()) as RenderResult
 
   await expect
-    .element(screen.getByRole("heading", { name: "Scrape" }))
+    .element(screen.locator.getByRole("heading", { name: "Scrape" }))
     .toBeVisible()
-  await screen.getByTitle("Settings").click()
+  await screen.locator.getByTitle("Settings").click()
 
   await expect
-    .element(screen.getByRole("heading", { name: "Settings" }))
+    .element(screen.locator.getByRole("heading", { name: "Settings" }))
     .toBeVisible()
-  await expect.element(screen.getByText("SidePanelSettings")).toBeVisible()
+  await expect
+    .element(screen.locator.getByText("SidePanelSettings"))
+    .toBeVisible()
 })
