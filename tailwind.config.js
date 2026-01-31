@@ -81,27 +81,35 @@ const config = {
         info: "oklch(68.5% 0.169 237.323 / <alpha-value>)",
         "info-hover": "oklch(68.5% 0.169 237.323 / 85%)",
         "info-active": "oklch(68.5% 0.169 237.323 / 75%)",
-        "info-ghost": "oklch(68.5% 0.169 237.323 / 10%)",
-        "info-ghost-hover": "oklch(68.5% 0.169 237.323 / 15%)",
-        "info-ghost-active": "oklch(68.5% 0.169 237.323 / 20%)",
+        "info-ghost": "var(--color-info-ghost)",
+        "info-ghost-hover":
+          "color-mix(in oklab, var(--color-info-ghost), black 5%)",
+        "info-ghost-active":
+          "color-mix(in oklab, var(--color-info-ghost), black 10%)",
         success: "oklch(62.7% 0.1699 149.21 / <alpha-value>)",
         "success-hover": "oklch(62.7% 0.1699 149.21 / 85%)",
         "success-active": "oklch(62.7% 0.1699 149.21 / 75%)",
-        "success-ghost": "oklch(62.7% 0.1699 149.21 / 10%)",
-        "success-ghost-hover": "oklch(62.7% 0.1699 149.21 / 15%)",
-        "success-ghost-active": "oklch(62.7% 0.1699 149.21 / 20%)",
+        "success-ghost": "var(--color-success-ghost)",
+        "success-ghost-hover":
+          "color-mix(in oklab, var(--color-success-ghost), black 5%)",
+        "success-ghost-active":
+          "color-mix(in oklab, var(--color-success-ghost), black 10%)",
         warning: "oklch(75% 0.183 55.934 / <alpha-value>)",
         "warning-hover": "oklch(75% 0.183 55.934 / 85%)",
         "warning-active": "oklch(75% 0.183 55.934 / 75%)",
-        "warning-ghost": "oklch(75% 0.183 55.934 / 10%)",
-        "warning-ghost-hover": "oklch(75% 0.183 55.934 / 15%)",
-        "warning-ghost-active": "oklch(75% 0.183 55.934 / 20%)",
+        "warning-ghost": "var(--color-warning-ghost)",
+        "warning-ghost-hover":
+          "color-mix(in oklab, var(--color-warning-ghost), black 5%)",
+        "warning-ghost-active":
+          "color-mix(in oklab, var(--color-warning-ghost), black 10%)",
         error: "oklch(63.7% 0.237 25.331 / <alpha-value>)",
         "error-hover": "oklch(63.7% 0.237 25.331 / 85%)",
         "error-active": "oklch(63.7% 0.237 25.331 / 75%)",
-        "error-ghost": "oklch(63.7% 0.237 25.331 / 10%)",
-        "error-ghost-hover": "oklch(63.7% 0.237 25.331 / 15%)",
-        "error-ghost-active": "oklch(63.7% 0.237 25.331 / 20%)",
+        "error-ghost": "var(--color-error-ghost)",
+        "error-ghost-hover":
+          "color-mix(in oklab, var(--color-error-ghost), black 5%)",
+        "error-ghost-active":
+          "color-mix(in oklab, var(--color-error-ghost), black 10%)",
         // 文本颜色使用 CSS 变量
         text: {
           1: "var(--color-text-1)",
