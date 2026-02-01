@@ -24,16 +24,16 @@ export const THEME_CSS_VARIABLES: Record<
       "color-mix(in oklab, oklch(100% 0 0), black 5%)",
     "--color-content-solid-active":
       "color-mix(in oklab, oklch(100% 0 0), black 10%)",
-    "--color-content-alt": "oklch(96.8% 0.0069 247.9 / 0.6)",
+    "--color-content-alt": "oklch(92% 0.0069 247.9 / 0.6)",
     "--color-content-alt-hover":
-      "color-mix(in oklab, oklch(96.8% 0.0069 247.9 / 0.6), black 5%)",
+      "color-mix(in oklab, oklch(92% 0.0069 247.9 / 0.6), black 5%)",
     "--color-content-alt-active":
-      "color-mix(in oklab, oklch(96.8% 0.0069 247.9 / 0.6), black 10%)",
-    "--color-content-alt-solid": "oklch(96.8% 0.0069 247.9)",
+      "color-mix(in oklab, oklch(92% 0.0069 247.9 / 0.6), black 10%)",
+    "--color-content-alt-solid": "oklch(92% 0.0069 247.9)",
     "--color-content-alt-solid-hover":
-      "color-mix(in oklab, oklch(96.8% 0.0069 247.9), black 5%)",
+      "color-mix(in oklab, oklch(92% 0.0069 247.9), black 5%)",
     "--color-content-alt-solid-active":
-      "color-mix(in oklab, oklch(96.8% 0.0069 247.9), black 10%)",
+      "color-mix(in oklab, oklch(92% 0.0069 247.9), black 10%)",
 
     // Elevated layers
     "--color-elevated-1": "rgba(255, 255, 255, 0.6)",
@@ -76,27 +76,27 @@ export const THEME_CSS_VARIABLES: Record<
   },
   dark: {
     // Background colors
-    "--color-app": "#0f0f10",
-    "--color-content": "oklch(20% 0.01 264 / 0.6)",
+    "--color-app": "oklch(16% 0.0073 274.74)",
+    "--color-content": "oklch(24% 0.0073 274.74 / 0.6)",
     "--color-content-hover":
-      "color-mix(in oklab, oklch(20% 0.01 264 / 0.6), white 5%)",
+      "color-mix(in oklab, oklch(24% 0.0073 274.74 / 0.6), white 5%)",
     "--color-content-active":
-      "color-mix(in oklab, oklch(20% 0.01 264 / 0.6), white 10%)",
-    "--color-content-solid": "oklch(18% 0.01 264)",
+      "color-mix(in oklab, oklch(24% 0.0073 274.74 / 0.6), white 10%)",
+    "--color-content-solid": "oklch(24% 0.0073 274.74)",
     "--color-content-solid-hover":
-      "color-mix(in oklab, oklch(18% 0.01 264), white 5%)",
+      "color-mix(in oklab, oklch(24% 0.0073 274.74), white 5%)",
     "--color-content-solid-active":
-      "color-mix(in oklab, oklch(18% 0.01 264), white 10%)",
-    "--color-content-alt": "oklch(22% 0.012 264 / 0.6)",
+      "color-mix(in oklab, oklch(24% 0.0073 274.74), white 10%)",
+    "--color-content-alt": "oklch(32% 0.0073 274.74 / 0.6)",
     "--color-content-alt-hover":
-      "color-mix(in oklab, oklch(22% 0.012 264 / 0.6), white 5%)",
+      "color-mix(in oklab, oklch(32% 0.0073 274.74 / 0.6), white 5%)",
     "--color-content-alt-active":
-      "color-mix(in oklab, oklch(22% 0.012 264 / 0.6), white 10%)",
-    "--color-content-alt-solid": "oklch(22% 0.012 264)",
+      "color-mix(in oklab, oklch(32% 0.0073 274.74 / 0.6), white 10%)",
+    "--color-content-alt-solid": "oklch(32% 0.0073 274.74)",
     "--color-content-alt-solid-hover":
-      "color-mix(in oklab, oklch(22% 0.012 264), white 5%)",
+      "color-mix(in oklab, oklch(32% 0.0073 274.74), white 5%)",
     "--color-content-alt-solid-active":
-      "color-mix(in oklab, oklch(22% 0.012 264), white 10%)",
+      "color-mix(in oklab, oklch(32% 0.0073 274.74), white 10%)",
 
     // Elevated layers
     "--color-elevated-1": "rgba(40, 40, 45, 0.6)",
@@ -128,13 +128,13 @@ export const THEME_CSS_VARIABLES: Record<
     "--color-fill-3": "rgba(180, 180, 185, 0.24)",
 
     // Shadow highlights - reduced for dark mode
-    "--shadow-highlight": "rgb(255 255 255 / 0.05)",
-    "--shadow-highlight-weak": "rgb(255 255 255 / 0.03)",
+    "--shadow-highlight": "rgb(255 255 255 / 0.1)",
+    "--shadow-highlight-weak": "rgb(255 255 255 / 0.04)",
 
-    // Semantic ghost colors (20% opacity for dark mode - more visible)
-    "--color-info-ghost": "oklch(68.5% 0.169 237.323 / 20%)",
-    "--color-warning-ghost": "oklch(75% 0.183 55.934 / 20%)",
-    "--color-success-ghost": "oklch(62.7% 0.1699 149.21 / 20%)",
-    "--color-error-ghost": "oklch(63.7% 0.237 25.331 / 20%)"
+    // Semantic ghost colors (15% opacity for dark mode - more visible)
+    "--color-info-ghost": "oklch(68.5% 0.169 237.323 / 15%)",
+    "--color-warning-ghost": "oklch(75% 0.183 55.934 / 15%)",
+    "--color-success-ghost": "oklch(62.7% 0.1699 149.21 / 15%)",
+    "--color-error-ghost": "oklch(63.7% 0.237 25.331 / 15%)"
   }
 }

@@ -140,7 +140,7 @@ const CompactPromptInput = ({
             type="button"
             onClick={() => setShowPreview(!showPreview)}
             disabled={disabled}
-            className="flex items-center gap-1 rounded bg-emerald-100 px-2 py-1 text-emerald-600 text-xs hover:bg-emerald-200 disabled:opacity-50">
+            className="flex items-center gap-1 rounded bg-success-ghost px-2 py-1 text-success text-xs hover:bg-success-ghost-hover disabled:opacity-50">
             <Icon icon={showPreview ? "mdi:eye-off" : "mdi:eye"} width={12} />
             {showPreview
               ? t("scrape.prompt.hidePreview")
