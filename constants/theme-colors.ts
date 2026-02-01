@@ -13,7 +13,7 @@ export const THEME_CSS_VARIABLES: Record<
 > = {
   light: {
     // Background colors
-    "--color-app": "#fafafa",
+    "--color-app": "#EAEEF6",
     "--color-content": "oklch(100% 0 0 / 0.6)",
     "--color-content-hover":
       "color-mix(in oklab, oklch(100% 0 0 / 0.6), black 5%)",

@@ -105,7 +105,7 @@ export const Segmented = <T extends string | number = string | number>({
               <motion.div
                 layoutId={`segmented_selected_bg_${id ?? "default"}`}
                 className={cn(
-                  "absolute inset-0 -z-10 rounded-md bg-content-alt-solid",
+                  "absolute inset-0 -z-10 rounded-md border border-line-1 bg-content-alt-solid",
                   indicateClass
                 )}
                 transition={
