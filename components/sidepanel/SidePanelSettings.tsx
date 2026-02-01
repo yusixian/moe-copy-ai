@@ -23,6 +23,7 @@ import {
   BatchScrapeSettings,
   CompactSelect
 } from "../batch/BatchScrapeSettings"
+import { ThemeSelect } from "../option/ThemeSelect"
 
 // 开关行组件（用于单选项设置）
 function ToggleRow({
@@ -337,6 +338,8 @@ export default function SidePanelSettings() {
         icon={<Icon icon="mdi:file-document-multiple" width={16} />}>
         <BatchScrapeSettings />
       </Collapsible>
+
+      <ThemeSelect variant="inline" showDescription={false} />
 
       <LanguageSettings />
 

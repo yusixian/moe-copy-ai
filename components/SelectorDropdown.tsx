@@ -112,7 +112,7 @@ const SelectorItem = memo<SelectorItemProps>(
             ) : (
               <Icon
                 icon="mdi:selector"
-                className="mr-1.5 text-gray-300 md:mr-2"
+                className="mr-1.5 text-text-4 md:mr-2"
                 width={16}
                 height={16}
               />
@@ -124,7 +124,7 @@ const SelectorItem = memo<SelectorItemProps>(
           <div className="flex items-center">
             {hasContent ? (
               <span
-                className={`inline-block max-w-[5rem] truncate whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-xs ${hasMultipleContents ? "bg-green-100 text-green-600" : "bg-blue-100 text-text-1"}`}>
+                className={`inline-block max-w-[5rem] truncate whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-xs ${hasMultipleContents ? "bg-green-500/10 text-green-600" : "bg-accent-blue/10 text-accent-blue"}`}>
                 {hasMultipleContents
                   ? t("selector.count", {
                       count: allPreviewContents?.length
@@ -132,7 +132,7 @@ const SelectorItem = memo<SelectorItemProps>(
                   : t("batch.results")}
               </span>
             ) : (
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-500 text-xs">
+              <span className="rounded-full bg-fill-1 px-2 py-0.5 font-medium text-text-3 text-xs">
                 {t("common.noData")}
               </span>
             )}
@@ -164,8 +164,8 @@ const SelectorItem = memo<SelectorItemProps>(
         {hasContent && showPreview && (
           <div
             ref={previewRef}
-            className="border-sky-100 border-t bg-blue-50 p-2">
-            <div className="mb-2 font-medium text-sky-600 text-xs">
+            className="border-line-1 border-t bg-accent-blue-ghost p-2">
+            <div className="mb-2 font-medium text-accent-blue text-xs">
               {t(
                 hasMultipleContents ? "metadata.preview" : "extraction.preview"
               )}
@@ -175,16 +175,16 @@ const SelectorItem = memo<SelectorItemProps>(
                 {allPreviewContents?.map((content, idx) => (
                   <div
                     key={`preview-${idx}-${content.slice(0, 20)}`}
-                    className="overflow-hidden rounded-lg border border-sky-100 bg-white shadow-sm transition-all hover:shadow-md">
-                    <div className="flex items-center justify-between border-sky-50 border-b bg-gradient-to-r from-sky-50 to-blue-50 px-2 py-2">
-                      <span className="flex items-center font-medium text-sky-600 text-xs">
+                    className="overflow-hidden rounded-lg border border-line-1 bg-content-solid shadow-sm transition-all hover:shadow-md">
+                    <div className="flex items-center justify-between border-line-1 border-b bg-accent-blue-ghost px-2 py-2">
+                      <span className="flex items-center font-medium text-accent-blue text-xs">
                         <Icon icon="mdi:numeric" className="mr-1" width={14} />
                         {t("batch.results")} {idx + 1}
                       </span>
                       {onSelectContent && (
                         <button
                           type="button"
-                          className="flex min-h-[32px] items-center rounded-full border border-sky-200 bg-white px-3 py-1 font-medium text-sky-600 text-xs shadow-sm transition-all hover:bg-sky-100 hover:shadow"
+                          className="flex min-h-[32px] items-center rounded-full border border-line-1 bg-content-solid px-3 py-1 font-medium text-accent-blue text-xs shadow-sm transition-all hover:bg-accent-blue-ghost-hover hover:shadow"
                           onClick={() => handleContentSelect(idx)}
                           title={t("batch.results.selected")}>
                           <Icon
@@ -197,7 +197,7 @@ const SelectorItem = memo<SelectorItemProps>(
                         </button>
                       )}
                     </div>
-                    <div className="max-h-32 overflow-auto p-2 text-gray-700 text-xs md:max-h-40">
+                    <div className="max-h-32 overflow-auto p-2 text-text-2 text-xs md:max-h-40">
                       {content}
                     </div>
                   </div>
@@ -206,7 +206,7 @@ const SelectorItem = memo<SelectorItemProps>(
             ) : (
               <button
                 type="button"
-                className="max-h-32 w-full cursor-pointer overflow-auto rounded-lg border border-sky-100 bg-white p-2 text-left text-gray-700 shadow-sm md:max-h-40"
+                className="max-h-32 w-full cursor-pointer overflow-auto rounded-lg border border-line-1 bg-content-solid p-2 text-left text-text-2 shadow-sm md:max-h-40"
                 onClick={() => handleContentSelect(0)}>
                 {previewContent}
               </button>

@@ -1,5 +1,8 @@
+import themePlugin from "./tailwind-theme-plugin"
+
 /** @type {import('tailwindcss').Config} */
 const config = {
+  darkMode: "class",
   content: [
     "./*.tsx",
     "./contents/**/*.{ts,tsx}",
@@ -27,33 +30,29 @@ const config = {
           DEFAULT: "#ffffff1f",
           hover: "#ffffff14"
         },
-        app: "#fafafa",
-        content: "oklch(100% 0 0 / 0.6)",
-        "content-hover": "color-mix(in oklab, oklch(100% 0 0 / 0.6), black 5%)",
-        "content-active":
-          "color-mix(in oklab, oklch(100% 0 0 / 0.6), black 10%)",
-        "content-solid": "oklch(100% 0 0)",
-        "content-solid-hover": "color-mix(in oklab, oklch(100% 0 0), black 5%)",
-        "content-solid-active":
-          "color-mix(in oklab, oklch(100% 0 0), black 10%)",
-        "content-alt": "oklch(96.8% 0.0069 247.9 / 0.6)",
-        "content-alt-hover":
-          "color-mix(in oklab, oklch(96.8% 0.0069 247.9 / 0.6), black 5%)",
-        "content-alt-active":
-          "color-mix(in oklab, oklch(96.8% 0.0069 247.9 / 0.6), black 10%)",
-        "content-alt-solid": "oklch(96.8% 0.0069 247.9)",
-        "content-alt-solid-hover":
-          "color-mix(in oklab, oklch(96.8% 0.0069 247.9), black 5%)",
-        "content-alt-solid-active":
-          "color-mix(in oklab, oklch(96.8% 0.0069 247.9), black 10%)",
+        // CSS 变量引用的颜色（支持深色模式）
+        app: "var(--color-app)",
+        content: "var(--color-content)",
+        "content-hover": "var(--color-content-hover)",
+        "content-active": "var(--color-content-active)",
+        "content-solid": "var(--color-content-solid)",
+        "content-solid-hover": "var(--color-content-solid-hover)",
+        "content-solid-active": "var(--color-content-solid-active)",
+        "content-alt": "var(--color-content-alt)",
+        "content-alt-hover": "var(--color-content-alt-hover)",
+        "content-alt-active": "var(--color-content-alt-active)",
+        "content-alt-solid": "var(--color-content-alt-solid)",
+        "content-alt-solid-hover": "var(--color-content-alt-solid-hover)",
+        "content-alt-solid-active": "var(--color-content-alt-solid-active)",
         elevated: {
-          1: "rgba(255, 255, 255, 0.6)",
-          2: "rgba(255, 255, 255, 0.6)",
+          1: "var(--color-elevated-1)",
+          2: "var(--color-elevated-2)",
           solid: {
-            1: "#fff",
-            2: "#fff"
+            1: "var(--color-elevated-solid-1)",
+            2: "var(--color-elevated-solid-2)"
           }
         },
+        // Accent 颜色保持不变（品牌色）
         accent: {
           blue: "oklch(60% 0.203 257.46)",
           "blue-hover": "oklch(60% 0.203 257.46 / 85%)",
@@ -78,54 +77,64 @@ const config = {
           "purple-light-4": "oklch(55% 0.137 302.716 / <alpha-value>)",
           "purple-light-5": "oklch(48% 0.167 302.716 / <alpha-value>)"
         },
+        // 语义色保持不变
         info: "oklch(68.5% 0.169 237.323 / <alpha-value>)",
         "info-hover": "oklch(68.5% 0.169 237.323 / 85%)",
         "info-active": "oklch(68.5% 0.169 237.323 / 75%)",
-        "info-ghost": "oklch(68.5% 0.169 237.323 / 10%)",
-        "info-ghost-hover": "oklch(68.5% 0.169 237.323 / 15%)",
-        "info-ghost-active": "oklch(68.5% 0.169 237.323 / 20%)",
+        "info-ghost": "var(--color-info-ghost)",
+        "info-ghost-hover":
+          "color-mix(in oklab, var(--color-info-ghost), black 5%)",
+        "info-ghost-active":
+          "color-mix(in oklab, var(--color-info-ghost), black 10%)",
         success: "oklch(62.7% 0.1699 149.21 / <alpha-value>)",
         "success-hover": "oklch(62.7% 0.1699 149.21 / 85%)",
         "success-active": "oklch(62.7% 0.1699 149.21 / 75%)",
-        "success-ghost": "oklch(62.7% 0.1699 149.21 / 10%)",
-        "success-ghost-hover": "oklch(62.7% 0.1699 149.21 / 15%)",
-        "success-ghost-active": "oklch(62.7% 0.1699 149.21 / 20%)",
+        "success-ghost": "var(--color-success-ghost)",
+        "success-ghost-hover":
+          "color-mix(in oklab, var(--color-success-ghost), black 5%)",
+        "success-ghost-active":
+          "color-mix(in oklab, var(--color-success-ghost), black 10%)",
         warning: "oklch(75% 0.183 55.934 / <alpha-value>)",
         "warning-hover": "oklch(75% 0.183 55.934 / 85%)",
         "warning-active": "oklch(75% 0.183 55.934 / 75%)",
-        "warning-ghost": "oklch(75% 0.183 55.934 / 10%)",
-        "warning-ghost-hover": "oklch(75% 0.183 55.934 / 15%)",
-        "warning-ghost-active": "oklch(75% 0.183 55.934 / 20%)",
+        "warning-ghost": "var(--color-warning-ghost)",
+        "warning-ghost-hover":
+          "color-mix(in oklab, var(--color-warning-ghost), black 5%)",
+        "warning-ghost-active":
+          "color-mix(in oklab, var(--color-warning-ghost), black 10%)",
         error: "oklch(63.7% 0.237 25.331 / <alpha-value>)",
         "error-hover": "oklch(63.7% 0.237 25.331 / 85%)",
         "error-active": "oklch(63.7% 0.237 25.331 / 75%)",
-        "error-ghost": "oklch(63.7% 0.237 25.331 / 10%)",
-        "error-ghost-hover": "oklch(63.7% 0.237 25.331 / 15%)",
-        "error-ghost-active": "oklch(63.7% 0.237 25.331 / 20%)",
+        "error-ghost": "var(--color-error-ghost)",
+        "error-ghost-hover":
+          "color-mix(in oklab, var(--color-error-ghost), black 5%)",
+        "error-ghost-active":
+          "color-mix(in oklab, var(--color-error-ghost), black 10%)",
+        // 文本颜色使用 CSS 变量
         text: {
-          1: "oklch(12.9% 0.042 264.695 / <alpha-value>)",
-          "1-hover": "oklch(12.9% 0.042 264.695 / 85%)",
-          "1-active": "oklch(12.9% 0.042 264.695 / 75%)",
-          2: "oklch(44.6% 0.043 257.281 / <alpha-value>)",
-          "2-hover": "oklch(44.6% 0.043 257.281 / 85%)",
-          "2-active": "oklch(44.6% 0.043 257.281 / 75%)",
-          3: "oklch(70.4% 0.04 256.788 / <alpha-value>)",
-          "3-hover": "oklch(70.4% 0.04 256.788 / 85%)",
-          "3-active": "oklch(70.4% 0.04 256.788 / 75%)",
-          4: "oklch(92.9% 0.013 255.508 / <alpha-value>)",
-          "4-hover": "oklch(92.9% 0.013 255.508 / 85%)",
-          "4-active": "oklch(92.9% 0.013 255.508 / 75%)"
+          1: "var(--color-text-1)",
+          "1-hover": "var(--color-text-1-hover)",
+          "1-active": "var(--color-text-1-active)",
+          2: "var(--color-text-2)",
+          "2-hover": "var(--color-text-2-hover)",
+          "2-active": "var(--color-text-2-active)",
+          3: "var(--color-text-3)",
+          "3-hover": "var(--color-text-3-hover)",
+          "3-active": "var(--color-text-3-active)",
+          4: "var(--color-text-4)",
+          "4-hover": "var(--color-text-4-hover)",
+          "4-active": "var(--color-text-4-active)"
         },
         // 边框配色或是分割线配色
         line: {
-          1: "rgba(120 120 122 / 0.32)",
-          2: "rgba(120 120 122 / 0.44)"
+          1: "var(--color-line-1)",
+          2: "var(--color-line-2)"
         },
         // 填充色, 可以用于填充像是按钮、下拉框背景、输入框背景等
         fill: {
-          1: "rgba(120 120 122 / 0.08)",
-          2: "rgba(120 120 122 / 0.16)",
-          3: "rgba(120 120 122 / 0.24)"
+          1: "var(--color-fill-1)",
+          2: "var(--color-fill-2)",
+          3: "var(--color-fill-3)"
         }
       },
       keyframes: {
@@ -154,6 +163,7 @@ const config = {
         bounce: "bounce 0.6s ease-in-out infinite"
       }
     }
-  }
+  },
+  plugins: [themePlugin]
 }
 export default config

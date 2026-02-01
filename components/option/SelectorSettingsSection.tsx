@@ -121,9 +121,9 @@ const SelectorEditor: React.FC<{
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-xl bg-white p-6 shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-xl bg-content-solid p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-semibold text-sky-600 text-xl">
+          <h3 className="font-semibold text-accent-blue text-xl">
             <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2 inline" />
             {t("option.selector.edit", {
               type: t(`option.selector.type.${type}`)
@@ -134,7 +134,7 @@ const SelectorEditor: React.FC<{
           </Button>
         </div>
 
-        <p className="mb-4 text-gray-600 text-sm">
+        <p className="mb-4 text-sm text-text-3">
           {t(`option.selector.type.${type}.desc`)} (
           {t("option.selector.priority")})
         </p>
@@ -162,8 +162,8 @@ const SelectorEditor: React.FC<{
                     ? "mt-3 max-h-[500px] scale-100 opacity-100"
                     : "mt-0 max-h-0 scale-98 overflow-hidden opacity-0"
                 }`}>
-                <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
-                  <strong className="mb-2 flex items-center text-sky-700">
+                <div className="rounded-lg border border-accent-blue/20 bg-accent-blue-ghost p-3">
+                  <strong className="mb-2 flex items-center text-accent-blue">
                     <Icon
                       icon="mdi:information-outline"
                       className="mr-1"
@@ -171,7 +171,7 @@ const SelectorEditor: React.FC<{
                     />
                     {t("option.selector.titleRulesTitle")}
                   </strong>
-                  <ol className="ml-5 list-decimal space-y-1 text-gray-600">
+                  <ol className="ml-5 list-decimal space-y-1 text-text-3">
                     <li>{t("option.selector.titleRule1")}</li>
                     <li>{t("option.selector.titleRule2")}</li>
                   </ol>
@@ -186,8 +186,8 @@ const SelectorEditor: React.FC<{
                     ? "mt-3 max-h-[500px] scale-100 opacity-100"
                     : "mt-0 max-h-0 scale-98 overflow-hidden opacity-0"
                 }`}>
-                <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
-                  <strong className="mb-2 flex items-center text-sky-700">
+                <div className="rounded-lg border border-accent-blue/20 bg-accent-blue-ghost p-3">
+                  <strong className="mb-2 flex items-center text-accent-blue">
                     <Icon
                       icon="mdi:information-outline"
                       className="mr-1"
@@ -195,7 +195,7 @@ const SelectorEditor: React.FC<{
                     />
                     {t("option.selector.contentRulesTitle")}
                   </strong>
-                  <ol className="ml-5 list-decimal space-y-1 text-gray-600">
+                  <ol className="ml-5 list-decimal space-y-1 text-text-3">
                     <li>{t("option.selector.contentRule1")}</li>
                     <li>{t("option.selector.contentRule2")}</li>
                     <li>{t("option.selector.contentRule3")}</li>
@@ -215,7 +215,7 @@ const SelectorEditor: React.FC<{
             value={newSelector}
             onChange={(e) => setNewSelector(e.target.value)}
             placeholder={t("option.selector.inputPlaceholder")}
-            className="flex-1 rounded-l-lg border border-sky-200 bg-blue-50 p-2 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+            className="flex-1 rounded-l-lg border border-line-2 bg-content p-2 focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/30"
           />
           <Button onClick={handleAddSelector} className="rounded-l-none">
             {t("option.selector.add")}
@@ -223,16 +223,16 @@ const SelectorEditor: React.FC<{
         </div>
 
         {/* 选择器列表 */}
-        <div className="mb-4 max-h-[40vh] overflow-auto rounded-lg border border-sky-100">
+        <div className="mb-4 max-h-[40vh] overflow-auto rounded-lg border border-line-1">
           {editingSelectors.length > 0 ? (
-            <ul className="divide-y divide-sky-100">
+            <ul className="divide-y divide-line-1">
               {editingSelectors.map((selector, index) => {
                 // Selectors may be duplicated, so index is needed for uniqueness
                 const itemKey = `selector-${index}-${selector.slice(0, 10)}`
                 return (
                   <li
                     key={itemKey}
-                    className="flex items-center justify-between bg-white p-3 hover:bg-blue-50">
+                    className="flex items-center justify-between bg-content-solid p-3 hover:bg-content-alt">
                     <span className="flex-1 font-mono text-sm">{selector}</span>
                     <div className="flex space-x-1">
                       <Button
@@ -264,7 +264,7 @@ const SelectorEditor: React.FC<{
               })}
             </ul>
           ) : (
-            <div className="flex h-24 items-center justify-center text-gray-500">
+            <div className="flex h-24 items-center justify-center text-text-3">
               {t("option.selector.emptyList")}
             </div>
           )}
@@ -297,14 +297,14 @@ const SelectorTypeCard: React.FC<{
     <button
       type="button"
       onClick={onClick}
-      className="w-full cursor-pointer rounded-lg border-2 border-sky-100 bg-white p-4 text-left shadow-sm transition-all hover:border-sky-300 hover:shadow-md">
-      <div className="mb-2 flex items-center text-sky-600">
+      className="w-full cursor-pointer rounded-lg border border-line-1 bg-content-solid p-4 text-left shadow-sm transition-all hover:border-accent-blue/30 hover:shadow-md">
+      <div className="mb-2 flex items-center text-accent-blue">
         <Icon icon={SELECTOR_TYPE_ICONS[type]} className="mr-2" width={24} />
         <h3 className="font-medium text-lg">
           {t(`option.selector.type.${type}`)}
         </h3>
       </div>
-      <p className="text-gray-600 text-sm">
+      <p className="text-sm text-text-3">
         {t(`option.selector.type.${type}.desc`)}
       </p>
     </button>
@@ -315,25 +315,25 @@ const SelectorTypeCard: React.FC<{
 const ScrapeRulesExplanation = () => {
   const { t } = useI18n()
   return (
-    <div className="rounded-lg border-2 border-sky-100 bg-white p-5 text-sm shadow-sm">
-      <h4 className="mb-3 flex items-center font-semibold text-sky-600">
+    <div className="rounded-lg border border-line-1 bg-content-solid p-5 text-sm shadow-sm">
+      <h4 className="mb-3 flex items-center font-semibold text-accent-blue">
         <Icon icon="mdi:information-outline" className="mr-2" width={20} />
         {t("option.selector.rulesExplanationTitle")}
       </h4>
-      <p className="mb-3 text-gray-600">{t("option.selector.rulesIntro")}</p>
-      <ol className="mb-4 ml-5 list-decimal space-y-2 text-gray-600">
+      <p className="mb-3 text-text-3">{t("option.selector.rulesIntro")}</p>
+      <ol className="mb-4 ml-5 list-decimal space-y-2 text-text-3">
         <li>{t("option.selector.contentRule1")}</li>
         <li>{t("option.selector.contentRule2")}</li>
         <li>{t("option.selector.contentRule3")}</li>
         <li>{t("option.selector.contentRule4")}</li>
         <li>{t("option.selector.contentRule5")}</li>
       </ol>
-      <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
-        <p className="mb-2 font-medium text-sky-700">
+      <div className="rounded-lg border border-accent-blue/20 bg-accent-blue-ghost p-3">
+        <p className="mb-2 font-medium text-accent-blue">
           {t("option.selector.defaultListTitle")}
         </p>
-        <div className="max-h-32 overflow-y-auto rounded border border-sky-100 bg-white p-2">
-          <code className="font-mono text-gray-600 text-xs">
+        <div className="max-h-32 overflow-y-auto rounded border border-line-1 bg-content-solid p-2">
+          <code className="font-mono text-text-3 text-xs">
             {CONTENT_SELECTORS.join(", ")}
           </code>
         </div>
@@ -363,9 +363,7 @@ export const SelectorSettingsSection: React.FC = () => {
       title={t("option.selector.title")}
       icon="line-md:document-code">
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-gray-600 text-sm">
-          {t("option.selector.desc")}
-        </span>
+        <span className="text-sm text-text-3">{t("option.selector.desc")}</span>
         <Button
           variant="outline"
           size="xs"

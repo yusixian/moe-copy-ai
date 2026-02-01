@@ -205,7 +205,7 @@ export const ExtractionModeSection: React.FC = () => {
         </div>
 
         {extractionMode === "readability" && (
-          <div className="mt-4 rounded-xl border-2 border-success/20 bg-success-ghost p-4 shadow-sm">
+          <div className="mt-4 rounded-xl border border-line-1 bg-success-ghost p-4 shadow-sm">
             <div className="flex items-start space-x-3">
               <Icon
                 icon="line-md:lightbulb-twotone"
@@ -228,7 +228,7 @@ export const ExtractionModeSection: React.FC = () => {
         )}
 
         {extractionMode === "hybrid" && (
-          <div className="mt-4 rounded-xl border-2 border-accent-purple/20 bg-accent-purple-ghost p-4 shadow-sm">
+          <div className="mt-4 rounded-xl border border-line-1 bg-accent-purple-ghost p-4 shadow-sm">
             <div className="flex items-start space-x-3">
               <Icon
                 icon="line-md:lightbulb-twotone"
@@ -251,7 +251,7 @@ export const ExtractionModeSection: React.FC = () => {
         )}
 
         {extractionMode === "selector" && (
-          <div className="mt-4 rounded-xl border-2 border-accent-blue/20 bg-accent-blue-ghost p-4 shadow-sm">
+          <div className="mt-4 rounded-xl border border-line-1 bg-accent-blue-ghost p-4 shadow-sm">
             <div className="flex items-start space-x-3">
               <Icon
                 icon="line-md:lightbulb-twotone"

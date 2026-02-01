@@ -140,14 +140,14 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
     <div className="flex h-full flex-col gap-4 overflow-y-auto">
       {/* 标题 */}
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
-          <Icon icon="mdi:check-bold" className="h-5 w-5 text-emerald-600" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-success/10">
+          <Icon icon="mdi:check-bold" className="h-5 w-5 text-success" />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-800">
+          <h3 className="font-semibold text-text-1">
             {t("batch.results.title")}
           </h3>
-          <p className="text-gray-500 text-sm">
+          <p className="text-sm text-text-3">
             {t("batch.results.summary", {
               success: stats.successCount,
               total: stats.total
@@ -158,36 +158,36 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-lg bg-emerald-50 p-3 text-center">
-          <div className="font-bold text-emerald-600 text-xl">
+        <div className="rounded-lg bg-success/10 p-3 text-center">
+          <div className="font-bold text-success text-xl">
             {stats.successCount}
           </div>
-          <div className="text-emerald-700 text-xs">
+          <div className="text-success text-xs">
             {t("batch.results.stats.success")}
           </div>
         </div>
-        <div className="rounded-lg bg-red-50 p-3 text-center">
-          <div className="font-bold text-red-600 text-xl">
+        <div className="rounded-lg bg-error/10 p-3 text-center">
+          <div className="font-bold text-error text-xl">
             {stats.failedCount}
           </div>
-          <div className="text-red-700 text-xs">
+          <div className="text-error text-xs">
             {t("batch.results.stats.failed")}
           </div>
         </div>
-        <div className="rounded-lg bg-sky-50 p-3 text-center">
-          <div className="font-bold text-sky-600 text-xl">
+        <div className="rounded-lg bg-accent-blue-ghost p-3 text-center">
+          <div className="font-bold text-accent-blue text-xl">
             {stats.totalChars > 1000
               ? `${(stats.totalChars / 1000).toFixed(1)}k`
               : stats.totalChars}
           </div>
-          <div className="text-sky-700 text-xs">
+          <div className="text-accent-blue text-xs">
             {t("batch.results.stats.chars")}
           </div>
         </div>
       </div>
 
       {/* 选择操作栏 */}
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+      <div className="flex items-center justify-between rounded-lg border border-line-1 bg-content-alt px-3 py-2">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="xs" onClick={selectAll}>
             <Icon
@@ -204,25 +204,25 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
             {t("batch.results.deselectAll")}
           </Button>
         </div>
-        <span className="text-gray-500 text-xs">
+        <span className="text-text-3 text-xs">
           {t("batch.results.selected")}{" "}
-          <b className="text-blue-600">{selectedStats.count}</b> /{" "}
+          <b className="text-accent-blue">{selectedStats.count}</b> /{" "}
           {stats.successCount}
         </span>
       </div>
 
       {/* 结果列表 */}
-      <div className="max-h-64 min-h-32 flex-shrink-0 overflow-y-auto rounded-lg border border-gray-200">
+      <div className="max-h-64 min-h-32 flex-shrink-0 overflow-y-auto rounded-lg border border-line-1">
         {results.map((result, index) => (
           <div
             key={result.url}
             className={cn(
-              "border-gray-100 border-b last:border-b-0",
-              expandedIndex === index && "bg-gray-50"
+              "border-line-2 border-b last:border-b-0",
+              expandedIndex === index && "bg-content-alt"
             )}>
             <button
               type="button"
-              className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 hover:bg-gray-50"
+              className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 hover:bg-content-alt"
               onClick={() => toggleExpand(index)}>
               {/* Checkbox - 仅成功项可勾选 */}
               {result.success ? (
@@ -241,47 +241,49 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
                     }
                     className={cn(
                       "h-4 w-4",
-                      isSelected(result.url) ? "text-sky-500" : "text-gray-400"
+                      isSelected(result.url)
+                        ? "text-accent-blue"
+                        : "text-text-4"
                     )}
                   />
                 </button>
               ) : (
                 <Icon
                   icon="mdi:checkbox-blank-off-outline"
-                  className="h-4 w-4 flex-shrink-0 text-gray-300"
+                  className="h-4 w-4 flex-shrink-0 text-text-4"
                 />
               )}
               {result.success ? (
                 <Icon
                   icon="mdi:check-circle"
-                  className="h-4 w-4 flex-shrink-0 text-emerald-500"
+                  className="h-4 w-4 flex-shrink-0 text-success"
                 />
               ) : (
                 <Icon
                   icon="mdi:close-circle"
-                  className="h-4 w-4 flex-shrink-0 text-red-500"
+                  className="h-4 w-4 flex-shrink-0 text-error"
                 />
               )}
               <span
                 className={cn(
                   "flex-1 truncate text-sm",
-                  result.success ? "text-gray-700" : "text-gray-400"
+                  result.success ? "text-text-2" : "text-text-4"
                 )}>
                 {result.title}
               </span>
               <Icon
                 icon="mdi:chevron-down"
                 className={cn(
-                  "h-4 w-4 text-gray-400 transition-transform",
+                  "h-4 w-4 text-text-4 transition-transform",
                   expandedIndex === index && "rotate-180"
                 )}
               />
             </button>
             {expandedIndex === index && (
-              <div className="border-gray-100 border-t bg-white px-3 py-2">
+              <div className="border-line-2 border-t bg-content-solid px-3 py-2">
                 {/* URL + Copy JSON button */}
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="flex-1 truncate text-gray-500 text-xs">
+                  <span className="flex-1 truncate text-text-3 text-xs">
                     {result.url}
                   </span>
                   <Button
@@ -308,10 +310,10 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
                 </div>
                 {/* Content */}
                 {result.success ? (
-                  <div className="rounded bg-gray-50 p-2">
+                  <div className="rounded bg-content-alt p-2">
                     <div
                       className={cn(
-                        "overflow-y-auto whitespace-pre-wrap break-words text-gray-600 text-xs",
+                        "overflow-y-auto whitespace-pre-wrap break-words text-text-2 text-xs",
                         fullContentItems.has(index) ? "max-h-96" : "max-h-24"
                       )}>
                       {fullContentItems.has(index)
@@ -346,7 +348,7 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
                     )}
                   </div>
                 ) : (
-                  <div className="text-red-500 text-xs">{result.error}</div>
+                  <div className="text-error text-xs">{result.error}</div>
                 )}
               </div>
             )}

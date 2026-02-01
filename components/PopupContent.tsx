@@ -9,10 +9,12 @@ import ImageGrid from "~/components/ImageGrid"
 import MetadataImageSection from "~/components/MetadataImageSection"
 import MetadataTable from "~/components/MetadataTable"
 import { Button } from "~/components/ui/button"
+import { BACKGROUND_GRADIENTS } from "~constants/theme"
 import { useOpenOptionPage } from "~hooks/common/useOpenOptionPage"
 import useScrapedData from "~hooks/useScrapedData"
 import { cn } from "~utils"
 import { useI18n } from "~utils/i18n"
+import { useTheme } from "~utils/theme"
 
 import CopyableTextField from "./CopyableTextField"
 import { ArticleContentHeader } from "./popup/ArticleContentHeader"
@@ -33,6 +35,7 @@ const PopupContent = ({
   enablePortal
 }: PopupContentProps) => {
   const { t } = useI18n()
+  const { resolvedTheme } = useTheme()
   const {
     isLoading,
     error,
@@ -78,15 +81,11 @@ const PopupContent = ({
         "relative max-h-[600px] overflow-y-auto rounded-[inherit] p-3 sm:p-4",
         className
       )}>
-      {/* Soft Blue Radial Background */}
+      {/* Soft Blue Radial Background - adjust opacity for dark mode */}
       <div
-        className="fixed inset-0 top-0 left-0 z-[-1] h-full w-full rounded-[inherit]"
+        className="fixed inset-0 top-0 left-0 z-[-1] h-full w-full rounded-[inherit] bg-app"
         style={{
-          backgroundImage: `
-            radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.18), transparent 40%),
-            radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.15), transparent 45%),
-            radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.12), transparent 40%)
-          `
+          backgroundImage: BACKGROUND_GRADIENTS[resolvedTheme]
         }}
       />
 

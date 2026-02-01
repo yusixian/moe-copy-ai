@@ -16,8 +16,10 @@ import { useEffect, useState } from "react"
 
 import FloatingButton from "~components/FloatingButton"
 import PopupContent from "~components/PopupContent"
+import { THEME_CSS_VARIABLES } from "~constants/theme-colors"
 import { useFloatButtonStorage } from "~hooks/useFloatButtonStorage"
 import { I18nProvider, useI18n } from "~utils/i18n"
+import { ThemeProvider, useTheme } from "~utils/theme"
 
 // 注入全局样式
 export const getStyle = () => {
@@ -35,10 +37,14 @@ export const config: PlasmoCSConfig = {
 // 主组件
 const FloatingPopup = () => {
   const { t } = useI18n()
+  const { resolvedTheme } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
 
   // 使用 useSyncExternalStore 订阅外部存储状态
   const storageState = useFloatButtonStorage()
+
+  // CSS 变量样式，从常量获取（无需 useMemo，常量引用稳定）
+  const themeStyles = THEME_CSS_VARIABLES[resolvedTheme]
 
   // 使用floating-ui来定位弹窗
   const { refs, context } = useFloating({
@@ -136,6 +142,7 @@ const FloatingPopup = () => {
           <FloatingFocusManager context={context}>
             <div
               ref={refs.setFloating}
+              style={themeStyles}
               className="dialog fixed top-1/2 left-1/2 z-[999] max-h-[90vh] w-[80vw] max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-app/80 text-text-1 backdrop-blur-md backdrop-brightness-110 md:fixed md:h-[90vh] md:max-h-[90vh] md:w-[95vw]"
               {...getFloatingProps()}>
               <PopupContent
@@ -153,9 +160,11 @@ const FloatingPopup = () => {
 
 function FloatingPopupWithI18n() {
   return (
-    <I18nProvider>
-      <FloatingPopup />
-    </I18nProvider>
+    <ThemeProvider>
+      <I18nProvider>
+        <FloatingPopup />
+      </I18nProvider>
+    </ThemeProvider>
   )
 }
 
