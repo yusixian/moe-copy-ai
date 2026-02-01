@@ -128,8 +128,8 @@ export const THEME_CSS_VARIABLES: Record<
     "--color-fill-3": "rgba(180, 180, 185, 0.24)",
 
     // Shadow highlights - reduced for dark mode
-    "--shadow-highlight": "rgb(255 255 255 / 0.14)",
-    "--shadow-highlight-weak": "rgb(255 255 255 / 0.05)",
+    "--shadow-highlight": "rgb(255 255 255 / 0.1)",
+    "--shadow-highlight-weak": "rgb(255 255 255 / 0.04)",
 
     // Semantic ghost colors (15% opacity for dark mode - more visible)
     "--color-info-ghost": "oklch(68.5% 0.169 237.323 / 15%)",

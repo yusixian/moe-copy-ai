@@ -38,7 +38,7 @@ function ToggleRow({
   onChange: (checked: boolean) => void
 }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-line-1 bg-content p-3">
+    <div className="card flex items-center justify-between rounded-xl p-3">
       <span className="flex items-center gap-2 font-medium text-sm text-text-1">
         <Icon icon={icon} width={16} className="text-accent-blue" />
         {label}
@@ -266,7 +266,7 @@ function LanguageSettings() {
   }
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-line-1 bg-content p-3">
+    <div className="card flex items-center justify-between p-3">
       <span className="flex items-center gap-2 font-medium text-sm text-text-1">
         <Icon icon="mdi:globe" width={16} className="text-accent-blue" />
         {t("option.interface.language")}
@@ -362,7 +362,7 @@ export default function SidePanelSettings() {
         variant="outline"
         fullWidth
         onClick={openFullSettings}
-        className="justify-between rounded-xl p-3">
+        className="card mb-2 justify-between rounded-xl border-none bg-content p-3 shadow-sm hover:bg-content-hover">
         <span className="flex items-center gap-2 font-medium text-sm text-text-1">
           <Icon
             icon="mdi:code-braces"

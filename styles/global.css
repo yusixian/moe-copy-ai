@@ -31,7 +31,7 @@
 
 @layer components {
   .top-bar {
-    @apply rounded-2xl border border-line-1 bg-elevated-1 shadow-lg backdrop-blur-sm backdrop-brightness-110;
+    @apply rounded-xl border border-line-1 bg-elevated-1 shadow-lg backdrop-blur-sm backdrop-brightness-110;
     box-shadow:
       inset 1px 1px 0 0.5px var(--shadow-highlight),
       inset -1px -1px 0 0.5px var(--shadow-highlight-weak),
@@ -40,7 +40,7 @@
   }
 
   .dialog {
-    @apply rounded-2xl border border-line-1 bg-elevated-1 backdrop-blur-sm backdrop-brightness-110;
+    @apply rounded-xl border border-line-1 bg-elevated-1 backdrop-blur-sm backdrop-brightness-110;
     box-shadow:
       inset 1px 1px 0 0.5px var(--shadow-highlight),
       inset -1px -1px 0 0.5px var(--shadow-highlight-weak),
@@ -48,7 +48,7 @@
   }
 
   .popover {
-    @apply rounded-2xl border border-line-1 bg-elevated-1 backdrop-blur-sm backdrop-brightness-110;
+    @apply rounded-xl border border-line-1 bg-elevated-1 backdrop-blur-sm backdrop-brightness-110;
     box-shadow:
       inset 1px 1px 0 0.5px var(--shadow-highlight),
       inset -1px -1px 0 0.5px var(--shadow-highlight-weak),
@@ -57,11 +57,11 @@
   }
 
   .card {
-    @apply rounded-2xl bg-content;
+    @apply rounded-xl bg-content;
     box-shadow:
       inset 1px 1px 0 0.5px var(--shadow-highlight),
       inset -1px -1px 0 0.5px var(--shadow-highlight-weak),
-      0 2px 3px 0 rgb(0 0 0 / 0.1);
+      0 2px 3px 0 rgb(0 0 0 / 0.06);
   }
 }
 
