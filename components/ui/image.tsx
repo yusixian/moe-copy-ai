@@ -5,7 +5,7 @@ import { cn } from "~/utils"
 import { useI18n } from "~utils/i18n"
 
 const imageContainerVariants = cva(
-  "relative flex items-center justify-center bg-white",
+  "relative flex items-center justify-center bg-fill-1",
   {
     variants: {
       variant: {
@@ -62,8 +62,8 @@ const Image = forwardRef<HTMLImageElement, ImageProps>(
         )}>
         {isLoading && !hasError && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex size-full animate-pulse items-center justify-center bg-gradient-to-r from-pink-50 to-purple-50">
-              <div className="animate-bounce text-pink-400">
+            <div className="flex size-full animate-pulse items-center justify-center bg-fill-1">
+              <div className="animate-bounce text-text-1">
                 {t("image.loading")}
               </div>
             </div>
@@ -86,7 +86,7 @@ const Image = forwardRef<HTMLImageElement, ImageProps>(
             {...props}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center p-2 text-red-500 text-sm">
+          <div className="flex flex-col items-center justify-center p-2 text-error text-sm">
             <span className="mb-1">(˃̣̣̥⌓˂̣̣̥) </span>
             <span>{t("image.loadError")}</span>
           </div>

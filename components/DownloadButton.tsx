@@ -44,7 +44,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       className={cn(
-        "flex size-9 items-center justify-center rounded-full border-2 border-white/80 bg-gradient-to-br from-pink-400 to-purple-400 text-white shadow-md transition-all hover:scale-110 hover:from-pink-500 hover:to-purple-500 hover:shadow-pink-300/60",
+        "flex size-9 items-center justify-center rounded-full border-2 border-white/80 bg-accent-purple text-white shadow-md transition-all hover:scale-110 hover:bg-accent-purple-hover hover:shadow-accent-purple-hover/60",
         className
       )}
       title={title || t("image.download")}>

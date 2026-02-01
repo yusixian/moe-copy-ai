@@ -119,8 +119,8 @@ const BatchAiSummary = memo(function BatchAiSummary({
   return (
     <div className="space-y-2">
       {/* Token 预估信息 - 醒目显示（基于模板替换后的完整提示词） */}
-      <div className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 px-3 py-2 text-xs">
-        <Icon icon="mdi:counter" width={16} className="text-amber-500" />
+      <div className="flex items-center gap-2 rounded-lg bg-warning-ghost px-3 py-2 text-xs">
+        <Icon icon="mdi:counter" width={16} className="text-warning" />
         <span className="text-gray-600">
           {t("batch.ai.tokenEstimate", {
             chars: processedPrompt.length,
@@ -176,7 +176,7 @@ const BatchAiSummary = memo(function BatchAiSummary({
 
           {/* 错误提示 */}
           {error && (
-            <div className="flex items-center gap-1 rounded bg-red-50 px-2 py-1.5 text-red-600 text-xs">
+            <div className="flex items-center gap-1 rounded bg-error-ghost px-2 py-1.5 text-error text-xs">
               <Icon icon="mdi:alert-circle" width={14} />
               {error}
             </div>

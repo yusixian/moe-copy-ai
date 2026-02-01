@@ -83,7 +83,7 @@ const PopupContent = ({
       )}>
       {/* Soft Blue Radial Background - adjust opacity for dark mode */}
       <div
-        className="fixed inset-0 top-0 left-0 z-[-1] h-full w-full rounded-[inherit] bg-app"
+        className="fixed inset-0 top-0 left-0 z-[-1] h-full w-full rounded-[inherit]"
         style={{
           backgroundImage: BACKGROUND_GRADIENTS[resolvedTheme]
         }}
@@ -337,7 +337,7 @@ const PopupContent = ({
         </div>
       )}
 
-      <footer className="mt-4 flex items-center justify-center border-blue-200 border-t pt-4 text-center text-blue-500 text-xs">
+      <footer className="mt-4 flex items-center justify-center border-line-1 border-t pt-4 text-center text-accent-blue text-xs">
         {t("popup.footer", { version: "1.0" })}
       </footer>
     </div>
