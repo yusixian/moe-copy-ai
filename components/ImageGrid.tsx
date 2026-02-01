@@ -24,8 +24,8 @@ import {
 const ImageLoadError = () => {
   const { t } = useI18n()
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 p-2 text-center">
-      <span className="mt-2 text-red-400 text-xs">
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-content-alt p-2 text-center">
+      <span className="mt-2 text-error text-xs">
         <SadFaceDecoration />
         <br />
         {t("image.loadError")}
@@ -61,10 +61,10 @@ const ImageCard = memo(
         key={index}
         variant="image"
         padding="none"
-        className="overflow-hidden border border-sky-100/60 shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-sky-100/50"
+        className="overflow-hidden border border-line-1 shadow-sm transition-all duration-300 hover:shadow-md"
         onMouseEnter={() => onHover(index)}
         onMouseLeave={() => onHover(null)}>
-        <div className="relative flex h-[140px] w-full items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 to-white">
+        <div className="relative flex h-[140px] w-full items-center justify-center overflow-hidden bg-content-alt">
           <CornerDots variant="blue" />
           <Image
             src={img.src}
@@ -90,18 +90,18 @@ const ImageCard = memo(
             </AnimatedContainer>
           )}
         </div>
-        <div className="truncate border-sky-100/50 border-t bg-gradient-to-r from-blue-50/80 to-sky-50/80 p-2 text-center font-medium text-sky-700 text-xs">
+        <div className="truncate border-line-1 border-t bg-content-alt p-2 text-center font-medium text-accent-blue text-xs">
           {img.alt || img.title || `${t("image.noImages")} #${img.index}`}
         </div>
 
-        <div className="border-sky-100/50 border-t bg-gradient-to-r from-blue-50/60 to-sky-50/60 px-3 py-2 transition-all duration-300">
+        <div className="border-line-1 border-t bg-content-alt px-3 py-2 transition-all duration-300">
           <CopyableTextField text={img.src} isUrl={true} />
           <div className="mt-2 flex justify-end">
             <Button
               onClick={preventBubbling(() => onOpen(img.src))}
               variant="ghost"
               size="sm"
-              className="text-sky-600 text-xs hover:bg-sky-50 hover:text-sky-700"
+              className="text-accent-blue text-xs hover:bg-accent-blue-ghost hover:text-accent-blue-hover"
               icon={
                 <Icon
                   icon="line-md:external-link"
@@ -130,14 +130,14 @@ const ImageGridFooter = ({ count }: ImageGridFooterProps) => {
       <Badge
         variant="info"
         size="lg"
-        className="relative bg-white/80 px-6 py-2 shadow-sm">
+        className="relative bg-content px-6 py-2 shadow-sm">
         <CornerDots variant="mixed" />
 
         <Icon
           icon="line-md:image-twotone"
           className="mr-1.5 h-4 w-4 text-sky-500"
         />
-        <span className="font-medium text-sky-700 text-sm">
+        <span className="font-medium text-accent-blue text-sm">
           {t("image.count", { count })}
         </span>
         <AnimatedContainer animation="bounce" className="ml-1 inline-block">

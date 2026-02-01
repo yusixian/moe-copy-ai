@@ -64,10 +64,10 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
   // Fullscreen mode
   if (isFullscreen) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col bg-white">
+      <div className="fixed inset-0 z-50 flex flex-col bg-content-solid">
         {/* Header bar - compact design */}
-        <div className="flex items-center justify-between border-gray-200 border-b bg-white px-3 py-2 shadow-sm">
-          <span className="flex items-center gap-2 font-medium text-gray-700 text-sm">
+        <div className="flex items-center justify-between border-line-1 border-b bg-content-solid px-3 py-2 shadow-sm">
+          <span className="flex items-center gap-2 font-medium text-sm text-text-1">
             <Icon
               icon="line-md:lightbulb-twotone"
               className="h-4 w-4 text-amber-500"
@@ -80,7 +80,7 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
             <button
               type="button"
               onClick={() => setIsViewSource(!isViewSource)}
-              className="rounded p-1.5 text-gray-500 hover:bg-gray-100"
+              className="rounded p-1.5 text-text-3 hover:bg-content-alt"
               title={
                 isViewSource
                   ? t("content.preview.markdown")
@@ -94,28 +94,28 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
             <button
               type="button"
               onClick={handleCopy}
-              className="rounded p-1.5 text-gray-500 hover:bg-gray-100"
+              className="rounded p-1.5 text-text-3 hover:bg-content-alt"
               title={
                 copied ? t("extraction.copy.copied") : t("extraction.copy.copy")
               }>
               <Icon
                 icon={copied ? "mdi:check" : "mdi:content-copy"}
-                className={`h-5 w-5 ${copied ? "text-green-500" : ""}`}
+                className={`h-5 w-5 ${copied ? "text-success" : ""}`}
               />
             </button>
             <button
               type="button"
               onClick={() => setIsFullscreen(false)}
-              className="rounded p-1.5 text-gray-500 hover:bg-gray-100"
+              className="rounded p-1.5 text-text-3 hover:bg-content-alt"
               title={t("content.fullscreen.help")}>
               <Icon icon="mdi:close" className="h-5 w-5" />
             </button>
           </div>
         </div>
         {/* Content area */}
-        <div className="flex-1 overflow-auto bg-white p-4">
+        <div className="flex-1 overflow-auto bg-content-solid p-4">
           {isViewSource ? (
-            <pre className="whitespace-pre-wrap rounded-lg bg-gray-50 p-4 font-mono text-gray-700 text-sm">
+            <pre className="whitespace-pre-wrap rounded-lg bg-content-alt p-4 font-mono text-sm text-text-2">
               {content}
             </pre>
           ) : (
@@ -135,7 +135,7 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
     <div className={className}>
       {/* Header with buttons */}
       <div className="mb-1.5 flex items-center justify-between">
-        <span className="flex items-center gap-1 font-medium text-sky-700 text-xs">
+        <span className="flex items-center gap-1 font-medium text-accent-blue text-xs">
           <Icon
             icon="line-md:lightbulb-twotone"
             width={14}
@@ -150,7 +150,7 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
           <button
             type="button"
             onClick={() => setIsViewSource(!isViewSource)}
-            className="flex items-center gap-1 rounded px-1.5 py-0.5 text-gray-500 text-xs hover:bg-gray-100"
+            className="flex items-center gap-1 rounded px-1.5 py-0.5 text-text-3 text-xs hover:bg-content-alt"
             title={
               isViewSource
                 ? t("content.preview.markdown")
@@ -164,23 +164,23 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
           <button
             type="button"
             onClick={() => setIsFullscreen(true)}
-            className="flex items-center gap-1 rounded px-1.5 py-0.5 text-gray-500 text-xs hover:bg-gray-100"
+            className="flex items-center gap-1 rounded px-1.5 py-0.5 text-text-3 text-xs hover:bg-content-alt"
             title={t("content.fullscreen.enter")}>
             <Icon icon="mdi:fullscreen" width={14} />
           </button>
           <button
             type="button"
             onClick={handleCopy}
-            className="flex items-center gap-1 rounded bg-sky-100 px-2 py-0.5 text-sky-600 text-xs hover:bg-sky-200">
+            className="flex items-center gap-1 rounded bg-accent-blue-ghost px-2 py-0.5 text-accent-blue text-xs hover:bg-accent-blue-ghost-hover">
             <Icon icon={copied ? "mdi:check" : "mdi:content-copy"} width={12} />
             {copied ? t("extraction.copy.copied") : t("extraction.copy.copy")}
           </button>
         </div>
       </div>
       {/* Content area - 400px max height */}
-      <div className="max-h-[400px] overflow-y-auto text-gray-700 text-sm">
+      <div className="max-h-[400px] overflow-y-auto text-sm text-text-2">
         {isViewSource ? (
-          <pre className="whitespace-pre-wrap rounded bg-gray-50 p-2 font-mono text-gray-700 text-xs">
+          <pre className="whitespace-pre-wrap rounded bg-content-alt p-2 font-mono text-text-2 text-xs">
             {content}
           </pre>
         ) : (

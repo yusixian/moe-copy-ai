@@ -62,7 +62,7 @@ const CompactPromptInput = ({
       <div className="flex items-center justify-between">
         <label
           htmlFor="compact-prompt-input"
-          className="font-medium text-gray-600 text-xs">
+          className="font-medium text-text-2 text-xs">
           {t("ai.panel.prompt.label")}
         </label>
         {supportedPlaceholders && supportedPlaceholders.length > 0 && (
@@ -85,7 +85,7 @@ const CompactPromptInput = ({
         onChange={(e) => setCustomPrompt(e.target.value)}
         disabled={disabled}
         placeholder={t("ai.prompt.placeholder")}
-        className="w-full rounded border border-sky-200 bg-sky-50 px-2 py-1.5 text-xs focus:border-sky-400 focus:outline-none disabled:opacity-50"
+        className="w-full rounded border border-line-1 bg-content px-2 py-1.5 text-text-1 text-xs focus:border-accent-blue focus:outline-none disabled:opacity-50"
         rows={4}
       />
 
@@ -93,8 +93,8 @@ const CompactPromptInput = ({
       {showPlaceholders &&
         supportedPlaceholders &&
         supportedPlaceholders.length > 0 && (
-          <div className="rounded border border-sky-100 bg-sky-50/50 p-2">
-            <p className="mb-1.5 text-gray-500 text-xs">
+          <div className="rounded border border-accent-blue/20 bg-accent-blue-ghost p-2">
+            <p className="mb-1.5 text-text-3 text-xs">
               {t("scrape.prompt.placeholderHelp")}
             </p>
             <div className="flex flex-wrap gap-1">
@@ -104,7 +104,7 @@ const CompactPromptInput = ({
                   type="button"
                   onClick={() => insertPlaceholder(info.placeholder)}
                   disabled={disabled}
-                  className="rounded bg-white px-1.5 py-0.5 text-sky-700 text-xs shadow-sm hover:bg-sky-100 disabled:opacity-50"
+                  className="rounded bg-content-solid px-1.5 py-0.5 text-accent-blue text-xs shadow-sm hover:bg-accent-blue-ghost-hover disabled:opacity-50"
                   title={info.description}>
                   {info.placeholder}
                 </button>
@@ -130,7 +130,7 @@ const CompactPromptInput = ({
             type="button"
             onClick={() => setCustomPrompt(systemPrompt)}
             disabled={disabled}
-            className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-gray-600 text-xs hover:bg-gray-200 disabled:opacity-50">
+            className="flex items-center gap-1 rounded bg-content-alt px-2 py-1 text-text-2 text-xs hover:bg-content-alt/80 disabled:opacity-50">
             <Icon icon="mdi:restore" width={12} />
             {t("scrape.prompt.resetDefault")}
           </button>
@@ -151,12 +151,12 @@ const CompactPromptInput = ({
 
       {/* 预览区域 */}
       {showPreview && hasPlaceholders && scrapedData && (
-        <div className="rounded border border-emerald-100 bg-emerald-50/50 p-2">
-          <p className="mb-1 flex items-center gap-1 text-emerald-700 text-xs">
+        <div className="rounded border border-success/20 bg-success/10 p-2">
+          <p className="mb-1 flex items-center gap-1 text-success text-xs">
             <Icon icon="mdi:file-document-outline" width={12} />
             {t("scrape.prompt.previewTitle")}
           </p>
-          <div className="max-h-24 overflow-y-auto rounded bg-white p-1.5 text-gray-600 text-xs">
+          <div className="max-h-24 overflow-y-auto rounded bg-content-solid p-1.5 text-text-2 text-xs">
             {getPreviewContent()}
           </div>
           <TokenizationDisplay

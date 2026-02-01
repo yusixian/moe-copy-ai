@@ -100,9 +100,9 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
     <div className="space-y-2">
       {/* Token 预估信息 */}
       {showTokenEstimate && (
-        <div className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 px-3 py-2 text-xs">
-          <Icon icon="mdi:counter" width={16} className="text-amber-500" />
-          <span className="text-gray-600">
+        <div className="flex items-center gap-2 rounded-lg bg-warning-ghost px-3 py-2 text-xs">
+          <Icon icon="mdi:counter" width={16} className="text-warning" />
+          <span className="text-text-2">
             {t("content.tokenization.stats", {
               chars: processedPrompt.length,
               tokens: tokenCount
@@ -130,7 +130,7 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
           {/* 操作行：模型 + 历史 + 生成按钮 */}
           <div className="flex items-center gap-2">
             <span
-              className={`flex items-center gap-1 text-xs ${modelId ? "text-gray-500" : "text-amber-500"}`}>
+              className={`flex items-center gap-1 text-xs ${modelId ? "text-text-3" : "text-warning"}`}>
               {modelId || t("ai.model.select")}
             </span>
 
@@ -138,7 +138,7 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
               <button
                 type="button"
                 onClick={toggleHistoryDrawer}
-                className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-gray-600 text-xs hover:bg-gray-200">
+                className="flex items-center gap-1 rounded bg-fill-1 px-2 py-1 text-text-2 text-xs hover:bg-fill-2">
                 <Icon icon="mdi:history" width={12} />
                 {t("ai.panel.history")}
               </button>
@@ -169,7 +169,7 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
 
           {/* 错误提示 */}
           {error && (
-            <div className="flex items-center gap-1 rounded bg-red-50 px-2 py-1.5 text-red-600 text-xs">
+            <div className="flex items-center gap-1 rounded bg-error-ghost px-2 py-1.5 text-error text-xs">
               <Icon icon="mdi:alert-circle" width={14} />
               {error}
             </div>
@@ -186,21 +186,21 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
 
           {/* Token 统计 */}
           {usage?.total_tokens && (
-            <div className="flex items-center gap-3 border-gray-100 border-t pt-2 text-gray-500 text-xs">
+            <div className="flex items-center gap-3 border-line-1 border-t pt-2 text-text-3 text-xs">
               <span className="flex items-center gap-1">
                 <Icon icon="mdi:counter" width={12} />
                 {t("ai.history.detail.metadata.tokens")}:{" "}
-                <b className="text-gray-700">{usage.total_tokens}</b>
+                <b className="text-text-1">{usage.total_tokens}</b>
               </span>
-              <span className="text-gray-300">|</span>
+              <span className="text-text-4">|</span>
               <span>
                 {t("ai.tokens.input")}:{" "}
-                <b className="text-sky-600">{usage.prompt_tokens}</b>
+                <b className="text-info">{usage.prompt_tokens}</b>
               </span>
-              <span className="text-gray-300">|</span>
+              <span className="text-text-4">|</span>
               <span>
                 {t("ai.tokens.output")}:
-                <b className="text-emerald-600">{usage.completion_tokens}</b>
+                <b className="text-success">{usage.completion_tokens}</b>
               </span>
             </div>
           )}

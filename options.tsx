@@ -5,7 +5,9 @@ import { ToastContainer } from "react-toastify"
 import "./styles/global.css"
 
 import { ErrorBoundary } from "~/components/ui/ErrorBoundary"
+import { BACKGROUND_GRADIENTS_SUBTLE } from "~constants/theme"
 import { I18nProvider } from "~utils/i18n"
+import { ThemeProvider, useTheme } from "~utils/theme"
 import Footer from "./components/option/Footer"
 import OptionHeader from "./components/option/OptionHeader"
 
@@ -37,47 +39,53 @@ function SectionSkeleton() {
   )
 }
 
+function OptionsPageContent() {
+  const { resolvedTheme } = useTheme()
+
+  return (
+    <div className="relative min-h-screen bg-app p-8">
+      {/* Background Gradient - adjust opacity for dark mode */}
+      <div
+        className="fixed inset-0 z-0 h-full w-full"
+        style={{
+          backgroundImage: BACKGROUND_GRADIENTS_SUBTLE[resolvedTheme]
+        }}
+      />
+      <div className="relative z-1 mx-auto max-w-2xl">
+        <OptionHeader />
+        <Suspense fallback={<SectionSkeleton />}>
+          <ExtractionModeSection />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <LogSettingsSection />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <InterfaceSettingsSection />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <SelectorSettingsSection />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <AiSettingsSection />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <DevSettingsSection />
+        </Suspense>
+        <Footer />
+      </div>
+      <ToastContainer theme={resolvedTheme === "dark" ? "dark" : "light"} />
+    </div>
+  )
+}
+
 function OptionsPage() {
   return (
     <I18nProvider>
-      <ErrorBoundary>
-        <div className="relative min-h-screen bg-app p-8">
-          {/* Background Gradient */}
-          <div
-            className="fixed inset-0 z-0 h-full w-full"
-            style={{
-              backgroundImage: `
-                radial-gradient(circle at 15% 10%, rgb(37 99 235 / 0.14), transparent 40%),
-                radial-gradient(circle at 50% 5%, rgb(6 182 212 / 0.11), transparent 45%),
-                radial-gradient(circle at 85% 10%, rgb(168 85 247 / 0.08), transparent 40%)
-              `
-            }}
-          />
-          <div className="relative z-1 mx-auto max-w-2xl">
-            <OptionHeader />
-            <Suspense fallback={<SectionSkeleton />}>
-              <ExtractionModeSection />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <LogSettingsSection />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <InterfaceSettingsSection />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <SelectorSettingsSection />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <AiSettingsSection />
-            </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
-              <DevSettingsSection />
-            </Suspense>
-            <Footer />
-          </div>
-          <ToastContainer />
-        </div>
-      </ErrorBoundary>
+      <ThemeProvider>
+        <ErrorBoundary>
+          <OptionsPageContent />
+        </ErrorBoundary>
+      </ThemeProvider>
     </I18nProvider>
   )
 }

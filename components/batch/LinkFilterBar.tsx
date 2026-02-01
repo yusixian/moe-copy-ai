@@ -82,7 +82,7 @@ const LinkFilterBar = memo(function LinkFilterBar({
   const hasFilter = pattern.trim().length > 0
 
   return (
-    <div className="space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-3">
+    <div className="space-y-2 rounded-lg border border-line-1 bg-content-alt p-3">
       {/* 第一行：输入框和预设 */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
@@ -90,7 +90,7 @@ const LinkFilterBar = memo(function LinkFilterBar({
             icon="mdi:regex"
             className={cn(
               "absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2",
-              !isValid ? "text-red-400" : "text-gray-400"
+              !isValid ? "text-error" : "text-text-4"
             )}
           />
           <input
@@ -99,10 +99,10 @@ const LinkFilterBar = memo(function LinkFilterBar({
             onChange={(e) => onPatternChange(e.target.value)}
             placeholder={t("batch.filter.placeholder")}
             className={cn(
-              "w-full rounded-md border py-1.5 pr-8 pl-8 text-sm transition-colors focus:outline-none focus:ring-1",
+              "w-full rounded-md border py-1.5 pr-8 pl-8 text-sm text-text-1 transition-colors focus:outline-none focus:ring-1",
               !isValid
-                ? "border-red-300 bg-red-50 focus:border-red-400 focus:ring-red-400"
-                : "border-gray-300 bg-white focus:border-sky-400 focus:ring-sky-400"
+                ? "border-error/50 bg-error/10 focus:border-error focus:ring-error"
+                : "border-line-1 bg-content-solid focus:border-accent-blue focus:ring-accent-blue"
             )}
           />
           {hasFilter && (
@@ -138,7 +138,7 @@ const LinkFilterBar = memo(function LinkFilterBar({
 
           {/* 预设下拉菜单 */}
           {isPresetOpen && (
-            <div className="absolute top-full right-0 z-10 mt-1 w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+            <div className="absolute top-full right-0 z-10 mt-1 w-56 rounded-lg border border-line-1 bg-elevated-solid-1 py-1 shadow-lg">
               {LINK_FILTER_PRESETS.map((preset) => (
                 <button
                   type="button"
@@ -147,24 +147,24 @@ const LinkFilterBar = memo(function LinkFilterBar({
                     onApplyPreset(preset)
                     setIsPresetOpen(false)
                   }}
-                  className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left transition-colors hover:bg-gray-50">
+                  className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left transition-colors hover:bg-content-alt">
                   <div className="flex items-center gap-2">
                     <span
                       className={cn(
                         "rounded px-1.5 py-0.5 font-medium text-[10px]",
                         preset.mode === "exclude"
-                          ? "bg-red-100 text-red-600"
-                          : "bg-emerald-100 text-emerald-600"
+                          ? "bg-error/10 text-error"
+                          : "bg-success/10 text-success"
                       )}>
                       {preset.mode === "exclude"
                         ? t("batch.filter.mode.exclude")
                         : t("batch.filter.mode.include")}
                     </span>
-                    <span className="font-medium text-gray-700 text-sm">
+                    <span className="font-medium text-sm text-text-1">
                       {t(preset.nameKey)}
                     </span>
                   </div>
-                  <span className="text-gray-400 text-xs">
+                  <span className="text-text-4 text-xs">
                     {t(preset.descKey)}
                   </span>
                 </button>
@@ -205,17 +205,17 @@ const LinkFilterBar = memo(function LinkFilterBar({
                   icon={filteredCount > 0 ? "mdi:filter" : "mdi:filter-off"}
                   className={cn(
                     "h-3.5 w-3.5",
-                    filteredCount > 0 ? "text-sky-500" : "text-gray-400"
+                    filteredCount > 0 ? "text-accent-blue" : "text-text-4"
                   )}
                 />
-                <span className="text-gray-500">
+                <span className="text-text-3">
                   {mode === "exclude"
                     ? t("batch.filter.stats.excluded")
                     : t("batch.filter.stats.included")}{" "}
                   <span
                     className={cn(
                       "font-medium",
-                      filteredCount > 0 ? "text-sky-600" : "text-gray-600"
+                      filteredCount > 0 ? "text-accent-blue" : "text-text-2"
                     )}>
                     {mode === "exclude" ? filteredCount : filteredLinks.length}
                   </span>
@@ -223,7 +223,7 @@ const LinkFilterBar = memo(function LinkFilterBar({
                 </span>
               </>
             ) : (
-              <span className="text-red-500">
+              <span className="text-error">
                 <Icon
                   icon="mdi:alert-circle"
                   className="mr-1 inline h-3.5 w-3.5"

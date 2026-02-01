@@ -229,16 +229,16 @@ const LinkPreviewList = memo(function LinkPreviewList({
     <div className="flex flex-col gap-4">
       {/* 元素信息 */}
       {elementInfo && (
-        <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+        <div className="flex items-center justify-between rounded-lg bg-content-alt p-3">
           <div className="flex items-center gap-2">
-            <span className="rounded bg-indigo-100 px-2 py-0.5 font-medium text-indigo-700 text-xs">
+            <span className="rounded bg-accent-indigo-ghost px-2 py-0.5 font-medium text-accent-indigo text-xs">
               {elementInfo.tagName}
             </span>
             {elementInfo.id && (
-              <span className="text-gray-500 text-xs">#{elementInfo.id}</span>
+              <span className="text-text-3 text-xs">#{elementInfo.id}</span>
             )}
             {elementInfo.className && (
-              <span className="text-gray-400 text-xs">
+              <span className="text-text-4 text-xs">
                 .{elementInfo.className.split(" ")[0]}
               </span>
             )}
@@ -276,19 +276,19 @@ const LinkPreviewList = memo(function LinkPreviewList({
               type="checkbox"
               checked={isAllSelected}
               onChange={toggleAll}
-              className="h-4 w-4 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500"
+              className="h-4 w-4 rounded border-line-1 text-success focus:ring-success"
             />
-            <span className="text-gray-500 text-xs">
+            <span className="text-text-3 text-xs">
               {t("batch.preview.selectAll")}
             </span>
           </label>
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-600 text-sm">
+          <span className="text-line-1">|</span>
+          <span className="text-sm text-text-2">
             {t("batch.preview.selected")}{" "}
-            <span className="font-bold text-emerald-500">{selectedCount}</span>/
+            <span className="font-bold text-success">{selectedCount}</span>/
             {filteredLinks.length}
             {filteredLinks.length !== links.length && (
-              <span className="ml-1 text-gray-400 text-xs">
+              <span className="ml-1 text-text-4 text-xs">
                 {t("batch.preview.total", { total: links.length })}
               </span>
             )}
@@ -296,7 +296,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
         </div>
         {links.length > 0 && (
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-gray-400">{t("batch.preview.export")}</span>
+            <span className="text-text-4">{t("batch.preview.export")}</span>
             <Button
               variant="ghost"
               size="xs"
@@ -321,22 +321,22 @@ const LinkPreviewList = memo(function LinkPreviewList({
       </div>
 
       {/* 链接列表 */}
-      <div className="max-h-64 overflow-y-auto rounded-lg border border-gray-200">
+      <div className="max-h-64 overflow-y-auto rounded-lg border border-line-1">
         {filteredLinks.map((link, idx) => (
           <div
             key={link.index}
             className={cn(
-              "flex items-start gap-3 px-3 py-2 transition-colors hover:bg-gray-50",
-              idx !== filteredLinks.length - 1 && "border-gray-100 border-b",
+              "flex items-start gap-3 px-3 py-2 transition-colors hover:bg-content-alt",
+              idx !== filteredLinks.length - 1 && "border-line-2 border-b",
               !isSelected(link.index) && "opacity-50"
             )}>
             <input
               type="checkbox"
               checked={isSelected(link.index)}
               onChange={() => toggleLink(link.index)}
-              className="mt-0.5 h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-300 text-emerald-500 focus:ring-emerald-500"
+              className="mt-0.5 h-4 w-4 flex-shrink-0 cursor-pointer rounded border-line-1 text-success focus:ring-success"
             />
-            <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500 text-xs">
+            <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-content-alt text-text-3 text-xs">
               {link.index + 1}
             </span>
 
@@ -350,7 +350,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
                     dispatch({ type: "UPDATE_EDIT_FORM", text: e.target.value })
                   }
                   placeholder={t("batch.preview.linkTitle")}
-                  className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded border border-line-1 bg-content-solid px-2 py-1 text-sm text-text-1 focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue"
                 />
                 <input
                   type="text"
@@ -359,7 +359,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
                     dispatch({ type: "UPDATE_EDIT_FORM", url: e.target.value })
                   }
                   placeholder={t("batch.preview.linkUrl")}
-                  className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded border border-line-1 bg-content-solid px-2 py-1 text-text-1 text-xs focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue"
                 />
                 <div className="flex gap-2">
                   <Button variant="success" size="xs" onClick={saveEdit}>
@@ -375,12 +375,10 @@ const LinkPreviewList = memo(function LinkPreviewList({
               // 正常模式
               <>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium text-gray-800 text-sm">
+                  <div className="truncate font-medium text-sm text-text-1">
                     {link.text || t("batch.preview.noTitle")}
                   </div>
-                  <div className="truncate text-gray-400 text-xs">
-                    {link.url}
-                  </div>
+                  <div className="truncate text-text-4 text-xs">{link.url}</div>
                 </div>
                 <div className="flex flex-shrink-0 items-center gap-1">
                   <Button
@@ -408,8 +406,8 @@ const LinkPreviewList = memo(function LinkPreviewList({
 
       {/* 添加链接 */}
       {isAdding ? (
-        <div className="space-y-2 rounded-lg border border-sky-200 bg-sky-50 p-3">
-          <div className="font-medium text-gray-600 text-xs">
+        <div className="space-y-2 rounded-lg border border-accent-blue/30 bg-accent-blue-ghost p-3">
+          <div className="font-medium text-text-2 text-xs">
             {t("batch.preview.addNew")}
           </div>
           <input
@@ -419,7 +417,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
               dispatch({ type: "UPDATE_ADD_FORM", url: e.target.value })
             }
             placeholder={t("batch.preview.linkUrl")}
-            className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full rounded border border-line-1 bg-content-solid px-2.5 py-1.5 text-sm text-text-1 focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue"
           />
           <input
             type="text"
@@ -428,7 +426,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
               dispatch({ type: "UPDATE_ADD_FORM", text: e.target.value })
             }
             placeholder={t("batch.preview.linkTitleOptional")}
-            className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full rounded border border-line-1 bg-content-solid px-2.5 py-1.5 text-sm text-text-1 focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue"
           />
           <div className="flex gap-2">
             <Button
@@ -457,14 +455,14 @@ const LinkPreviewList = memo(function LinkPreviewList({
       )}
 
       {/* 下一页按钮选择 */}
-      <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+      <div className="rounded-lg border border-line-1 bg-content-alt p-3">
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon
               icon="mdi:page-next-outline"
-              className="h-4 w-4 text-indigo-500"
+              className="h-4 w-4 text-accent-indigo"
             />
-            <span className="font-medium text-gray-700 text-sm">
+            <span className="font-medium text-sm text-text-1">
               {t("batch.preview.pagination.title")}
             </span>
           </div>
@@ -472,34 +470,31 @@ const LinkPreviewList = memo(function LinkPreviewList({
             <Button
               variant="ghost"
               size="xs"
-              className="text-gray-400 hover:text-red-500"
+              className="text-text-4 hover:text-error"
               onClick={onClearNextPage}>
               {t("batch.preview.pagination.clear")}
             </Button>
           )}
         </div>
         {isSelectingNextPage ? (
-          <div className="flex items-center gap-2 rounded-md bg-indigo-100 px-3 py-2">
+          <div className="flex items-center gap-2 rounded-md bg-accent-indigo-ghost px-3 py-2">
             <Icon
               icon="mdi:loading"
-              className="h-4 w-4 animate-spin text-indigo-500"
+              className="h-4 w-4 animate-spin text-accent-indigo"
             />
-            <span className="text-indigo-700 text-sm">
+            <span className="text-accent-indigo text-sm">
               {t("batch.preview.pagination.selecting")}
             </span>
           </div>
         ) : nextPageButton ? (
-          <div className="flex items-center justify-between rounded-md bg-emerald-50 px-3 py-2">
+          <div className="flex items-center justify-between rounded-md bg-success/10 px-3 py-2">
             <div className="flex items-center gap-2">
-              <Icon
-                icon="mdi:check-circle"
-                className="h-4 w-4 text-emerald-500"
-              />
+              <Icon icon="mdi:check-circle" className="h-4 w-4 text-success" />
               <div>
-                <div className="font-medium text-gray-700 text-sm">
+                <div className="font-medium text-sm text-text-1">
                   {nextPageButton.text}
                 </div>
-                <div className="max-w-[200px] truncate text-gray-400 text-xs">
+                <div className="max-w-[200px] truncate text-text-4 text-xs">
                   {nextPageButton.xpath}
                 </div>
               </div>
@@ -519,7 +514,7 @@ const LinkPreviewList = memo(function LinkPreviewList({
             {t("batch.preview.pagination.select")}
           </Button>
         )}
-        <p className="mt-2 text-gray-400 text-xs">
+        <p className="mt-2 text-text-4 text-xs">
           {t("batch.preview.pagination.hint")}
         </p>
       </div>

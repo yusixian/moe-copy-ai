@@ -59,11 +59,11 @@ const PromptInput = ({
 
   return (
     <div className="mb-3">
-      <div className="mb-2 rounded-lg border border-indigo-100 bg-indigo-50 p-2">
-        <p className="flex items-center text-indigo-700 text-xs">
+      <div className="mb-2 rounded-lg border border-accent-indigo/20 bg-accent-indigo-ghost p-2">
+        <p className="flex items-center text-accent-indigo text-xs">
           <Icon
             icon="line-md:information"
-            className="mr-1 flex-shrink-0 text-indigo-500"
+            className="mr-1 flex-shrink-0 text-accent-indigo"
             width="16"
             height="16"
           />
@@ -75,7 +75,7 @@ const PromptInput = ({
           value={customPrompt}
           onChange={(e) => setCustomPrompt(e.target.value)}
           placeholder={t("ai.panel.prompt.placeholder")}
-          className="w-full rounded-xl border border-sky-200 bg-white p-3 text-sm shadow-sm transition-all hover:border-sky-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+          className="w-full rounded-xl border border-line-1 bg-content-solid p-3 text-sm text-text-1 shadow-sm transition-all hover:border-accent-blue/50 focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/20"
           rows={4}
         />
 
@@ -85,7 +85,7 @@ const PromptInput = ({
               <button
                 type="button"
                 onClick={() => setShowPlaceholders(!showPlaceholders)}
-                className="flex items-center rounded-md bg-sky-100 px-3 py-1.5 font-medium text-sky-600 text-sm shadow-sm transition-all hover:bg-sky-200 hover:shadow">
+                className="flex items-center rounded-md bg-fill-1 px-3 py-1.5 font-medium text-accent-blue text-sm shadow-sm transition-all hover:bg-fill-2 hover:shadow">
                 <Icon
                   icon={
                     showPlaceholders
@@ -107,7 +107,7 @@ const PromptInput = ({
               <button
                 type="button"
                 onClick={handleSaveAsDefault}
-                className="flex items-center rounded-md bg-purple-100 px-3 py-1.5 font-medium text-purple-600 text-sm shadow-sm transition-all hover:bg-purple-200 hover:shadow">
+                className="flex items-center rounded-md bg-purple-500/10 px-3 py-1.5 font-medium text-purple-600 text-sm shadow-sm transition-all hover:bg-purple-500/20 hover:shadow">
                 <Icon
                   icon="line-md:check-list-3"
                   className="mr-1.5"
@@ -121,7 +121,7 @@ const PromptInput = ({
               <button
                 type="button"
                 onClick={() => setCustomPrompt(systemPrompt)}
-                className="flex items-center rounded-md bg-indigo-100 px-3 py-1.5 font-medium text-indigo-600 text-sm shadow-sm transition-all hover:bg-indigo-200 hover:shadow">
+                className="flex items-center rounded-md bg-accent-indigo/10 px-3 py-1.5 font-medium text-accent-indigo text-sm shadow-sm transition-all hover:bg-accent-indigo/20 hover:shadow">
                 <Icon
                   icon="line-md:restore"
                   className="mr-1.5"
@@ -135,7 +135,7 @@ const PromptInput = ({
               <button
                 type="button"
                 onClick={() => setShowPreview(!showPreview)}
-                className="flex items-center rounded-md bg-emerald-100 px-3 py-1.5 font-medium text-emerald-600 text-sm shadow-sm transition-all hover:bg-emerald-200 hover:shadow">
+                className="flex items-center rounded-md bg-emerald-500/10 px-3 py-1.5 font-medium text-emerald-600 text-sm shadow-sm transition-all hover:bg-emerald-500/20 hover:shadow">
                 <Icon
                   icon={showPreview ? "line-md:eye-off" : "line-md:eye"}
                   className="mr-1.5"
@@ -153,8 +153,8 @@ const PromptInput = ({
         {showPlaceholders &&
           supportedPlaceholders &&
           supportedPlaceholders.length > 0 && (
-            <div className="mt-1 rounded-md border border-sky-100 bg-sky-50 p-2">
-              <p className="mb-1 text-sky-700 text-xs">
+            <div className="mt-1 rounded-md border border-accent-blue/20 bg-accent-blue-ghost p-2">
+              <p className="mb-1 text-accent-blue text-xs">
                 {t("scrape.prompt.placeholderHelp")}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -163,7 +163,7 @@ const PromptInput = ({
                     type="button"
                     key={info.placeholder}
                     onClick={() => insertPlaceholder(info.placeholder)}
-                    className="rounded-md bg-white px-2.5 py-1 text-sky-700 text-sm shadow-sm hover:bg-sky-100"
+                    className="rounded-md bg-content-solid px-2.5 py-1 text-accent-blue text-sm shadow-sm hover:bg-accent-blue-ghost-hover"
                     title={info.description}>
                     {info.placeholder} {info.description}
                   </button>
@@ -173,8 +173,8 @@ const PromptInput = ({
           )}
 
         {showPreview && hasPlaceholders && scrapedData && (
-          <div className="mt-2 rounded-md border border-emerald-100 bg-emerald-50 p-2">
-            <p className="mb-1 flex items-center font-medium text-emerald-700 text-xs">
+          <div className="mt-2 rounded-md border border-success/20 bg-success/10 p-2">
+            <p className="mb-1 flex items-center font-medium text-success text-xs">
               <Icon
                 icon="line-md:document-code"
                 className="mr-1 flex-shrink-0"
@@ -183,7 +183,7 @@ const PromptInput = ({
               />
               {t("scrape.prompt.previewTitle")}
             </p>
-            <div className="max-h-40 overflow-y-auto rounded-md bg-white p-2 text-slate-700 text-xs">
+            <div className="max-h-40 overflow-y-auto rounded-md bg-content-solid p-2 text-text-2 text-xs">
               {getPreviewContent()}
             </div>
 

@@ -18,6 +18,7 @@
 2. **Pure Functions**: Isolate side effects (storage, Chrome APIs, AI calls); immutable transforms.
 3. **No Circular Deps**: Dependency flow: `popup/options → components → hooks → utils → constants`.
 4. **TypeScript Strict**: No `any`; export types with implementations.
+5. **Browser Compatibility**: Minimum Chrome 88+ (CSS `color-mix()` support); target modern CSS features (CSS variables, `oklch()`, `color-mix()`).
 
 ## Commands
 

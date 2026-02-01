@@ -150,7 +150,7 @@ export function useSelectors(options: UseSelectorsOptions = {}) {
   const updateSelectorResults = useCallback(
     (results: SelectorResultsMap) => {
       setSelectorResults(results)
-      addDebugInfo("收到选择器结果: " + Object.keys(results).length + " 种类型")
+      addDebugInfo(`收到选择器结果: ${Object.keys(results).length} 种类型`)
     },
     [addDebugInfo]
   )

@@ -140,6 +140,12 @@
   "sidepanel.settings.selector.title": "Selector Settings",
   "sidepanel.settings.selector.openFull": "All Settings",
 
+  "settings.theme": "Theme",
+  "settings.theme.light": "Light",
+  "settings.theme.dark": "Dark",
+  "settings.theme.system": "System",
+  "settings.theme.desc": "Select interface appearance theme",
+
   "settings.log.level.debug": "Debug",
   "settings.log.level.info": "Info",
   "settings.log.level.error": "Error",

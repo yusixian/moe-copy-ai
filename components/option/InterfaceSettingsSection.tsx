@@ -5,12 +5,14 @@ import { FLOAT_BUTTON_OPTIONS } from "../../constants/options"
 import LanguageSelect from "./LanguageSelect"
 import OptionSection from "./OptionSection"
 import OptionSelect from "./OptionSelect"
+import ThemeSelect from "./ThemeSelect"
 
 export const InterfaceSettingsSection: React.FC = () => {
   const { t } = useI18n()
 
   return (
     <OptionSection title={t("option.interface.title")} icon="line-md:cog">
+      <ThemeSelect />
       <LanguageSelect />
       <OptionSelect
         id="floatButton"
