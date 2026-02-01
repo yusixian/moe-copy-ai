@@ -43,7 +43,7 @@ export function ExtractionModeIndicator({
       )}
       {(!mode || mode === "selector") && (
         <>
-          <span className="inline-flex items-center gap-1 rounded-full border border-ghost bg-info-ghost px-2.5 py-1 font-medium text-info text-xs shadow-sm">
+          <span className="inline-flex items-center gap-1 rounded-full border border-info bg-info-ghost px-2.5 py-1 font-medium text-info text-xs shadow-sm">
             <Icon
               icon="line-md:settings-twotone"
               width="12"
