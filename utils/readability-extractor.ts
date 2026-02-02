@@ -3,55 +3,34 @@ import type {
   ReadabilityResult,
   ScrapedContent
 } from "../constants/types"
-import type { ExtractionResult, QualityEvaluation } from "./readability"
-import { getScrapeWorker } from "./workers/scrape-worker-client"
+import type { ExtractionResult } from "./readability/extractor"
+import type { QualityEvaluation } from "./readability/quality-core"
+import {
+  type ReadabilitySource,
+  resolveReadabilitySource
+} from "./readability/source-resolver"
+import { createReadabilityWorkerFacade } from "./readability/worker-facade"
 
-function getDefaultDocumentHtml(): string {
-  if (typeof document !== "undefined") {
-    return document.documentElement?.outerHTML || ""
-  }
-  return ""
-}
-
-function getDefaultBaseUrl(): string | undefined {
-  if (typeof document !== "undefined") {
-    return document.baseURI
-  }
-  if (typeof window !== "undefined") {
-    return window.location.href
-  }
-  return undefined
-}
+// 组合入口：负责“来源解析 + worker 调度”，不含评分/清理细节。
+const workerFacade = createReadabilityWorkerFacade()
 
 export async function convertHtmlToMarkdown(
   html: string,
   baseUrl?: string
 ): Promise<string> {
-  return await getScrapeWorker().convertHtmlToMarkdown(html, baseUrl)
+  return await workerFacade.convertHtmlToMarkdown(html, baseUrl)
 }
 
 export type { ExtractionResult, QualityEvaluation }
 
 export async function extractWithReadability(
-  source?: Document | string,
+  source?: ReadabilitySource,
   baseUrl?: string
 ): Promise<ExtractionResult> {
-  let html = ""
-  let resolvedBaseUrl = baseUrl
-
-  if (typeof source === "string") {
-    html = source
-  } else if (source) {
-    html = source.documentElement?.outerHTML || ""
-    resolvedBaseUrl = resolvedBaseUrl || source.baseURI
-  } else {
-    html = getDefaultDocumentHtml()
-    resolvedBaseUrl = resolvedBaseUrl || getDefaultBaseUrl()
-  }
-
-  return await getScrapeWorker().extractWithReadabilityFromHtml(
-    html,
-    resolvedBaseUrl
+  const resolved = resolveReadabilitySource(source, baseUrl)
+  return await workerFacade.extractWithReadabilityFromHtml(
+    resolved.html,
+    resolved.baseUrl
   )
 }
 
@@ -59,7 +38,7 @@ export async function evaluateContentQuality(
   selectorContent: string,
   readabilityContent: string
 ): Promise<QualityEvaluation> {
-  return await getScrapeWorker().evaluateContentQuality(
+  return await workerFacade.evaluateContentQuality(
     selectorContent,
     readabilityContent
   )
@@ -68,13 +47,13 @@ export async function evaluateContentQuality(
 export async function extractImagesFromMarkdown(
   markdownContent: string
 ): Promise<ImageInfo[]> {
-  return await getScrapeWorker().extractImagesFromMarkdown(markdownContent)
+  return await workerFacade.extractImagesFromMarkdown(markdownContent)
 }
 
 export async function finalizeScrapedContent(
   scrapedContent: ScrapedContent
 ): Promise<ScrapedContent> {
-  return await getScrapeWorker().finalizeScrapedContent(scrapedContent)
+  return await workerFacade.finalizeScrapedContent(scrapedContent)
 }
 
 export function createEmptyReadabilityResult(): ExtractionResult {

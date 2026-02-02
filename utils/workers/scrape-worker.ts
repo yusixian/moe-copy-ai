@@ -7,18 +7,20 @@ import type {
   ReadabilityResult,
   ScrapedContent
 } from "../../constants/types"
-import { parseHtmlToMarkdown } from "../../parser"
+import {
+  convertHtmlToMarkdownCore,
+  extractImagesFromMarkdownCore
+} from "../readability/markdown-core"
+import {
+  evaluateContentQualityCore,
+  type QualityEvaluation
+} from "../readability/quality-core"
+import { cleanContent as cleanContentCore } from "../text/clean-content"
 
 export type ExtractionResult = {
   content: string
   metadata: ReadabilityResult
   success: boolean
-}
-
-export type QualityEvaluation = {
-  betterContent: string
-  reason: string
-  scores: { selector: number; readability: number }
 }
 
 export type ScrapeWorkerApi = {
@@ -94,8 +96,6 @@ const EMPTY_METADATA: ReadabilityResult = {
   publishedTime: ""
 }
 
-const SCORE_THRESHOLD = 10
-
 function createFailureResult(): ExtractionResult {
   return { content: "", metadata: EMPTY_METADATA, success: false }
 }
@@ -104,6 +104,7 @@ function sanitizeHtml(sourceDoc: Document): string {
   const originalHTML = sourceDoc.body?.outerHTML || ""
 
   try {
+    // worker 内部只负责净化，不进行额外结构改写。
     return DOMPurify.sanitize(originalHTML, DOMPURIFY_CONFIG) as string
   } catch {
     return originalHTML
@@ -115,6 +116,7 @@ function createDocumentForReadability(
   cleanBodyHTML: string,
   baseUrl?: string
 ): Document {
+  // 通过 base 标签固定相对链接解析，降低跨页面差异。
   const baseTag = baseUrl ? `<base href="${baseUrl}">` : ""
 
   const fullHTML = `<!DOCTYPE html>
@@ -166,94 +168,10 @@ function toMetadata(article: ParsedArticle): ReadabilityResult {
   }
 }
 
-function calculateScore(content: string): number {
-  if (!content) return 0
-
-  const length = content.length
-  const paragraphs = content
-    .split("\n\n")
-    .filter((p) => p.trim().length > 20).length
-  const headings = (content.match(/^#+\s/gm) || []).length
-  const htmlTagCount = (content.match(/<[^>]+>/g) || []).length
-  const htmlTagRatio = length > 0 ? htmlTagCount / (length / 100) : 0
-
-  let score = 0
-
-  if (length > 1000) score += 40
-  else if (length > 500) score += 30
-  else if (length > 200) score += 20
-  else score += 10
-
-  if (paragraphs > 5) score += 20
-  else if (paragraphs > 2) score += 15
-  else score += 5
-
-  if (headings > 2) score += 20
-  else if (headings > 0) score += 10
-
-  if (htmlTagRatio < 1) score += 20
-  else if (htmlTagRatio < 3) score += 10
-
-  return Math.min(score, 100)
-}
-
-function cleanContentInternal(content: string): string {
-  if (!content) return ""
-
-  const codeBlocks: string[] = []
-  let tempContent = content
-
-  const codeBlockRegex = /```[\s\S]*?```/g
-  let match: RegExpExecArray | null = codeBlockRegex.exec(content)
-  let index = 0
-
-  while (match !== null) {
-    const placeholder = `__CODE_BLOCK_${index}__`
-    tempContent = tempContent.replace(match[0], placeholder)
-    codeBlocks.push(match[0])
-    index++
-    match = codeBlockRegex.exec(content)
-  }
-
-  tempContent = tempContent
-    .replace(/\n+/g, " ")
-    .replace(/[ \t]+/g, " ")
-    .replace(/^\s+|\s+$/g, "")
-    .replace(/\s+([.,;:!?])/g, "$1")
-    .replace(/\s*-\s*/g, "-")
-    .replace(/\(\s+|\s+\)/g, (m) => m.replace(/\s+/g, ""))
-    .replace(/\s+"|"\s+/g, '"')
-    .replace(/\s*\[\s*|\s*\]\s*/g, (m) => m.replace(/\s+/g, ""))
-    .replace(/\s*\{\s*|\s*\}\s*/g, (m) => m.replace(/\s+/g, ""))
-    .replace(/([.!?:;]) +/g, "$1 ")
-
-  tempContent = tempContent.replace(/# +/g, "# ")
-  tempContent = tempContent.replace(/## +/g, "## ")
-  tempContent = tempContent.replace(/### +/g, "### ")
-  tempContent = tempContent.replace(/#### +/g, "#### ")
-  tempContent = tempContent.replace(/##### +/g, "##### ")
-  tempContent = tempContent.replace(/###### +/g, "###### ")
-
-  for (let i = 0; i < codeBlocks.length; i++) {
-    tempContent = tempContent.replace(`__CODE_BLOCK_${i}__`, codeBlocks[i])
-  }
-
-  return tempContent
-}
-
 const api: ScrapeWorkerApi = {
   async convertHtmlToMarkdown(html: string, baseUrl?: string): Promise<string> {
-    if (!html) return ""
-
-    try {
-      const markdown = await parseHtmlToMarkdown(html, { baseUrl })
-      return markdown.replace(/\n{3,}/g, "\n\n").trim()
-    } catch {
-      return html
-        .replace(/<[^>]*>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-    }
+    // 统一调用 core 实现，避免 worker 与主线程行为分叉。
+    return await convertHtmlToMarkdownCore(html, baseUrl)
   },
 
   async extractWithReadabilityFromHtml(
@@ -263,6 +181,7 @@ const api: ScrapeWorkerApi = {
     try {
       if (!html) return createFailureResult()
 
+      // 在 worker 侧解析 DOM，避免主线程阻塞。
       const parser = new DOMParser()
       const sourceDoc = parser.parseFromString(html, "text/html")
 
@@ -281,6 +200,7 @@ const api: ScrapeWorkerApi = {
 
       let article: ParsedArticle | null
       try {
+        // Readability 只运行一次，失败直接降级。
         const reader = new Readability(docForReadability, READABILITY_OPTIONS)
         article = reader.parse() as ParsedArticle | null
       } catch {
@@ -305,63 +225,19 @@ const api: ScrapeWorkerApi = {
     selectorContent: string,
     readabilityContent: string
   ): Promise<QualityEvaluation> {
-    const selectorScore = calculateScore(selectorContent)
-    const readabilityScore = calculateScore(readabilityContent)
-    const scores = { selector: selectorScore, readability: readabilityScore }
-
-    if (readabilityScore > selectorScore + SCORE_THRESHOLD) {
-      return {
-        betterContent: readabilityContent,
-        reason: `Readability higher (${readabilityScore} vs ${selectorScore})`,
-        scores
-      }
-    }
-
-    if (selectorScore > readabilityScore + SCORE_THRESHOLD) {
-      return {
-        betterContent: selectorContent,
-        reason: `Selector higher (${selectorScore} vs ${readabilityScore})`,
-        scores
-      }
-    }
-
-    return {
-      betterContent:
-        readabilityContent.length > selectorContent.length
-          ? readabilityContent
-          : selectorContent,
-      reason: "Scores similar, choosing longer content",
-      scores
-    }
+    return evaluateContentQualityCore(selectorContent, readabilityContent)
   },
 
   async extractImagesFromMarkdown(
     markdownContent: string
   ): Promise<ImageInfo[]> {
-    const images: ImageInfo[] = []
-    const regex = /!\[([^\]]*)\]\(([^)]+)\)/g
-
-    let index = 0
-
-    while (true) {
-      const match = regex.exec(markdownContent)
-      if (!match) break
-      images.push({
-        src: match[2],
-        alt: match[1] || `Image#${index}`,
-        title: "",
-        index
-      })
-      index++
-    }
-
-    return images
+    return extractImagesFromMarkdownCore(markdownContent)
   },
 
   async finalizeScrapedContent(
     scrapedContent: ScrapedContent
   ): Promise<ScrapedContent> {
-    const cleanedContent = cleanContentInternal(scrapedContent.articleContent)
+    const cleanedContent = cleanContentCore(scrapedContent.articleContent)
     const images =
       scrapedContent.images.length > 0
         ? scrapedContent.images
@@ -375,7 +251,7 @@ const api: ScrapeWorkerApi = {
   },
 
   async cleanContent(content: string): Promise<string> {
-    return cleanContentInternal(content)
+    return cleanContentCore(content)
   }
 }
 
