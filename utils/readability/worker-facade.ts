@@ -1,5 +1,5 @@
-import { getScrapeWorker } from "../workers/scrape-worker-client"
 import type { ImageInfo, ScrapedContent } from "../../constants/types"
+import { getScrapeWorker } from "../workers/scrape-worker-client"
 import type { ExtractionResult } from "./extractor"
 import type { QualityEvaluation } from "./quality-core"
 
