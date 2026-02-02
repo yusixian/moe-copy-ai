@@ -1,7 +1,10 @@
-// Re-export from new modular structure for backwards compatibility
+// Facade for backwards compatibility
+// All functionality now in ./readability.ts (deep module)
 export {
   convertHtmlToMarkdown,
+  type ExtractionResult,
   evaluateContentQuality,
   extractImagesFromMarkdown,
-  extractWithReadability
-} from "./readability/index"
+  extractWithReadability,
+  type QualityEvaluation
+} from "./readability"
