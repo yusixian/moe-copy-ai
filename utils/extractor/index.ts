@@ -144,7 +144,7 @@ export async function scrapeWebpageContent(
   }
 
   debugLog("Pipeline failed, returning fallback:", pipelineResult.error)
-  const fallback = finalizeScrapedContent(createBaseScrapedContent())
+  const fallback = await finalizeScrapedContent(createBaseScrapedContent())
   fallback.metadata = {
     ...fallback.metadata,
     "extraction:mode": mode,

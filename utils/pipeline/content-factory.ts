@@ -1,6 +1,5 @@
 import type { ScrapedContent } from "../../constants/types"
-import { cleanContent } from "../formatter"
-import { extractImagesFromMarkdown } from "../readability-extractor"
+import { finalizeScrapedContent as finalizeInWorker } from "../readability-extractor"
 
 export function createBaseScrapedContent(currentUrl?: string): ScrapedContent {
   return {
@@ -43,20 +42,10 @@ export function cloneScrapedContent(base: ScrapedContent): ScrapedContent {
   }
 }
 
-export function finalizeScrapedContent(
+export async function finalizeScrapedContent(
   scrapedContent: ScrapedContent
-): ScrapedContent {
-  const cleanedContent = cleanContent(scrapedContent.articleContent)
-  const images =
-    scrapedContent.images.length > 0
-      ? scrapedContent.images
-      : extractImagesFromMarkdown(scrapedContent.articleContent)
-
-  return {
-    ...scrapedContent,
-    cleanedContent,
-    images
-  }
+): Promise<ScrapedContent> {
+  return await finalizeInWorker(scrapedContent)
 }
 
 export function getErrorMessage(error: unknown): string {

@@ -15,8 +15,12 @@ vi.mock("../readability-extractor", () => ({
     div.innerHTML = html
     return div.textContent || ""
   }),
-  extractImagesFromMarkdown: vi.fn(() => []),
-  evaluateContentQuality: vi.fn(),
+  extractImagesFromMarkdown: vi.fn(async () => []),
+  evaluateContentQuality: vi.fn(async () => ({
+    betterContent: "",
+    reason: "",
+    scores: { selector: 0, readability: 0 }
+  })),
   extractWithReadability: vi.fn()
 }))
 

@@ -37,7 +37,7 @@ async function convertElementToMarkdown(
 ): Promise<string> {
   const html = element.outerHTML || element.innerHTML || ""
   const markdown = await convertHtmlToMarkdown(html, getBaseUrl())
-  mergeExtractedImages(imagesArray, extractImagesFromMarkdown(markdown))
+  mergeExtractedImages(imagesArray, await extractImagesFromMarkdown(markdown))
   return markdown
 }
 
@@ -113,7 +113,7 @@ const paragraphStrategy: ContentStrategy = async (imagesArray) => {
 
   const html = contentElements.map((p) => p.outerHTML).join("\n")
   const content = await convertHtmlToMarkdown(html, getBaseUrl())
-  mergeExtractedImages(imagesArray, extractImagesFromMarkdown(content))
+  mergeExtractedImages(imagesArray, await extractImagesFromMarkdown(content))
 
   return {
     content,

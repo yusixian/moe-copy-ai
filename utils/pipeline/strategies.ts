@@ -121,7 +121,7 @@ export function buildScrapeActions({
         readabilityResult.content,
         getBaseUrl()
       )
-      const evaluation = evaluateContentQuality(
+      const evaluation = await evaluateContentQuality(
         selectorResult.articleContent,
         readabilityContent
       )
@@ -192,7 +192,7 @@ export function buildScrapeActions({
     "finalize",
     async (context) => {
       const result = context.result ?? context.base
-      return finalizeScrapedContent(cloneScrapedContent(result))
+      return await finalizeScrapedContent(cloneScrapedContent(result))
     },
     aspects,
     getMetadata
