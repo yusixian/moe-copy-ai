@@ -66,5 +66,5 @@ export function getErrorMessage(error: unknown): string {
     const message = (error as { message?: unknown }).message
     if (typeof message === "string") return message
   }
-  return "未知错误"
+  return "Unknown error"
 }

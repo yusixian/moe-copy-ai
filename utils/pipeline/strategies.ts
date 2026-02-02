@@ -15,11 +15,8 @@ import {
   cloneScrapedContent,
   finalizeScrapedContent,
   getErrorMessage
-} from "./context"
-import type {
-  ScrapePipelineActions,
-  ScrapePipelineContext
-} from "./scrape-machine"
+} from "./content-factory"
+import type { ScrapePipelineActions, ScrapePipelineContext } from "./machine"
 
 export type SelectorScraper = (
   customSelectors?: Partial<Record<SelectorType, string>>,
@@ -28,16 +25,11 @@ export type SelectorScraper = (
 
 type BuildActionsParams = {
   customSelectors?: Partial<Record<SelectorType, string>>
-  aspects: Array<
-    PipelineAspect<[ScrapePipelineContext<ScrapedContent>], ScrapedContent>
-  >
+  aspects: Array<PipelineAspect<[ScrapePipelineContext], ScrapedContent>>
   getBaseUrl: () => string | undefined
   selectorScraper: SelectorScraper
 }
 
-type PipelineContext = ScrapePipelineContext<ScrapedContent>
-
-// Extract common readability metadata to reduce duplication
 function buildReadabilityMetadata(
   metadata: ReadabilityResult
 ): Record<string, string> {
@@ -49,12 +41,11 @@ function buildReadabilityMetadata(
   }
 }
 
-// Helper to create aspect-wrapped actions with common pattern
-function createAction<TArgs extends unknown[]>(
+function createAction(
   name: string,
-  fn: (...args: TArgs) => Promise<ScrapedContent>,
-  aspects: Array<PipelineAspect<TArgs, ScrapedContent>>,
-  metadataFactory: (...args: TArgs) => Record<string, unknown>
+  fn: (ctx: ScrapePipelineContext) => Promise<ScrapedContent>,
+  aspects: Array<PipelineAspect<[ScrapePipelineContext], ScrapedContent>>,
+  metadataFactory: (ctx: ScrapePipelineContext) => Record<string, unknown>
 ) {
   return withAspects(name, fn, aspects, metadataFactory)
 }
@@ -64,13 +55,15 @@ export function buildScrapeActions({
   aspects,
   getBaseUrl,
   selectorScraper
-}: BuildActionsParams): ScrapePipelineActions<ScrapedContent> {
-  const getMetadata = (ctx: PipelineContext) => ({ mode: ctx.options.mode })
+}: BuildActionsParams): ScrapePipelineActions {
+  const getMetadata = (ctx: ScrapePipelineContext) => ({
+    mode: ctx.options.mode
+  })
 
   const selector = createAction(
     "selector",
-    async (context: PipelineContext) => {
-      debugLog("使用选择器模式")
+    async (context) => {
+      debugLog("Using selector mode")
       return await selectorScraper(
         customSelectors,
         cloneScrapedContent(context.base)
@@ -82,11 +75,11 @@ export function buildScrapeActions({
 
   const readability = createAction(
     "readability",
-    async (context: PipelineContext) => {
-      debugLog("使用 Readability 模式")
+    async (context) => {
+      debugLog("Using readability mode")
       const readabilityResult = await extractWithReadability()
       if (!readabilityResult.success) {
-        throw new Error("Readability解析失败")
+        throw new Error("Readability parsing failed")
       }
 
       const scrapedContent = cloneScrapedContent(context.base)
@@ -112,8 +105,8 @@ export function buildScrapeActions({
 
   const hybrid = createAction(
     "hybrid",
-    async (context: PipelineContext) => {
-      debugLog("使用混合模式")
+    async (context) => {
+      debugLog("Using hybrid mode")
       const selectorResult = await selectorScraper(
         customSelectors,
         cloneScrapedContent(context.base)
@@ -121,7 +114,7 @@ export function buildScrapeActions({
 
       const readabilityResult = await extractWithReadability()
       if (!readabilityResult.success) {
-        throw new Error("Readability解析失败")
+        throw new Error("Readability parsing failed")
       }
 
       const readabilityContent = await convertHtmlToMarkdown(
@@ -133,7 +126,7 @@ export function buildScrapeActions({
         readabilityContent
       )
 
-      debugLog("混合模式内容评估:", evaluation.reason)
+      debugLog("Hybrid mode content evaluation:", evaluation.reason)
 
       const scrapedContent = cloneScrapedContent(context.base)
       scrapedContent.articleContent = evaluation.betterContent
@@ -170,25 +163,24 @@ export function buildScrapeActions({
     getMetadata
   )
 
-  // Unified fallback action - replaces separate readability/hybrid fallback
   const selectorFallback = createAction(
     "selector-fallback",
-    async (context: PipelineContext) => {
+    async (context) => {
       const originalMode = context.options.mode
       const fallbackResult = await selectorScraper(
         customSelectors,
         cloneScrapedContent(context.base)
       )
       const errorMessage = getErrorMessage(context.error)
-      const isReadabilityError = errorMessage === "Readability解析失败"
+      const isReadabilityError = errorMessage === "Readability parsing failed"
 
-      const modeLabel = originalMode === "hybrid" ? "混合模式中" : ""
+      const modeLabel = originalMode === "hybrid" ? "in hybrid mode " : ""
       fallbackResult.metadata = {
         ...fallbackResult.metadata,
         "original:mode": originalMode,
         "fallback:reason": isReadabilityError
-          ? `${modeLabel}Readability解析失败，自动切换到选择器模式`
-          : `${modeLabel}执行异常(${errorMessage})，自动切换到选择器模式`
+          ? `${modeLabel}Readability parsing failed, auto-switched to selector mode`
+          : `${modeLabel}Execution error (${errorMessage}), auto-switched to selector mode`
       }
       return fallbackResult
     },
@@ -198,7 +190,7 @@ export function buildScrapeActions({
 
   const finalize = createAction(
     "finalize",
-    async (context: PipelineContext) => {
+    async (context) => {
       const result = context.result ?? context.base
       return finalizeScrapedContent(cloneScrapedContent(result))
     },

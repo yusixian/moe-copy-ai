@@ -9,64 +9,62 @@ import {
   transition
 } from "robot3"
 
-import type { ExtractorOptions } from "../../constants/types"
+import type { ExtractorOptions, ScrapedContent } from "../../constants/types"
 
-type DoneEvent<T> = { type: "done"; data: T }
+type DoneEvent = { type: "done"; data: ScrapedContent }
 type ErrorEvent = { type: "error"; error: unknown }
 
-export type ScrapePipelineContext<T> = {
+export type ScrapePipelineContext<T = ScrapedContent> = {
   options: ExtractorOptions
   base: T
   result?: T
   error?: unknown
 }
 
-export type ScrapePipelineActions<T> = {
-  selector: (context: ScrapePipelineContext<T>) => Promise<T>
-  readability: (context: ScrapePipelineContext<T>) => Promise<T>
-  hybrid: (context: ScrapePipelineContext<T>) => Promise<T>
-  selectorFallback: (context: ScrapePipelineContext<T>) => Promise<T>
-  finalize: (context: ScrapePipelineContext<T>) => Promise<T>
+export type ScrapePipelineActions = {
+  selector: (context: ScrapePipelineContext) => Promise<ScrapedContent>
+  readability: (context: ScrapePipelineContext) => Promise<ScrapedContent>
+  hybrid: (context: ScrapePipelineContext) => Promise<ScrapedContent>
+  selectorFallback: (context: ScrapePipelineContext) => Promise<ScrapedContent>
+  finalize: (context: ScrapePipelineContext) => Promise<ScrapedContent>
 }
 
-export type ScrapePipelineResult<T> = {
+export type ScrapePipelineResult = {
   status: "success" | "failed"
-  result?: T
+  result?: ScrapedContent
   error?: unknown
 }
 
-// Reducer factories to eliminate repetitive callback definitions
-const setResult = <T>() =>
+const setResult = () =>
   reduce(
-    (ctx: ScrapePipelineContext<T>, event: DoneEvent<T>) =>
-      ({ ...ctx, result: event.data }) as ScrapePipelineContext<T>
+    (ctx: ScrapePipelineContext, event: DoneEvent) =>
+      ({ ...ctx, result: event.data }) as ScrapePipelineContext
   )
 
-const setError = <T>() =>
+const setError = () =>
   reduce(
-    (ctx: ScrapePipelineContext<T>, event: ErrorEvent) =>
-      ({ ...ctx, error: event.error }) as ScrapePipelineContext<T>
+    (ctx: ScrapePipelineContext, event: ErrorEvent) =>
+      ({ ...ctx, error: event.error }) as ScrapePipelineContext
   )
 
-// Reusable state builder for invoke states with standard done/error transitions
-function invokeState<T>(
-  action: (ctx: ScrapePipelineContext<T>) => Promise<T>,
+function invokeState(
+  action: (ctx: ScrapePipelineContext) => Promise<ScrapedContent>,
   successTarget: string,
   errorTarget: string
 ) {
   return invoke(
     action,
-    transition("done", successTarget, setResult<T>()),
-    transition("error", errorTarget, setError<T>())
+    transition("done", successTarget, setResult()),
+    transition("error", errorTarget, setError())
   )
 }
 
-export async function runScrapePipeline<T>(
-  initialContext: ScrapePipelineContext<T>,
-  actions: ScrapePipelineActions<T>
-): Promise<ScrapePipelineResult<T>> {
+export async function runScrapePipeline(
+  initialContext: ScrapePipelineContext,
+  actions: ScrapePipelineActions
+): Promise<ScrapePipelineResult> {
   const modeGuard = (mode: string) =>
-    guard((ctx: ScrapePipelineContext<T>) => ctx.options.mode === mode)
+    guard((ctx: ScrapePipelineContext) => ctx.options.mode === mode)
 
   const machine = createMachine(
     "modeSelect",
@@ -92,7 +90,7 @@ export async function runScrapePipeline<T>(
       success: state(),
       failed: state()
     },
-    (ctx: ScrapePipelineContext<T>) => ctx
+    (ctx: ScrapePipelineContext) => ctx
   )
 
   return await new Promise((resolve) => {
