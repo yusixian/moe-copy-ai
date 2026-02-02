@@ -1,28 +1,28 @@
-import { beforeAll, expect, test, vi } from "vitest"
-import { type RenderResult, render } from "vitest-browser-react"
+import { beforeAll, beforeEach, expect, test, vi } from "vitest"
+import { render } from "vitest-browser-react"
+
+import {
+  createPlasmoStorageMock,
+  MockStorage,
+  resetMockStorage
+} from "~utils/__tests__/mocks"
+
+vi.mock("@plasmohq/storage", () => createPlasmoStorageMock())
 
 vi.mock("~components/batch/BatchScrapePanel", () => ({
-  default: function MockBatchScrapePanel() {
-    return <div>BatchScrapePanel</div>
-  }
+  default: () => <div>BatchScrapePanel</div>
 }))
 
 vi.mock("~components/extraction/ContentExtractionPanel", () => ({
-  default: function MockContentExtractionPanel() {
-    return <div>ContentExtractionPanel</div>
-  }
+  default: () => <div>ContentExtractionPanel</div>
 }))
 
 vi.mock("~components/singlescrape/SingleScrapePanel", () => ({
-  default: function MockSingleScrapePanel() {
-    return <div>SingleScrapePanel</div>
-  }
+  default: () => <div>SingleScrapePanel</div>
 }))
 
 vi.mock("~components/sidepanel/SidePanelSettings", () => ({
-  default: function MockSidePanelSettings() {
-    return <div>SidePanelSettings</div>
-  }
+  default: () => <div>SidePanelSettings</div>
 }))
 
 vi.mock("~hooks/useBatchScrape", () => ({
@@ -72,43 +72,22 @@ vi.mock("~hooks/useElementSelector", () => ({
   })
 }))
 
-const createMockStorage = () => {
-  const store = new Map<string, unknown>()
-
-  return {
-    get: vi.fn(async (key: string) => store.get(key)),
-    set: vi.fn(async (key: string, value: unknown) => {
-      store.set(key, value)
-    }),
-    setMany: vi.fn(async (items: Record<string, unknown>) => {
-      for (const [key, value] of Object.entries(items)) {
-        store.set(key, value)
-      }
-    }),
-    clear: vi.fn(() => {
-      store.clear()
-    }),
-    watch: vi.fn().mockReturnValue(true),
-    unwatch: vi.fn()
-  }
-}
-
 vi.mock("~utils/storage", () => ({
-  syncStorage: createMockStorage(),
-  localStorage: createMockStorage()
+  syncStorage: new MockStorage({ area: "sync" }),
+  localStorage: new MockStorage({ area: "local" })
 }))
 
 beforeAll(() => {
-  const chrome = {
-    runtime: {
-      getManifest: () => ({ version: "0.0.0" })
-    },
-    i18n: {
-      getUILanguage: () => "en-US"
+  Object.assign(globalThis, {
+    chrome: {
+      runtime: { getManifest: () => ({ version: "0.0.0" }) },
+      i18n: { getUILanguage: () => "en-US" }
     }
-  }
+  })
+})
 
-  Object.assign(globalThis, { chrome })
+beforeEach(() => {
+  resetMockStorage()
 })
 
 async function renderSidePanel() {
@@ -117,44 +96,38 @@ async function renderSidePanel() {
 }
 
 test("renders single scrape view by default", async () => {
-  const screen = (await renderSidePanel()) as RenderResult
+  const { locator } = await renderSidePanel()
 
   await expect
-    .element(screen.locator.getByRole("heading", { name: "Scrape" }))
+    .element(locator.getByRole("heading", { name: "Scrape" }))
     .toBeVisible()
-  await expect
-    .element(screen.locator.getByText("SingleScrapePanel"))
-    .toBeVisible()
+  await expect.element(locator.getByText("SingleScrapePanel")).toBeVisible()
 })
 
 test("switches to batch view", async () => {
-  const screen = (await renderSidePanel()) as RenderResult
+  const { locator } = await renderSidePanel()
 
   await expect
-    .element(screen.locator.getByRole("heading", { name: "Scrape" }))
+    .element(locator.getByRole("heading", { name: "Scrape" }))
     .toBeVisible()
-  await screen.locator.getByText("Batch").click()
+  await locator.getByText("Batch").click()
 
   await expect
-    .element(screen.locator.getByRole("heading", { name: "Batch" }))
+    .element(locator.getByRole("heading", { name: "Batch" }))
     .toBeVisible()
-  await expect
-    .element(screen.locator.getByText("BatchScrapePanel"))
-    .toBeVisible()
+  await expect.element(locator.getByText("BatchScrapePanel")).toBeVisible()
 })
 
 test("switches to settings view via the gear button", async () => {
-  const screen = (await renderSidePanel()) as RenderResult
+  const { locator } = await renderSidePanel()
 
   await expect
-    .element(screen.locator.getByRole("heading", { name: "Scrape" }))
+    .element(locator.getByRole("heading", { name: "Scrape" }))
     .toBeVisible()
-  await screen.locator.getByTitle("Settings").click()
+  await locator.getByTitle("Settings").click()
 
   await expect
-    .element(screen.locator.getByRole("heading", { name: "Settings" }))
+    .element(locator.getByRole("heading", { name: "Settings" }))
     .toBeVisible()
-  await expect
-    .element(screen.locator.getByText("SidePanelSettings"))
-    .toBeVisible()
+  await expect.element(locator.getByText("SidePanelSettings")).toBeVisible()
 })

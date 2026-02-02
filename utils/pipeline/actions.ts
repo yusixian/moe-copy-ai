@@ -1,4 +1,8 @@
-import type { ScrapedContent, SelectorType } from "../../constants/types"
+import type {
+  ReadabilityResult,
+  ScrapedContent,
+  SelectorType
+} from "../../constants/types"
 import { debugLog } from "../logger"
 import {
   convertHtmlToMarkdown,
@@ -33,15 +37,39 @@ type BuildActionsParams = {
 
 type PipelineContext = ScrapePipelineContext<ScrapedContent>
 
+// Extract common readability metadata to reduce duplication
+function buildReadabilityMetadata(
+  metadata: ReadabilityResult
+): Record<string, string> {
+  return {
+    "readability:siteName": metadata.siteName || "",
+    "readability:excerpt": metadata.excerpt || "",
+    "readability:lang": metadata.lang || "",
+    "readability:length": metadata.length.toString()
+  }
+}
+
+// Helper to create aspect-wrapped actions with common pattern
+function createAction<TArgs extends unknown[]>(
+  name: string,
+  fn: (...args: TArgs) => Promise<ScrapedContent>,
+  aspects: Array<PipelineAspect<TArgs, ScrapedContent>>,
+  metadataFactory: (...args: TArgs) => Record<string, unknown>
+) {
+  return withAspects(name, fn, aspects, metadataFactory)
+}
+
 export function buildScrapeActions({
   customSelectors,
   aspects,
   getBaseUrl,
   selectorScraper
 }: BuildActionsParams): ScrapePipelineActions<ScrapedContent> {
-  const selectorAction = withAspects<[PipelineContext], ScrapedContent>(
+  const getMetadata = (ctx: PipelineContext) => ({ mode: ctx.options.mode })
+
+  const selector = createAction(
     "selector",
-    async (context) => {
+    async (context: PipelineContext) => {
       debugLog("使用选择器模式")
       return await selectorScraper(
         customSelectors,
@@ -49,12 +77,12 @@ export function buildScrapeActions({
       )
     },
     aspects,
-    (context) => ({ mode: context.options.mode })
+    getMetadata
   )
 
-  const readabilityAction = withAspects<[PipelineContext], ScrapedContent>(
+  const readability = createAction(
     "readability",
-    async (context) => {
+    async (context: PipelineContext) => {
       debugLog("使用 Readability 模式")
       const readabilityResult = await extractWithReadability()
       if (!readabilityResult.success) {
@@ -73,21 +101,18 @@ export function buildScrapeActions({
       scrapedContent.metadata = {
         ...scrapedContent.metadata,
         "extraction:mode": "readability",
-        "readability:siteName": readabilityResult.metadata.siteName || "",
-        "readability:excerpt": readabilityResult.metadata.excerpt || "",
-        "readability:lang": readabilityResult.metadata.lang || "",
-        "readability:length": readabilityResult.metadata.length.toString()
+        ...buildReadabilityMetadata(readabilityResult.metadata)
       }
 
       return scrapedContent
     },
     aspects,
-    (context) => ({ mode: context.options.mode })
+    getMetadata
   )
 
-  const hybridAction = withAspects<[PipelineContext], ScrapedContent>(
+  const hybrid = createAction(
     "hybrid",
-    async (context) => {
+    async (context: PipelineContext) => {
       debugLog("使用混合模式")
       const selectorResult = await selectorScraper(
         customSelectors,
@@ -113,10 +138,9 @@ export function buildScrapeActions({
       const scrapedContent = cloneScrapedContent(context.base)
       scrapedContent.articleContent = evaluation.betterContent
 
-      if (
-        evaluation.betterContent === readabilityContent ||
-        !selectorResult.title
-      ) {
+      const useReadabilityMeta =
+        evaluation.betterContent === readabilityContent || !selectorResult.title
+      if (useReadabilityMeta) {
         scrapedContent.title =
           readabilityResult.metadata.title || selectorResult.title
         scrapedContent.author =
@@ -134,10 +158,7 @@ export function buildScrapeActions({
       scrapedContent.metadata = {
         ...selectorResult.metadata,
         "extraction:mode": "hybrid",
-        "readability:siteName": readabilityResult.metadata.siteName || "",
-        "readability:excerpt": readabilityResult.metadata.excerpt || "",
-        "readability:lang": readabilityResult.metadata.lang || "",
-        "readability:length": readabilityResult.metadata.length.toString(),
+        ...buildReadabilityMetadata(readabilityResult.metadata),
         "evaluation:reason": evaluation.reason,
         "evaluation:selectorScore": evaluation.scores.selector.toString(),
         "evaluation:readabilityScore": evaluation.scores.readability.toString()
@@ -146,74 +167,44 @@ export function buildScrapeActions({
       return scrapedContent
     },
     aspects,
-    (context) => ({ mode: context.options.mode })
+    getMetadata
   )
 
-  const readabilityFallbackAction = withAspects<
-    [PipelineContext],
-    ScrapedContent
-  >(
-    "readability-fallback",
-    async (context) => {
+  // Unified fallback action - replaces separate readability/hybrid fallback
+  const selectorFallback = createAction(
+    "selector-fallback",
+    async (context: PipelineContext) => {
+      const originalMode = context.options.mode
       const fallbackResult = await selectorScraper(
         customSelectors,
         cloneScrapedContent(context.base)
       )
       const errorMessage = getErrorMessage(context.error)
+      const isReadabilityError = errorMessage === "Readability解析失败"
+
+      const modeLabel = originalMode === "hybrid" ? "混合模式中" : ""
       fallbackResult.metadata = {
         ...fallbackResult.metadata,
-        "original:mode": "readability",
-        "fallback:reason":
-          errorMessage === "Readability解析失败"
-            ? "Readability解析失败，自动切换到选择器模式"
-            : `Readability解析异常(${errorMessage})，自动切换到选择器模式`
+        "original:mode": originalMode,
+        "fallback:reason": isReadabilityError
+          ? `${modeLabel}Readability解析失败，自动切换到选择器模式`
+          : `${modeLabel}执行异常(${errorMessage})，自动切换到选择器模式`
       }
       return fallbackResult
     },
     aspects,
-    (context) => ({ mode: context.options.mode, fallbackFrom: "readability" })
+    (ctx) => ({ mode: ctx.options.mode, fallbackFrom: ctx.options.mode })
   )
 
-  const hybridFallbackAction = withAspects<[PipelineContext], ScrapedContent>(
-    "hybrid-fallback",
-    async (context) => {
-      const fallbackResult = await selectorScraper(
-        customSelectors,
-        cloneScrapedContent(context.base)
-      )
-      const errorMessage = getErrorMessage(context.error)
-      fallbackResult.metadata = {
-        ...fallbackResult.metadata,
-        "original:mode": "hybrid",
-        "fallback:reason":
-          errorMessage === "Readability解析失败"
-            ? "混合模式中Readability解析失败，自动使用选择器模式结果"
-            : `混合模式执行异常(${errorMessage})，自动切换到选择器模式`
-      }
-      return fallbackResult
-    },
-    aspects,
-    (context) => ({ mode: context.options.mode, fallbackFrom: "hybrid" })
-  )
-
-  const finalizeAction = withAspects<[PipelineContext], ScrapedContent>(
+  const finalize = createAction(
     "finalize",
-    async (context) => {
-      const result = context.result
-        ? cloneScrapedContent(context.result)
-        : cloneScrapedContent(context.base)
-      return finalizeScrapedContent(result)
+    async (context: PipelineContext) => {
+      const result = context.result ?? context.base
+      return finalizeScrapedContent(cloneScrapedContent(result))
     },
     aspects,
-    (context) => ({ mode: context.options.mode })
+    getMetadata
   )
 
-  return {
-    selector: selectorAction,
-    readability: readabilityAction,
-    hybrid: hybridAction,
-    selectorFallbackFromReadability: readabilityFallbackAction,
-    selectorFallbackFromHybrid: hybridFallbackAction,
-    finalize: finalizeAction
-  }
+  return { selector, readability, hybrid, selectorFallback, finalize }
 }

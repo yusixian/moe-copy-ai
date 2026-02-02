@@ -25,14 +25,7 @@ export type ScrapePipelineActions<T> = {
   selector: (context: ScrapePipelineContext<T>) => Promise<T>
   readability: (context: ScrapePipelineContext<T>) => Promise<T>
   hybrid: (context: ScrapePipelineContext<T>) => Promise<T>
-  selectorFallbackFromReadability: (
-    context: ScrapePipelineContext<T>,
-    event?: ErrorEvent
-  ) => Promise<T>
-  selectorFallbackFromHybrid: (
-    context: ScrapePipelineContext<T>,
-    event?: ErrorEvent
-  ) => Promise<T>
+  selectorFallback: (context: ScrapePipelineContext<T>) => Promise<T>
   finalize: (context: ScrapePipelineContext<T>) => Promise<T>
 }
 
@@ -42,148 +35,60 @@ export type ScrapePipelineResult<T> = {
   error?: unknown
 }
 
+// Reducer factories to eliminate repetitive callback definitions
+const setResult = <T>() =>
+  reduce(
+    (ctx: ScrapePipelineContext<T>, event: DoneEvent<T>) =>
+      ({ ...ctx, result: event.data }) as ScrapePipelineContext<T>
+  )
+
+const setError = <T>() =>
+  reduce(
+    (ctx: ScrapePipelineContext<T>, event: ErrorEvent) =>
+      ({ ...ctx, error: event.error }) as ScrapePipelineContext<T>
+  )
+
+// Reusable state builder for invoke states with standard done/error transitions
+function invokeState<T>(
+  action: (ctx: ScrapePipelineContext<T>) => Promise<T>,
+  successTarget: string,
+  errorTarget: string
+) {
+  return invoke(
+    action,
+    transition("done", successTarget, setResult<T>()),
+    transition("error", errorTarget, setError<T>())
+  )
+}
+
 export async function runScrapePipeline<T>(
   initialContext: ScrapePipelineContext<T>,
   actions: ScrapePipelineActions<T>
 ): Promise<ScrapePipelineResult<T>> {
+  const modeGuard = (mode: string) =>
+    guard((ctx: ScrapePipelineContext<T>) => ctx.options.mode === mode)
+
   const machine = createMachine(
     "modeSelect",
     {
       modeSelect: state(
-        immediate(
-          "selector",
-          guard(
-            (ctx: ScrapePipelineContext<T>) => ctx.options.mode === "selector"
-          )
-        ),
-        immediate(
-          "readability",
-          guard(
-            (ctx: ScrapePipelineContext<T>) =>
-              ctx.options.mode === "readability"
-          )
-        ),
-        immediate(
-          "hybrid",
-          guard(
-            (ctx: ScrapePipelineContext<T>) => ctx.options.mode === "hybrid"
-          )
-        )
+        immediate("selector", modeGuard("selector")),
+        immediate("readability", modeGuard("readability")),
+        immediate("hybrid", modeGuard("hybrid"))
       ),
-      selector: invoke(
-        actions.selector,
-        transition(
-          "done",
-          "finalize",
-          reduce((ctx: ScrapePipelineContext<T>, event: DoneEvent<T>) => ({
-            ...ctx,
-            result: event.data
-          }))
-        ),
-        transition(
-          "error",
-          "failed",
-          reduce((ctx: ScrapePipelineContext<T>, event: ErrorEvent) => ({
-            ...ctx,
-            error: event.error
-          }))
-        )
-      ),
-      readability: invoke(
+      selector: invokeState(actions.selector, "finalize", "failed"),
+      readability: invokeState(
         actions.readability,
-        transition(
-          "done",
-          "finalize",
-          reduce((ctx: ScrapePipelineContext<T>, event: DoneEvent<T>) => ({
-            ...ctx,
-            result: event.data
-          }))
-        ),
-        transition(
-          "error",
-          "readabilityFallback",
-          reduce((ctx: ScrapePipelineContext<T>, event: ErrorEvent) => ({
-            ...ctx,
-            error: event.error
-          }))
-        )
+        "finalize",
+        "selectorFallback"
       ),
-      readabilityFallback: invoke(
-        actions.selectorFallbackFromReadability,
-        transition(
-          "done",
-          "finalize",
-          reduce((ctx: ScrapePipelineContext<T>, event: DoneEvent<T>) => ({
-            ...ctx,
-            result: event.data
-          }))
-        ),
-        transition(
-          "error",
-          "failed",
-          reduce((ctx: ScrapePipelineContext<T>, event: ErrorEvent) => ({
-            ...ctx,
-            error: event.error
-          }))
-        )
+      hybrid: invokeState(actions.hybrid, "finalize", "selectorFallback"),
+      selectorFallback: invokeState(
+        actions.selectorFallback,
+        "finalize",
+        "failed"
       ),
-      hybrid: invoke(
-        actions.hybrid,
-        transition(
-          "done",
-          "finalize",
-          reduce((ctx: ScrapePipelineContext<T>, event: DoneEvent<T>) => ({
-            ...ctx,
-            result: event.data
-          }))
-        ),
-        transition(
-          "error",
-          "hybridFallback",
-          reduce((ctx: ScrapePipelineContext<T>, event: ErrorEvent) => ({
-            ...ctx,
-            error: event.error
-          }))
-        )
-      ),
-      hybridFallback: invoke(
-        actions.selectorFallbackFromHybrid,
-        transition(
-          "done",
-          "finalize",
-          reduce((ctx: ScrapePipelineContext<T>, event: DoneEvent<T>) => ({
-            ...ctx,
-            result: event.data
-          }))
-        ),
-        transition(
-          "error",
-          "failed",
-          reduce((ctx: ScrapePipelineContext<T>, event: ErrorEvent) => ({
-            ...ctx,
-            error: event.error
-          }))
-        )
-      ),
-      finalize: invoke(
-        actions.finalize,
-        transition(
-          "done",
-          "success",
-          reduce((ctx: ScrapePipelineContext<T>, event: DoneEvent<T>) => ({
-            ...ctx,
-            result: event.data
-          }))
-        ),
-        transition(
-          "error",
-          "failed",
-          reduce((ctx: ScrapePipelineContext<T>, event: ErrorEvent) => ({
-            ...ctx,
-            error: event.error
-          }))
-        )
-      ),
+      finalize: invokeState(actions.finalize, "success", "failed"),
       success: state(),
       failed: state()
     },
