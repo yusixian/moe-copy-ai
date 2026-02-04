@@ -11,24 +11,24 @@ import OptionSection from "./OptionSection"
 const EXTRACTION_MODE_STYLES = {
   selector: {
     icon: "heroicons-solid:selector",
-    color: "sky",
-    borderColor: "border-sky-300",
-    textColor: "text-sky-700",
-    bgColor: "bg-sky-50"
+    color: "accent-blue",
+    borderColor: "border-accent-blue",
+    textColor: "text-accent-blue",
+    bgColor: "bg-accent-blue-ghost"
   },
   readability: {
     icon: "ant-design:read-filled",
-    color: "emerald",
-    borderColor: "border-emerald-300",
-    textColor: "text-emerald-700",
-    bgColor: "bg-emerald-50"
+    color: "success",
+    borderColor: "border-success",
+    textColor: "text-success",
+    bgColor: "bg-success-ghost"
   },
   hybrid: {
     icon: "radix-icons:mix",
-    color: "purple",
-    borderColor: "border-purple-300",
-    textColor: "text-purple-700",
-    bgColor: "bg-purple-50"
+    color: "accent-purple",
+    borderColor: "border-accent-purple",
+    textColor: "text-accent-purple",
+    bgColor: "bg-accent-purple-ghost"
   }
 }
 
@@ -145,11 +145,11 @@ export const ExtractionModeSection: React.FC = () => {
                       style={{
                         backgroundColor:
                           extractionMode === modeKey
-                            ? style.color === "sky"
-                              ? "oklch(60% 0.203 257.46)"
-                              : style.color === "emerald"
+                            ? style.color === "accent-blue"
+                              ? "oklch(63% 0.1727 257.57)"
+                              : style.color === "success"
                                 ? "oklch(62.7% 0.1699 149.21)"
-                                : "oklch(42% 0.196 302.716)"
+                                : "oklch(62% 0.196 302.716)"
                             : "transparent"
                       }}
                     />

@@ -54,28 +54,18 @@ const config = {
         },
         // Accent 颜色保持不变（品牌色）
         accent: {
-          blue: "oklch(60% 0.203 257.46)",
-          "blue-hover": "oklch(60% 0.203 257.46 / 85%)",
-          "blue-active": "oklch(60% 0.203 257.46 / 75%)",
-          "blue-ghost": "oklch(60% 0.203 257.46 / 10%)",
-          "blue-ghost-hover": "oklch(60% 0.203 257.46 / 15%)",
-          "blue-ghost-active": "oklch(60% 0.203 257.46 / 20%)",
-          "blue-light-1": "oklch(91% 0.048 264.052 / <alpha-value>)",
-          "blue-light-2": "oklch(83% 0.077 264.052 / <alpha-value>)",
-          "blue-light-3": "oklch(75% 0.106 264.052 / <alpha-value>)",
-          "blue-light-4": "oklch(67% 0.135 264.052 / <alpha-value>)",
-          "blue-light-5": "oklch(59% 0.164 264.052 / <alpha-value>)",
-          purple: "oklch(42% 0.196 302.716 / <alpha-value>)",
-          "purple-hover": "oklch(42% 0.196 302.716 / 85%)",
-          "purple-active": "oklch(42% 0.196 302.716 / 75%)",
-          "purple-ghost": "oklch(42% 0.196 302.716 / 10%)",
-          "purple-ghost-hover": "oklch(42% 0.196 302.716 / 15%)",
-          "purple-ghost-active": "oklch(42% 0.196 302.716 / 20%)",
-          "purple-light-1": "oklch(85% 0.049 302.716 / <alpha-value>)",
-          "purple-light-2": "oklch(75% 0.078 302.716 / <alpha-value>)",
-          "purple-light-3": "oklch(65% 0.108 302.716 / <alpha-value>)",
-          "purple-light-4": "oklch(55% 0.137 302.716 / <alpha-value>)",
-          "purple-light-5": "oklch(48% 0.167 302.716 / <alpha-value>)"
+          blue: "oklch(63% 0.1727 257.57 / <alpha-value>)",
+          "blue-hover": "oklch(63% 0.1727 257.57 / 85%)",
+          "blue-active": "oklch(63% 0.1727 257.57 / 75%)",
+          "blue-ghost": "oklch(63% 0.1727 257.57 / 10%)",
+          "blue-ghost-hover": "oklch(63% 0.1727 257.57 / 15%)",
+          "blue-ghost-active": "oklch(63% 0.1727 257.57 / 20%)",
+          purple: "oklch(62% 0.196 302.716 / <alpha-value>)",
+          "purple-hover": "oklch(62% 0.196 302.716 / 85%)",
+          "purple-active": "oklch(62% 0.196 302.716 / 75%)",
+          "purple-ghost": "oklch(62% 0.196 302.716 / 10%)",
+          "purple-ghost-hover": "oklch(62% 0.196 302.716 / 15%)",
+          "purple-ghost-active": "oklch(62% 0.196 302.716 / 20%)"
         },
         // 语义色保持不变
         info: "oklch(68.5% 0.169 237.323 / <alpha-value>)",
@@ -153,6 +143,10 @@ const config = {
         bounce: {
           "0%, 100%": { transform: "translateY(-5%)" },
           "50%": { transform: "translateY(0)" }
+        },
+        fly: {
+          "0%": { transform: "translateY(-0.1rem)" },
+          "100%": { transform: "translateY(0.1rem)" }
         }
       },
       animation: {
@@ -160,7 +154,8 @@ const config = {
         wiggle: "wiggle 1s ease-in-out infinite",
         "spin-slow": "spin 3s linear infinite",
         fadeIn: "fadeIn 0.5s ease-out forwards",
-        bounce: "bounce 0.6s ease-in-out infinite"
+        bounce: "bounce 0.6s ease-in-out infinite",
+        fly: "fly 0.6s ease-in-out infinite alternate;"
       }
     }
   },

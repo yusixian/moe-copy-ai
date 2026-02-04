@@ -92,13 +92,13 @@ export function ArticleContentHeader({
       )}
 
       {evaluationReason && (
-        <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-blue-700 text-xs">
+        <div className="mt-3 rounded-lg border border-line-1 bg-fill-1 px-3 py-2 text-text-2 text-xs">
           <div className="flex items-center gap-1.5">
             <Icon
-              icon="line-md:chart-rising-twotone"
+              icon="line-md:alert-circle"
               width="14"
               height="14"
-              className="text-blue-500"
+              className="text-text-3"
             />
             <span className="font-medium">
               {t("popup.mode.hybridEvaluation")}
@@ -109,21 +109,21 @@ export function ArticleContentHeader({
       )}
 
       {fallbackReason && (
-        <div className="mt-3 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-orange-700 text-xs">
+        <div className="mt-3 rounded-lg border border-warning bg-warning-ghost px-3 py-2 text-warning text-xs">
           <div className="flex items-center gap-1.5">
             <Icon
-              icon="line-md:alert-circle-twotone"
+              icon="line-md:alert-circle"
               width="14"
               height="14"
-              className="text-orange-500"
+              className="text-warning"
             />
             <span className="font-medium">
               {t("popup.mode.fallbackExplanation")}
             </span>
           </div>
           <div className="mt-1 pl-5">
-            <p className="text-orange-600">{fallbackReason}</p>
-            <p className="mt-1 text-orange-500 text-xs">
+            <p className="text-warning">{fallbackReason}</p>
+            <p className="mt-1 text-warning/80 text-xs">
               {t("popup.mode.fallbackInfo")}
             </p>
           </div>

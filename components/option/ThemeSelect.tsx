@@ -81,10 +81,7 @@ export const ThemeSelect: React.FC<ThemeSelectProps> = ({
   // Inline 布局（水平，用于 sidepanel）
   return (
     <div
-      className={cn(
-        "flex items-center justify-between rounded-xl border border-line-1 bg-content p-3",
-        className
-      )}>
+      className={cn("card flex items-center justify-between p-3", className)}>
       <span className="flex items-center gap-2 font-medium text-sm text-text-1">
         {showIcon && (
           <Icon

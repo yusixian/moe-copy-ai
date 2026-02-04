@@ -135,7 +135,7 @@ const ImageGridFooter = ({ count }: ImageGridFooterProps) => {
 
         <Icon
           icon="line-md:image-twotone"
-          className="mr-1.5 h-4 w-4 text-sky-500"
+          className="mr-1.5 h-4 w-4 text-accent-blue"
         />
         <span className="font-medium text-accent-blue text-sm">
           {t("image.count", { count })}
@@ -185,7 +185,7 @@ export const ImageGrid: React.FC<ImageGridProps> = ({
     <span className="flex items-center font-medium text-xs">
       <Icon
         icon="line-md:image-twotone"
-        className="mr-1.5 h-4 w-4 text-sky-500"
+        className="mr-1.5 h-4 w-4 text-accent-blue"
       />
       {t("image.count", { count: images.length })}
     </span>

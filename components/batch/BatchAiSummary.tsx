@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react"
 import { countTokens } from "gpt-tokenizer"
 import { memo, useMemo } from "react"
-
+import { AiSendButton } from "~components/ai/AiSendButton"
 import type { BatchScrapeResult, ScrapedContent } from "~constants/types"
 import { useAiSummary } from "~hooks/useAiSummary"
 import { aggregateToSingleMarkdown } from "~utils/content-aggregator"
@@ -119,8 +119,8 @@ const BatchAiSummary = memo(function BatchAiSummary({
   return (
     <div className="space-y-2">
       {/* Token 预估信息 - 醒目显示（基于模板替换后的完整提示词） */}
-      <div className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 px-3 py-2 text-xs">
-        <Icon icon="mdi:counter" width={16} className="text-amber-500" />
+      <div className="flex items-center gap-2 rounded-lg bg-warning-ghost px-3 py-2 text-xs">
+        <Icon icon="mdi:counter" width={16} className="text-warning" />
         <span className="text-gray-600">
           {t("batch.ai.tokenEstimate", {
             chars: processedPrompt.length,
@@ -151,32 +151,17 @@ const BatchAiSummary = memo(function BatchAiSummary({
               className={`flex items-center gap-1 text-xs ${modelId ? "text-gray-500" : "text-amber-500"}`}>
               {modelId || t("batch.ai.noModel")}
             </span>
-            <button
-              type="button"
+            <AiSendButton
               onClick={generateSummaryText}
-              disabled={isLoading || successCount === 0}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 py-2 font-medium text-white text-xs shadow-sm transition-all hover:from-sky-600 hover:to-indigo-600 disabled:cursor-not-allowed disabled:opacity-50">
-              {isLoading ? (
-                <>
-                  <Icon
-                    icon="mdi:loading"
-                    width={14}
-                    className="animate-spin"
-                  />
-                  {t("batch.ai.generating")}
-                </>
-              ) : (
-                <>
-                  <Icon icon="line-md:lightbulb-twotone" width={14} />
-                  {t("batch.ai.generate")}
-                </>
-              )}
-            </button>
+              disabled={successCount === 0}
+              isLoading={isLoading}
+              className="flex-1"
+            />
           </div>
 
           {/* 错误提示 */}
           {error && (
-            <div className="flex items-center gap-1 rounded bg-red-50 px-2 py-1.5 text-red-600 text-xs">
+            <div className="flex items-center gap-1 rounded bg-error-ghost px-2 py-1.5 text-error text-xs">
               <Icon icon="mdi:alert-circle" width={14} />
               {error}
             </div>

@@ -736,6 +736,8 @@
   "ai.panel.model.label": "模型",
   "ai.panel.generate": "生成",
   "ai.panel.generating": "生成中...",
+  "ai.panel.send": "发送",
+  "ai.panel.sending": "发送中...",
   "ai.panel.stop": "停止",
   "ai.panel.regenerate": "重新生成",
   "ai.panel.clear": "清空",

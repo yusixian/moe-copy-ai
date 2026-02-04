@@ -30,42 +30,151 @@
  * from constants/theme-colors.ts (single source of truth) */
 
 @layer components {
+  .ai-send-button {
+    /* Use accent.blue from tailwind.config.js design system */
+    --btn-accent: oklch(62% 0.25 260);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    border-radius: 36px;
+    font-weight: 700;
+    height: 36px;
+    font-size: 12px;
+    padding-inline: 16px;
+    background-color: transparent;
+    color: var(--btn-accent);
+    text-transform: uppercase;
+    overflow: hidden;
+    transition: all 0.25s ease-in-out;
+    z-index: 1;
+    border: none;
+  }
+
+  .ai-send-button:is(:hover, :focus) {
+    color: #fff;
+  }
+
+  .ai-send-button::after {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border: 1px solid var(--btn-accent);
+    border-radius: 36px;
+    z-index: 2;
+  }
+
+  .ai-send-button::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: var(--btn-accent);
+    z-index: 1;
+    transform: translateX(100%);
+    transition-delay: 200ms;
+    transition: all 0.3s ease-out;
+    border-radius: 9999px;
+  }
+
+  .ai-send-button:is(:hover, :focus)::before {
+    transform: translateX(0%);
+  }
+
+  .ai-send-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .ai-send-button:disabled:is(:hover, :focus) {
+    color: var(--btn-accent);
+  }
+
+  .ai-send-button:disabled:is(:hover, :focus)::before {
+    transform: translateX(100%);
+  }
+
+  .ai-send-button-text {
+    white-space: nowrap;
+    line-height: 1.2;
+    padding-inline-end: 36px;
+    z-index: 2;
+  }
+
+  .ai-send-button-icon {
+    display: inherit;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    background-color: var(--btn-accent);
+    color: #fff;
+    z-index: 2;
+  }
+
+  /* Collapsed state - circle button */
+  .ai-send-button.collapsed {
+    width: 36px;
+    padding: 0;
+  }
+
+  .ai-send-button.collapsed::after {
+    display: none;
+  }
+
+  .ai-send-button.collapsed::before {
+    display: none;
+  }
+
+  .ai-send-button.collapsed .ai-send-button-text {
+    display: none;
+  }
+
+  .ai-send-button.collapsed .ai-send-button-icon {
+    position: static;
+    transform: none;
+  }
+
   .top-bar {
-    @apply rounded-2xl border border-line-1 bg-elevated-1 shadow-lg backdrop-blur-sm backdrop-brightness-110;
+    @apply rounded-xl border border-line-1 bg-elevated-1 shadow-lg backdrop-blur-sm backdrop-brightness-110;
     box-shadow:
-      inset 1px 1px 2px var(--shadow-highlight),
-      inset -1px -1px 2px var(--shadow-highlight-weak),
-      inset 0 0 6px var(--shadow-highlight),
-      0 10px 15px -3px rgb(0 0 0 / 0.1),
-      0 4px 6px -4px rgb(0 0 0 / 0.1);
+      inset 1px 1px 0 0.5px var(--shadow-highlight),
+      inset -1px -1px 0 0.5px var(--shadow-highlight-weak),
+      0 10px 15px -3px rgb(0 0 0 / 0.12),
+      0 4px 6px -4px rgb(0 0 0 / 0.12);
   }
 
   .dialog {
-    @apply rounded-2xl border border-line-1 bg-elevated-1 backdrop-blur-sm backdrop-brightness-110;
+    @apply rounded-xl border border-line-1 bg-elevated-1 backdrop-blur-sm backdrop-brightness-110;
     box-shadow:
-      inset 1px 1px 2px var(--shadow-highlight),
-      inset 0 0 6px var(--shadow-highlight),
-      inset -1px -1px 2px var(--shadow-highlight-weak),
+      inset 1px 1px 0 0.5px var(--shadow-highlight),
+      inset -1px -1px 0 0.5px var(--shadow-highlight-weak),
       0 25px 50px -12px rgb(0 0 0 / 0.25);
   }
 
   .popover {
-    @apply rounded-2xl border border-line-1 bg-elevated-1 backdrop-blur-sm backdrop-brightness-110;
+    @apply rounded-xl border border-line-1 bg-elevated-1 backdrop-blur-sm backdrop-brightness-110;
     box-shadow:
-      inset 1px 1px 2px var(--shadow-highlight),
-      inset 0 0 6px var(--shadow-highlight),
-      inset -1px -1px 2px var(--shadow-highlight-weak),
-      0 4px 6px -1px rgb(0 0 0 / 0.1),
-      0 2px 4px -2px rgb(0 0 0 / 0.1);
+      inset 1px 1px 0 0.5px var(--shadow-highlight),
+      inset -1px -1px 0 0.5px var(--shadow-highlight-weak),
+      0 4px 6px -1px rgb(0 0 0 / 0.12),
+      0 2px 4px -2px rgb(0 0 0 / 0.12);
   }
 
   .card {
-    @apply rounded-2xl border border-line-1 bg-content;
+    @apply rounded-xl bg-content;
     box-shadow:
-      inset 1px 1px 2px var(--shadow-highlight),
-      inset 0 0 6px var(--shadow-highlight),
-      inset -1px -1px 2px var(--shadow-highlight-weak),
-      0 1px 2px 0 rgb(0 0 0 / 0.05);
+      inset 1px 1px 0 0.5px var(--shadow-highlight),
+      inset -1px -1px 0 0.5px var(--shadow-highlight-weak),
+      0 2px 3px 0 rgb(0 0 0 / 0.06);
   }
 }
 

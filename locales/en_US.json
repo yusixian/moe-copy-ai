@@ -736,6 +736,8 @@
   "ai.panel.model.label": "Model",
   "ai.panel.generate": "Generate",
   "ai.panel.generating": "Generating...",
+  "ai.panel.send": "Send",
+  "ai.panel.sending": "Sending...",
   "ai.panel.stop": "Stop",
   "ai.panel.regenerate": "Regenerate",
   "ai.panel.clear": "Clear",
