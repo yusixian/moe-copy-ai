@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react"
 import { countTokens } from "gpt-tokenizer"
 import { memo, useMemo } from "react"
-
+import { AiSendButton } from "~components/ai/AiSendButton"
 import type { BatchScrapeResult, ScrapedContent } from "~constants/types"
 import { useAiSummary } from "~hooks/useAiSummary"
 import { aggregateToSingleMarkdown } from "~utils/content-aggregator"
@@ -151,27 +151,12 @@ const BatchAiSummary = memo(function BatchAiSummary({
               className={`flex items-center gap-1 text-xs ${modelId ? "text-gray-500" : "text-amber-500"}`}>
               {modelId || t("batch.ai.noModel")}
             </span>
-            <button
-              type="button"
+            <AiSendButton
               onClick={generateSummaryText}
-              disabled={isLoading || successCount === 0}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 py-2 font-medium text-white text-xs shadow-sm transition-all hover:from-sky-600 hover:to-indigo-600 disabled:cursor-not-allowed disabled:opacity-50">
-              {isLoading ? (
-                <>
-                  <Icon
-                    icon="mdi:loading"
-                    width={14}
-                    className="animate-spin"
-                  />
-                  {t("batch.ai.generating")}
-                </>
-              ) : (
-                <>
-                  <Icon icon="line-md:lightbulb-twotone" width={14} />
-                  {t("batch.ai.generate")}
-                </>
-              )}
-            </button>
+              disabled={successCount === 0}
+              isLoading={isLoading}
+              className="flex-1"
+            />
           </div>
 
           {/* 错误提示 */}

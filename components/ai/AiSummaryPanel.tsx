@@ -9,6 +9,7 @@ import { processTemplate } from "~utils/template"
 
 import { Collapsible } from "../ui/collapsible"
 import AiHistoryDrawer from "./AiHistoryDrawer"
+import { AiSendButton } from "./AiSendButton"
 import CompactPromptInput from "./CompactPromptInput"
 import SummaryResultDisplay from "./SummaryResultDisplay"
 
@@ -144,27 +145,12 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
               </button>
             )}
 
-            <button
-              type="button"
+            <AiSendButton
               onClick={generateSummaryText}
-              disabled={isLoading || !content}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-500 py-2 font-medium text-white text-xs shadow-sm transition-all hover:from-sky-600 hover:to-indigo-600 disabled:cursor-not-allowed disabled:opacity-50">
-              {isLoading ? (
-                <>
-                  <Icon
-                    icon="mdi:loading"
-                    width={14}
-                    className="animate-spin"
-                  />
-                  {t("ai.panel.generating")}
-                </>
-              ) : (
-                <>
-                  <Icon icon="line-md:lightbulb-twotone" width={14} />
-                  {t("ai.panel.generate")}
-                </>
-              )}
-            </button>
+              disabled={!content}
+              isLoading={isLoading}
+              className="flex-1"
+            />
           </div>
 
           {/* 错误提示 */}

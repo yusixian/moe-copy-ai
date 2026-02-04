@@ -11,7 +11,7 @@ module.exports = (opts = {}) => {
     postcssPlugin: "postcss-rem-to-var",
     Declaration(decl) {
       if (remRE.test(decl.value)) {
-        decl.value = decl.value.replace(remRE, (match, num) => {
+        decl.value = decl.value.replace(remRE, (_match, num) => {
           // 如果是 1rem,直接使用变量
           if (num === "1") {
             return `var(${varName})`

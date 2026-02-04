@@ -143,6 +143,10 @@ const config = {
         bounce: {
           "0%, 100%": { transform: "translateY(-5%)" },
           "50%": { transform: "translateY(0)" }
+        },
+        fly: {
+          "0%": { transform: "translateY(-0.1rem)" },
+          "100%": { transform: "translateY(0.1rem)" }
         }
       },
       animation: {
@@ -150,7 +154,8 @@ const config = {
         wiggle: "wiggle 1s ease-in-out infinite",
         "spin-slow": "spin 3s linear infinite",
         fadeIn: "fadeIn 0.5s ease-out forwards",
-        bounce: "bounce 0.6s ease-in-out infinite"
+        bounce: "bounce 0.6s ease-in-out infinite",
+        fly: "fly 0.6s ease-in-out infinite alternate;"
       }
     }
   },
