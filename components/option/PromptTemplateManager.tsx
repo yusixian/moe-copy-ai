@@ -8,11 +8,7 @@ import { useI18n } from "~utils/i18n"
 
 import { Button } from "../ui/button"
 
-function PromptTemplateManager({
-  showTitle = true
-}: {
-  showTitle?: boolean
-} = {}) {
+function PromptTemplateManager({ showTitle = true }: { showTitle?: boolean }) {
   const { t } = useI18n()
   const {
     presetTemplates,
@@ -33,10 +29,12 @@ function PromptTemplateManager({
   const [editContent, setEditContent] = useState("")
 
   const handleAdd = useCallback(async () => {
-    await createTemplate(newName, newContent)
-    setIsAdding(false)
-    setNewName("")
-    setNewContent("")
+    const ok = await createTemplate(newName, newContent)
+    if (ok) {
+      setIsAdding(false)
+      setNewName("")
+      setNewContent("")
+    }
   }, [newName, newContent, createTemplate])
 
   const startEdit = useCallback((tpl: PromptTemplate) => {
@@ -46,10 +44,10 @@ function PromptTemplateManager({
   }, [])
 
   const handleUpdate = useCallback(async () => {
-    if (editingId) {
+    if (editingId && editName.trim() && editContent.trim()) {
       await updateTemplate(editingId, {
-        name: editName,
-        content: editContent
+        name: editName.trim(),
+        content: editContent.trim()
       })
       setEditingId(null)
     }

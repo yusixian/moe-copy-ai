@@ -23,7 +23,7 @@ interface CompactPromptInputProps {
   disabled?: boolean
   templates?: PromptTemplate[]
   onSelectTemplate?: (template: PromptTemplate) => void
-  createTemplate?: (name: string, content: string) => Promise<void>
+  createTemplate?: (name: string, content: string) => Promise<boolean>
   enablePortal?: boolean
 }
 
@@ -51,12 +51,12 @@ const CompactPromptInput = ({
     setNewTemplateName("")
   }, [])
 
-  const handleConfirmSave = async () => {
+  const handleConfirmSave = useCallback(async () => {
     if (newTemplateName.trim() && customPrompt.trim() && createTemplate) {
-      await createTemplate(newTemplateName, customPrompt)
-      setShowSaveDialog(false)
+      const ok = await createTemplate(newTemplateName, customPrompt)
+      if (ok) setShowSaveDialog(false)
     }
-  }
+  }, [newTemplateName, customPrompt, createTemplate])
 
   const canSaveAsDefault = useMemo(() => {
     return onSaveAsDefault && customPrompt && systemPrompt !== customPrompt

@@ -112,14 +112,14 @@ export function usePromptTemplates() {
   )
 
   const createTemplate = useCallback(
-    async (name: string, content: string) => {
+    async (name: string, content: string): Promise<boolean> => {
       if (!name.trim()) {
         toast.error(t("toast.promptTemplate.nameRequired"))
-        return
+        return false
       }
       if (!content.trim()) {
         toast.error(t("toast.promptTemplate.contentRequired"))
-        return
+        return false
       }
       if (customTemplates.length >= MAX_CUSTOM_TEMPLATES) {
         toast.error(
@@ -127,7 +127,7 @@ export function usePromptTemplates() {
             max: MAX_CUSTOM_TEMPLATES
           })
         )
-        return
+        return false
       }
       const now = Date.now()
       const newTemplate: PromptTemplate = {
@@ -140,6 +140,7 @@ export function usePromptTemplates() {
       }
       await persistTemplates([...customTemplates, newTemplate])
       toast.success(t("toast.promptTemplate.saved"))
+      return true
     },
     [customTemplates, persistTemplates, t]
   )
