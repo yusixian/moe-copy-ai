@@ -2,8 +2,9 @@ import { Icon } from "@iconify/react"
 import { countTokens } from "gpt-tokenizer"
 import { memo, useCallback, useMemo, useState } from "react"
 
-import type { ScrapedContent } from "~constants/types"
+import type { PromptTemplate, ScrapedContent } from "~constants/types"
 import { useAiSummary } from "~hooks/useAiSummary"
+import { usePromptTemplates } from "~hooks/usePromptTemplates"
 import { useI18n } from "~utils/i18n"
 import { processTemplate } from "~utils/template"
 
@@ -32,6 +33,7 @@ interface AiSummaryPanelProps {
 
   // 回调
   onSummaryGenerated?: (summary: string) => void
+  enablePortal?: boolean
 }
 
 // 默认占位符生成函数
@@ -55,10 +57,12 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
   showHistory = false,
   showTokenEstimate = true,
   title,
-  onSummaryGenerated
+  onSummaryGenerated,
+  enablePortal
 }: AiSummaryPanelProps) {
   const { t } = useI18n()
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false)
+  const { templates, createTemplate } = usePromptTemplates()
 
   const finalPlaceholders = placeholders || getDefaultPlaceholders(t)
   const finalTitle = title || t("ai.panel.title")
@@ -97,6 +101,11 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
     []
   )
 
+  const handleSelectTemplate = useCallback(
+    (tpl: PromptTemplate) => setCustomPrompt(tpl.content),
+    [setCustomPrompt]
+  )
+
   return (
     <div className="space-y-2">
       {/* Token 预估信息 */}
@@ -126,6 +135,10 @@ const AiSummaryPanel = memo(function AiSummaryPanel({
             scrapedData={scrapedData}
             onSaveAsDefault={saveAsDefaultPrompt}
             disabled={isLoading}
+            templates={templates}
+            onSelectTemplate={handleSelectTemplate}
+            createTemplate={createTemplate}
+            enablePortal={enablePortal}
           />
 
           {/* 操作行：模型 + 历史 + 生成按钮 */}

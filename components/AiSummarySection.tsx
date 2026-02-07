@@ -9,12 +9,14 @@ interface AiSummarySectionProps {
   content: string
   onSummaryGenerated?: (summary: string) => void
   scrapedData: ScrapedContent
+  enablePortal?: boolean
 }
 
 const AiSummarySection = memo(function AiSummarySection({
   content,
   onSummaryGenerated,
-  scrapedData
+  scrapedData,
+  enablePortal
 }: AiSummarySectionProps) {
   const { t } = useI18n()
 
@@ -48,6 +50,7 @@ const AiSummarySection = memo(function AiSummarySection({
         showHistory={true}
         title={t("ai.panel.title")}
         onSummaryGenerated={onSummaryGenerated}
+        enablePortal={enablePortal}
       />
     </div>
   )

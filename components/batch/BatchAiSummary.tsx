@@ -1,9 +1,14 @@
 import { Icon } from "@iconify/react"
 import { countTokens } from "gpt-tokenizer"
-import { memo, useMemo } from "react"
+import { memo, useCallback, useMemo } from "react"
 import { AiSendButton } from "~components/ai/AiSendButton"
-import type { BatchScrapeResult, ScrapedContent } from "~constants/types"
+import type {
+  BatchScrapeResult,
+  PromptTemplate,
+  ScrapedContent
+} from "~constants/types"
 import { useAiSummary } from "~hooks/useAiSummary"
+import { usePromptTemplates } from "~hooks/usePromptTemplates"
 import { aggregateToSingleMarkdown } from "~utils/content-aggregator"
 import { useI18n } from "~utils/i18n"
 import { processTemplate } from "~utils/template"
@@ -84,6 +89,8 @@ const BatchAiSummary = memo(function BatchAiSummary({
     return content
   }, [results])
 
+  const { templates, createTemplate } = usePromptTemplates()
+
   // 使用 AI 摘要 hook
   const {
     summary,
@@ -116,6 +123,11 @@ const BatchAiSummary = memo(function BatchAiSummary({
 
   const successCount = results.filter((r) => r.success).length
 
+  const handleSelectTemplate = useCallback(
+    (tpl: PromptTemplate) => setCustomPrompt(tpl.content),
+    [setCustomPrompt]
+  )
+
   return (
     <div className="space-y-2">
       {/* Token 预估信息 - 醒目显示（基于模板替换后的完整提示词） */}
@@ -143,6 +155,9 @@ const BatchAiSummary = memo(function BatchAiSummary({
             scrapedData={scrapedData}
             onSaveAsDefault={saveAsDefaultPrompt}
             disabled={isLoading}
+            templates={templates}
+            onSelectTemplate={handleSelectTemplate}
+            createTemplate={createTemplate}
           />
 
           {/* 生成按钮 */}

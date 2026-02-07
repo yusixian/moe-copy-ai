@@ -1,11 +1,12 @@
 import { Icon } from "@iconify/react"
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
-import type { ScrapedContent } from "~constants/types"
+import type { PromptTemplate, ScrapedContent } from "~constants/types"
 import { useI18n } from "~utils/i18n"
 import { hasAnyPlaceholder, processTemplate } from "~utils/template"
 
 import TokenizationDisplay from "../TokenizationDisplay"
+import { PromptTemplateSelector } from "./PromptTemplateSelector"
 
 interface PlaceholderInfo {
   placeholder: string
@@ -20,6 +21,10 @@ interface CompactPromptInputProps {
   scrapedData?: ScrapedContent
   onSaveAsDefault?: (prompt: string) => void
   disabled?: boolean
+  templates?: PromptTemplate[]
+  onSelectTemplate?: (template: PromptTemplate) => void
+  createTemplate?: (name: string, content: string) => Promise<boolean>
+  enablePortal?: boolean
 }
 
 const CompactPromptInput = ({
@@ -29,11 +34,30 @@ const CompactPromptInput = ({
   supportedPlaceholders,
   scrapedData,
   onSaveAsDefault,
-  disabled = false
+  disabled = false,
+  templates,
+  onSelectTemplate,
+  createTemplate,
+  enablePortal
 }: CompactPromptInputProps) => {
   const { t } = useI18n()
   const [showPlaceholders, setShowPlaceholders] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [newTemplateName, setNewTemplateName] = useState("")
+
+  const handleSaveAsCurrent = useCallback(() => {
+    if (!customPrompt.trim()) return
+    setShowSaveDialog(true)
+    setNewTemplateName("")
+  }, [customPrompt])
+
+  const handleConfirmSave = useCallback(async () => {
+    if (newTemplateName.trim() && customPrompt.trim() && createTemplate) {
+      const ok = await createTemplate(newTemplateName, customPrompt)
+      if (ok) setShowSaveDialog(false)
+    }
+  }, [newTemplateName, customPrompt, createTemplate])
 
   const canSaveAsDefault = useMemo(() => {
     return onSaveAsDefault && customPrompt && systemPrompt !== customPrompt
@@ -41,10 +65,10 @@ const CompactPromptInput = ({
 
   const hasPlaceholders = hasAnyPlaceholder(customPrompt)
 
-  const getPreviewContent = () => {
+  const previewContent = useMemo(() => {
     if (!scrapedData || !customPrompt) return ""
     return processTemplate(customPrompt, scrapedData)
-  }
+  }, [customPrompt, scrapedData])
 
   const insertPlaceholder = (placeholder: string) => {
     setCustomPrompt(customPrompt + placeholder)
@@ -65,17 +89,28 @@ const CompactPromptInput = ({
           className="font-medium text-text-2 text-xs">
           {t("ai.panel.prompt.label")}
         </label>
-        {supportedPlaceholders && supportedPlaceholders.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowPlaceholders(!showPlaceholders)}
-            className="flex items-center gap-1 text-sky-600 text-xs hover:text-sky-700">
-            <Icon icon="mdi:code-braces" width={14} />
-            {showPlaceholders
-              ? t("ai.panel.placeholders.hide")
-              : t("ai.panel.placeholders.title")}
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {templates && onSelectTemplate && (
+            <PromptTemplateSelector
+              templates={templates}
+              onSelect={onSelectTemplate}
+              onSaveAsCurrent={createTemplate ? handleSaveAsCurrent : undefined}
+              disabled={disabled}
+              enablePortal={enablePortal}
+            />
+          )}
+          {supportedPlaceholders && supportedPlaceholders.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowPlaceholders(!showPlaceholders)}
+              className="flex items-center gap-1 text-sky-600 text-xs hover:text-sky-700">
+              <Icon icon="mdi:code-braces" width={14} />
+              {showPlaceholders
+                ? t("ai.panel.placeholders.hide")
+                : t("ai.panel.placeholders.title")}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 输入框 */}
@@ -88,6 +123,35 @@ const CompactPromptInput = ({
         className="w-full rounded border border-line-1 bg-content px-2 py-1.5 text-text-1 text-xs focus:border-accent-blue focus:outline-none disabled:opacity-50"
         rows={4}
       />
+
+      {/* Save as template dialog */}
+      {showSaveDialog && (
+        <div className="flex items-center gap-2 rounded border border-accent-blue/20 bg-accent-blue-ghost p-2">
+          <input
+            type="text"
+            value={newTemplateName}
+            onChange={(e) => setNewTemplateName(e.target.value)}
+            placeholder={t("promptTemplate.selector.namePlaceholder")}
+            className="flex-1 rounded border border-line-1 bg-content px-2 py-1 text-xs focus:border-accent-blue focus:outline-none"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleConfirmSave()
+              if (e.key === "Escape") setShowSaveDialog(false)
+            }}
+          />
+          <button
+            type="button"
+            onClick={handleConfirmSave}
+            className="rounded bg-accent-blue px-2 py-1 text-white text-xs hover:bg-accent-blue-hover">
+            {t("common.save")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowSaveDialog(false)}
+            className="rounded bg-content-alt px-2 py-1 text-text-2 text-xs hover:bg-content-alt/80">
+            {t("common.cancel")}
+          </button>
+        </div>
+      )}
 
       {/* 占位符列表 */}
       {showPlaceholders &&
@@ -157,11 +221,11 @@ const CompactPromptInput = ({
             {t("scrape.prompt.previewTitle")}
           </p>
           <div className="max-h-24 overflow-y-auto rounded bg-content-solid p-1.5 text-text-2 text-xs">
-            {getPreviewContent()}
+            {previewContent}
           </div>
           <TokenizationDisplay
             showOnlySummary
-            content={getPreviewContent()}
+            content={previewContent}
             isVisible={true}
             className="mt-1.5"
           />
