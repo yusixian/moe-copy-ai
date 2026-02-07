@@ -29,9 +29,9 @@ export class MockStorage {
     }
   }
 
-  watch(): () => void {
-    return () => {}
-  }
+  watch(_watchMap?: Record<string, unknown>): void {}
+
+  unwatch(_watchMap?: Record<string, unknown>): void {}
 
   clear(): void {
     this.store.clear()

@@ -25,6 +25,7 @@ description: 记录 MoeCopy AI 的所有版本更新、新功能、改进和修�
 - [@yusixian](https://github.com/yusixian) - 项目作者
 - [@hyoban](https://github.com/hyoban) - 批量抓取功能贡献者
 - [@XueHua-s](https://github.com/XueHua-s) - htmlToMarkdown 重构贡献者
+- [@hakadao](https://github.com/hakadao) - UI 设计系统贡献者
 - 以及所有提交 Issue 和 PR 的朋友们！
 
 ## 反馈渠道
@@ -34,13 +35,96 @@ description: 记录 MoeCopy AI 的所有版本更新、新功能、改进和修�
 - [GitHub Discussions](https://github.com/yusixian/moe-copy-ai/discussions)
 - 邮箱：i@cosine.ren
 
+## [v0.3.5] - 2026-02-08
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.3.5)
+
+新增完整的 Prompt Template 管理功能，支持预设模版和自定义模版，让 AI 摘要更加灵活。
+
+<img width="1383" alt="Prompt Template Manager" src="https://r2.cosine.ren/i/2026/02/c9b63e5b248226dbd560969277b41f0a.webp" />
+
+* v0.3.5 by @yusixian in https://github.com/yusixian/moe-copy-ai/pull/41
+
+### 新功能
+
+- **Prompt Template 管理** — 全新的模版系统，轻松管理和切换 AI 提示词
+  - 内置 9 个预设模版，覆盖常用摘要场景
+  - 支持自定义模版的创建、编辑、删除（CRUD）
+  - 在 AI 摘要面板、批量摘要、设置页和侧边栏中均可选择/管理模版
+
+**Full Changelog**: https://github.com/yusixian/moe-copy-ai/compare/0.3.4...0.3.5
+
+## [v0.3.4] - 2026-02-04
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.3.4)
+
+优化 AI 发送按钮组件，完善深色模式支持，统一设计系统颜色和圆角规范
+
+* v0.3.4 by @yusixian in https://github.com/yusixian/moe-copy-ai/pull/40
+
+## [v0.3.3] - 2026-02-01
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.3.3)
+
+本次更新实现完整的深色模式支持，并对整个设计系统进行了重构。
+
+* v0.3.3 by @yusixian in https://github.com/yusixian/moe-copy-ai/pull/37
+
+### 新功能
+
+- 主题选择能力：集成全局 Theme Context，组件统一感知主题
+- 使用 Tailwind CSS 插件与集中化主题变量，统一主题管理
+- UI 组件支持主题感知样式并改进类名管理
+
+### 重构
+
+- 组件样式全面迁移至新的设计令牌（Design Tokens），提升一致性与可维护性
+- 使用语义化颜色令牌替代硬编码颜色，统一色彩体系
+
+**Full Changelog**: https://github.com/yusixian/moe-copy-ai/compare/0.3.2...0.3.3
+
+## [v0.3.2] - 2026-01-30
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.3.2)
+
+* v0.3.2 by @yusixian in https://github.com/yusixian/moe-copy-ai/pull/34
+* 修复 rem 单位与宿主页面解耦 PR #31 by [@hakadao](https://github.com/hakadao)
+* 修复 Popup 响应式布局优化 PR #33 by [@hakadao](https://github.com/hakadao)
+
+**Full Changelog**: https://github.com/yusixian/moe-copy-ai/compare/0.3.1...0.3.2
+
+## [v0.3.1] - 2026-01-24
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.3.1)
+
+Fixes #28 and Refator
+- 修复重新选择按钮失效问题
+- 重构批量抓取状态管理：新增 BatchScrapeContext 与一组 hooks（进度、链接、选择器、流处理等），BatchScrapePanel 改为通过 Context 获取数据，sidepanel 简化
+- 重构 Popup UI 拆分为多个子组件，新增错误提示/调试面板/元数据与悬浮按钮控制等区块，并调整相关 hooks
+
+**Full Changelog**: https://github.com/yusixian/moe-copy-ai/compare/0.3.0...0.3.1
+
+## [v0.3.0] - 2026-01-22
+
+[Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.3.0)
+
+感谢 [@hakadao](https://github.com/hakadao) 重新设计整合的新 UI，看起来舒服多了！太辛苦了～
+
+<img width="1383" height="1330" alt="image" src="https://r2.cosine.ren/i/2026/01/1d920bb07ee14ee8cc00040725323246.webp" />
+
+<img width="949" height="1400" alt="image" src="https://r2.cosine.ren/i/2026/01/a0cee904f4484519b66be13f93264582.webp" />
+
+<img width="949" height="1400" alt="image" src="https://r2.cosine.ren/i/2026/01/10c9916b78d566889d9039cb7f283bf3.webp" />
+
+<img width="2360" height="1708" alt="image" src="https://r2.cosine.ren/i/2026/01/21f8e8784c82e362ad9ae79aa1c91a3a.webp" />
+
 ## [v0.2.2] - 2026-01-16
 
 [Release Notes](https://github.com/yusixian/moe-copy-ai/releases/tag/0.2.2)
 
 ### 新功能
 
-- **国际化支持 (i18n)**：添加了多语言支持系统，目前仅支持简体中文和英语两种语言，详见[国际化指南](/developer-guide/i18n-guide)
+- **国际化支持 (i18n)**：添加了多语言支持系统，目前仅支持简体中文和英语两种语言，详见[🌍 国际化指南](/docs/developer-guide/i18n-guide)
   - 自动检测浏览器语言，首次使用时自动设置
   - 支持运行时切换语言，无需刷新页面
   - 语言偏好通过 Chrome sync storage 同步至所有扩展窗口

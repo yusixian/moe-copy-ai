@@ -77,6 +77,19 @@ export interface AiChatHistory {
   items: AiChatHistoryItem[]
 }
 
+// Prompt template
+export interface PromptTemplate {
+  id: string // preset: "preset:<key>", custom: crypto.randomUUID()
+  name: string
+  content: string // supports {{placeholders}}
+  isPreset: boolean
+  description?: string
+  icon?: string // Iconify icon name (preset only)
+  isModified?: boolean // true if preset has user overrides
+  createdAt?: number // custom only
+  updatedAt?: number // custom only
+}
+
 // 内容抓取模式
 export type ExtractionMode = "selector" | "readability" | "hybrid"
 
