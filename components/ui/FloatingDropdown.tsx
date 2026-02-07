@@ -40,6 +40,8 @@ export function FloatingDropdown({
   const { refs, floatingStyles, context } = useFloating({
     open,
     onOpenChange,
+    // Portal mounts to body → "absolute" works relative to offsetParent.
+    // Without portal (popup/sidepanel), "fixed" escapes overflow:hidden containers.
     strategy: enablePortal ? "absolute" : "fixed",
     middleware: [
       offset(4),

@@ -1,5 +1,6 @@
 import { Storage } from "@plasmohq/storage"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useStorage } from "@plasmohq/storage/hook"
+import { useCallback, useMemo } from "react"
 import { toast } from "react-toastify"
 
 import {
@@ -23,9 +24,16 @@ type PresetOverrides = Record<string, PresetOverride>
 
 export function usePromptTemplates() {
   const { t } = useI18n()
-  const [customTemplates, setCustomTemplates] = useState<PromptTemplate[]>([])
-  const [presetOverrides, setPresetOverrides] = useState<PresetOverrides>({})
-  const [isLoaded, setIsLoaded] = useState(false)
+
+  const [customTemplates, setCustomTemplates] = useStorage<PromptTemplate[]>(
+    { key: STORAGE_KEY, instance: storage },
+    (v) => (v === undefined ? [] : v)
+  )
+
+  const [presetOverrides, setPresetOverrides] = useStorage<PresetOverrides>(
+    { key: OVERRIDES_KEY, instance: storage },
+    (v) => (v === undefined ? {} : v)
+  )
 
   const presetTemplates = useMemo(() => {
     const defaults = getPresetTemplates(t)
@@ -53,64 +61,6 @@ export function usePromptTemplates() {
     [presetOverrides]
   )
 
-  // Load custom templates and preset overrides, then watch for cross-page changes
-  useEffect(() => {
-    let mounted = true
-
-    Promise.all([
-      storage.get<PromptTemplate[]>(STORAGE_KEY),
-      storage.get<PresetOverrides>(OVERRIDES_KEY)
-    ])
-      .then(([templates, overrides]) => {
-        if (!mounted) return
-        if (templates) setCustomTemplates(templates)
-        if (overrides) setPresetOverrides(overrides)
-      })
-      .catch((err) => console.error("Failed to load templates:", err))
-      .finally(() => {
-        if (mounted) setIsLoaded(true)
-      })
-
-    const watchMap = {
-      [STORAGE_KEY]: (change: { newValue?: PromptTemplate[] }) => {
-        if (mounted) setCustomTemplates(change.newValue ?? [])
-      },
-      [OVERRIDES_KEY]: (change: { newValue?: PresetOverrides }) => {
-        if (mounted) setPresetOverrides(change.newValue ?? {})
-      }
-    }
-    storage.watch(watchMap)
-
-    return () => {
-      mounted = false
-      storage.unwatch(watchMap)
-    }
-  }, [])
-
-  const persistTemplates = useCallback(
-    async (updated: PromptTemplate[]) => {
-      try {
-        await storage.set(STORAGE_KEY, updated)
-        setCustomTemplates(updated)
-      } catch {
-        toast.error(t("toast.promptTemplate.saveFailed"))
-      }
-    },
-    [t]
-  )
-
-  const persistOverrides = useCallback(
-    async (updated: PresetOverrides) => {
-      try {
-        await storage.set(OVERRIDES_KEY, updated)
-        setPresetOverrides(updated)
-      } catch {
-        toast.error(t("toast.promptTemplate.saveFailed"))
-      }
-    },
-    [t]
-  )
-
   const createTemplate = useCallback(
     async (name: string, content: string): Promise<boolean> => {
       if (!name.trim()) {
@@ -129,20 +79,25 @@ export function usePromptTemplates() {
         )
         return false
       }
-      const now = Date.now()
-      const newTemplate: PromptTemplate = {
-        id: crypto.randomUUID(),
-        name: name.trim(),
-        content: content.trim(),
-        isPreset: false,
-        createdAt: now,
-        updatedAt: now
+      try {
+        const now = Date.now()
+        const newTemplate: PromptTemplate = {
+          id: crypto.randomUUID(),
+          name: name.trim(),
+          content: content.trim(),
+          isPreset: false,
+          createdAt: now,
+          updatedAt: now
+        }
+        await setCustomTemplates([...customTemplates, newTemplate])
+        toast.success(t("toast.promptTemplate.saved"))
+        return true
+      } catch {
+        toast.error(t("toast.promptTemplate.saveFailed"))
+        return false
       }
-      await persistTemplates([...customTemplates, newTemplate])
-      toast.success(t("toast.promptTemplate.saved"))
-      return true
     },
-    [customTemplates, persistTemplates, t]
+    [customTemplates, setCustomTemplates, t]
   )
 
   const updateTemplate = useCallback(
@@ -150,63 +105,88 @@ export function usePromptTemplates() {
       id: string,
       updates: Partial<Pick<PromptTemplate, "name" | "content">>
     ) => {
-      if (id.startsWith("preset:")) {
-        const next = { ...presetOverrides }
-        next[id] = {
-          ...next[id],
-          ...(updates.name != null && { name: updates.name }),
-          ...(updates.content != null && { content: updates.content })
+      try {
+        if (id.startsWith("preset:")) {
+          const next = { ...presetOverrides }
+          next[id] = {
+            ...next[id],
+            ...(updates.name != null && { name: updates.name }),
+            ...(updates.content != null && { content: updates.content })
+          }
+          await setPresetOverrides(next)
+        } else {
+          const updated = customTemplates.map((tpl) =>
+            tpl.id === id ? { ...tpl, ...updates, updatedAt: Date.now() } : tpl
+          )
+          await setCustomTemplates(updated)
         }
-        await persistOverrides(next)
         toast.success(t("toast.promptTemplate.saved"))
-      } else {
-        const updated = customTemplates.map((tpl) =>
-          tpl.id === id ? { ...tpl, ...updates, updatedAt: Date.now() } : tpl
-        )
-        await persistTemplates(updated)
-        toast.success(t("toast.promptTemplate.saved"))
+      } catch {
+        toast.error(t("toast.promptTemplate.saveFailed"))
       }
     },
-    [customTemplates, persistTemplates, presetOverrides, persistOverrides, t]
+    [
+      customTemplates,
+      setCustomTemplates,
+      presetOverrides,
+      setPresetOverrides,
+      t
+    ]
   )
 
   const deleteTemplate = useCallback(
     async (id: string) => {
-      if (id.startsWith("preset:")) {
-        const next = { ...presetOverrides }
-        next[id] = { ...next[id], hidden: true }
-        await persistOverrides(next)
+      try {
+        if (id.startsWith("preset:")) {
+          const next = { ...presetOverrides }
+          next[id] = { ...next[id], hidden: true }
+          await setPresetOverrides(next)
+        } else {
+          const updated = customTemplates.filter((tpl) => tpl.id !== id)
+          await setCustomTemplates(updated)
+        }
         toast.success(t("toast.promptTemplate.deleted"))
-      } else {
-        const updated = customTemplates.filter((tpl) => tpl.id !== id)
-        await persistTemplates(updated)
-        toast.success(t("toast.promptTemplate.deleted"))
+      } catch {
+        toast.error(t("toast.promptTemplate.saveFailed"))
       }
     },
-    [customTemplates, persistTemplates, presetOverrides, persistOverrides, t]
+    [
+      customTemplates,
+      setCustomTemplates,
+      presetOverrides,
+      setPresetOverrides,
+      t
+    ]
   )
 
   const resetPreset = useCallback(
     async (id: string) => {
       if (!id.startsWith("preset:")) return
-      const next = { ...presetOverrides }
-      delete next[id]
-      await persistOverrides(next)
-      toast.success(t("toast.promptTemplate.saved"))
+      try {
+        const next = { ...presetOverrides }
+        delete next[id]
+        await setPresetOverrides(next)
+        toast.success(t("toast.promptTemplate.saved"))
+      } catch {
+        toast.error(t("toast.promptTemplate.saveFailed"))
+      }
     },
-    [presetOverrides, persistOverrides, t]
+    [presetOverrides, setPresetOverrides, t]
   )
 
   const restoreAllPresets = useCallback(async () => {
-    await persistOverrides({})
-    toast.success(t("toast.promptTemplate.saved"))
-  }, [persistOverrides, t])
+    try {
+      await setPresetOverrides({})
+      toast.success(t("toast.promptTemplate.saved"))
+    } catch {
+      toast.error(t("toast.promptTemplate.saveFailed"))
+    }
+  }, [setPresetOverrides, t])
 
   return {
     templates,
     presetTemplates,
     customTemplates,
-    isLoaded,
     createTemplate,
     updateTemplate,
     deleteTemplate,
