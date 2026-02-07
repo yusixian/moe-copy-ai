@@ -54,7 +54,8 @@ pnpm test:ui                # Vitest UI
 - `options.tsx` — Settings page (lazy loads 6 setting sections)
 - `background/` — Extension lifecycle; `messages/` subdir has Chrome messaging handlers
 - `contents/` — Content scripts: `scraper.ts`, `floating-popup.tsx`, `element-selector.tsx`
-- `components/` — React UI, organized by feature: `ai/`, `batch/`, `extraction/`, `option/`, `popup/`, `singlescrape/`, `sidepanel/`, `ui/`
+- `components/` — React UI, organized by feature: `ai/`, `batch/`, `extraction/`, `option/`, `popup/`, `singlescrape/`, `sidepanel/`, `svg/`, `ui/`
+- `contexts/` — React contexts (`BatchScrapeContext`)
 - `hooks/` — React hooks (business logic layer)
 - `utils/` — Core business logic, services, and pure functions
 - `constants/` — Config, types, and theme definitions

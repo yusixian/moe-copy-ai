@@ -23,6 +23,7 @@ import {
   BatchScrapeSettings,
   CompactSelect
 } from "../batch/BatchScrapeSettings"
+import PromptTemplateManager from "../option/PromptTemplateManager"
 import { ThemeSelect } from "../option/ThemeSelect"
 
 // 开关行组件（用于单选项设置）
@@ -325,6 +326,12 @@ export default function SidePanelSettings() {
         icon={<Icon icon="mdi:robot" width={16} />}
         defaultExpanded>
         <AiSettings />
+      </Collapsible>
+
+      <Collapsible
+        title={t("promptTemplate.manager.title")}
+        icon={<Icon icon="mdi:file-document-multiple-outline" width={16} />}>
+        <PromptTemplateManager showTitle={false} />
       </Collapsible>
 
       <Collapsible

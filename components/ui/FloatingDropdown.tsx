@@ -25,6 +25,7 @@ interface FloatingDropdownProps {
   content: React.ReactNode
   matchWidth?: boolean
   className?: string
+  enablePortal?: boolean
 }
 
 export function FloatingDropdown({
@@ -33,11 +34,13 @@ export function FloatingDropdown({
   children,
   content,
   matchWidth = true,
-  className = ""
+  className = "",
+  enablePortal = true
 }: FloatingDropdownProps) {
   const { refs, floatingStyles, context } = useFloating({
     open,
     onOpenChange,
+    strategy: enablePortal ? "absolute" : "fixed",
     middleware: [
       offset(4),
       flip({ padding: 8 }),
@@ -62,27 +65,29 @@ export function FloatingDropdown({
     role
   ])
 
+  const floatingEl = (
+    <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
+      <div
+        ref={refs.setFloating}
+        style={floatingStyles}
+        className={className}
+        {...getFloatingProps()}>
+        {content}
+      </div>
+    </FloatingFocusManager>
+  )
+
   return (
     <>
       <div ref={refs.setReference} {...getReferenceProps()}>
         {children}
       </div>
-      {open && (
-        <FloatingPortal>
-          <FloatingFocusManager
-            context={context}
-            modal={false}
-            initialFocus={-1}>
-            <div
-              ref={refs.setFloating}
-              style={floatingStyles}
-              className={className}
-              {...getFloatingProps()}>
-              {content}
-            </div>
-          </FloatingFocusManager>
-        </FloatingPortal>
-      )}
+      {open &&
+        (enablePortal ? (
+          <FloatingPortal>{floatingEl}</FloatingPortal>
+        ) : (
+          floatingEl
+        ))}
     </>
   )
 }

@@ -7,6 +7,7 @@ import { useI18n } from "~utils/i18n"
 
 import { ModelSelectInput } from "../ai/ModelSelectInput"
 import OptionSection from "./OptionSection"
+import PromptTemplateManager from "./PromptTemplateManager"
 
 function AiSettingsSection() {
   const { t } = useI18n()
@@ -162,6 +163,10 @@ function AiSettingsSection() {
           <p className="mt-2 text-sm text-text-2">
             {t("option.ai.systemPrompt.helper")}
           </p>
+        </div>
+
+        <div className="mb-4 border-line-1 border-t pt-4">
+          <PromptTemplateManager />
         </div>
 
         <Button fullWidth onClick={saveSettings}>

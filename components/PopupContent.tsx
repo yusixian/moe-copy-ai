@@ -277,6 +277,7 @@ const PopupContent = ({
           <AiSummarySection
             content={scrapedData.articleContent}
             scrapedData={scrapedData}
+            enablePortal={enablePortal}
           />
 
           {/* Page Images */}
