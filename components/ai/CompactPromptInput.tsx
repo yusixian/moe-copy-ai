@@ -47,9 +47,10 @@ const CompactPromptInput = ({
   const [newTemplateName, setNewTemplateName] = useState("")
 
   const handleSaveAsCurrent = useCallback(() => {
+    if (!customPrompt.trim()) return
     setShowSaveDialog(true)
     setNewTemplateName("")
-  }, [])
+  }, [customPrompt])
 
   const handleConfirmSave = useCallback(async () => {
     if (newTemplateName.trim() && customPrompt.trim() && createTemplate) {
@@ -64,10 +65,10 @@ const CompactPromptInput = ({
 
   const hasPlaceholders = hasAnyPlaceholder(customPrompt)
 
-  const getPreviewContent = () => {
+  const previewContent = useMemo(() => {
     if (!scrapedData || !customPrompt) return ""
     return processTemplate(customPrompt, scrapedData)
-  }
+  }, [customPrompt, scrapedData])
 
   const insertPlaceholder = (placeholder: string) => {
     setCustomPrompt(customPrompt + placeholder)
@@ -220,11 +221,11 @@ const CompactPromptInput = ({
             {t("scrape.prompt.previewTitle")}
           </p>
           <div className="max-h-24 overflow-y-auto rounded bg-content-solid p-1.5 text-text-2 text-xs">
-            {getPreviewContent()}
+            {previewContent}
           </div>
           <TokenizationDisplay
             showOnlySummary
-            content={getPreviewContent()}
+            content={previewContent}
             isVisible={true}
             className="mt-1.5"
           />

@@ -89,7 +89,12 @@ export function usePromptTemplates() {
           createdAt: now,
           updatedAt: now
         }
-        await setCustomTemplates([...customTemplates, newTemplate])
+        // Functional update to avoid stale closure on concurrent writes
+        await setCustomTemplates((prev) => {
+          const list = prev ?? []
+          if (list.length >= MAX_CUSTOM_TEMPLATES) return list
+          return [...list, newTemplate]
+        })
         toast.success(t("toast.promptTemplate.saved"))
         return true
       } catch {
@@ -97,7 +102,7 @@ export function usePromptTemplates() {
         return false
       }
     },
-    [customTemplates, setCustomTemplates, t]
+    [customTemplates.length, setCustomTemplates, t]
   )
 
   const updateTemplate = useCallback(
@@ -107,71 +112,69 @@ export function usePromptTemplates() {
     ) => {
       try {
         if (id.startsWith("preset:")) {
-          const next = { ...presetOverrides }
-          next[id] = {
-            ...next[id],
-            ...(updates.name != null && { name: updates.name }),
-            ...(updates.content != null && { content: updates.content })
-          }
-          await setPresetOverrides(next)
+          await setPresetOverrides((prev) => {
+            const next = { ...(prev ?? {}) }
+            next[id] = {
+              ...next[id],
+              ...(updates.name != null && { name: updates.name }),
+              ...(updates.content != null && { content: updates.content })
+            }
+            return next
+          })
         } else {
-          const updated = customTemplates.map((tpl) =>
-            tpl.id === id ? { ...tpl, ...updates, updatedAt: Date.now() } : tpl
+          await setCustomTemplates((prev) =>
+            (prev ?? []).map((tpl) =>
+              tpl.id === id
+                ? { ...tpl, ...updates, updatedAt: Date.now() }
+                : tpl
+            )
           )
-          await setCustomTemplates(updated)
         }
         toast.success(t("toast.promptTemplate.saved"))
       } catch {
         toast.error(t("toast.promptTemplate.saveFailed"))
       }
     },
-    [
-      customTemplates,
-      setCustomTemplates,
-      presetOverrides,
-      setPresetOverrides,
-      t
-    ]
+    [setCustomTemplates, setPresetOverrides, t]
   )
 
   const deleteTemplate = useCallback(
     async (id: string) => {
       try {
         if (id.startsWith("preset:")) {
-          const next = { ...presetOverrides }
-          next[id] = { ...next[id], hidden: true }
-          await setPresetOverrides(next)
+          await setPresetOverrides((prev) => {
+            const next = { ...(prev ?? {}) }
+            next[id] = { ...next[id], hidden: true }
+            return next
+          })
         } else {
-          const updated = customTemplates.filter((tpl) => tpl.id !== id)
-          await setCustomTemplates(updated)
+          await setCustomTemplates((prev) =>
+            (prev ?? []).filter((tpl) => tpl.id !== id)
+          )
         }
         toast.success(t("toast.promptTemplate.deleted"))
       } catch {
         toast.error(t("toast.promptTemplate.saveFailed"))
       }
     },
-    [
-      customTemplates,
-      setCustomTemplates,
-      presetOverrides,
-      setPresetOverrides,
-      t
-    ]
+    [setCustomTemplates, setPresetOverrides, t]
   )
 
   const resetPreset = useCallback(
     async (id: string) => {
       if (!id.startsWith("preset:")) return
       try {
-        const next = { ...presetOverrides }
-        delete next[id]
-        await setPresetOverrides(next)
+        await setPresetOverrides((prev) => {
+          const next = { ...(prev ?? {}) }
+          delete next[id]
+          return next
+        })
         toast.success(t("toast.promptTemplate.saved"))
       } catch {
         toast.error(t("toast.promptTemplate.saveFailed"))
       }
     },
-    [presetOverrides, setPresetOverrides, t]
+    [setPresetOverrides, t]
   )
 
   const restoreAllPresets = useCallback(async () => {
