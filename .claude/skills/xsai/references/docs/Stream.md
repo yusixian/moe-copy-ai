@@ -1,0 +1,54 @@
+# Stream
+
+**URL**: https://xsai.js.org/docs/packages/utils/stream
+
+---
+
+Utils # Stream![install size](https://flat.badgen.net/packagephobia/install/@xsai/utils-stream?color=gray)![minified size](https://flat.badgen.net/bundlephobia/min/@xsai/utils-stream?color=gray)![minzipped size](https://flat.badgen.net/bundlephobia/minzip/@xsai/utils-stream?color=gray) npmpnpmyarnbun ```
+npm i @xsai/utils-stream
+``` ## Examples ### simulateReadableStream ```
+import { simulateReadableStream } from '@xsai/utils-stream'
+
+const stream = simulateReadableStream<number>({
+  chunks: [1, 2, 3],
+  chunkDelay: 100,
+  initialDelay: 0,
+})
+``` ### smoothStream ```
+import { streamText } from '@xsai/stream-text'
+import { smoothStream } from '@xsai/utils-stream'
+import { env } from 'node:process'
+
+const { textStream } = streamText({
+  apiKey: env.OPENAI_API_KEY!,
+  baseURL: 'https://api.openai.com/v1/',
+  messages: [
+    {
+      content: 'You are a helpful assistant.',
+      role: 'system',
+    },
+    {
+      content: 'This is a test, so please answer'
+        + '\'The quick brown fox jumps over the lazy dog.\''
+        + 'and nothing else.',
+      role: 'user',
+    },
+  ],
+  model: 'gpt-4o',
+})
+
+const smoothTextStream = textStream.pipeThrough(smoothStream({
+  delay: 20,
+  chunking: 'line',
+}))
+``` ### toAsyncIterator Simple polyfill for Safari. (see <https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream#browser_compatibility>) ```
+import { simulateReadableStream, toAsyncIterator } from '@xsai/utils-stream'
+
+const stream = simulateReadableStream<number>({
+  chunks: [1, 2, 3],
+  chunkDelay: 100,
+  initialDelay: 0,
+})
+
+const iterableStream = toAsyncIterator(stream)
+```[Edit on GitHub](https://github.com/moeru-ai/xsai/blob/main/docs/content/docs/packages/utils/stream.mdx)[Reasoning](/docs/packages/utils/reasoning)[Previous Page](/docs/packages/utils/reasoning)[xsai](/docs/packages-top/xsai)[A package containing all the core xsAI tools.](/docs/packages-top/xsai)
