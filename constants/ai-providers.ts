@@ -57,7 +57,7 @@ export const AI_PROVIDERS: AiProvider[] = [
   {
     id: "perplexity",
     name: "Perplexity",
-    baseURL: "https://api.perplexity.ai/",
+    baseURL: "https://api.perplexity.ai",
     icon: "simple-icons:perplexity"
   },
   {

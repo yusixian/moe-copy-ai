@@ -19,7 +19,7 @@ export async function getAiConfig() {
     const apiKey = await syncStorage.get<string>("ai_api_key")
     const baseURL =
       (await syncStorage.get<string>("ai_base_url")) ||
-      "https://api.openai.com/v1/"
+      "https://api.openai.com/v1"
     const savedLocale = await syncStorage.get<Locale>(LOCALE_STORAGE_KEY)
     const locale = SUPPORTED_LOCALES.includes(savedLocale as Locale)
       ? (savedLocale as Locale)
@@ -75,7 +75,7 @@ export async function generateSummary(customPrompt?: string) {
     return res
   } catch (error) {
     debugLog("生成摘要出错:", error)
-    return null
+    throw error
   }
 }
 
