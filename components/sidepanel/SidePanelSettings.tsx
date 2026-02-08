@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react"
 import { useStorage } from "@plasmohq/storage/hook"
 import { useLayoutEffect, useState } from "react"
 import { toast } from "react-toastify"
-
+import AiProviderSelect from "~/components/ai/AiProviderSelect"
 import { Button } from "~/components/ui/button"
 import { Collapsible } from "~/components/ui/collapsible"
 import Segmented from "~/components/ui/segmented"
@@ -158,6 +158,9 @@ function AiSettings() {
         <label htmlFor="sp-base-url" className="mb-1 block text-text-1 text-xs">
           {t("sidepanel.settings.ai.baseUrl")}
         </label>
+        <div className="mb-1">
+          <AiProviderSelect value={baseURL} onChange={setBaseURL} compact />
+        </div>
         <div className="flex gap-1">
           <input
             id="sp-base-url"

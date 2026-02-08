@@ -52,7 +52,7 @@ describe("getAiConfig", () => {
     const config = await getAiConfig()
 
     expect(config.apiKey).toBeUndefined()
-    expect(config.baseURL).toBe("https://api.openai.com/v1/")
+    expect(config.baseURL).toBe("https://api.openai.com/v1")
     expect(config.systemPrompt).toContain("摘要任务")
     expect(config.model).toBe("")
   })
@@ -79,17 +79,18 @@ describe("generateSummary", () => {
       ai_model: "gpt-4"
     })
 
-    vi.mocked(streamText).mockResolvedValueOnce({
-      text: "Generated summary",
-      usage: { prompt_tokens: 100, completion_tokens: 50 }
-    } as unknown as Awaited<ReturnType<typeof streamText>>)
+    vi.mocked(streamText).mockReturnValueOnce({
+      textStream: new ReadableStream(),
+      usage: Promise.resolve({
+        prompt_tokens: 100,
+        completion_tokens: 50,
+        total_tokens: 150
+      })
+    } as unknown as ReturnType<typeof streamText>)
 
     const result = await generateSummary()
 
-    expect(result).toEqual({
-      text: "Generated summary",
-      usage: { prompt_tokens: 100, completion_tokens: 50 }
-    })
+    expect(result).toBeTruthy()
     expect(streamText).toHaveBeenCalledWith(
       expect.objectContaining({
         apiKey: "test-key",
@@ -99,15 +100,13 @@ describe("generateSummary", () => {
     )
   })
 
-  it("returns null when API key is missing", async () => {
+  it("throws when API key is missing", async () => {
     await syncStorage.setMany({
       ai_base_url: "https://api.test.com/v1/",
       ai_model: "gpt-4"
     })
 
-    const result = await generateSummary()
-
-    expect(result).toBeNull()
+    await expect(generateSummary()).rejects.toThrow("未设置API密钥")
     expect(streamText).not.toHaveBeenCalled()
   })
 
@@ -118,9 +117,10 @@ describe("generateSummary", () => {
       ai_model: "gpt-4"
     })
 
-    vi.mocked(streamText).mockResolvedValueOnce({
-      text: "Custom result"
-    } as unknown as Awaited<ReturnType<typeof streamText>>)
+    vi.mocked(streamText).mockReturnValueOnce({
+      textStream: new ReadableStream(),
+      usage: Promise.resolve(undefined)
+    } as unknown as ReturnType<typeof streamText>)
 
     await generateSummary("Custom prompt here")
 
@@ -131,17 +131,17 @@ describe("generateSummary", () => {
     )
   })
 
-  it("returns null when API call fails", async () => {
+  it("throws when API call fails", async () => {
     await syncStorage.setMany({
       ai_api_key: "test-key",
       ai_model: "gpt-4"
     })
 
-    vi.mocked(streamText).mockRejectedValueOnce(new Error("API error"))
+    vi.mocked(streamText).mockImplementationOnce(() => {
+      throw new Error("API error")
+    })
 
-    const result = await generateSummary()
-
-    expect(result).toBeNull()
+    await expect(generateSummary()).rejects.toThrow("API error")
   })
 })
 

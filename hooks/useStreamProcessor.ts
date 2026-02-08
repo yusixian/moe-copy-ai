@@ -1,4 +1,4 @@
-import type { StreamTextChunkResult, StreamTextResult } from "@xsai/stream-text"
+import type { StreamTextResult } from "@xsai/stream-text"
 import { useCallback, useState } from "react"
 
 import { debugLog } from "~utils/logger"
@@ -25,50 +25,16 @@ export function useStreamProcessor() {
   const processStream = useCallback(
     async (result: StreamTextResult): Promise<StreamProcessResult> => {
       let fullText = ""
-      let currentUsage: UsageInfo | null = null
-
-      const chunkStream =
-        result.chunkStream as unknown as AsyncIterable<StreamTextChunkResult>
-
-      // Process chunk stream for usage info in background
-      const processChunkStream = async () => {
-        debugLog("Starting to process chunkStream for usage...")
-
-        try {
-          for await (const chunk of chunkStream) {
-            if (chunk.usage) {
-              debugLog("Received usage info:", chunk.usage)
-              const newUsage = {
-                total_tokens: chunk.usage.total_tokens,
-                prompt_tokens: chunk.usage.prompt_tokens,
-                completion_tokens: chunk.usage.completion_tokens
-              }
-              setUsage(newUsage)
-              currentUsage = newUsage
-            }
-          }
-          debugLog("chunkStream processing complete")
-        } catch (chunkError) {
-          console.error("chunkStream processing error:", chunkError)
-          debugLog("chunkStream processing detailed error:", {
-            name: (chunkError as Error).name,
-            message: (chunkError as Error).message,
-            stack: (chunkError as Error).stack
-          })
-        }
-      }
-
-      // Start async processing without waiting
-      processChunkStream().catch(console.error)
-
-      // Process text stream
-      const textStream = result.textStream as unknown as AsyncIterable<string>
 
       debugLog("Starting to process textStream...")
       let chunkCount = 0
 
+      const reader = result.textStream.getReader()
       try {
-        for await (const textPart of textStream) {
+        while (true) {
+          const { done, value: textPart } = await reader.read()
+          if (done) break
+
           chunkCount++
           if (chunkCount % 20 === 0 || chunkCount <= 2) {
             debugLog(`Received chunk ${chunkCount}:`, {
@@ -96,6 +62,25 @@ export function useStreamProcessor() {
           "Despite textStream error, using collected text, length:",
           fullText.length
         )
+      } finally {
+        reader.releaseLock()
+      }
+
+      // Retrieve usage from the Promise (resolves after stream ends)
+      let currentUsage: UsageInfo | null = null
+      try {
+        const usageResult = await result.usage
+        if (usageResult) {
+          debugLog("Received usage info:", usageResult)
+          currentUsage = {
+            total_tokens: usageResult.total_tokens,
+            prompt_tokens: usageResult.prompt_tokens,
+            completion_tokens: usageResult.completion_tokens
+          }
+          setUsage(currentUsage)
+        }
+      } catch (usageError) {
+        debugLog("Failed to get usage:", usageError)
       }
 
       return { fullText, usage: currentUsage }
