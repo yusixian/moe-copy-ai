@@ -115,9 +115,9 @@ export const useAiSummary = (
           model: config.model
         })
 
-        fullText = text
-        setSummary(text)
-        onSummaryGenerated?.(text)
+        fullText = text ?? ""
+        setSummary(fullText)
+        onSummaryGenerated?.(fullText)
 
         if (usage) {
           const newUsage = {
@@ -130,7 +130,7 @@ export const useAiSummary = (
         }
 
         await saveToHistory({
-          text,
+          text: fullText,
           customPrompt,
           scrapedData,
           usage: currentUsage

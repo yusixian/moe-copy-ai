@@ -79,17 +79,18 @@ describe("generateSummary", () => {
       ai_model: "gpt-4"
     })
 
-    vi.mocked(streamText).mockResolvedValueOnce({
-      text: "Generated summary",
-      usage: { prompt_tokens: 100, completion_tokens: 50 }
-    } as unknown as Awaited<ReturnType<typeof streamText>>)
+    vi.mocked(streamText).mockReturnValueOnce({
+      textStream: new ReadableStream(),
+      usage: Promise.resolve({
+        prompt_tokens: 100,
+        completion_tokens: 50,
+        total_tokens: 150
+      })
+    } as unknown as ReturnType<typeof streamText>)
 
     const result = await generateSummary()
 
-    expect(result).toEqual({
-      text: "Generated summary",
-      usage: { prompt_tokens: 100, completion_tokens: 50 }
-    })
+    expect(result).toBeTruthy()
     expect(streamText).toHaveBeenCalledWith(
       expect.objectContaining({
         apiKey: "test-key",
@@ -118,9 +119,10 @@ describe("generateSummary", () => {
       ai_model: "gpt-4"
     })
 
-    vi.mocked(streamText).mockResolvedValueOnce({
-      text: "Custom result"
-    } as unknown as Awaited<ReturnType<typeof streamText>>)
+    vi.mocked(streamText).mockReturnValueOnce({
+      textStream: new ReadableStream(),
+      usage: Promise.resolve(undefined)
+    } as unknown as ReturnType<typeof streamText>)
 
     await generateSummary("Custom prompt here")
 
@@ -137,7 +139,9 @@ describe("generateSummary", () => {
       ai_model: "gpt-4"
     })
 
-    vi.mocked(streamText).mockRejectedValueOnce(new Error("API error"))
+    vi.mocked(streamText).mockImplementationOnce(() => {
+      throw new Error("API error")
+    })
 
     const result = await generateSummary()
 

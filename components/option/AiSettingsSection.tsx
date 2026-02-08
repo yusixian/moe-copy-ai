@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react"
 import { useState } from "react"
 
+import AiProviderSelect from "~/components/ai/AiProviderSelect"
 import { Button } from "~/components/ui/button"
 import { useAiSettings } from "~hooks/useAiSettings"
 import { useI18n } from "~utils/i18n"
@@ -92,6 +93,9 @@ function AiSettingsSection() {
             <Icon icon="mdi:web" className="mr-1.5 inline" width={18} />
             {t("option.ai.baseUrl.label")}
           </label>
+          <div className="mb-2">
+            <AiProviderSelect value={baseURL} onChange={setBaseURL} />
+          </div>
           <div className="flex items-center space-x-2">
             <input
               id="ai-base-url"

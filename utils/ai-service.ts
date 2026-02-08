@@ -56,7 +56,7 @@ export async function generateSummary(customPrompt?: string) {
     debugLog("模型:", model)
     debugLog("baseURL:", baseURL)
 
-    const res = await streamText({
+    const res = streamText({
       apiKey,
       baseURL,
       model,
