@@ -1,6 +1,6 @@
 import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { toast } from "react-toastify"
 
 import { getDefaultSystemPrompt, useI18n } from "~utils/i18n"
@@ -36,17 +36,14 @@ export function useAiPrompt() {
     setCustomPrompt(value)
   }, [])
 
-  // Initialize from storage once, and re-sync on locale change when user hasn't edited
-  useEffect(() => {
-    if (userEditedRef.current) return
-    storage
-      .get<string>("ai_system_prompt")
-      .then((stored) => {
-        if (userEditedRef.current) return
-        setCustomPrompt(stored || defaultPrompt)
-      })
-      .catch(console.error)
-  }, [defaultPrompt])
+  // Sync from reactive storage when user hasn't manually edited
+  const prevSystemPromptRef = useRef(systemPrompt)
+  if (prevSystemPromptRef.current !== systemPrompt) {
+    prevSystemPromptRef.current = systemPrompt
+    if (!userEditedRef.current) {
+      setCustomPrompt(systemPrompt)
+    }
+  }
 
   const saveAsDefaultPrompt = useCallback(
     async (prompt: string) => {
