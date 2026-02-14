@@ -1,8 +1,8 @@
 import { Icon } from "@iconify/react"
-import MarkdownIt from "markdown-it"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useRef } from "react"
 
 import { Button } from "~/components/ui/button"
+import { renderMarkdown } from "~/utils/markdown"
 import { useI18n } from "~utils/i18n"
 
 interface ContentDisplayProps {
@@ -29,17 +29,6 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
   // 文本区域引用
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // 初始化 markdown-it 实例
-  const md = useMemo(
-    () =>
-      new MarkdownIt({
-        html: true,
-        linkify: true,
-        typographer: true
-      }),
-    []
-  )
-
   // 处理文本格式，保留必要的换行
   const formatContent = (text: string): string => {
     if (!text) return ""
@@ -52,10 +41,9 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
   }
 
   // 渲染 Markdown 内容
-  const renderMarkdown = (text: string) => {
-    // 在渲染前确保内容格式正确
+  const renderMarkdownHtml = (text: string) => {
     const formattedContent = formatContent(text)
-    return { __html: md.render(formattedContent || "") }
+    return { __html: renderMarkdown(formattedContent) }
   }
 
   // 处理内容变更
@@ -119,8 +107,8 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
           {/* 全屏内容区域 */}
           <div
             className="markdown-preview markdown-preview-fullscreen flex-1 overflow-auto bg-content-solid px-6 py-4"
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: renderMarkdown sanitizes output
-            dangerouslySetInnerHTML={renderMarkdown(content)}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: content is from user's own scraped pages
+            dangerouslySetInnerHTML={renderMarkdownHtml(content)}
           />
         </div>
       )
@@ -129,8 +117,8 @@ export const ContentDisplay: React.FC<ContentDisplayProps> = ({
     return (
       <div
         className="markdown-preview"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: renderMarkdown sanitizes output
-        dangerouslySetInnerHTML={renderMarkdown(content)}
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: content is from user's own scraped pages
+        dangerouslySetInnerHTML={renderMarkdownHtml(content)}
       />
     )
   }

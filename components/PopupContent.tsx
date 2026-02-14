@@ -2,7 +2,7 @@ import iconUrl from "data-base64:~assets/icon.png"
 import { Icon } from "@iconify/react"
 import { sendToBackground } from "@plasmohq/messaging"
 import { useStorage } from "@plasmohq/storage/hook"
-import { memo } from "react"
+import { memo, useMemo } from "react"
 import AiSummarySection from "~/components/AiSummarySection"
 import ContentSection from "~/components/ContentSection"
 import ImageGrid from "~/components/ImageGrid"
@@ -22,6 +22,8 @@ import { DebugPanel } from "./popup/DebugPanel"
 import { ErrorAlert } from "./popup/ErrorAlert"
 import { FloatButtonControl } from "./popup/FloatButtonControl"
 import { MetadataFieldSection } from "./popup/MetadataFieldSection"
+
+const noop = () => {}
 
 interface PopupContentProps {
   className?: string
@@ -54,6 +56,39 @@ const PopupContent = ({
 
   const [showDebugPanel] = useStorage<string>("show_debug_panel", "true")
   const handleOpenOptions = useOpenOptionPage()
+
+  const selectorConfigs = useMemo(() => {
+    const build = (
+      type: "title" | "author" | "date" | "content",
+      selectors: string[]
+    ) => {
+      if (selectors.length === 0) return undefined
+      return {
+        type,
+        selectors,
+        selectedIndex: selectedSelectorIndices[type],
+        results: scrapedData?.selectorResults?.[type] || [],
+        onSelectorChange: (index: number) => handleSelectorChange(type, index),
+        onSelectContent: (selector: string, contentIndex: number) =>
+          handleSelectContent(type, selector, contentIndex)
+      }
+    }
+    return {
+      title: build("title", titleSelectors),
+      author: build("author", authorSelectors),
+      date: build("date", dateSelectors),
+      content: build("content", contentSelectors)
+    }
+  }, [
+    titleSelectors,
+    authorSelectors,
+    dateSelectors,
+    contentSelectors,
+    selectedSelectorIndices,
+    scrapedData?.selectorResults,
+    handleSelectorChange,
+    handleSelectContent
+  ])
 
   const handleOpenSidePanel = async () => {
     try {
@@ -176,20 +211,7 @@ const PopupContent = ({
             label={t("content.title")}
             value={scrapedData.title}
             enablePortal={enablePortal}
-            selectorConfig={
-              titleSelectors.length > 0
-                ? {
-                    type: "title",
-                    selectors: titleSelectors,
-                    selectedIndex: selectedSelectorIndices.title,
-                    results: scrapedData?.selectorResults?.title || [],
-                    onSelectorChange: (index) =>
-                      handleSelectorChange("title", index),
-                    onSelectContent: (selector, contentIndex) =>
-                      handleSelectContent("title", selector, contentIndex)
-                  }
-                : undefined
-            }
+            selectorConfig={selectorConfigs.title}
           />
 
           {/* Author */}
@@ -199,20 +221,7 @@ const PopupContent = ({
               label={t("content.author")}
               value={scrapedData.author}
               enablePortal={enablePortal}
-              selectorConfig={
-                authorSelectors.length > 0
-                  ? {
-                      type: "author",
-                      selectors: authorSelectors,
-                      selectedIndex: selectedSelectorIndices.author,
-                      results: scrapedData?.selectorResults?.author || [],
-                      onSelectorChange: (index) =>
-                        handleSelectorChange("author", index),
-                      onSelectContent: (selector, contentIndex) =>
-                        handleSelectContent("author", selector, contentIndex)
-                    }
-                  : undefined
-              }
+              selectorConfig={selectorConfigs.author}
             />
           )}
 
@@ -223,20 +232,7 @@ const PopupContent = ({
               label={t("content.date")}
               value={scrapedData.publishDate}
               enablePortal={enablePortal}
-              selectorConfig={
-                dateSelectors.length > 0
-                  ? {
-                      type: "date",
-                      selectors: dateSelectors,
-                      selectedIndex: selectedSelectorIndices.date,
-                      results: scrapedData?.selectorResults?.date || [],
-                      onSelectorChange: (index) =>
-                        handleSelectorChange("date", index),
-                      onSelectContent: (selector, contentIndex) =>
-                        handleSelectContent("date", selector, contentIndex)
-                    }
-                  : undefined
-              }
+              selectorConfig={selectorConfigs.date}
             />
           )}
 
@@ -255,12 +251,12 @@ const PopupContent = ({
                 onRefresh={handleRefresh}
                 contentSelectors={contentSelectors}
                 selectedIndex={selectedSelectorIndices.content}
-                selectorResults={scrapedData?.selectorResults?.content || []}
-                onSelectorChange={(index) =>
-                  handleSelectorChange("content", index)
+                selectorResults={selectorConfigs.content?.results || []}
+                onSelectorChange={
+                  selectorConfigs.content?.onSelectorChange || noop
                 }
-                onSelectContent={(selector, contentIndex) =>
-                  handleSelectContent("content", selector, contentIndex)
+                onSelectContent={
+                  selectorConfigs.content?.onSelectContent || noop
                 }
                 enablePortal={enablePortal}
                 metadata={scrapedData.metadata}

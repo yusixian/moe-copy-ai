@@ -1,5 +1,5 @@
 import { sendToBackground } from "@plasmohq/messaging"
-import { useCallback, useLayoutEffect, useState } from "react"
+import { useCallback, useLayoutEffect, useRef, useState } from "react"
 
 import type {
   ScrapedContent,
@@ -89,10 +89,13 @@ export const useScrapedData = () => {
     [addDebugInfo, updateSelectorResults]
   )
 
+  const scrapedDataRef = useRef(scrapedData)
+  scrapedDataRef.current = scrapedData
+
   // Update scraped data based on selector type
   const updateScrapedDataField = useCallback(
     (type: SelectorType, content: string, isInvalid?: boolean) => {
-      if (!scrapedData && !isInvalid) return
+      if (!scrapedDataRef.current && !isInvalid) return
 
       setScrapedData((prev) => {
         if (!prev) return prev
@@ -119,7 +122,7 @@ export const useScrapedData = () => {
         return updatedData
       })
     },
-    [scrapedData]
+    []
   )
 
   // Create handlers using the selectors hook

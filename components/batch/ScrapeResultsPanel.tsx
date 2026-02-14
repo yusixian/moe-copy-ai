@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react"
 import { useClipboard } from "foxact/use-clipboard"
-import { memo, useCallback, useMemo, useState } from "react"
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { Button } from "~/components/ui/button"
 import type { BatchScrapeResult } from "~constants/types"
@@ -29,7 +29,11 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
     new Set()
   )
   const [copiedItemIndex, setCopiedItemIndex] = useState<number | null>(null)
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const { copy, copied } = useClipboard({ timeout: 2000 })
+
+  // Clean up timer on unmount
+  useEffect(() => () => clearTimeout(copiedTimerRef.current), [])
 
   // 使用 useSelectionSet 管理选中状态
   const canSelectResult = useCallback((r: BatchScrapeResult) => r.success, [])
@@ -110,12 +114,12 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
   }
 
   // 切换展开
-  const toggleExpand = (index: number) => {
+  const toggleExpand = useCallback((index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index))
-  }
+  }, [])
 
   // 切换完整内容显示
-  const toggleFullContent = (index: number) => {
+  const toggleFullContent = useCallback((index: number) => {
     setFullContentItems((prev) => {
       const next = new Set(prev)
       if (next.has(index)) {
@@ -125,16 +129,19 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
       }
       return next
     })
-  }
+  }, [])
 
   // 复制单项 JSON（使用与 markdown 相同的 foxact hook）
-  const handleCopyItemJson = (result: BatchScrapeResult, index: number) => {
-    const json = JSON.stringify(result, null, 2)
-    copy(json)
-    setCopiedItemIndex(index)
-    // 使用与 useClipboard 相同的 2000ms 超时
-    setTimeout(() => setCopiedItemIndex(null), 2000)
-  }
+  const handleCopyItemJson = useCallback(
+    (result: BatchScrapeResult, index: number) => {
+      const json = JSON.stringify(result, null, 2)
+      copy(json)
+      setCopiedItemIndex(index)
+      clearTimeout(copiedTimerRef.current)
+      copiedTimerRef.current = setTimeout(() => setCopiedItemIndex(null), 2000)
+    },
+    [copy]
+  )
 
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto">
@@ -214,145 +221,19 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
       {/* 结果列表 */}
       <div className="max-h-64 min-h-32 flex-shrink-0 overflow-y-auto rounded-lg border border-line-1">
         {results.map((result, index) => (
-          <div
+          <ScrapeResultItem
             key={result.url}
-            className={cn(
-              "border-line-2 border-b last:border-b-0",
-              expandedIndex === index && "bg-content-alt"
-            )}>
-            <button
-              type="button"
-              className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 hover:bg-content-alt"
-              onClick={() => toggleExpand(index)}>
-              {/* Checkbox - 仅成功项可勾选 */}
-              {result.success ? (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    toggleSelect(result.url)
-                  }}
-                  className="flex-shrink-0">
-                  <Icon
-                    icon={
-                      isSelected(result.url)
-                        ? "mdi:checkbox-marked"
-                        : "mdi:checkbox-blank-outline"
-                    }
-                    className={cn(
-                      "h-4 w-4",
-                      isSelected(result.url)
-                        ? "text-accent-blue"
-                        : "text-text-4"
-                    )}
-                  />
-                </button>
-              ) : (
-                <Icon
-                  icon="mdi:checkbox-blank-off-outline"
-                  className="h-4 w-4 flex-shrink-0 text-text-4"
-                />
-              )}
-              {result.success ? (
-                <Icon
-                  icon="mdi:check-circle"
-                  className="h-4 w-4 flex-shrink-0 text-success"
-                />
-              ) : (
-                <Icon
-                  icon="mdi:close-circle"
-                  className="h-4 w-4 flex-shrink-0 text-error"
-                />
-              )}
-              <span
-                className={cn(
-                  "flex-1 truncate text-sm",
-                  result.success ? "text-text-2" : "text-text-4"
-                )}>
-                {result.title}
-              </span>
-              <Icon
-                icon="mdi:chevron-down"
-                className={cn(
-                  "h-4 w-4 text-text-4 transition-transform",
-                  expandedIndex === index && "rotate-180"
-                )}
-              />
-            </button>
-            {expandedIndex === index && (
-              <div className="border-line-2 border-t bg-content-solid px-3 py-2">
-                {/* URL + Copy JSON button */}
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="flex-1 truncate text-text-3 text-xs">
-                    {result.url}
-                  </span>
-                  <Button
-                    variant={
-                      copiedItemIndex === index ? "success" : "secondary"
-                    }
-                    size="xs"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleCopyItemJson(result, index)
-                    }}>
-                    <Icon
-                      icon={
-                        copiedItemIndex === index
-                          ? "mdi:check"
-                          : "mdi:code-json"
-                      }
-                      className="mr-1 h-3.5 w-3.5"
-                    />
-                    {copiedItemIndex === index
-                      ? t("batch.results.copied")
-                      : t("batch.results.json")}
-                  </Button>
-                </div>
-                {/* Content */}
-                {result.success ? (
-                  <div className="rounded bg-content-alt p-2">
-                    <div
-                      className={cn(
-                        "overflow-y-auto whitespace-pre-wrap break-words text-text-2 text-xs",
-                        fullContentItems.has(index) ? "max-h-96" : "max-h-24"
-                      )}>
-                      {fullContentItems.has(index)
-                        ? result.content
-                        : result.content.substring(0, 500)}
-                      {result.content.length > 500 &&
-                        !fullContentItems.has(index) &&
-                        "..."}
-                    </div>
-                    {result.content.length > 500 && (
-                      <Button
-                        variant="outline"
-                        size="xs"
-                        fullWidth
-                        className="mt-2"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          toggleFullContent(index)
-                        }}>
-                        <Icon
-                          icon={
-                            fullContentItems.has(index)
-                              ? "mdi:chevron-up"
-                              : "mdi:chevron-down"
-                          }
-                          className="mr-1 h-4 w-4"
-                        />
-                        {fullContentItems.has(index)
-                          ? t("batch.results.collapse")
-                          : t("batch.results.expandAll")}
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-error text-xs">{result.error}</div>
-                )}
-              </div>
-            )}
-          </div>
+            result={result}
+            index={index}
+            isExpanded={expandedIndex === index}
+            isFullContent={fullContentItems.has(index)}
+            isSelected={isSelected(result.url)}
+            isCopied={copiedItemIndex === index}
+            onToggleExpand={toggleExpand}
+            onToggleSelect={toggleSelect}
+            onToggleFullContent={toggleFullContent}
+            onCopyJson={handleCopyItemJson}
+          />
         ))}
       </div>
 
@@ -402,6 +283,159 @@ const ScrapeResultsPanel = memo(function ScrapeResultsPanel({
         <Icon icon="mdi:refresh" className="mr-1 h-4 w-4" />
         {t("batch.results.reset")}
       </Button>
+    </div>
+  )
+})
+
+interface ScrapeResultItemProps {
+  result: BatchScrapeResult
+  index: number
+  isExpanded: boolean
+  isFullContent: boolean
+  isSelected: boolean
+  isCopied: boolean
+  onToggleExpand: (index: number) => void
+  onToggleSelect: (url: string) => void
+  onToggleFullContent: (index: number) => void
+  onCopyJson: (result: BatchScrapeResult, index: number) => void
+}
+
+const ScrapeResultItem = memo(function ScrapeResultItem({
+  result,
+  index,
+  isExpanded,
+  isFullContent,
+  isSelected,
+  isCopied,
+  onToggleExpand,
+  onToggleSelect,
+  onToggleFullContent,
+  onCopyJson
+}: ScrapeResultItemProps) {
+  const { t } = useI18n()
+
+  return (
+    <div
+      className={cn(
+        "border-line-2 border-b last:border-b-0",
+        isExpanded && "bg-content-alt"
+      )}>
+      <button
+        type="button"
+        className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 hover:bg-content-alt"
+        onClick={() => onToggleExpand(index)}>
+        {/* Checkbox - 仅成功项可勾选 */}
+        {result.success ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggleSelect(result.url)
+            }}
+            className="flex-shrink-0">
+            <Icon
+              icon={
+                isSelected
+                  ? "mdi:checkbox-marked"
+                  : "mdi:checkbox-blank-outline"
+              }
+              className={cn(
+                "h-4 w-4",
+                isSelected ? "text-accent-blue" : "text-text-4"
+              )}
+            />
+          </button>
+        ) : (
+          <Icon
+            icon="mdi:checkbox-blank-off-outline"
+            className="h-4 w-4 flex-shrink-0 text-text-4"
+          />
+        )}
+        {result.success ? (
+          <Icon
+            icon="mdi:check-circle"
+            className="h-4 w-4 flex-shrink-0 text-success"
+          />
+        ) : (
+          <Icon
+            icon="mdi:close-circle"
+            className="h-4 w-4 flex-shrink-0 text-error"
+          />
+        )}
+        <span
+          className={cn(
+            "flex-1 truncate text-sm",
+            result.success ? "text-text-2" : "text-text-4"
+          )}>
+          {result.title}
+        </span>
+        <Icon
+          icon="mdi:chevron-down"
+          className={cn(
+            "h-4 w-4 text-text-4 transition-transform",
+            isExpanded && "rotate-180"
+          )}
+        />
+      </button>
+      {isExpanded && (
+        <div className="border-line-2 border-t bg-content-solid px-3 py-2">
+          {/* URL + Copy JSON button */}
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <span className="flex-1 truncate text-text-3 text-xs">
+              {result.url}
+            </span>
+            <Button
+              variant={isCopied ? "success" : "secondary"}
+              size="xs"
+              onClick={(e) => {
+                e.stopPropagation()
+                onCopyJson(result, index)
+              }}>
+              <Icon
+                icon={isCopied ? "mdi:check" : "mdi:code-json"}
+                className="mr-1 h-3.5 w-3.5"
+              />
+              {isCopied ? t("batch.results.copied") : t("batch.results.json")}
+            </Button>
+          </div>
+          {/* Content */}
+          {result.success ? (
+            <div className="rounded bg-content-alt p-2">
+              <div
+                className={cn(
+                  "overflow-y-auto whitespace-pre-wrap break-words text-text-2 text-xs",
+                  isFullContent ? "max-h-96" : "max-h-24"
+                )}>
+                {isFullContent
+                  ? result.content
+                  : result.content.substring(0, 500)}
+                {result.content.length > 500 && !isFullContent && "..."}
+              </div>
+              {result.content.length > 500 && (
+                <Button
+                  variant="outline"
+                  size="xs"
+                  fullWidth
+                  className="mt-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onToggleFullContent(index)
+                  }}>
+                  <Icon
+                    icon={isFullContent ? "mdi:chevron-up" : "mdi:chevron-down"}
+                    className="mr-1 h-4 w-4"
+                  />
+                  {isFullContent
+                    ? t("batch.results.collapse")
+                    : t("batch.results.expandAll")}
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="text-error text-xs">{result.error}</div>
+          )}
+        </div>
+      )}
     </div>
   )
 })

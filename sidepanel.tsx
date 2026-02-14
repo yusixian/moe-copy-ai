@@ -2,7 +2,7 @@ import "./styles/global.css"
 import "react-toastify/dist/ReactToastify.css"
 
 import { Icon } from "@iconify/react"
-import { lazy, Suspense, useRef, useState } from "react"
+import { lazy, Suspense, useMemo, useRef, useState } from "react"
 import { ToastContainer } from "react-toastify"
 
 import type { SingleScrapePanelHandle } from "~components/singlescrape"
@@ -43,8 +43,10 @@ function SidePanel() {
   const { t } = useI18n()
   const { resolvedTheme } = useTheme()
 
-  const tabOptions: SegmentedOption<"batch" | "extraction" | "singlescrape">[] =
-    [
+  const tabOptions = useMemo<
+    SegmentedOption<"batch" | "extraction" | "singlescrape">[]
+  >(
+    () => [
       {
         value: "singlescrape",
         label: t("sidepanel.title.singlescrape"),
@@ -60,7 +62,9 @@ function SidePanel() {
         label: t("sidepanel.title.extraction"),
         icon: <Icon icon="mdi:text-box-search-outline" width={14} />
       }
-    ]
+    ],
+    [t]
+  )
 
   const [currentView, setCurrentView] = useState<SidePanelView>("singlescrape")
   const [isSingleScrapeLoading, setIsSingleScrapeLoading] = useState(false)
@@ -77,24 +81,27 @@ function SidePanel() {
     reset: resetContentExtraction
   } = useContentExtraction()
 
-  const viewConfig = {
-    singlescrape: {
-      title: t("sidepanel.title.singlescrape"),
-      description: t("sidepanel.desc.singlescrape")
-    },
-    batch: {
-      title: t("sidepanel.title.batch"),
-      description: t("sidepanel.desc.batch")
-    },
-    extraction: {
-      title: t("sidepanel.title.extraction"),
-      description: t("sidepanel.desc.extraction")
-    },
-    settings: {
-      title: t("sidepanel.title.settings"),
-      description: t("sidepanel.desc.settings")
-    }
-  }
+  const viewConfig = useMemo(
+    () => ({
+      singlescrape: {
+        title: t("sidepanel.title.singlescrape"),
+        description: t("sidepanel.desc.singlescrape")
+      },
+      batch: {
+        title: t("sidepanel.title.batch"),
+        description: t("sidepanel.desc.batch")
+      },
+      extraction: {
+        title: t("sidepanel.title.extraction"),
+        description: t("sidepanel.desc.extraction")
+      },
+      settings: {
+        title: t("sidepanel.title.settings"),
+        description: t("sidepanel.desc.settings")
+      }
+    }),
+    [t]
+  )
 
   const currentConfig = viewConfig[currentView]
 

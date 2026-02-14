@@ -1,0 +1,82 @@
+# Text
+
+**URL**: https://xsai.js.org/docs/packages/stream/text
+
+---
+
+Streaming # Text Streams text from a given prompt.![install size](https://flat.badgen.net/packagephobia/install/@xsai/stream-text?color=gray)![minified size](https://flat.badgen.net/bundlephobia/min/@xsai/stream-text?color=gray)![minzipped size](https://flat.badgen.net/bundlephobia/minzip/@xsai/stream-text?color=gray) npmpnpmyarnbun ```
+npm i @xsai/stream-text
+``` ## Examples ### Basic ```
+import { streamText } from '@xsai/stream-text'
+import { env } from 'node:process'
+
+const { textStream } = streamText({
+  apiKey: env.OPENAI_API_KEY!,
+  baseURL: 'https://api.openai.com/v1/',
+  messages: [
+    {
+      content: 'You are a helpful assistant.',
+      role: 'system',
+    },
+    {
+      content: 'This is a test, so please answer'
+        + '\'The quick brown fox jumps over the lazy dog.\''
+        + 'and nothing else.',
+      role: 'user',
+    },
+  ],
+  model: 'gpt-4o',
+})
+
+const text: string[] = []
+
+for await (const textPart of textStream) {
+  text.push(textPart)
+}
+
+// "The quick brown fox jumps over the lazy dog."
+console.log(text)
+``` ### Image input xsAI has no way of knowing if your model supports multi-modal, so please check before using it. ```
+import { streamText } from '@xsai/stream-text'
+import { env } from 'node:process'
+
+const { textStream } = streamText({
+  apiKey: env.OPENAI_API_KEY!,
+  baseURL: 'https://api.openai.com/v1/',
+  messages: [{
+    role: 'user',
+    content: [
+      { type: 'text', text: 'What\'s in this image?' },
+      { 
+        type: 'image_url', 
+        image_url: { 
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg', 
+        }, 
+      }, 
+    ],
+  }],
+  model: 'gpt-4o',
+})
+``` ### Audio input xsAI has no way of knowing if your model supports multi-modal, so please check before using it. ```
+import { streamText } from '@xsai/stream-text'
+import { Buffer } from 'node:buffer'
+import { env } from 'node:process'
+
+const data = await fetch('https://cdn.openai.com/API/docs/audio/alloy.wav')
+  .then(res => res.arrayBuffer())
+  .then(buffer => Buffer.from(buffer).toString('base64'))
+
+const { textStream } = streamText({
+  apiKey: env.OPENAI_API_KEY!,
+  baseURL: 'https://api.openai.com/v1/',
+  messages: [{
+    role: 'user',
+    content: [
+      { type: 'text', text: 'What is in this recording?' },
+      { type: 'input_audio', input_audio: { data, format: 'wav' }} 
+    ],
+  }],
+  model: 'gpt-4o-audio-preview', 
+  modalities: ['text', 'audio'], 
+})
+```[Edit on GitHub](https://github.com/moeru-ai/xsai/blob/main/docs/content/docs/packages/stream/text.mdx)[Image](/docs/packages/generate/image)[Creates an image given a prompt.](/docs/packages/generate/image)[Structured Data](/docs/packages/stream/object)[Streams structured data for a given prompt and schema.](/docs/packages/stream/object)

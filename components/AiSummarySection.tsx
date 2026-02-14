@@ -1,4 +1,4 @@
-import { memo } from "react"
+import { memo, useMemo } from "react"
 
 import type { ScrapedContent } from "~constants/types"
 import { useI18n } from "~utils/i18n"
@@ -21,24 +21,36 @@ const AiSummarySection = memo(function AiSummarySection({
   const { t } = useI18n()
 
   // Popup 专用占位符
-  const popupPlaceholders = [
-    {
-      placeholder: "{{content}}",
-      description: t("scrape.placeholders.content")
-    },
-    { placeholder: "{{title}}", description: t("scrape.placeholders.title") },
-    { placeholder: "{{url}}", description: t("scrape.placeholders.url") },
-    { placeholder: "{{author}}", description: t("scrape.placeholders.author") },
-    {
-      placeholder: "{{publishDate}}",
-      description: t("scrape.placeholders.publishDate")
-    },
-    {
-      placeholder: "{{cleanedContent}}",
-      description: t("scrape.placeholders.cleanedContent")
-    },
-    { placeholder: "{{meta.xxx}}", description: t("scrape.placeholders.meta") }
-  ]
+  const popupPlaceholders = useMemo(
+    () => [
+      {
+        placeholder: "{{content}}",
+        description: t("scrape.placeholders.content")
+      },
+      {
+        placeholder: "{{title}}",
+        description: t("scrape.placeholders.title")
+      },
+      { placeholder: "{{url}}", description: t("scrape.placeholders.url") },
+      {
+        placeholder: "{{author}}",
+        description: t("scrape.placeholders.author")
+      },
+      {
+        placeholder: "{{publishDate}}",
+        description: t("scrape.placeholders.publishDate")
+      },
+      {
+        placeholder: "{{cleanedContent}}",
+        description: t("scrape.placeholders.cleanedContent")
+      },
+      {
+        placeholder: "{{meta.xxx}}",
+        description: t("scrape.placeholders.meta")
+      }
+    ],
+    [t]
+  )
 
   return (
     <div className="mb-4">

@@ -1,5 +1,6 @@
 import cssText from "data-text:~styles/element-selector.css"
 import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo"
+import type React from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import type {
@@ -67,6 +68,139 @@ function HighlightOverlay({
   return <div style={style} />
 }
 
+// InfoPanel static styles grouped by section
+const STYLES = {
+  panel: {
+    root: {
+      position: "fixed",
+      top: "16px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      zIndex: Z_INDEX.PANEL,
+      backgroundColor: "white",
+      borderRadius: "12px",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+      padding: "16px 20px",
+      minWidth: "320px",
+      maxWidth: "90vw",
+      fontFamily: "system-ui, -apple-system, sans-serif"
+    } satisfies React.CSSProperties,
+    divider: {
+      padding: "12px 0",
+      borderTop: "1px solid #e5e7eb",
+      borderBottom: "1px solid #e5e7eb",
+      marginBottom: "12px"
+    } satisfies React.CSSProperties
+  },
+  section: {
+    selected: { marginBottom: "12px" } satisfies React.CSSProperties,
+    title: {
+      fontSize: "14px",
+      fontWeight: "600",
+      color: "#1f2937",
+      marginBottom: "4px"
+    } satisfies React.CSSProperties,
+    label: { fontSize: "12px", color: "#6b7280" } satisfies React.CSSProperties,
+    subsectionLabel: {
+      fontSize: "12px",
+      color: "#6b7280",
+      marginBottom: "8px"
+    } satisfies React.CSSProperties
+  },
+  preview: {
+    content: {
+      fontSize: "13px",
+      color: "#374151",
+      backgroundColor: "#f9fafb",
+      padding: "8px 12px",
+      borderRadius: "6px",
+      maxHeight: "80px",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      lineHeight: "1.5"
+    } satisfies React.CSSProperties,
+    nextPage: {
+      fontSize: "13px",
+      color: "#374151",
+      backgroundColor: "#ecfdf5",
+      padding: "8px 12px",
+      borderRadius: "6px",
+      border: "1px solid #a7f3d0"
+    } satisfies React.CSSProperties,
+    xpath: {
+      fontSize: "11px",
+      color: "#6b7280",
+      wordBreak: "break-all"
+    } satisfies React.CSSProperties
+  },
+  link: {
+    countRow: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: "8px"
+    } satisfies React.CSSProperties,
+    number: {
+      fontSize: "24px",
+      fontWeight: "700",
+      color: "#10b981"
+    } satisfies React.CSSProperties,
+    label: {
+      fontSize: "14px",
+      color: "#6b7280",
+      marginLeft: "8px"
+    } satisfies React.CSSProperties
+  },
+  hint: {
+    normal: {
+      fontSize: "12px",
+      color: "#9ca3af",
+      marginTop: "8px"
+    } satisfies React.CSSProperties,
+    small: { fontSize: "12px", color: "#9ca3af" } satisfies React.CSSProperties
+  },
+  checkbox: {
+    label: {
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      fontSize: "13px",
+      color: "#4b5563",
+      cursor: "pointer",
+      userSelect: "none"
+    } satisfies React.CSSProperties,
+    input: {
+      width: "16px",
+      height: "16px",
+      accentColor: "#10b981",
+      cursor: "pointer"
+    } satisfies React.CSSProperties
+  },
+  button: {
+    row: { display: "flex", gap: "8px" } satisfies React.CSSProperties,
+    cancel: {
+      flex: 1,
+      padding: "10px 16px",
+      borderRadius: "8px",
+      border: "1px solid #d1d5db",
+      backgroundColor: "white",
+      color: "#374151",
+      fontSize: "14px",
+      fontWeight: "500",
+      cursor: "pointer"
+    } satisfies React.CSSProperties,
+    confirmBase: {
+      flex: 1,
+      padding: "10px 16px",
+      borderRadius: "8px",
+      border: "none",
+      color: "white",
+      fontSize: "14px",
+      fontWeight: "500"
+    } satisfies React.CSSProperties
+  }
+} as const
+
 // 信息面板组件
 function InfoPanel({
   elementInfo,
@@ -94,33 +228,13 @@ function InfoPanel({
   const isContentMode = purpose === "content-extraction"
   const isNextPageButtonMode = purpose === "next-page-button"
 
+  const isEnabled = isContentMode || isNextPageButtonMode || links.length > 0
+
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: "16px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        zIndex: Z_INDEX.PANEL,
-        backgroundColor: "white",
-        borderRadius: "12px",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-        padding: "16px 20px",
-        minWidth: "320px",
-        maxWidth: "90vw",
-        fontFamily: "system-ui, -apple-system, sans-serif"
-      }}>
-      <div style={{ marginBottom: "12px" }}>
-        <div
-          style={{
-            fontSize: "14px",
-            fontWeight: "600",
-            color: "#1f2937",
-            marginBottom: "4px"
-          }}>
-          已选中元素
-        </div>
-        <div style={{ fontSize: "12px", color: "#6b7280" }}>
+    <div style={STYLES.panel.root}>
+      <div style={STYLES.section.selected}>
+        <div style={STYLES.section.title}>已选中元素</div>
+        <div style={STYLES.section.label}>
           <span
             style={{
               backgroundColor: isContentMode ? "#fef3c7" : "#e0e7ff",
@@ -142,134 +256,50 @@ function InfoPanel({
         </div>
       </div>
 
-      <div
-        style={{
-          padding: "12px 0",
-          borderTop: "1px solid #e5e7eb",
-          borderBottom: "1px solid #e5e7eb",
-          marginBottom: "12px"
-        }}>
+      <div style={STYLES.panel.divider}>
         {isNextPageButtonMode ? (
           // 下一页按钮选择模式：显示按钮信息
           <div>
-            <div
-              style={{
-                fontSize: "12px",
-                color: "#6b7280",
-                marginBottom: "8px"
-              }}>
-              已选中下一页按钮
-            </div>
-            <div
-              style={{
-                fontSize: "13px",
-                color: "#374151",
-                backgroundColor: "#ecfdf5",
-                padding: "8px 12px",
-                borderRadius: "6px",
-                border: "1px solid #a7f3d0"
-              }}>
+            <div style={STYLES.section.subsectionLabel}>已选中下一页按钮</div>
+            <div style={STYLES.preview.nextPage}>
               <div style={{ fontWeight: "500", marginBottom: "4px" }}>
                 {nextPageButton?.text || "下一页"}
               </div>
-              <div
-                style={{
-                  fontSize: "11px",
-                  color: "#6b7280",
-                  wordBreak: "break-all"
-                }}>
-                {nextPageButton?.xpath}
-              </div>
+              <div style={STYLES.preview.xpath}>{nextPageButton?.xpath}</div>
             </div>
-            <div
-              style={{ fontSize: "12px", color: "#9ca3af", marginTop: "8px" }}>
+            <div style={STYLES.hint.normal}>
               确认后将在抓取完成时自动点击此按钮加载下一页
             </div>
           </div>
         ) : isContentMode ? (
           // 内容提取模式：显示内容预览
           <div>
-            <div
-              style={{
-                fontSize: "12px",
-                color: "#6b7280",
-                marginBottom: "8px"
-              }}>
-              内容预览
-            </div>
-            <div
-              style={{
-                fontSize: "13px",
-                color: "#374151",
-                backgroundColor: "#f9fafb",
-                padding: "8px 12px",
-                borderRadius: "6px",
-                maxHeight: "80px",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                lineHeight: "1.5"
-              }}>
+            <div style={STYLES.section.subsectionLabel}>内容预览</div>
+            <div style={STYLES.preview.content}>
               {contentPreview || "（无文本内容）"}
             </div>
-            <div
-              style={{ fontSize: "12px", color: "#9ca3af", marginTop: "8px" }}>
+            <div style={STYLES.hint.normal}>
               确认后将提取 HTML / Markdown / 纯文本
             </div>
           </div>
         ) : (
           // 链接提取模式：显示链接数量
           <>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "8px"
-              }}>
+            <div style={STYLES.link.countRow}>
               <div>
-                <span
-                  style={{
-                    fontSize: "24px",
-                    fontWeight: "700",
-                    color: "#10b981"
-                  }}>
-                  {links.length}
-                </span>
-                <span
-                  style={{
-                    fontSize: "14px",
-                    color: "#6b7280",
-                    marginLeft: "8px"
-                  }}>
-                  个链接
-                </span>
+                <span style={STYLES.link.number}>{links.length}</span>
+                <span style={STYLES.link.label}>个链接</span>
               </div>
               {links.length > 0 && (
-                <div style={{ fontSize: "12px", color: "#9ca3af" }}>
-                  点击确认开始批量抓取
-                </div>
+                <div style={STYLES.hint.small}>点击确认开始批量抓取</div>
               )}
             </div>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "13px",
-                color: "#4b5563",
-                cursor: "pointer",
-                userSelect: "none"
-              }}>
+            <label style={STYLES.checkbox.label}>
               <input
                 type="checkbox"
                 checked={sameDomainOnly}
                 onChange={onToggleSameDomain}
-                style={{
-                  width: "16px",
-                  height: "16px",
-                  accentColor: "#10b981",
-                  cursor: "pointer"
-                }}
+                style={STYLES.checkbox.input}
               />
               仅同域名链接
             </label>
@@ -277,45 +307,18 @@ function InfoPanel({
         )}
       </div>
 
-      <div style={{ display: "flex", gap: "8px" }}>
-        <button
-          type="button"
-          onClick={onCancel}
-          style={{
-            flex: 1,
-            padding: "10px 16px",
-            borderRadius: "8px",
-            border: "1px solid #d1d5db",
-            backgroundColor: "white",
-            color: "#374151",
-            fontSize: "14px",
-            fontWeight: "500",
-            cursor: "pointer"
-          }}>
+      <div style={STYLES.button.row}>
+        <button type="button" onClick={onCancel} style={STYLES.button.cancel}>
           取消
         </button>
         <button
           type="button"
           onClick={onConfirm}
-          disabled={
-            !isContentMode && !isNextPageButtonMode && links.length === 0
-          }
+          disabled={!isEnabled}
           style={{
-            flex: 1,
-            padding: "10px 16px",
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor:
-              isContentMode || isNextPageButtonMode || links.length > 0
-                ? "#10b981"
-                : "#d1d5db",
-            color: "white",
-            fontSize: "14px",
-            fontWeight: "500",
-            cursor:
-              isContentMode || isNextPageButtonMode || links.length > 0
-                ? "pointer"
-                : "not-allowed"
+            ...STYLES.button.confirmBase,
+            backgroundColor: isEnabled ? "#10b981" : "#d1d5db",
+            cursor: isEnabled ? "pointer" : "not-allowed"
           }}>
           确认选择
         </button>

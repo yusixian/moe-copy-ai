@@ -101,7 +101,7 @@ export const useAiSummary = (
 
         const { text, usage } = await generateText({
           apiKey: apiKey,
-          baseURL: config.baseURL || "https://api.openai.com/v1/",
+          baseURL: config.baseURL || "https://api.openai.com/v1",
           messages: [
             {
               content: config.systemPrompt || "你是一个有用的助手",
@@ -115,9 +115,9 @@ export const useAiSummary = (
           model: config.model
         })
 
-        fullText = text
-        setSummary(text)
-        onSummaryGenerated?.(text)
+        fullText = text ?? ""
+        setSummary(fullText)
+        onSummaryGenerated?.(fullText)
 
         if (usage) {
           const newUsage = {
@@ -130,7 +130,7 @@ export const useAiSummary = (
         }
 
         await saveToHistory({
-          text,
+          text: fullText,
           customPrompt,
           scrapedData,
           usage: currentUsage
@@ -140,48 +140,44 @@ export const useAiSummary = (
       } else {
         // Desktop: use streaming generation
         const streamResult = await generateSummary(processedPrompt)
-        if (streamResult) {
-          debugLog("generateSummaryText result obtained", streamResult)
+        debugLog("generateSummaryText result obtained", streamResult)
 
-          setResult(streamResult)
+        setResult(streamResult)
 
-          const { fullText: processedText, usage: processedUsage } =
-            await processStream(streamResult)
+        const { fullText: processedText, usage: processedUsage } =
+          await processStream(streamResult)
 
-          fullText = processedText
-          currentUsage = processedUsage
+        fullText = processedText
+        currentUsage = processedUsage
 
-          if (fullText) {
-            setSummary(fullText)
-            onSummaryGenerated?.(fullText)
-            debugLog("Processing complete, final text length:", fullText.length)
+        if (fullText) {
+          setSummary(fullText)
+          onSummaryGenerated?.(fullText)
+          debugLog("Processing complete, final text length:", fullText.length)
 
-            const usageForSave = currentUsage || usage || null
+          const usageForSave = currentUsage || usage || null
 
-            debugLog("Preparing to save history:", {
-              fullTextLength: fullText?.length || 0,
-              hasFullText: !!fullText,
-              hasScrapedData: !!scrapedData,
-              hasUrl: !!scrapedData?.url,
-              usage: usageForSave
-            })
+          debugLog("Preparing to save history:", {
+            fullTextLength: fullText.length,
+            hasFullText: !!fullText,
+            hasScrapedData: !!scrapedData,
+            hasUrl: !!scrapedData?.url,
+            usage: usageForSave
+          })
 
-            const saved = await saveToHistory({
-              text: fullText,
-              customPrompt,
-              scrapedData,
-              usage: usageForSave
-            })
-            savedToHistory = saved
-            if (saved) {
-              debugLog("Successfully saved to history")
-            }
+          const saved = await saveToHistory({
+            text: fullText,
+            customPrompt,
+            scrapedData,
+            usage: usageForSave
+          })
+          savedToHistory = saved
+          if (saved) {
+            debugLog("Successfully saved to history")
           }
-
-          setError(null)
-        } else {
-          throw new Error("Failed to generate summary")
         }
+
+        setError(null)
       }
     } catch (err) {
       setError((err as Error).message || "Unknown error")

@@ -1,9 +1,9 @@
 import { Storage } from "@plasmohq/storage"
-import { useCallback, useLayoutEffect, useState } from "react"
+import { useStorage } from "@plasmohq/storage/hook"
+import { useCallback, useRef, useState } from "react"
 import { toast } from "react-toastify"
 
-import { getAiConfig } from "~utils/ai-service"
-import { useI18n } from "~utils/i18n"
+import { getDefaultSystemPrompt, useI18n } from "~utils/i18n"
 
 const storage = new Storage({ area: "sync" })
 
@@ -11,33 +11,44 @@ const storage = new Storage({ area: "sync" })
  * Hook for managing AI prompt state
  */
 export function useAiPrompt() {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const defaultPrompt = getDefaultSystemPrompt(locale)
+
+  // Reactive storage reads
+  const [storedPrompt] = useStorage<string>(
+    { key: "ai_system_prompt", instance: storage },
+    (v) => (v === undefined ? "" : v)
+  )
+  const [modelId] = useStorage<string>(
+    { key: "ai_model", instance: storage },
+    (v) => (v === undefined ? "" : v)
+  )
+
+  const systemPrompt = storedPrompt || defaultPrompt
+
+  // Local editing buffer — tracks whether the user has manually edited
   const [customPrompt, setCustomPrompt] = useState("")
-  const [systemPrompt, setSystemPrompt] = useState("")
-  const [modelId, setModelId] = useState<string | null>(null)
+  const userEditedRef = useRef(false)
 
-  const fetchSystemPrompt = useCallback(async () => {
-    try {
-      const config = await getAiConfig()
-      setModelId(config.model || null)
-      if (!customPrompt) {
-        setSystemPrompt(config.systemPrompt)
-        setCustomPrompt(config.systemPrompt)
-      }
-    } catch (error) {
-      console.error("Failed to get system prompt:", error)
+  // Wrap setCustomPrompt to track manual edits
+  const setCustomPromptTracked = useCallback((value: string) => {
+    userEditedRef.current = true
+    setCustomPrompt(value)
+  }, [])
+
+  // Sync from reactive storage when user hasn't manually edited
+  const prevSystemPromptRef = useRef(systemPrompt)
+  if (prevSystemPromptRef.current !== systemPrompt) {
+    prevSystemPromptRef.current = systemPrompt
+    if (!userEditedRef.current) {
+      setCustomPrompt(systemPrompt)
     }
-  }, [customPrompt])
-
-  useLayoutEffect(() => {
-    fetchSystemPrompt()
-  }, [fetchSystemPrompt])
+  }
 
   const saveAsDefaultPrompt = useCallback(
     async (prompt: string) => {
       try {
         await storage.set("ai_system_prompt", prompt)
-        setSystemPrompt(prompt)
         toast.success(t("toast.ai.defaultPromptSaved"))
       } catch (error) {
         toast.error(t("toast.ai.defaultPromptSaveFailed"))
@@ -49,11 +60,10 @@ export function useAiPrompt() {
 
   return {
     customPrompt,
-    setCustomPrompt,
+    setCustomPrompt: setCustomPromptTracked,
     systemPrompt,
-    modelId,
-    saveAsDefaultPrompt,
-    refreshConfig: fetchSystemPrompt
+    modelId: modelId || null,
+    saveAsDefaultPrompt
   }
 }
 
