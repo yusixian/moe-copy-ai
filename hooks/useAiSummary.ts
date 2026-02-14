@@ -101,7 +101,7 @@ export const useAiSummary = (
 
         const { text, usage } = await generateText({
           apiKey: apiKey,
-          baseURL: config.baseURL || "https://api.openai.com/v1/",
+          baseURL: config.baseURL || "https://api.openai.com/v1",
           messages: [
             {
               content: config.systemPrompt || "你是一个有用的助手",

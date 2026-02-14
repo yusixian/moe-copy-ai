@@ -39,10 +39,13 @@ export function useAiPrompt() {
   // Initialize from storage once, and re-sync on locale change when user hasn't edited
   useEffect(() => {
     if (userEditedRef.current) return
-    storage.get<string>("ai_system_prompt").then((stored) => {
-      if (userEditedRef.current) return
-      setCustomPrompt(stored || defaultPrompt)
-    })
+    storage
+      .get<string>("ai_system_prompt")
+      .then((stored) => {
+        if (userEditedRef.current) return
+        setCustomPrompt(stored || defaultPrompt)
+      })
+      .catch(console.error)
   }, [defaultPrompt])
 
   const saveAsDefaultPrompt = useCallback(

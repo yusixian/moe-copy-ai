@@ -60,9 +60,12 @@ const SelectorEditor: React.FC<{
   const [newSelector, setNewSelector] = useState("")
   const [showRules, setShowRules] = useState(true)
 
-  // Keep syncing when storage changes externally
+  // Keep syncing when storage changes externally (shallow array compare)
   const prevSelectorsRef = useRef(selectors)
-  if (prevSelectorsRef.current !== selectors) {
+  const selectorsChanged =
+    prevSelectorsRef.current.length !== selectors.length ||
+    prevSelectorsRef.current.some((s, i) => s !== selectors[i])
+  if (selectorsChanged) {
     prevSelectorsRef.current = selectors
     setEditingSelectors([...selectors])
   }
