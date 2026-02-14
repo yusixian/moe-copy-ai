@@ -1,8 +1,8 @@
 import { Icon } from "@iconify/react"
 import { useClipboard } from "foxact/use-clipboard"
-import MarkdownIt from "markdown-it"
 import { memo, useEffect, useMemo, useState } from "react"
 
+import { renderMarkdown } from "~/utils/markdown"
 import { sanitizeHtmlForDisplay } from "~/utils/sanitize-html"
 import { useI18n } from "~utils/i18n"
 
@@ -25,23 +25,11 @@ export const SummaryResultDisplay = memo(function SummaryResultDisplay({
   const [isViewSource, setIsViewSource] = useState(false)
   const { copy, copied } = useClipboard({ timeout: 2000 })
 
-  // Initialize markdown-it instance
-  const md = useMemo(
-    () =>
-      new MarkdownIt({
-        html: true,
-        linkify: true,
-        typographer: true
-      }),
-    []
-  )
-
   // Render and sanitize HTML
   const sanitizedHtml = useMemo(() => {
     if (!content) return ""
-    const html = md.render(content)
-    return sanitizeHtmlForDisplay(html)
-  }, [content, md])
+    return sanitizeHtmlForDisplay(renderMarkdown(content))
+  }, [content])
 
   // ESC key handler for fullscreen
   useEffect(() => {

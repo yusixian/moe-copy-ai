@@ -1,5 +1,5 @@
 import type { RefObject } from "react"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 
 /**
  * 用于检测点击指定元素外部的自定义Hook
@@ -12,6 +12,9 @@ const useOutsideClick = <T extends HTMLElement = HTMLElement>(
   callback: (event: MouseEvent) => void,
   deps: unknown[] = []
 ): void => {
+  const callbackRef = useRef(callback)
+  callbackRef.current = callback
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       // 确保触发事件的元素是有效的
@@ -34,7 +37,7 @@ const useOutsideClick = <T extends HTMLElement = HTMLElement>(
 
       // 只有当点击发生在所有元素外部时才调用回调
       if (isOutside) {
-        callback(event)
+        callbackRef.current(event)
       }
     }
 
@@ -45,7 +48,7 @@ const useOutsideClick = <T extends HTMLElement = HTMLElement>(
     return () => {
       document.removeEventListener("mousedown", handleClickOutside, true)
     }
-  }, [ref, callback, ...deps])
+  }, [ref, ...deps])
 }
 
 export default useOutsideClick

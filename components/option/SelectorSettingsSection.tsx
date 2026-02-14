@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react"
 import { useStorage } from "@plasmohq/storage/hook"
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useRef, useState } from "react"
 import { toast } from "react-toastify"
 
 import { Button } from "~/components/ui/button"
@@ -54,14 +54,18 @@ const SelectorEditor: React.FC<{
   )
 
   // 本地编辑状态
-  const [editingSelectors, setEditingSelectors] = useState<string[]>([])
+  const [editingSelectors, setEditingSelectors] = useState<string[]>(() => [
+    ...selectors
+  ])
   const [newSelector, setNewSelector] = useState("")
   const [showRules, setShowRules] = useState(true)
 
-  // 初始化编辑状态
-  useEffect(() => {
+  // Keep syncing when storage changes externally
+  const prevSelectorsRef = useRef(selectors)
+  if (prevSelectorsRef.current !== selectors) {
+    prevSelectorsRef.current = selectors
     setEditingSelectors([...selectors])
-  }, [selectors])
+  }
 
   // 添加新选择器
   const handleAddSelector = () => {

@@ -48,22 +48,23 @@ const ScrapeProgressPanel = memo(function ScrapeProgressPanel({
   }, [progress])
 
   // 每秒更新耗时
+  const startTime = progress?.startTime
   useEffect(() => {
-    if (!progress) {
+    if (startTime == null) {
       setElapsedTime("0s")
       return
     }
 
     // 立即更新一次
-    setElapsedTime(formatElapsedTime(progress.startTime))
+    setElapsedTime(formatElapsedTime(startTime))
 
     // 设置定时器每秒更新
     const interval = setInterval(() => {
-      setElapsedTime(formatElapsedTime(progress.startTime))
+      setElapsedTime(formatElapsedTime(startTime))
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [progress?.startTime, progress])
+  }, [startTime])
 
   // 统计成功/失败
   const stats = useMemo(() => {
