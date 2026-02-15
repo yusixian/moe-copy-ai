@@ -20,7 +20,8 @@ describe("processTemplate", () => {
     metadata: {
       description: "Article description",
       keywords: "test, article"
-    }
+    },
+    images: []
   }
 
   it("replaces basic placeholders", () => {
@@ -53,7 +54,12 @@ describe("processTemplate", () => {
     const emptyData: ScrapedContent = {
       url: "https://example.com",
       title: "",
-      articleContent: ""
+      articleContent: "",
+      cleanedContent: "",
+      author: "",
+      publishDate: "",
+      metadata: {},
+      images: []
     }
     const template = "Title: {{title}}\nAuthor: {{author}}"
     const result = processTemplate(template, emptyData)

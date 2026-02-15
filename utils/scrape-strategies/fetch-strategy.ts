@@ -64,17 +64,8 @@ export class FetchStrategy implements ScrapeStrategy {
 
       const html = await response.text()
 
-      // 创建 Document 对象
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(html, "text/html")
-
-      // 设置文档的 URL（Readability 需要）
-      const base = doc.createElement("base")
-      base.href = url
-      doc.head.insertBefore(base, doc.head.firstChild)
-
-      // 使用 Readability 提取内容
-      const result = await extractWithReadability(doc)
+      // 使用 Readability 提取内容（交给 worker 处理）
+      const result = await extractWithReadability(html, url)
 
       if (!result.success || !result.content) {
         throw new Error("Readability 提取失败")

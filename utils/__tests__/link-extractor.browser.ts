@@ -96,6 +96,9 @@ describe("filterLinks", () => {
   it("applies custom exclude patterns", () => {
     const links = [link("/login", 0), link("/logout", 1), link("/page", 2)]
     const result = filterLinks(links, baseUrl, {
+      sameDomainOnly: false,
+      excludeAnchors: false,
+      excludeJavaScript: false,
       excludePatterns: [/login/, /logout/]
     })
     expect(result).toHaveLength(1)

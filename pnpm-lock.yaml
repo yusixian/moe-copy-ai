@@ -54,6 +54,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      comlink:
+        specifier: ^4.4.2
+        version: 4.4.2
       dompurify:
         specifier: ^3.2.6
         version: 3.2.6
@@ -108,6 +111,9 @@ importers:
       remark-stringify:
         specifier: ^10.0.3
         version: 10.0.3
+      robot3:
+        specifier: ^1.2.0
+        version: 1.2.0
       tailwind-merge:
         specifier: ^3.0.2
         version: 3.0.2
@@ -2436,6 +2442,9 @@ packages:
     resolution: {integrity: sha512-1rXeuUUiGGrykh+CeBdu5Ie7OJwinCgQY0bc7GCRxy5xVHy+moaqkpL/jqQq0MtQOeYcrqEz4abc5f0KtU7W4A==}
     engines: {node: '>=12.5.0'}
 
+  comlink@4.4.2:
+    resolution: {integrity: sha512-OxGdvBmJuNKSCMO4NTl1L47VRp6xn2wG4F/2hYzB6tiCb709otOxtEYCSvK80PtjODfXXZu8ds+Nw5kVCjqd2g==}
+
   comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
 
@@ -3934,6 +3943,9 @@ packages:
   reusify@1.1.0:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
+
+  robot3@1.2.0:
+    resolution: {integrity: sha512-Xin8KHqCKrD9Rqk1ZzZQYjsb6S9DRggcfwBqnVPeM3DLtNCJLxWWTrPJDYm3E+ZiTO7H3VMdgyPSkIbuYnYP2Q==}
 
   rollup@3.29.5:
     resolution: {integrity: sha512-GVsDdsbJzzy4S/v3dqWPJ7EfvZJfCHiDqe80IyrF59LYuP+e6U1LJoUqeuqRbwAWoMNoXivMNeNAOf5E22VA1w==}
@@ -6923,6 +6935,8 @@ snapshots:
       color-convert: 2.0.1
       color-string: 1.9.1
 
+  comlink@4.4.2: {}
+
   comma-separated-tokens@2.0.3: {}
 
   commander@4.1.1: {}
@@ -8583,6 +8597,8 @@ snapshots:
       lowercase-keys: 3.0.0
 
   reusify@1.1.0: {}
+
+  robot3@1.2.0: {}
 
   rollup@3.29.5:
     optionalDependencies:
