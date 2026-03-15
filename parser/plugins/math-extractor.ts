@@ -144,6 +144,13 @@ interface MathMLToLaTeXConverter {
 // Core extraction logic (operates on HAST tree)
 // ---------------------------------------------------------------------------
 
+/** Check whether a node is a <script type="math/tex"> (MathJax v2 source). */
+function isMathTexScript(node: HastNode): boolean {
+  if (!isElement(node, "script")) return false
+  const type = String(node.properties?.type ?? "")
+  return type.startsWith("math/tex")
+}
+
 /**
  * Check if a <math> node is nested inside a KaTeX or MathJax container.
  * If so, we skip it — the parent handler already extracted it.
@@ -218,26 +225,35 @@ async function processNode(
     }
   }
 
+  // --- MathJax v2: <script type="math/tex"> ---
+  if (isMathTexScript(node)) {
+    const type = String(node.properties?.type ?? "")
+    const isDisplay = type.includes("mode=display")
+    const latex = textContent(node).trim()
+    if (latex && parent?.children) {
+      parent.children[index] = makeMathMarker(latex, isDisplay)
+      return true
+    }
+  }
+
   // --- MathJax v2 rendered span: .MathJax / .MathJax_Display ---
-  // Note: <script type="math/tex"> is handled by preprocessHtml (converted to
-  // data-math-type markers before HAST parsing), so we only handle the
-  // rendered output span here.
   if (
     isElement(node) &&
     (hasClass(node, "MathJax") || hasClass(node, "MathJax_Display"))
   ) {
-    // Check if a sibling math marker already covers this formula.
-    // Preprocessing converts <script type="math/tex"> to data-math-type
-    // marker elements, so we look for those markers (not the original scripts).
+    // Check if a sibling math/tex script or marker already covers this formula.
+    // Due to reverse iteration, the script may not yet be converted to a marker,
+    // so we check for both forms.
     if (parent?.children) {
-      const hasSiblingMathMarker = parent.children.some(
+      const hasSiblingMathSource = parent.children.some(
         (sibling) =>
           sibling !== node &&
           isElement(sibling) &&
           (sibling.properties?.dataMathType === "inline" ||
-            sibling.properties?.dataMathType === "block")
+            sibling.properties?.dataMathType === "block" ||
+            isMathTexScript(sibling))
       )
-      if (hasSiblingMathMarker) {
+      if (hasSiblingMathSource) {
         // Remove the rendered span to avoid duplication
         parent.children.splice(index, 1)
         return true

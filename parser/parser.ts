@@ -8,6 +8,7 @@ import { unified } from "unified"
 import { createHeadingHandlers } from "./plugins/heading-handlers"
 import { rehypeExtractMath } from "./plugins/math-extractor"
 import { createMathHandlers } from "./plugins/math-handlers"
+import { rehypeCleanup } from "./plugins/rehype-cleanup"
 import { rehypeUnwrapInvalidLinks } from "./plugins/unwrap-invalid-links"
 
 export function getParser() {
@@ -17,6 +18,7 @@ export function getParser() {
   return unified()
     .use(rehypeParse, { fragment: true })
     .use(rehypeExtractMath)
+    .use(rehypeCleanup)
     .use(rehypeUnwrapInvalidLinks)
     .use(
       rehypeRemark as unknown as (options?: Record<string, unknown>) => void,
