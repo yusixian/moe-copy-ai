@@ -148,7 +148,7 @@ interface MathMLToLaTeXConverter {
  * Check if a <math> node is nested inside a KaTeX or MathJax container.
  * If so, we skip it — the parent handler already extracted it.
  */
-function isMathInsideRenderer(_node: HastNode, ancestors: HastNode[]): boolean {
+function isMathInsideRenderer(ancestors: HastNode[]): boolean {
   for (const ancestor of ancestors) {
     if (hasClass(ancestor, "katex") || hasClass(ancestor, "katex-mathml")) {
       return true
@@ -218,39 +218,26 @@ async function processNode(
     }
   }
 
-  // --- MathJax v2: <script type="math/tex"> ---
-  if (
-    isElement(node, "script") &&
-    typeof node.properties?.type === "string" &&
-    node.properties.type.startsWith("math/tex")
-  ) {
-    const typeAttr = node.properties.type as string
-    const isDisplay = typeAttr.includes("mode=display")
-    const latex = textContent(node).trim()
-
-    if (latex && parent?.children) {
-      parent.children[index] = makeMathMarker(latex, isDisplay)
-      return true
-    }
-  }
-
   // --- MathJax v2 rendered span: .MathJax / .MathJax_Display ---
+  // Note: <script type="math/tex"> is handled by preprocessHtml (converted to
+  // data-math-type markers before HAST parsing), so we only handle the
+  // rendered output span here.
   if (
     isElement(node) &&
     (hasClass(node, "MathJax") || hasClass(node, "MathJax_Display"))
   ) {
-    // Check if a neighbouring <script type="math/tex"> already handles this.
-    // If the previous or next sibling is a math/tex script, skip this node
-    // (the script handler already created a marker).
+    // Check if a sibling math marker already covers this formula.
+    // Preprocessing converts <script type="math/tex"> to data-math-type
+    // marker elements, so we look for those markers (not the original scripts).
     if (parent?.children) {
-      const hasSiblingScript = parent.children.some(
+      const hasSiblingMathMarker = parent.children.some(
         (sibling) =>
           sibling !== node &&
-          isElement(sibling, "script") &&
-          typeof sibling.properties?.type === "string" &&
-          (sibling.properties.type as string).startsWith("math/tex")
+          isElement(sibling) &&
+          (sibling.properties?.dataMathType === "inline" ||
+            sibling.properties?.dataMathType === "block")
       )
-      if (hasSiblingScript) {
+      if (hasSiblingMathMarker) {
         // Remove the rendered span to avoid duplication
         parent.children.splice(index, 1)
         return true
@@ -268,7 +255,7 @@ async function processNode(
   }
 
   // --- Native MathML: <math> (not inside KaTeX/MathJax) ---
-  if (isElement(node, "math") && !isMathInsideRenderer(node, ancestors)) {
+  if (isElement(node, "math") && !isMathInsideRenderer(ancestors)) {
     const displayAttr = node.properties?.display
     const isDisplay = displayAttr === "block"
 
