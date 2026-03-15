@@ -1,3 +1,5 @@
+@import "katex/dist/katex.min.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -470,4 +472,25 @@ body {
 
 .dark .markdown-preview table tr:nth-child(2n) {
   background-color: #2d3748;
+}
+
+/* Math formula styles */
+.markdown-preview .katex-display {
+  margin: 0.8em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.markdown-preview-fullscreen .katex-display {
+  margin: 1em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.markdown-preview .katex {
+  font-size: 1.1em;
+}
+
+.markdown-preview-fullscreen .katex {
+  font-size: 1.15em;
 }
