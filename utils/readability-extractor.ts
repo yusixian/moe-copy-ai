@@ -58,7 +58,12 @@ export async function extractWithReadability(
       debugLog("开始使用 DOMPurify 清洗 body 内容")
 
       // 获取完整的body HTML
-      const originalBodyHTML = sourceDoc.body?.outerHTML || ""
+      let originalBodyHTML = sourceDoc.body?.outerHTML || ""
+
+      // Pre-convert math elements to safe markers BEFORE DOMPurify.
+      // DOMPurify would strip <script type="math/tex"> and may strip
+      // custom elements like <mjx-container>. Converting first preserves them.
+      originalBodyHTML = preserveMathElements(originalBodyHTML)
 
       // 使用DOMPurify清洗HTML，移除恶意脚本但保留所有内容结构
       cleanBodyHTML = DOMPurify.sanitize(originalBodyHTML, {
@@ -150,7 +155,13 @@ ${cleanBodyHTML}
         "content",
         "article",
         "main",
-        "box"
+        "box",
+        // Math formula classes (preserved as fallback safety net)
+        "katex",
+        "katex-display",
+        "katex-mathml",
+        "MathJax",
+        "MathJax_Display"
       ],
       tags: {
         // 给所有可能包含内容的标签高权重
@@ -380,6 +391,97 @@ export function evaluateContentQuality(
       scores: { selector: selectorScore, readability: readabilityScore }
     }
   }
+}
+
+/**
+ * Pre-convert math formula elements to safe marker elements.
+ * Must run BEFORE DOMPurify, which would strip <script type="math/tex">
+ * and may strip custom elements like <mjx-container>.
+ *
+ * Converts to <span/div data-math-type="inline|block">LaTeX</span/div>
+ * which DOMPurify and Readability both preserve.
+ */
+function preserveMathElements(html: string): string {
+  if (typeof DOMParser === "undefined") return html
+
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(html, "text/html")
+  let modified = false
+
+  // KaTeX: .katex-display (block) and .katex (inline)
+  for (const el of Array.from(doc.querySelectorAll(".katex-display, .katex"))) {
+    const isDisplay = el.classList.contains("katex-display")
+    const annotation = el.querySelector(
+      'annotation[encoding="application/x-tex"]'
+    )
+    const latex = annotation?.textContent?.trim()
+    if (latex) {
+      const marker = doc.createElement(isDisplay ? "div" : "span")
+      marker.setAttribute("data-math-type", isDisplay ? "block" : "inline")
+      marker.textContent = latex
+      el.replaceWith(marker)
+      modified = true
+    }
+  }
+
+  // MathJax v3: <mjx-container>
+  for (const el of Array.from(doc.querySelectorAll("mjx-container"))) {
+    const isDisplay = el.getAttribute("display") === "true"
+    const annotation = el.querySelector(
+      'annotation[encoding="application/x-tex"]'
+    )
+    const latex = annotation?.textContent?.trim()
+    if (latex) {
+      const marker = doc.createElement(isDisplay ? "div" : "span")
+      marker.setAttribute("data-math-type", isDisplay ? "block" : "inline")
+      marker.textContent = latex
+      el.replaceWith(marker)
+      modified = true
+    }
+  }
+
+  // MathJax v2: <script type="math/tex"> + rendered spans
+  for (const el of Array.from(
+    doc.querySelectorAll('script[type^="math/tex"]')
+  )) {
+    const type = el.getAttribute("type") ?? ""
+    const isDisplay = type.includes("mode=display")
+    const latex = el.textContent?.trim()
+    if (latex) {
+      const marker = doc.createElement(isDisplay ? "div" : "span")
+      marker.setAttribute("data-math-type", isDisplay ? "block" : "inline")
+      marker.textContent = latex
+      el.replaceWith(marker)
+      modified = true
+    }
+  }
+  // Remove MathJax v2 rendered spans (duplicates of the scripts above)
+  for (const el of Array.from(
+    doc.querySelectorAll("span.MathJax, span.MathJax_Display")
+  )) {
+    el.remove()
+    modified = true
+  }
+
+  // Native MathML (standalone, not inside KaTeX/MathJax)
+  for (const el of Array.from(doc.querySelectorAll("math"))) {
+    if (el.closest(".katex, mjx-container, .MathJax")) continue
+    const isDisplay = el.getAttribute("display") === "block"
+    const annotation = el.querySelector(
+      'annotation[encoding="application/x-tex"]'
+    )
+    const latex = annotation?.textContent?.trim()
+    if (latex) {
+      const marker = doc.createElement(isDisplay ? "div" : "span")
+      marker.setAttribute("data-math-type", isDisplay ? "block" : "inline")
+      marker.textContent = latex
+      el.replaceWith(marker)
+      modified = true
+    }
+  }
+
+  if (!modified) return html
+  return doc.body?.outerHTML || html
 }
 
 // 从 Markdown 内容中提取图片信息
