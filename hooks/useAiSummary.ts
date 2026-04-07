@@ -10,9 +10,11 @@ import { generateSummary, getAiConfig } from "~utils/ai-service"
 import { useI18n } from "~utils/i18n"
 import { debugLog } from "~utils/logger"
 import { processTemplate } from "~utils/template"
+import { isContentScript } from "~utils/theme/runtime-env"
 
 import useAiPrompt from "./useAiPrompt"
 import useHistorySaver, { type UsageInfo } from "./useHistorySaver"
+import usePortStream from "./usePortStream"
 import useStreamProcessor from "./useStreamProcessor"
 
 export interface UseAiSummaryResult {
@@ -57,6 +59,13 @@ export const useAiSummary = (
   const { streamingText, usage, resetStream, processStream, setUsage } =
     useStreamProcessor()
 
+  const {
+    streamingText: portStreamingText,
+    usage: portUsage,
+    startStream,
+    resetStream: resetPortStream
+  } = usePortStream()
+
   const { saveToHistory } = useHistorySaver()
 
   const generateSummaryText = useCallback(async () => {
@@ -87,6 +96,7 @@ export const useAiSummary = (
       setIsLoading(true)
       setResult(null)
       resetStream()
+      resetPortStream()
 
       // Process template variables in prompt
       let processedPrompt = customPrompt
@@ -95,7 +105,33 @@ export const useAiSummary = (
       }
       debugLog("processedPrompt", processedPrompt)
 
-      if (isMobile) {
+      if (isContentScript()) {
+        // Content script: relay through background port to avoid CORS
+        debugLog("Content script detected, using port relay")
+
+        const { text, usage: relayUsage } = await startStream(
+          content,
+          processedPrompt
+        )
+
+        fullText = text
+        setSummary(fullText)
+        onSummaryGenerated?.(fullText)
+
+        if (relayUsage) {
+          setUsage(relayUsage)
+          currentUsage = relayUsage
+        }
+
+        await saveToHistory({
+          text: fullText,
+          customPrompt,
+          scrapedData,
+          usage: currentUsage
+        })
+        savedToHistory = true
+        setError(null)
+      } else if (isMobile) {
         // Mobile: use non-streaming generation
         debugLog("Mobile device detected, using direct generation")
 
@@ -213,15 +249,23 @@ export const useAiSummary = (
     usage,
     saveToHistory,
     resetStream,
+    resetPortStream,
+    startStream,
     processStream,
     setUsage,
     t
   ])
 
+  // In content script context, use port streaming text; otherwise use direct streaming text
+  const activeStreamingText = isContentScript()
+    ? portStreamingText
+    : streamingText
+  const activeUsage = isContentScript() ? portUsage : usage
+
   return {
     result,
     summary,
-    streamingText,
+    streamingText: activeStreamingText,
     isLoading,
     error,
     customPrompt,
@@ -229,7 +273,7 @@ export const useAiSummary = (
     systemPrompt,
     generateSummaryText,
     saveAsDefaultPrompt,
-    usage,
+    usage: activeUsage,
     modelId
   }
 }
