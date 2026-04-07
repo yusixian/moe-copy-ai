@@ -29,6 +29,7 @@ Moe Copy AI 是一个基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器�
 ![example](/assets/docs/example.webp)
 ![example-2](/assets/docs/example-2.webp)
 ![example-3](/assets/docs/example-3.webp)
+![math-formula](/assets/docs/math-formula.webp)
 
 ### 弹窗模式 (Popup)
 
@@ -44,6 +45,7 @@ Moe Copy AI 是一个基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器�
 - **双版本输出**:
   - 原始格式版: 保留 Markdown 格式和原始换行，适合需要保留格式的场景
   - 紧凑版: 清理多余空格和换行，使文本更加精简，优化 AI 模型输入
+- **数学公式支持**: 自动识别并提取网页中的数学公式（KaTeX、MathJax v2/v3、MathML），转换为标准 LaTeX 格式（`$...$` / `$$...$$`），并支持渲染预览
 - **智能清理**: 自动去除干扰元素、多余空白和无意义内容
 - **字数与 Token 统计**: 显示内容实际字数和估算的 AI 模型 token 数量，分词展示（使用 [gpt-tokenizer](https://github.com/niieani/gpt-tokenizer)）
 - **移动端适配**: 响应式设计，支持移动设备使用
@@ -129,6 +131,7 @@ Moe Copy AI 是一个基于 Plasmo 框架，使用 xsAI SDK 开发的浏览器�
 - [x] 内容提取（多格式输出）
 - [x] ZIP 打包导出
 - [x] i18n 国际化
+- [x] 数学公式提取与渲染（KaTeX / MathJax / MathML）
 - [ ] 完善工程化 & CI（一开始只是想让 ai 野蛮发展）
 - [ ] 简单文档站
 - [ ] 增加图片的 AI OCR 功能

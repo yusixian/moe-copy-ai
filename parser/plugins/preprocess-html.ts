@@ -8,14 +8,13 @@ function resolveUrl(value: string, baseUrl?: string): string {
 }
 
 export function preprocessHtml(html: string, baseUrl?: string): string {
-  // Browser environment: use DOMParser to clean.
+  // Browser environment: use DOMParser for robust HTML handling.
   if (typeof DOMParser !== "undefined") {
     const parser = new DOMParser()
     const doc = parser.parseFromString(html, "text/html")
 
     if (baseUrl) {
-      const images = doc.querySelectorAll("img[src]")
-      for (const image of Array.from(images)) {
+      for (const image of Array.from(doc.querySelectorAll("img[src]"))) {
         const src = image.getAttribute("src")
         if (src) {
           image.setAttribute("src", resolveUrl(src, baseUrl))
@@ -23,19 +22,23 @@ export function preprocessHtml(html: string, baseUrl?: string): string {
       }
     }
 
-    const unwantedTags = ["script", "style", "noscript", "svg", "meta", "link"]
-    for (const tag of unwantedTags) {
-      const elements = doc.querySelectorAll(tag)
-      for (const el of Array.from(elements)) {
-        el.remove()
+    // DOMParser may move <script> to <head>. Downstream HAST plugins
+    // (rehypeExtractMath, rehypeCleanup) need them in the tree, so
+    // move all head scripts back to <body> before serializing.
+    if (doc.head && doc.body) {
+      const firstChild = doc.body.firstChild
+      for (const script of Array.from(doc.head.querySelectorAll("script"))) {
+        doc.body.insertBefore(script, firstChild)
       }
     }
 
-    const allElements = doc.querySelectorAll("*")
-    for (const el of Array.from(allElements)) {
+    // Remove Plasmo extension elements
+    for (const el of Array.from(doc.querySelectorAll("*"))) {
+      // el.className can be an SVGAnimatedString; use getAttribute
+      const classAttr = el.getAttribute("class") ?? ""
       if (
         el.id?.toLowerCase().includes("plasmo") ||
-        el.className?.toLowerCase().includes("plasmo") ||
+        classAttr.toLowerCase().includes("plasmo") ||
         el.getAttribute("data-plasmo-id") ||
         el.tagName.toLowerCase().includes("plasmo")
       ) {
@@ -46,7 +49,7 @@ export function preprocessHtml(html: string, baseUrl?: string): string {
     return doc.body ? doc.body.innerHTML : html
   }
 
-  // Node.js environment: lightweight cleanup for tests.
+  // Node.js fallback: regex-based cleanup
   let cleanedHtml = html
   if (baseUrl) {
     cleanedHtml = cleanedHtml.replace(
@@ -61,8 +64,6 @@ export function preprocessHtml(html: string, baseUrl?: string): string {
   }
 
   return cleanedHtml
-    .replace(/<(script|style|noscript|svg|meta|link)[^>]*>[\s\S]*?<\/\1>/gi, "")
-    .replace(/<(script|style|noscript|svg|meta|link)[^>]*\/>/gi, "")
     .replace(
       /<[^>]*(?:id|class|data-plasmo-id)="[^"]*plasmo[^"]*"[^>]*>[\s\S]*?<\/[^>]+>/gi,
       ""

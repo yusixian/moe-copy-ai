@@ -1,13 +1,20 @@
-import { marked } from "marked"
+import katex from "katex"
+import MarkdownIt from "markdown-it"
+import texmath from "markdown-it-texmath"
 
-// Configure marked: GFM enabled (default), breaks off
-marked.use({ gfm: true, breaks: false })
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true
+}).use(texmath, {
+  engine: katex,
+  delimiters: "dollars"
+})
 
 /**
  * Render markdown string to HTML.
- * `as string` is safe because no async extensions are registered.
  */
 export function renderMarkdown(content: string): string {
   if (!content) return ""
-  return marked.parse(content) as string
+  return md.render(content)
 }

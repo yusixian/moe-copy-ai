@@ -29,6 +29,7 @@ Available on [Chrome Web Store](https://chromewebstore.google.com/detail/moe-cop
 ![example](/assets/docs/example.webp)
 ![example-2](/assets/docs/example-2.webp)
 ![example-3](/assets/docs/example-3.webp)
+![math-formula](/assets/docs/math-formula.webp)
 
 ### Popup Mode
 
@@ -44,6 +45,7 @@ Available on [Chrome Web Store](https://chromewebstore.google.com/detail/moe-cop
 - **Dual Output Formats**:
   - Original Format: Preserves Markdown formatting and original line breaks
   - Compact Version: Cleans excess whitespace and line breaks, optimized for AI model input
+- **Math Formula Support**: Automatically detects and extracts math formulas from web pages (KaTeX, MathJax v2/v3, MathML), converts to standard LaTeX format (`$...$` / `$$...$$`), and supports rendered preview
 - **Smart Cleanup**: Automatically removes distracting elements, excess whitespace, and meaningless content
 - **Word & Token Count**: Shows actual word count and estimated AI model token count with tokenization display (using [gpt-tokenizer](https://github.com/niieani/gpt-tokenizer))
 - **Mobile Responsive**: Responsive design supporting mobile devices
@@ -129,6 +131,7 @@ A brand new side panel interface for more efficient workflows.
 - [x] Content extraction (multiple output formats)
 - [x] ZIP export
 - [x] Internationalization of i18n
+- [x] Math formula extraction and rendering (KaTeX / MathJax / MathML)
 - [ ] Improve engineering & CI (initially let AI grow wild)
 - [ ] Simple documentation site
 - [ ] Add image AI OCR feature
